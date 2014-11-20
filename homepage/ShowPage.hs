@@ -18,15 +18,17 @@ import Tools
 showPage :: (HandleLike h, MonadIO (HandleMonad h)) => h -> HandleMonad h ()
 showPage p = do
 	req <- getRequest p
-	let	Path fp_ = requestPath req
+	let	Path fp__ = requestPath req
 --		fp = if fp_ == "/" then "index.html" else fp_
-		fp = processIndex $ BSC.unpack fp_
+		fp_ = takeWhile (/= '?') $ BSC.unpack fp__
+		fp = processIndex fp_
 		ex = takeExtension $ fp
 		stp = if ex == ".css" then Css else Html
 		tp = ContentType Text stp []
+	liftIO $ print fp__
 	as <- liftIO . readFile $ "static/" ++ fp
 	let	page = if ex == ".html"
-			then uncurry (makePage $ BSC.unpack fp_) $ span (/= '\n') as
+			then uncurry (makePage fp_) $ span (/= '\n') as
 			else as
 	putResponse p $ (responseH p $
 		LBS.fromChunks [BSU.fromString page]) { responseContentType = tp }
