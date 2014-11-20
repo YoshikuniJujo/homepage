@@ -5,6 +5,7 @@ module ShowPage (showPage) where
 import "monads-tf" Control.Monad.Trans
 import Data.HandleLike
 import Data.Pipe
+import Data.Pipe.List
 import System.FilePath
 import Network.TigHTTP.Server
 import Network.TigHTTP.Types
@@ -26,6 +27,7 @@ showPage p = do
 		stp = if ex == ".css" then Css else Html
 		tp = ContentType Text stp []
 	liftIO $ print fp__
+	getPostData req >>= liftIO . print
 	as <- liftIO . readFile $ "static/" ++ fp
 	let	page = if ex == ".html"
 			then uncurry (makePage fp_) $ span (/= '\n') as
@@ -35,3 +37,7 @@ showPage p = do
 
 responseH :: HandleLike h => h -> LBS.ByteString -> Response Pipe h
 responseH = const response
+
+getPostData :: HandleLike h => Request h -> HandleMonad h (Maybe [BSC.ByteString])
+getPostData (RequestPost _ _ Post { postBody = pb }) = runPipe $ pb =$= toList
+getPostData _ = return Nothing
