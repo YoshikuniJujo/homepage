@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+import Control.Applicative
 import Control.Monad
 import Control.Concurrent
 import Data.HandleLike
@@ -11,6 +12,7 @@ import Network.TigHTTP.Server
 import Network.TigHTTP.Types
 
 import System.FilePath
+import System.Posix.User
 
 import qualified Data.ByteString.Char8 as BSC
 import qualified Data.ByteString.UTF8 as BSU
@@ -21,6 +23,10 @@ import Tools
 main :: IO ()
 main = do
 	soc <- listenOn $ PortNumber 80
+	uid <- userID <$> getUserEntryForName "homepage"
+	gid <- groupID <$> getGroupEntryForName "homepage"
+	setGroupID gid
+	setUserID uid
 	forever $ do
 		(h, x, y) <- accept soc
 		print h

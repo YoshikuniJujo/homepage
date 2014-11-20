@@ -9,6 +9,7 @@ import Data.Pipe
 import System.IO
 import System.Environment
 import System.FilePath
+import System.Posix.User
 import Network
 import Network.PeyoTLS.Server
 import Network.PeyoTLS.ReadFile
@@ -30,6 +31,10 @@ main = do
 	c <- readCertificateChain [d ++ "/2014_only_skami.cert", d ++ "/owl_mid.pem"]
 	g0 <- cprgCreate <$> createEntropyPool :: IO SystemRNG
 	soc <- listenOn $ PortNumber 443
+	uid <- userID <$> getUserEntryForName "homepage"
+	gid <- groupID <$> getGroupEntryForName "homepage"
+	setGroupID gid
+	setUserID uid
 	void . (`runStateT` g0) . forever $ do
 		(h, _, _) <- liftIO $ accept soc
 		g <- StateT $ return . cprgFork
