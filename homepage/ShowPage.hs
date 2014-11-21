@@ -11,15 +11,23 @@ import Data.URLEncoded
 import System.FilePath
 import Network.TigHTTP.Server
 import Network.TigHTTP.Types
+import Network.Socket
+import Network.Mail.Mime (Mail)
+import Network.Mail.SMTP hiding (Response)
 
+import qualified Data.Text as T
+import qualified Data.Text.Lazy as LT
 import qualified Data.ByteString.Char8 as BSC
 import qualified Data.ByteString.UTF8 as BSU
 import qualified Data.ByteString.Lazy as LBS
 
 import Tools
 
+import System.Environment
+
 showPage :: (HandleLike h, MonadIO (HandleMonad h)) => h -> HandleMonad h ()
 showPage p = do
+	_ : addr : _ <- liftIO getArgs
 	req <- getRequest p
 	let	Path fp__ = requestPath req
 		fp_ = takeWhile (/= '?') $ BSC.unpack fp__
@@ -32,7 +40,11 @@ showPage p = do
 	liftIO $ case ret of
 		Just r -> do
 			ue <- importString $ BSC.unpack r
-			maybe (return ()) putStrLn $ ue %! ("nazo" :: String)
+			maybe (return ()) (\nazo -> do
+					putStrLn nazo
+					mailTo "Administer" (T.pack addr)
+						"nazo" $ LT.pack nazo
+				) $ ue %! ("nazo" :: String)
 		_ -> return ()
 --	getPostData req >>= liftIO . maybe (return ()) (print . BSC.concat)
 	as <- liftIO . readFile $ "static/" ++ fp
@@ -57,3 +69,8 @@ getPostData _ = return Nothing
 myTail :: BSC.ByteString -> BSC.ByteString
 myTail "" = ""
 myTail bs = BSC.tail bs
+
+mailTo :: T.Text -> T.Text -> T.Text -> LT.Text -> IO ()
+mailTo n a t b = sendMail "skami.iocikun.jp" $ simpleMail
+	(Address (Just "Homepage") "tatsuya@skami.iocikun.jp")
+	[Address (Just n) a] [] [] t [plainTextPart b]
