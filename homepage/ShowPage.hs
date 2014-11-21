@@ -2,10 +2,12 @@
 
 module ShowPage (showPage) where
 
+import Control.Monad
 import "monads-tf" Control.Monad.Trans
 import Data.HandleLike
 import Data.Pipe
 import Data.Pipe.List
+import Data.URLEncoded
 import System.FilePath
 import Network.TigHTTP.Server
 import Network.TigHTTP.Types
@@ -26,7 +28,13 @@ showPage p = do
 		stp = if ex == ".css" then Css else Html
 		tp = ContentType Text stp []
 	liftIO $ print fp__
-	getPostData req >>= liftIO . maybe (return ()) (mapM_ $ print)
+	ret <- (fmap BSC.concat) `liftM` getPostData req
+	liftIO $ case ret of
+		Just r -> do
+			ue <- importString $ BSC.unpack r
+			maybe (return ()) putStrLn $ ue %! ("nazo" :: String)
+		_ -> return ()
+--	getPostData req >>= liftIO . maybe (return ()) (print . BSC.concat)
 	as <- liftIO . readFile $ "static/" ++ fp
 	let	page = if ex == ".html"
 			then uncurry (makePage fp_) $ span (/= '\n') as
