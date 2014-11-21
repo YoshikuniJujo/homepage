@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, PackageImports #-}
+{-# LANGUAGE FlexibleContexts, PackageImports, OverloadedStrings #-}
 
 module ShowPage (showPage) where
 
@@ -20,14 +20,13 @@ showPage :: (HandleLike h, MonadIO (HandleMonad h)) => h -> HandleMonad h ()
 showPage p = do
 	req <- getRequest p
 	let	Path fp__ = requestPath req
---		fp = if fp_ == "/" then "index.html" else fp_
 		fp_ = takeWhile (/= '?') $ BSC.unpack fp__
 		fp = processIndex fp_
 		ex = takeExtension $ fp
 		stp = if ex == ".css" then Css else Html
 		tp = ContentType Text stp []
 	liftIO $ print fp__
-	getPostData req >>= liftIO . print
+	getPostData req >>= liftIO . maybe (return ()) (mapM_ $ print)
 	as <- liftIO . readFile $ "static/" ++ fp
 	let	page = if ex == ".html"
 			then uncurry (makePage fp_) $ span (/= '\n') as
@@ -40,4 +39,13 @@ responseH = const response
 
 getPostData :: HandleLike h => Request h -> HandleMonad h (Maybe [BSC.ByteString])
 getPostData (RequestPost _ _ Post { postBody = pb }) = runPipe $ pb =$= toList
+getPostData (RequestGet (Path p) _ _)
+	| BSC.null rtn = return Nothing
+	| otherwise = return . Just . (: []) $ myTail rtn
+	where
+	rtn = BSC.dropWhile (/= '?') p
 getPostData _ = return Nothing
+
+myTail :: BSC.ByteString -> BSC.ByteString
+myTail "" = ""
+myTail bs = BSC.tail bs
