@@ -36,6 +36,20 @@ showPage p = do
 		stp = if ex == ".css" then Css else Html
 		tp = ContentType Text stp []
 	liftIO $ print fp__
+
+	mailFromForm req addr
+
+--	getPostData req >>= liftIO . maybe (return ()) (print . BSC.concat)
+	as <- liftIO . readFile $ "static/" ++ fp
+	let	page = if ex == ".html"
+			then uncurry (makePage fp_) $ span (/= '\n') as
+			else as
+	putResponse p $ (responseH p $
+		LBS.fromChunks [BSU.fromString page]) { responseContentType = tp }
+
+mailFromForm :: (HandleLike h, MonadIO (HandleMonad h)) =>
+	Request h -> String -> HandleMonad h ()
+mailFromForm req addr = do
 	ret <- (fmap BSC.concat) `liftM` getPostData req
 	liftIO $ case ret of
 		Just r -> do
@@ -44,15 +58,14 @@ showPage p = do
 					putStrLn nazo
 					mailTo "Administer" (T.pack addr)
 						"nazo" $ LT.pack nazo
-				) $ ue %! ("nazo" :: String)
+				) $ makeMailBody ue -- ue %! ("address" :: String)
 		_ -> return ()
---	getPostData req >>= liftIO . maybe (return ()) (print . BSC.concat)
-	as <- liftIO . readFile $ "static/" ++ fp
-	let	page = if ex == ".html"
-			then uncurry (makePage fp_) $ span (/= '\n') as
-			else as
-	putResponse p $ (responseH p $
-		LBS.fromChunks [BSU.fromString page]) { responseContentType = tp }
+
+makeMailBody :: URLEncoded -> Maybe String
+makeMailBody ue = case (ue %! ("address" :: String), ue %! ("body" :: String)) of
+	(Just addr, Just bdy) -> Just $
+		"メールアドレス: " ++ addr ++ "\n\n内容:\n" ++ bdy
+	_ -> Nothing
 
 responseH :: HandleLike h => h -> LBS.ByteString -> Response Pipe h
 responseH = const response
