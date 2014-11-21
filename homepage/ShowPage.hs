@@ -62,10 +62,12 @@ mailFromForm req addr = do
 		_ -> return ()
 
 makeMailBody :: URLEncoded -> Maybe String
-makeMailBody ue = case (ue %! ("address" :: String), ue %! ("body" :: String)) of
-	(Just addr, Just bdy) -> Just $
-		"メールアドレス: " ++ addr ++ "\n\n内容:\n" ++ bdy
-	_ -> Nothing
+makeMailBody ue =
+	case (ue %! ("name" :: String), ue %! ("address" :: String),
+			ue %! ("body" :: String)) of
+		(Just nm, Just addr, Just bdy) -> Just $ "お名前: " ++ nm ++
+			"\nメールアドレス: " ++ addr ++ "\n\n内容:\n" ++ bdy
+		_ -> Nothing
 
 responseH :: HandleLike h => h -> LBS.ByteString -> Response Pipe h
 responseH = const response
