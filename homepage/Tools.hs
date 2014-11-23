@@ -23,6 +23,7 @@ makePage fp mt ttl bdy = "<!DOCTYPE html><html lang=\"UTF-8\"><head>"
 	++ "<div align=\"right\"><small>更新日: <time>"
 		++ show (utcToZonedTime japan mt)
 		++ "</time></small></div>"
+	++ "<div align=\"right\"><small>文責: 重城良国</small></div>"
 	++ "<h1>" ++ ttl ++ "</h1>"
 	++ filter (/= '\n') bdy
 	++ "</body></html>"
