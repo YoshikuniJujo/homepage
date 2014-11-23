@@ -8,6 +8,7 @@ import Data.HandleLike
 import Data.Pipe
 import Data.Pipe.List
 import Data.URLEncoded
+import System.Directory
 import System.FilePath
 import Network.TigHTTP.Server
 import Network.TigHTTP.Types
@@ -41,8 +42,10 @@ showPage p = do
 
 --	getPostData req >>= liftIO . maybe (return ()) (print . BSC.concat)
 	as <- liftIO . readFile $ "static/" ++ fp
-	let	page = if ex == ".html"
-			then uncurry (makePage fp_) $ span (/= '\n') as
+	t <- liftIO . getModificationTime $ "static/" ++ fp
+	let	
+		page = if ex == ".html"
+			then uncurry (makePage fp_ t) $ span (/= '\n') as
 			else as
 	putResponse p $ (responseH p $
 		LBS.fromChunks [BSU.fromString page]) { responseContentType = tp }
