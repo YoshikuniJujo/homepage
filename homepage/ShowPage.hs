@@ -47,8 +47,14 @@ showPage p = do
 		page = if ex == ".html"
 			then uncurry (makePage fp_ t) $ span (/= '\n') as
 			else as
-	putResponse p $ (responseH p $
-		LBS.fromChunks [BSU.fromString page]) { responseContentType = tp }
+		cl = if ex == ".html"
+			then Nothing
+			else Just . ContentLength $ length page
+	liftIO $ print "debug: here"
+	putResponse p $ (responseH p $ LBS.fromChunks [BSU.fromString page]) {
+		responseContentType = tp,
+		responseContentLength = cl }
+	liftIO $ print "debug: end"
 
 mailFromForm :: (HandleLike h, MonadIO (HandleMonad h)) =>
 	Request h -> String -> HandleMonad h ()

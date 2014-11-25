@@ -5,6 +5,7 @@ import Control.Monad
 import Control.Concurrent
 import Network
 
+import System.IO
 import System.Posix.User
 
 import ShowPage
@@ -18,7 +19,9 @@ main = do
 	setUserID uid
 	forever $ do
 		(h, x, y) <- accept soc
-		print h
-		print x
-		print y
-		void . forkIO $ showPage h
+		void . forkIO $ do
+			print h
+			print x
+			print y
+			showPage h
+			hClose h
