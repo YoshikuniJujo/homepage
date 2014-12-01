@@ -8,6 +8,7 @@ import Data.HandleLike
 import Data.Pipe
 import Data.Pipe.List
 import Data.URLEncoded
+import System.IO
 import System.Directory
 import System.FilePath
 import Network.TigHTTP.Server
@@ -35,13 +36,19 @@ showPage p = do
 		fp = processIndex fp_
 		ex = takeExtension $ fp
 		stp = if ex == ".css" then Css else Html
-		tp = ContentType Text stp []
+		tp = if ex == ".ico"
+			then ContentType
+				(TypeRaw "image")
+				(SubtypeRaw "vnd.microsoft.icon") []
+			else ContentType Text stp []
 	liftIO $ print fp__
 
 	mailFromForm req addr
 
 --	getPostData req >>= liftIO . maybe (return ()) (print . BSC.concat)
-	as <- liftIO . readFile $ "static/" ++ fp
+	as <- liftIO $ if ex == ".ico"
+		then readBinaryFile $ "static/" ++ fp
+		else readFile $ "static/" ++ fp
 	t <- liftIO . getModificationTime $ "static/" ++ fp
 	let	
 		page = if ex == ".html"
@@ -50,11 +57,17 @@ showPage p = do
 		cl = if ex == ".html"
 			then Nothing
 			else Just . ContentLength $ length page
+		page' = if ex == ".ico"
+			then LBS.fromChunks [BSC.pack page]
+			else LBS.fromChunks [BSU.fromString page]
 	liftIO $ print "debug: here"
-	putResponse p $ (responseH p $ LBS.fromChunks [BSU.fromString page]) {
+	putResponse p $ (responseH p page') {
 		responseContentType = tp,
 		responseContentLength = cl }
 	liftIO $ print "debug: end"
+
+readBinaryFile :: FilePath -> IO String
+readBinaryFile path = openBinaryFile path ReadMode >>= hGetContents
 
 mailFromForm :: (HandleLike h, MonadIO (HandleMonad h)) =>
 	Request h -> String -> HandleMonad h ()
