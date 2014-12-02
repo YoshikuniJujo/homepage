@@ -36,17 +36,20 @@ showPage p = do
 		fp = processIndex fp_
 		ex = takeExtension $ fp
 		stp = if ex == ".css" then Css else Html
-		tp = if ex == ".ico"
-			then ContentType
+		tp = case ex of
+			".ico" -> ContentType
 				(TypeRaw "image")
 				(SubtypeRaw "vnd.microsoft.icon") []
-			else ContentType Text stp []
+			".png" -> ContentType
+				(TypeRaw "image")
+				(SubtypeRaw "png") []
+			_ -> ContentType Text stp []
 	liftIO $ print fp__
 
 	mailFromForm req addr
 
 --	getPostData req >>= liftIO . maybe (return ()) (print . BSC.concat)
-	as <- liftIO $ if ex == ".ico"
+	as <- liftIO $ if ex `elem` [".ico", ".png"]
 		then readBinaryFile $ "static/" ++ fp
 		else readFile $ "static/" ++ fp
 	t <- liftIO . getModificationTime $ "static/" ++ fp
@@ -57,9 +60,11 @@ showPage p = do
 		cl = if ex == ".html"
 			then Nothing
 			else Just . ContentLength $ length page
-		page' = if ex == ".ico"
-			then LBS.fromChunks [BSC.pack page]
-			else LBS.fromChunks [BSU.fromString page]
+		page' = case (ex, take 7 fp) of
+			(".ico", _) -> LBS.fromChunks [BSC.pack page]
+			(".png", _) -> LBS.fromChunks [BSC.pack page]
+			(_, "/google") -> LBS.fromChunks [BSC.pack as]
+			_ -> LBS.fromChunks [BSU.fromString page]
 	liftIO $ print "debug: here"
 	putResponse p $ (responseH p page') {
 		responseContentType = tp,
