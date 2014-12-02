@@ -1,5 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+module Main (main) where
+
 import Control.Applicative ((<$>), (<*>), (<*))
 import Control.Monad (void, forever)
 import Control.Concurrent (forkIO)
