@@ -1,27 +1,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import Control.Applicative
-import Control.Monad
-import Control.Concurrent
-import Network
+import Control.Applicative ((<$>), (<*>), (<*))
+import Control.Monad (void, forever)
+import Control.Concurrent (forkIO)
+import System.IO (hClose)
+import Network (PortID(..), listenOn, accept)
 
-import System.IO
-import System.Posix.User
-
-import ShowPage
+import ShowPage (showPage)
+import Tools (setHomepageID)
 
 main :: IO ()
 main = do
-	soc <- listenOn $ PortNumber 80
-	uid <- userID <$> getUserEntryForName "homepage"
-	gid <- groupID <$> getGroupEntryForName "homepage"
-	setGroupID gid
-	setUserID uid
-	forever $ do
-		(h, x, y) <- accept soc
-		void . forkIO $ do
-			print h
-			print x
-			print y
-			showPage h
-			hClose h
+	soc <- listenOn (PortNumber 80) <* setHomepageID
+	forever $ accept soc >>=
+		void . forkIO . ((>>) <$> showPage <*> hClose) . (\(h, _, _) -> h)

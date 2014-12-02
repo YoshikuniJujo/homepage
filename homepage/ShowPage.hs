@@ -13,8 +13,8 @@ import System.Directory
 import System.FilePath
 import Network.TigHTTP.Server
 import Network.TigHTTP.Types
-import Network.Socket
-import Network.Mail.Mime (Mail)
+-- import Network.Socket
+-- import Network.Mail.Mime (Mail)
 import Network.Mail.SMTP hiding (Response)
 
 import qualified Data.Text as T
@@ -34,7 +34,7 @@ showPage p = do
 	let	Path fp__ = requestPath req
 		fp_ = takeWhile (/= '?') $ BSC.unpack fp__
 		fp = processIndex fp_
-		ex = takeExtension $ fp
+		ex = takeExtension fp
 		stp = if ex == ".css" then Css else Html
 		tp = case ex of
 			".ico" -> ContentType
@@ -65,11 +65,9 @@ showPage p = do
 			(".png", _) -> LBS.fromChunks [BSC.pack page]
 			(_, "/google") -> LBS.fromChunks [BSC.pack as]
 			_ -> LBS.fromChunks [BSU.fromString page]
-	liftIO $ print "debug: here"
 	putResponse p $ (responseH p page') {
 		responseContentType = tp,
 		responseContentLength = cl }
-	liftIO $ print "debug: end"
 
 readBinaryFile :: FilePath -> IO String
 readBinaryFile path = openBinaryFile path ReadMode >>= hGetContents
@@ -77,7 +75,7 @@ readBinaryFile path = openBinaryFile path ReadMode >>= hGetContents
 mailFromForm :: (HandleLike h, MonadIO (HandleMonad h)) =>
 	Request h -> String -> HandleMonad h ()
 mailFromForm req addr = do
-	ret <- (fmap BSC.concat) `liftM` getPostData req
+	ret <- fmap BSC.concat `liftM` getPostData req
 	liftIO $ case ret of
 		Just r -> do
 			ue <- importString $ BSC.unpack r

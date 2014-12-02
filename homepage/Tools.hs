@@ -1,10 +1,14 @@
 module Tools (
 	processIndex,
-	makePage
+	makePage,
+	setHomepageID
 	) where
 
 import System.FilePath
 import Data.Time
+import System.Posix.User (
+	getUserEntryForName, getGroupEntryForName,
+	userID, groupID, setUserID, setGroupID)
 
 processIndex :: FilePath -> FilePath
 processIndex fp_ = if null $ takeBaseName fp then fp </> "index.html" else fp
@@ -47,3 +51,8 @@ last' :: [String] -> String
 last' [] = ""
 last' [_] = "top"
 last' xs = last xs
+
+setHomepageID :: IO ()
+setHomepageID = do
+	getGroupEntryForName "homepage" >>= setGroupID . groupID
+	getUserEntryForName "homepage" >>= setUserID . userID
