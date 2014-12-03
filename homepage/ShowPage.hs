@@ -2,19 +2,21 @@
 
 module ShowPage (showPage) where
 
-import Control.Monad
-import "monads-tf" Control.Monad.Trans
-import Data.HandleLike
-import Data.Pipe
-import Data.Pipe.List
-import Data.URLEncoded
-import System.IO
-import System.Environment
-import System.Directory
-import System.FilePath
-import Network.TigHTTP.Server
-import Network.TigHTTP.Types
-import Network.Mail.SMTP hiding (Response)
+import Control.Monad (liftM)
+import "monads-tf" Control.Monad.Trans (MonadIO, liftIO)
+import Data.HandleLike (HandleLike, HandleMonad)
+import Data.Pipe (Pipe, runPipe, (=$=))
+import Data.Pipe.List (toList)
+import Data.URLEncoded (URLEncoded, importString, (%!))
+import System.IO (IOMode(..), openBinaryFile, hGetContents)
+import System.Environment (getArgs)
+import System.Directory (getModificationTime)
+import System.FilePath (takeExtension)
+import Network.TigHTTP.Server (getRequest, requestPath, putResponse, response)
+import Network.TigHTTP.Types (
+	Request(..), Path(..), Post(..), Response(..),
+	ContentType(..), Type(..), Subtype(..), ContentLength(..))
+import Network.Mail.SMTP (Address(..), sendMail, simpleMail, plainTextPart)
 
 import qualified Data.ByteString.Char8 as BSC
 import qualified Data.ByteString.UTF8 as BSU
@@ -22,7 +24,7 @@ import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as LT
 
-import Tools
+import Tools (makePage, processIndex)
 
 showPage :: (HandleLike h, MonadIO (HandleMonad h)) => h -> HandleMonad h ()
 showPage p = do
@@ -45,7 +47,6 @@ showPage p = do
 
 	mailFromForm req addr
 
---	getPostData req >>= liftIO . maybe (return ()) (print . BSC.concat)
 	as <- liftIO $ if ex `elem` [".ico", ".png"]
 		then readBinaryFile $ "static/" ++ fp
 		else readFile $ "static/" ++ fp
@@ -80,7 +81,7 @@ mailFromForm req addr = do
 					putStrLn nazo
 					mailTo "Administer" (T.pack addr)
 						"nazo" $ LT.pack nazo
-				) $ makeMailBody ue -- ue %! ("address" :: String)
+				) $ makeMailBody ue
 		_ -> return ()
 
 makeMailBody :: URLEncoded -> Maybe String
