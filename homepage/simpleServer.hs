@@ -7,6 +7,7 @@ import Control.Monad (void, forever)
 import "monads-tf" Control.Monad.State (StateT(..), runStateT, liftIO)
 import Control.Concurrent (forkIO)
 import Data.HandleLike (hlClose)
+import System.Environment (getArgs)
 import Network (PortID(..), listenOn, accept)
 import Network.PeyoTLS.Server (CipherSuite, run, open)
 import Network.PeyoTLS.ReadFile (readKey, readCertificateChain)
@@ -35,6 +36,7 @@ cipherSuites = [
 
 main :: IO ()
 main = do
+	addr : _ <- getArgs
 	kc <- (,) <$> readKey keyFile <*> readCertificateChain certFile
 	soc <- listenOn (PortNumber 443) <* setHomepageID
 	g0 :: SystemRNG <- cprgCreate <$> createEntropyPool
@@ -43,4 +45,4 @@ main = do
 		liftIO $ do
 			(h, _, _) <- accept soc
 			forkIO . (`run` g) $ open h cipherSuites [kc] Nothing >>=
-				(>>) <$> showPage <*> hlClose
+				(>>) <$> showPage addr <*> hlClose
