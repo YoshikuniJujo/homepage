@@ -9,8 +9,7 @@ import System.Directory (getModificationTime)
 import System.FilePath (takeExtension, takeBaseName, (</>), addTrailingPathSeparator)
 import Network.TigHTTP.Server (getRequest, requestPath, putResponse, response)
 import Network.TigHTTP.Types (
-	Path(..), Response(..),
-	ContentType(..), Type(..), Subtype(..), ContentLength(..))
+	Path(..), Response(..), ContentType(..), Type(..), Subtype(..))
 
 import qualified Data.ByteString.Char8 as BSC
 import qualified Data.ByteString.UTF8 as BSU
@@ -25,45 +24,45 @@ showPage ma p = do
 	req <- getRequest p
 	liftIO . print $ requestPath req
 	getPostData req >>= liftIO . maybe (return ()) (mailFromBS ma)
-	(page, tp, cl) <- liftIO . makeContents . takeWhile (/= '?')
+	(page, tp) <- liftIO . makeContents . takeWhile (/= '?')
 		. BSC.unpack . (\(Path f) -> f) $ requestPath req
-	putResponse p (responseH p $ LBS.fromChunks [page]) {
-		responseContentType = tp,
-		responseContentLength = cl }
+	putResponse p
+		(responseH p $ LBS.fromChunks [page]) { responseContentType = tp }
 	where
 	responseH :: HandleLike h => h -> LBS.ByteString -> Response Pipe h
 	responseH = const response
 
-ico, png :: ContentType
+ico, png, css, html, plain, octet :: ContentType
 ico = ContentType (TypeRaw "image") (SubtypeRaw "vnd.microsoft.icon") []
 png = ContentType (TypeRaw "image") (SubtypeRaw "png") []
+css = ContentType Text Css []
+html = ContentType Text Html []
+plain = ContentType Text Plain []
+octet = ContentType (TypeRaw "application") (SubtypeRaw "octet-stream") []
 
-makeContents :: String -> IO (BSC.ByteString, ContentType, Maybe ContentLength)
+isBinary :: ContentType -> Bool
+isBinary = (`elem` [ico, png, octet])
+
+makeContents :: String -> IO (BSC.ByteString, ContentType)
 makeContents fp_ = do
 	let	fp = addIndex $ addPathSeparator fp_
-		ex = takeExtension fp
-		tp = case ex of
-			".ico" -> ico
-			".png" -> png
-			".css" -> ContentType Text Css []
-			_ -> ContentType Text Html []
-	as <- liftIO $ if ex `elem` [".ico", ".png"]
+		tp = case takeExtension fp of
+			".ico" -> ico; ".png" -> png; ".css" -> css; ".html" -> html
+			".hs" -> plain
+			_ -> octet
+	as <- liftIO $ if isBinary tp
 		then readBinaryFile $ "static/" ++ fp
 		else readFile $ "static/" ++ fp
-	t <- liftIO . getModificationTime $ "static/" ++ fp
+	time <- liftIO . getModificationTime $ "static/" ++ fp
 	let	
-		page = if ex == ".html"
-			then uncurry (makePage fp_ t) $ span (/= '\n') as
+		page = if tp == html
+			then uncurry (makePage fp_ time) $ span (/= '\n') as
 			else as
-		cl = if ex == ".html"
-			then Nothing
-			else Just . ContentLength $ length page
-		page' = case (ex, take 7 fp) of
-			(".ico", _) -> BSC.pack page
-			(".png", _) -> BSC.pack page
+		page' = case (isBinary tp, take 7 fp) of
+			(True, _) -> BSC.pack page
 			(_, "/google") -> BSC.pack as
 			_ -> BSU.fromString page
-	return (page', tp, cl)
+	return (page', tp)
 
 addIndex, addPathSeparator :: FilePath -> FilePath
 addIndex fp
