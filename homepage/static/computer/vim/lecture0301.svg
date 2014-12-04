@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!-- MADE BY SVG.HS -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink" width="1060.5"
+     height="1500.0"
+  ><text x="120.0" y="210.0" font-family="MS Gothic"
+         font-weight="normal" font-size="67.5" fill="black"
+  >第3回 vimを学ぶ</text
+  ><text x="120.0" y="292.5" font-family="MS Gothic"
+         font-weight="normal" font-size="45.0" fill="black"
+  >1. はじめに</text
+  ><text x="204.0" y="331.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >「Haskell講座」では聞いているだけでなく手を動かすことで学習効</text
+  ><text x="180.0" y="363.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >果を高めるようにしている。そのためにはエディタが使える必要がある。</text
+  ><text x="180.0" y="395.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >指になじむエディタというものはプログラマの強力な武器となる。</text
+  ><text x="204.0" y="427.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >今回はvimについて学ぶ。しかし「エディタ戦争勃発」をふせぐため</text
+  ><text x="180.0" y="459.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >にnanoとEmacsも用意しておいた。nanoやEmacsが指になじむという人は</text
+  ><text x="180.0" y="491.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >それらを使っていただきたい。</text
+  ><text x="204.0" y="523.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >演者がvim使いなので、ここでは、vimについて学ぶことにしよう。</text
+  ><text x="120.0" y="591.5" font-family="MS Gothic"
+         font-weight="normal" font-size="45.0" fill="black"
+  >2. vimの特徴</text
+  ><text x="204.0" y="630.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >カーソルの移動等の編集作業に普通のキーを使うということが大き</text
+  ><text x="180.0" y="662.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >な特徴である。マウスは使わないので、いちいちキーボードから手を離</text
+  ><text x="180.0" y="694.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >す必要がない。たとえば、カーソルの左上下右への移動にはそれぞれ'h',</text
+  ><text x="180.0" y="726.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >'j', 'k', 'l'キーを使用する。</text
+  ><text x="204.0" y="758.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >ここで、普通にアルファベットを入力したいときはどうすれば良い</text
+  ><text x="180.0" y="790.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >のかという疑問が生じる。答えはそれぞれの「モード」を用意するとい</text
+  ><text x="180.0" y="822.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >うことだ。ノーマルモードではカーソル移動等のコマンド入力を行い、イ</text
+  ><text x="180.0" y="854.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >ンサートモードでは直接文字を入力するようにすれば良い。</text
+  ><text x="204.0" y="886.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >つまりvimは「モード付きのエディタ」であり、vimを使用するとき</text
+  ><text x="180.0" y="918.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >には常にモードを意識するということになる。</text
+  ><text x="120.0" y="986.5" font-family="MS Gothic"
+         font-weight="normal" font-size="45.0" fill="black"
+  >3. 練習を始める前に</text
+  ><text x="204.0" y="1025.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >今回の講義では基本的な機能と、それ以外の便利な機能の一部を紹</text
+  ><text x="180.0" y="1057.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >介する。もちろん、今すべて覚える必要はない。一度触れておくことで、</text
+  ><text x="180.0" y="1089.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >何かの際に「確か、こんな機能があったはず」と思い出せるだろう。</text
+  ><text x="204.0" y="1121.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >最後にもう一度触れるが、最低限必要なコマンドは以下の通りであ</text
+  ><text x="180.0" y="1153.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >る。</text
+  ><text x="240.0" y="1215.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >* 'h', 'j', 'k', 'l'によるカーソル移動</text
+  ><text x="240.0" y="1247.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >* 'i', 'a'によるインサートモードへの遷移</text
+  ><text x="240.0" y="1279.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >* Escキーによるノーマルモードへの遷移</text
+  ><text x="240.0" y="1311.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >* 'x'による一文字削除</text
+  ><text x="240.0" y="1343.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >* ':wq'による保存終了</text></svg>

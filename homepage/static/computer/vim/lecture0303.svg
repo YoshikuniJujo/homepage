@@ -1,0 +1,93 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!-- MADE BY SVG.HS -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink" width="1060.5"
+     height="1500.0"
+  ><text x="240.0" y="139.5" font-family="Monospace"
+         font-weight="normal" font-size="19.5" fill="black"
+  >undo: u</text
+  ><text x="240.0" y="165.5" font-family="Monospace"
+         font-weight="normal" font-size="19.5" fill="black"
+  ></text
+  ><text x="204.0" y="222.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >"Hello, world!"の'w'にカーソルを合わせてみよう。そこで'i'を押</text
+  ><text x="180.0" y="254.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >し何かを入力する。たとえば"miss"と入力してみよう。Escキーでノー</text
+  ><text x="180.0" y="286.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >マルモードにもどってから'u'を押してみる。もとに戻ったはずだ。</text
+  ><text x="204.0" y="318.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >ちょっとしたまちがいならば、すぐにもとに戻すことができる。</text
+  ><text x="120.0" y="386.0" font-family="MS Gothic"
+         font-weight="normal" font-size="45.0" fill="black"
+  >7. インサートモード再び</text
+  ><text x="204.0" y="425.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >インサートモードへの移行にはいくつかの方法がある。さっきと同</text
+  ><text x="180.0" y="457.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >じように'w'にカーソルを合わせてみよう。ここで'i'を押し適当な文字</text
+  ><text x="180.0" y="489.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >を入力する。たとえば"ABC"を入力する。'w'の「前に」文字列が挿入さ</text
+  ><text x="180.0" y="521.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >れる。Escキーでノーマルモードに戻り、'u'でもとに戻す。</text
+  ><text x="204.0" y="553.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >今度は'a'を押してから適当な文字を入力しよう。たとえば"DEF"を</text
+  ><text x="180.0" y="585.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >入力する。'w'の「後ろに」文字列が入力される。</text
+  ><text x="240.0" y="647.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >* 'i': カーソルの前に文字列を挿入する</text
+  ><text x="240.0" y="679.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >* 'a': カーソルの後ろに文字列を挿入する</text
+  ><text x="120.0" y="777.0" font-family="MS Gothic"
+         font-weight="normal" font-size="45.0" fill="black"
+  >8. 行を変えて挿入</text
+  ><text x="204.0" y="816.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >新たな行を加えたいということはよくある。カーソルを適当な行に</text
+  ><text x="180.0" y="848.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >移動させてから'o'を押してみよう。カーソルがあった行の下に新たな</text
+  ><text x="180.0" y="880.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >行ができる。以下を入力してからEscキーを押そう。</text
+  ><text x="240.0" y="933.5" font-family="Monospace"
+         font-weight="normal" font-size="19.5" fill="black"
+  >Hello, wworld!</text
+  ><text x="240.0" y="959.5" font-family="Monospace"
+         font-weight="normal" font-size="19.5" fill="black"
+  >(wが重なっているのは次の練習のためなのでそのまま入力しよう)</text
+  ><text x="240.0" y="985.5" font-family="Monospace"
+         font-weight="normal" font-size="19.5" fill="black"
+  ></text
+  ><text x="204.0" y="1042.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >'o'コマンドは「この下に新しい行を足そう」というときに便利だ。</text
+  ><text x="120.0" y="1110.0" font-family="MS Gothic"
+         font-weight="normal" font-size="45.0" fill="black"
+  >9. 一文字削除</text
+  ><text x="204.0" y="1149.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >さっきの入力ではwが2つ入力されていた。'h'キーを使ってカーソル</text
+  ><text x="180.0" y="1181.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >を'w'に合わせよう。</text
+  ><text x="240.0" y="1234.5" font-family="Monospace"
+         font-weight="normal" font-size="19.5" fill="black"
+  >そこで'x'キーですよ</text
+  ><text x="240.0" y="1260.5" font-family="Monospace"
+         font-weight="normal" font-size="19.5" fill="black"
+  >("wworld"となっていたのが"world"に修正される)</text
+  ><text x="240.0" y="1286.5" font-family="Monospace"
+         font-weight="normal" font-size="19.5" fill="black"
+  ></text></svg>

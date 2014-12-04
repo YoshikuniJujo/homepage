@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!-- MADE BY SVG.HS -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink" width="1060.5"
+     height="1500.0"
+  ><text x="204.0" y="144.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >消したい文字があったらhjklでカーソルを合わせ'x'コマンドを入力</text
+  ><text x="180.0" y="176.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >する。</text
+  ><text x="120.0" y="244.0" font-family="MS Gothic"
+         font-weight="normal" font-size="45.0" fill="black"
+  >10. 一行削除・貼り付け</text
+  ><text x="204.0" y="283.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >'j', 'k'コマンドで好きな行に移動しよう。そこで'd'を2回連続で</text
+  ><text x="180.0" y="315.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >入力すると、その1行が削除される。</text
+  ><text x="204.0" y="347.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >'j', 'k'コマンドで適当な行に移動する。そこで'p'を押すと、移動</text
+  ><text x="180.0" y="379.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >した行の「下に」削除した行が挿入される。</text
+  ><text x="204.0" y="411.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >ここで一度'u'コマンドでもとに戻す。今度は'P'を入力してみよう。</text
+  ><text x="180.0" y="443.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >カーソルのある行の「上に」行が挿入されるだろう。</text
+  ><text x="120.0" y="511.0" font-family="MS Gothic"
+         font-weight="normal" font-size="45.0" fill="black"
+  >11. 一行コピー</text
+  ><text x="204.0" y="550.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >'j', 'k'コマンドで好きな行に移動する。'y'を連続で2回入力する。</text
+  ><text x="180.0" y="582.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >この時点では何も起きていないように見える。</text
+  ><text x="204.0" y="614.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >再度適当な行に移動して、'p'を押す。さっきの行がコピーされてい</text
+  ><text x="180.0" y="646.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >るのがわかるだろう。</text
+  ><text x="120.0" y="714.0" font-family="MS Gothic"
+         font-weight="normal" font-size="45.0" fill="black"
+  >12. 複数行削除・コピー</text
+  ><text x="204.0" y="753.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >適当な行に移動し、大文字の'V'を押してみよう。'j'や'k'でカーソ</text
+  ><text x="180.0" y="785.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >ルを移動すると、選択範囲が白黒反転する。好きな範囲を選択したら'd'を</text
+  ><text x="180.0" y="817.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >押す。選択範囲が削除されるはずだ。適当な行に移動し'p'を入力する</text
+  ><text x="180.0" y="849.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >とその行の下に複数の削除された行が挿入される。</text
+  ><text x="204.0" y="881.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >次に'd'の代わりに'y'にして同じことをしてみよう。今度は選択範</text
+  ><text x="180.0" y="913.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >囲がコピーされるだろう。</text
+  ><text x="120.0" y="981.0" font-family="MS Gothic"
+         font-weight="normal" font-size="45.0" fill="black"
+  >13. 行頭・行末への移動</text
+  ><text x="204.0" y="1020.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >行頭や行末に移動したいことはしばしばある。'h'や'l'で1文字ずつ</text
+  ><text x="180.0" y="1052.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >移動しても良いが、もっと効率的なやりかたがある。適当な行に移動し</text
+  ><text x="180.0" y="1084.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >て'0'を入力してみよう。次に'$'を入力してみよう。'0'と'$'を交互に</text
+  ><text x="180.0" y="1116.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >入力すると、カーソルが行頭・行末を行き来するのが分かるだろう。</text
+  ><text x="120.0" y="1184.0" font-family="MS Gothic"
+         font-weight="normal" font-size="45.0" fill="black"
+  >14. 一文字をねらって</text
+  ><text x="120.0" y="1244.0" font-family="MS Gothic"
+         font-weight="normal" font-size="33.75" fill="black"
+  >14.1. 移動する文字を決める</text
+  ><text x="204.0" y="1279.25" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >今度は行内の好きな文字をねらった移動を見てみよう。'o'コマンド</text
+  ><text x="180.0" y="1311.25" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >を入力してから、以下の文字列を入力する。</text></svg>

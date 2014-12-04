@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!-- MADE BY SVG.HS -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink" width="1060.5"
+     height="1500.0"
+  ><text x="120.0" y="180.0" font-family="MS Gothic"
+         font-weight="normal" font-size="45.0" fill="black"
+  >4. カーソル移動</text
+  ><text x="204.0" y="219.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >HHKBの練習のときに当ったファイルを開こう。</text
+  ><text x="240.0" y="272.5" font-family="Monospace"
+         font-weight="normal" font-size="19.5" fill="black"
+  >vim practice.txt</text
+  ><text x="240.0" y="298.5" font-family="Monospace"
+         font-weight="normal" font-size="19.5" fill="black"
+  ></text
+  ><text x="204.0" y="355.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >カーソルは一番左下にある。カーソルを左右に動かしてみよう。</text
+  ><text x="240.0" y="417.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >* 左: h</text
+  ><text x="240.0" y="449.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >* 右: l</text
+  ><text x="204.0" y="511.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >何度か'l'を押してカーソルを右端まで持っていく。次に、'h'を押</text
+  ><text x="180.0" y="543.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >してカーソルを左端まで持っていってみよう。</text
+  ><text x="204.0" y="575.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >次は上下移動を試してみよう。</text
+  ><text x="240.0" y="637.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >* 下: j</text
+  ><text x="240.0" y="669.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >* 上: k</text
+  ><text x="204.0" y="731.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >何度か'j'を押してカーソルを一番上まで持っていこう。次に、'k'を</text
+  ><text x="180.0" y="763.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >押してカーソルを一番下まで持っていってみよう。</text
+  ><text x="120.0" y="831.0" font-family="MS Gothic"
+         font-weight="normal" font-size="45.0" fill="black"
+  >5. インサートモード</text
+  ><text x="204.0" y="870.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >今学んだ'h', 'j', 'k', 'l'を使ってカーソルを好きな場所に移動</text
+  ><text x="180.0" y="902.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >させ、'i'を押す。これで、インサートモードになった。</text
+  ><text x="204.0" y="934.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >以下のように入力してみよう。</text
+  ><text x="240.0" y="987.5" font-family="Monospace"
+         font-weight="normal" font-size="19.5" fill="black"
+  >Hello, world!</text
+  ><text x="240.0" y="1013.5" font-family="Monospace"
+         font-weight="normal" font-size="19.5" fill="black"
+  ></text
+  ><text x="204.0" y="1070.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >入力が終わったらインサートモードから抜ける。Escキーを押せば良</text
+  ><text x="180.0" y="1102.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >い。EscキーはHHKBでは左手小指をめいっぱい左上にのばしたところに</text
+  ><text x="180.0" y="1134.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >ある。これで'h', 'j', 'k', 'l'でカーソル移動ができるモードになる。</text
+  ><text x="180.0" y="1166.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >vimではこの状態が基本なので、このモードをノーマルモードと呼ぶ。</text
+  ><text x="120.0" y="1234.0" font-family="MS Gothic"
+         font-weight="normal" font-size="45.0" fill="black"
+  >6. もとに戻す</text
+  ><text x="204.0" y="1273.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >まちがった編集をしてしまってもとに戻したいときには'u'を押せば</text
+  ><text x="180.0" y="1305.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >良い。</text></svg>

@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!-- MADE BY SVG.HS -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink" width="1060.5"
+     height="1500.0"
+  ><text x="120.0" y="180.0" font-family="MS Gothic"
+         font-weight="normal" font-size="45.0" fill="black"
+  >17. 画面内移動</text
+  ><text x="204.0" y="219.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >'H', 'M', 'L'と順に打ってみよう。カーソルが画面の上中下と移動</text
+  ><text x="180.0" y="251.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >する。</text
+  ><text x="120.0" y="319.0" font-family="MS Gothic"
+         font-weight="normal" font-size="45.0" fill="black"
+  >18. 指定行への移動</text
+  ><text x="204.0" y="358.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >行番号で指定した行に移動することができる。'50g'と打ってみよう。</text
+  ><text x="180.0" y="390.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >カーソルがファイルの50行目に移動する。</text
+  ><text x="204.0" y="422.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >ここで、次の練習のために文字列を入力しておく。'h'や'l'コマン</text
+  ><text x="180.0" y="454.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >ドでカーソルを適当に移動して'i'コマンドで以下を入力する。</text
+  ><text x="240.0" y="507.5" font-family="Monospace"
+         font-weight="normal" font-size="19.5" fill="black"
+  >here you are</text
+  ><text x="240.0" y="533.5" font-family="Monospace"
+         font-weight="normal" font-size="19.5" fill="black"
+  ></text
+  ><text x="204.0" y="590.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >'yy'でこの行をクリップボードに保存する。[数]gで好きな行に移動</text
+  ><text x="180.0" y="622.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >してpで貼り付ける。この移動と貼り付けを何度かくりかえす。ファイ</text
+  ><text x="180.0" y="654.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >ルのいろいろな場所に"here you are"が挿入される。</text
+  ><text x="120.0" y="722.0" font-family="MS Gothic"
+         font-weight="normal" font-size="45.0" fill="black"
+  >19. 検索移動</text
+  ><text x="204.0" y="761.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >とりあえず、'gg'でファイルの先頭に移動しておこう。ここで'/you'と</text
+  ><text x="180.0" y="793.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >入力し、エンターキーを押す。カーソルが'you'の先頭の'y'に移動する。</text
+  ><text x="204.0" y="825.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >次に'n'を入力する。'n'を入力するたびに「次の」youにカーソルが</text
+  ><text x="180.0" y="857.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >移動する。</text
+  ><text x="204.0" y="889.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >今度は大文字の'N'を入力してみよう。大文字'N'を入力すると「前</text
+  ><text x="180.0" y="921.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >の」youにカーソルが移動する。</text
+  ><text x="120.0" y="989.0" font-family="MS Gothic"
+         font-weight="normal" font-size="45.0" fill="black"
+  >20. 保存終了</text
+  ><text x="204.0" y="1028.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >':wq'を入力しエンターキーを押すと保存終了できる。</text
+  ><text x="120.0" y="1096.0" font-family="MS Gothic"
+         font-weight="normal" font-size="45.0" fill="black"
+  >21. まとめ</text
+  ><text x="204.0" y="1135.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >よく使う機能についてひととおり練習してみた。これ以外にもvimに</text
+  ><text x="180.0" y="1167.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >は多くのコマンドが存在する。一度に全部覚える必要はない。ひとつコ</text
+  ><text x="180.0" y="1199.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >マンドを覚えるたびにひとつ編集効率が上がる。</text
+  ><text x="204.0" y="1231.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >はじめは以下のコマンドだけ覚えておけば良いだろう。</text></svg>

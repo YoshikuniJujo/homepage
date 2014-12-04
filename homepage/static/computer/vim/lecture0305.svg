@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!-- MADE BY SVG.HS -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink" width="1060.5"
+     height="1500.0"
+  ><text x="240.0" y="139.5" font-family="Monospace"
+         font-weight="normal" font-size="19.5" fill="black"
+  >One little, two little, three little Indians</text
+  ><text x="240.0" y="165.5" font-family="Monospace"
+         font-weight="normal" font-size="19.5" fill="black"
+  ></text
+  ><text x="204.0" y="222.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >'0'コマンドで行の先頭に移動しておく。ここでカーソルを文字'o'に</text
+  ><text x="180.0" y="254.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >移動したいとする。'fo'と打ってみよう。カーソルが'two'の'o'に移動</text
+  ><text x="180.0" y="286.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >するはずだ。</text
+  ><text x="120.0" y="339.0" font-family="MS Gothic"
+         font-weight="normal" font-size="33.75" fill="black"
+  >14.2. 次の文字へ</text
+  ><text x="204.0" y="374.25" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >次に'Indians'のふたつめの'n'をねらいたいとする。'fn'と打つと</text
+  ><text x="180.0" y="406.25" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >まずはひとつめの'n'に移動する。もう一度'fn'としても良いが、もっ</text
+  ><text x="180.0" y="438.25" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >と簡単な方法がある。';'を入力してみよう。カーソルは「次の」'n'に</text
+  ><text x="180.0" y="470.25" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >移動する。</text
+  ><text x="120.0" y="523.25" font-family="MS Gothic"
+         font-weight="normal" font-size="33.75" fill="black"
+  >14.3. もどる</text
+  ><text x="204.0" y="558.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >もう一度'0'を入力して行頭にカーソルを戻しておこう。今度は'two</text
+  ><text x="180.0" y="590.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >little'の3番目のtに移動させたいとしよう。'ft'を入力し';'を何度か</text
+  ><text x="180.0" y="622.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >押してみよう。</text
+  ><text x="204.0" y="654.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >ここでは、わざとねらった't'を通り越すまで';'を入力する。そし</text
+  ><text x="180.0" y="686.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >て、次に','を入力してみよう。ひとつ前の't'にもどっただろう。</text
+  ><text x="204.0" y="718.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >';'と','を適当に入力してカーソルの移動の様子を観察しよう。</text
+  ><text x="120.0" y="786.5" font-family="MS Gothic"
+         font-weight="normal" font-size="45.0" fill="black"
+  >15. ファイルの先頭・末尾への移動</text
+  ><text x="204.0" y="825.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >'g'を2回入力してみよう。次に大文字'G'を入力してみよう。これを</text
+  ><text x="180.0" y="857.5" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >くりかえす。カーソルがファイルの先頭と末尾を行き来する。</text
+  ><text x="120.0" y="925.5" font-family="MS Gothic"
+         font-weight="normal" font-size="45.0" fill="black"
+  >16. スクロール</text
+  ><text x="120.0" y="985.5" font-family="MS Gothic"
+         font-weight="normal" font-size="33.75" fill="black"
+  >16.1. 準備</text
+  ><text x="204.0" y="1020.75" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >スクロールの練習をするために長いファイルを作る。好きな行に移</text
+  ><text x="180.0" y="1052.75" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >動し、大文字'V'を入力しjまたはkを何度か押して複数行を選択する。'y'コ</text
+  ><text x="180.0" y="1084.75" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >マンドでコピーし、'50p'と入力してみよう。選択範囲が50倍になって</text
+  ><text x="180.0" y="1116.75" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >コピーされる。</text
+  ><text x="120.0" y="1169.75" font-family="MS Gothic"
+         font-weight="normal" font-size="33.75" fill="black"
+  >16.2. スクロールしてみる</text
+  ><text x="204.0" y="1205.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >まずはCtrl+'e'を何度か押してみよう。次にCtrl+'y'を何度か押す。</text
+  ><text x="180.0" y="1237.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >画面が上下に移動するのがわかるだろう。</text
+  ><text x="204.0" y="1269.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >Ctrl+'d'を何度か押してみよう。次にCtrl+'u'を何度か押す。画面</text
+  ><text x="180.0" y="1301.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >半分を単位として画面が上下に移動する。</text></svg>

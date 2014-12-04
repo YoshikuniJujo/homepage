@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!-- MADE BY SVG.HS -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink" width="1060.5"
+     height="1500.0"
+  ><text x="240.0" y="144.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >* 'h', 'j', 'k', 'l'によるカーソル移動</text
+  ><text x="240.0" y="176.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >* 'i', 'a'によるインサートモードへの遷移</text
+  ><text x="240.0" y="208.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >* Escキーによるノーマルモードへの遷移</text
+  ><text x="240.0" y="240.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >* 'x'による一文字削除</text
+  ><text x="240.0" y="272.0" font-family="MS Mincho"
+         font-weight="normal" font-size="24.0" fill="black"
+  >* ':wq'による保存終了</text></svg>

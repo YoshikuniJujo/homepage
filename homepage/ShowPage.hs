@@ -5,18 +5,20 @@ module ShowPage (showPage) where
 import "monads-tf" Control.Monad.Trans (MonadIO, liftIO)
 import Data.HandleLike (HandleLike, HandleMonad)
 import Data.Pipe (Pipe)
+import Data.Time
 import System.Directory (getModificationTime)
-import System.FilePath (takeExtension, takeBaseName, (</>), addTrailingPathSeparator)
+import System.FilePath (splitPath, dropTrailingPathSeparator)
 import Network.TigHTTP.Server (getRequest, requestPath, putResponse, response)
-import Network.TigHTTP.Types (
-	Path(..), Response(..), ContentType(..), Type(..), Subtype(..))
+import Network.TigHTTP.Types (Path(..), Response(..), ContentType)
 
 import qualified Data.ByteString.Char8 as BSC
 import qualified Data.ByteString.UTF8 as BSU
 import qualified Data.ByteString.Lazy as LBS
 
 import MailToMe (mailFromBS)
-import Tools (makePage, readBinaryFile, getPostData)
+import Tools (
+	readBinaryFile, getPostData, html, contentType, isBinary,
+	addIndex, addPathSeparator)
 
 showPage :: (HandleLike h, MonadIO (HandleMonad h)) =>
 	String -> h -> HandleMonad h ()
@@ -32,43 +34,59 @@ showPage ma p = do
 	responseH :: HandleLike h => h -> LBS.ByteString -> Response Pipe h
 	responseH = const response
 
-ico, png, css, html, plain, octet :: ContentType
-ico = ContentType (TypeRaw "image") (SubtypeRaw "vnd.microsoft.icon") []
-png = ContentType (TypeRaw "image") (SubtypeRaw "png") []
-css = ContentType Text Css []
-html = ContentType Text Html []
-plain = ContentType Text Plain []
-octet = ContentType (TypeRaw "application") (SubtypeRaw "octet-stream") []
-
-isBinary :: ContentType -> Bool
-isBinary = (`elem` [ico, png, octet])
-
-makeContents :: String -> IO (BSC.ByteString, ContentType)
+makeContents :: FilePath -> IO (BSC.ByteString, ContentType)
 makeContents fp_ = do
-	let	fp = addIndex $ addPathSeparator fp_
-		tp = case takeExtension fp of
-			".ico" -> ico; ".png" -> png; ".css" -> css; ".html" -> html
-			".hs" -> plain
-			_ -> octet
-	as <- liftIO $ if isBinary tp
-		then readBinaryFile $ "static/" ++ fp
-		else readFile $ "static/" ++ fp
-	time <- liftIO . getModificationTime $ "static/" ++ fp
-	let	
-		page = if tp == html
-			then uncurry (makePage fp_ time) $ span (/= '\n') as
-			else as
-		page' = case (isBinary tp, take 7 fp) of
+	cnt <- (if isBinary tp then readBinaryFile else readFile) $ "static/" ++ fp
+	mt <- getModificationTime $ "static/" ++ fp
+	return (createContents fp_ mt tp cnt, tp)
+	where
+	fp = addIndex $ addPathSeparator fp_
+	tp = contentType fp
+
+createContents :: FilePath -> UTCTime -> ContentType -> String -> BSC.ByteString
+createContents fp_ mt tp cnt = 
+	let	page = if tp == html
+			then uncurry (makeHtml fp_ mt) $ span (/= '\n') cnt
+			else cnt
+		page' = case (isBinary tp, take 7 fp_) of
 			(True, _) -> BSC.pack page
-			(_, "/google") -> BSC.pack as
+			(_, "/google") -> BSC.pack cnt
 			_ -> BSU.fromString page
-	return (page', tp)
+	in page'
 
-addIndex, addPathSeparator :: FilePath -> FilePath
-addIndex fp
-	| null $ takeBaseName fp = fp </> "index.html"
-	| otherwise = fp
+makeHtml :: FilePath -> UTCTime -> String -> String -> String
+makeHtml fp mt ttl bdy = "<!DOCTYPE html><html lang=\"UTF-8\"><head>"
+	++ "<meta charset=\"UTF-8\"><title>" ++ ttl ++ "</title>"
+	++ "<link href=\"/css/basic.css\" rel=\"stylesheet\" type=\"text/css\">"
+	++ "</head><body>"
+	++ "<small>"
+	++ (if fp /= "/" then "<a href=\"/\">top</a> > " else "")
+	++ concat (tail' $ map (uncurry pathToHref) (init $ getPaths fp))
+	++ (last' . map fst $ getPaths fp)
+	++ "<div align=\"right\"><small>更新日: <time>"
+		++ show (utcToZonedTime japan mt)
+		++ "</time></small></div>"
+	++ "<div align=\"right\"><small>文責: 重城良国</small></div>"
+	++ "<h1>" ++ ttl ++ "</h1>"
+	++ filter (/= '\n') bdy
+	++ "</body></html>"
+	where
+	japan :: TimeZone
+	japan = TimeZone 540 False "JST"
 
-addPathSeparator fp
-	| null $ takeExtension fp = addTrailingPathSeparator fp
-	| otherwise = fp
+	pathToHref :: String -> FilePath -> String
+	pathToHref n p = "<a href=\"" ++ p ++ "\">" ++ n ++ "</a> > "
+
+	getPaths :: FilePath -> [(String, FilePath)]
+	getPaths p = zip (map dropTrailingPathSeparator ps) (tail' $ scanl (++) "" ps)
+		where
+		ps = splitPath p
+
+	tail' :: [a] -> [a]
+	tail' [] = []
+	tail' (_ : t) = t
+
+	last' :: [String] -> String
+	last' [] = ""
+	last' [_] = "top"
+	last' xs = last xs
