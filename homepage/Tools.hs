@@ -1,7 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Tools (
-	setHomepageID,
 	readBinaryFile,
 	getPostData,
 
@@ -15,9 +14,6 @@ module Tools (
 import Control.Monad (liftM)
 import System.IO (IOMode(..), openBinaryFile, hGetContents)
 import System.FilePath -- (splitPath, dropTrailingPathSeparator)
-import System.Posix.User (
-	getUserEntryForName, getGroupEntryForName,
-	userID, groupID, setUserID, setGroupID)
 
 import Data.HandleLike (HandleLike, HandleMonad)
 import Data.Pipe (runPipe, (=$=))
@@ -25,11 +21,6 @@ import Data.Pipe.List (toList)
 import Network.TigHTTP.Types -- (Request(..), Path(..), Post(..))
 
 import qualified Data.ByteString.Char8 as BSC
-
-setHomepageID :: IO ()
-setHomepageID = do
-	getGroupEntryForName "homepage" >>= setGroupID . groupID
-	getUserEntryForName "homepage" >>= setUserID . userID
 
 readBinaryFile :: FilePath -> IO String
 readBinaryFile path = openBinaryFile path ReadMode >>= hGetContents

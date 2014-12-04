@@ -8,6 +8,9 @@ import "monads-tf" Control.Monad.State (StateT(..), runStateT, liftIO)
 import Control.Concurrent (forkIO)
 import Data.HandleLike (hlClose)
 import System.Environment (getArgs)
+import System.Posix.User (
+	getUserEntryForName, getGroupEntryForName,
+	userID, groupID, setUserID, setGroupID)
 import Network (PortID(..), listenOn, accept)
 import Network.PeyoTLS.Server (CipherSuite, run, open)
 import Network.PeyoTLS.ReadFile (readKey, readCertificateChain)
@@ -15,7 +18,6 @@ import "crypto-random" Crypto.Random (
 	SystemRNG, createEntropyPool, cprgCreate, cprgFork)
 
 import ShowPage (showPage)
-import Tools (setHomepageID)
 
 keyFile :: String
 keyFile = "../certs/private_2014.key"
@@ -46,3 +48,6 @@ main = do
 			(h, _, _) <- accept soc
 			forkIO . (`run` g) $ open h cipherSuites [kc] Nothing >>=
 				(>>) <$> showPage addr <*> hlClose
+	where setHomepageID = do
+		getGroupEntryForName "homepage" >>= setGroupID . groupID
+		getUserEntryForName "homepage" >>= setUserID . userID
