@@ -1,19 +1,26 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Tools (
-	processIndex,
 	makePage,
-	setHomepageID
+	setHomepageID,
+	readBinaryFile,
+	getPostData
 	) where
 
-import System.FilePath
+import Control.Monad (liftM)
+import System.IO (IOMode(..), openBinaryFile, hGetContents)
+import System.FilePath (splitPath, dropTrailingPathSeparator)
 import Data.Time
 import System.Posix.User (
 	getUserEntryForName, getGroupEntryForName,
 	userID, groupID, setUserID, setGroupID)
 
-processIndex :: FilePath -> FilePath
-processIndex fp_ = if null $ takeBaseName fp then fp </> "index.html" else fp
-	where
-	fp = if null $ takeExtension fp_ then addTrailingPathSeparator fp_ else fp_
+import Data.HandleLike (HandleLike, HandleMonad)
+import Data.Pipe (runPipe, (=$=))
+import Data.Pipe.List (toList)
+import Network.TigHTTP.Types (Request(..), Path(..), Post(..))
+
+import qualified Data.ByteString.Char8 as BSC
 
 makePage :: FilePath -> UTCTime -> String -> String -> String
 makePage fp mt ttl bdy = "<!DOCTYPE html><html lang=\"UTF-8\"><head>"
@@ -56,3 +63,18 @@ setHomepageID :: IO ()
 setHomepageID = do
 	getGroupEntryForName "homepage" >>= setGroupID . groupID
 	getUserEntryForName "homepage" >>= setUserID . userID
+
+readBinaryFile :: FilePath -> IO String
+readBinaryFile path = openBinaryFile path ReadMode >>= hGetContents
+
+getPostData :: HandleLike h => Request h -> HandleMonad h (Maybe BSC.ByteString)
+getPostData (RequestPost _ _ Post { postBody = pb }) =
+	liftM (fmap BSC.concat) . runPipe $ pb =$= toList
+getPostData (RequestGet (Path p) _ _)
+	| BSC.null rtn = return Nothing
+	| otherwise = return . Just $ myTail rtn
+	where
+	rtn = BSC.dropWhile (/= '?') p
+	myTail "" = ""
+	myTail bs = BSC.tail bs
+getPostData _ = return Nothing
