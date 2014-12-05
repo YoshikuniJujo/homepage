@@ -5,7 +5,7 @@ module ShowPage (showPage) where
 import "monads-tf" Control.Monad.Trans (MonadIO, liftIO)
 import Data.HandleLike (HandleLike, HandleMonad)
 import Data.Pipe (Pipe)
-import Data.Time
+import Data.Time (UTCTime, TimeZone(..), utcToZonedTime)
 import System.Directory (getModificationTime)
 import System.FilePath (splitPath, dropTrailingPathSeparator)
 import Network.TigHTTP.Server (getRequest, requestPath, putResponse, response)
