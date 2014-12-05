@@ -4,7 +4,7 @@ module Tools (
 	readBinaryFile,
 	getPostData,
 
-	html,
+	isHtml,
 	contentType,
 	isBinary,
 	addIndex,
@@ -54,6 +54,9 @@ contentType fp = case takeExtension fp of
 
 isBinary :: ContentType -> Bool
 isBinary = (`elem` [ico, png, octet])
+
+isHtml :: ContentType -> Bool
+isHtml = (== html)
 
 addIndex, addPathSeparator :: FilePath -> FilePath
 addIndex p
