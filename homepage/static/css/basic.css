@@ -1,7 +1,7 @@
-dt {	padding-left : 30px; padding-right : 30px;
+dt {	padding-left : 0px; padding-right : 0px;
 	float : left; clear : both; font-weight : bold }
 
-dd {	margin-left : 100px }
+dd {	margin-left : 80px }
 
 .right { text-align : right }
 
