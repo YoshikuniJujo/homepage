@@ -37,9 +37,10 @@ getPostData (RequestGet (Path p) _ _)
 	myTail bs = BSC.tail bs
 getPostData _ = return Nothing
 
-ico, png, svg, css, html, plain, octet :: ContentType
+ico, png, jpg, svg, css, html, plain, octet :: ContentType
 ico = ContentType (TypeRaw "image") (SubtypeRaw "vnd.microsoft.icon") []
 png = ContentType (TypeRaw "image") (SubtypeRaw "png") []
+jpg = ContentType (TypeRaw "image") (SubtypeRaw "jpg") []
 svg = ContentType (TypeRaw "image") (SubtypeRaw "svg") []
 css = ContentType Text Css []
 html = ContentType Text Html []
@@ -48,12 +49,12 @@ octet = ContentType (TypeRaw "application") (SubtypeRaw "octet-stream") []
 
 contentType :: FilePath -> ContentType
 contentType fp = case takeExtension fp of
-	".ico" -> ico; ".png" -> png; ".svg" -> svg
+	".ico" -> ico; ".png" -> png; ".jpg" -> jpg; ".svg" -> svg
 	".css" -> css; ".html" -> html; ".hs" -> plain
 	_ -> octet
 
 isBinary :: ContentType -> Bool
-isBinary = (`elem` [ico, png, octet])
+isBinary = (`elem` [ico, png, jpg, octet])
 
 isHtml :: ContentType -> Bool
 isHtml = (== html)

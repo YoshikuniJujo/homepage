@@ -5,6 +5,7 @@ module ShowPage (showPage) where
 import Control.Applicative ((<$>), (<*>))
 import "monads-tf" Control.Monad.Trans (MonadIO, liftIO)
 import Data.List (isPrefixOf)
+import Data.Char (isAscii)
 import Data.Time (UTCTime, TimeZone(..), utcToZonedTime, formatTime)
 import Data.HandleLike (HandleLike, HandleMonad)
 import Data.Pipe (Pipe)
@@ -45,54 +46,55 @@ showPage ma hdl = do
 
 createContents ::
 	FilePath -> UTCTime -> ContentType -> String -> BSC.ByteString
-createContents fp_ mt tp cnt =
-	case (isHtml tp, isBinary tp, "/google89" `isPrefixOf` fp_) of
-		(True, _, _) -> BSU.fromString
-			. uncurry (makeHtml fp_ mt) $ span (/= '\n') cnt
-		(_, False, False) -> BSU.fromString cnt
-		_ -> BSC.pack cnt
+createContents fp_ mt tp cnt = case (isHtml tp, isBinary tp, isGoogleCheck fp_) of
+	(True, _, False) -> BSU.fromString . makeHtml fp_ mt $ span (/= '\n') cnt
+	(_, False, False) -> BSU.fromString cnt
+	_ -> BSC.pack cnt
+	where isGoogleCheck = ("/google89" `isPrefixOf`)
 
-makeHtml :: FilePath -> UTCTime -> String -> String -> String
-makeHtml fp mt ttl bdy = "<!DOCTYPE html><html lang=\"ja\"><head>"
-	++ "<meta charset=\"UTF-8\"><title>" ++ ttl ++ "</title>"
-	++ "<link href=\"/css/basic.css\" rel=\"stylesheet\" type=\"text/css\">"
-	++ "</head><body>"
-	++ "<small>"
-	++ (if fp /= "/" then "<a href=\"/\">top</a> > " else "")
-	++ concat (tail' $ map (uncurry pathToHref) (init $ getPaths fp))
-	++ (last' . map fst $ getPaths fp)
-	++ "</small>"
-	++ "<div class=\"right\"><small>更新日: <time>"
-		++ formatTime defaultTimeLocale "%Y-%m-%dT%H:%M+09:00" (utcToZonedTime japan mt)
-		++ "</time></small></div>"
-	++ "<div class=\"right\"><small>文責: 重城良国</small></div>"
+makeHtml :: FilePath -> UTCTime -> (String, String) -> String
+makeHtml fp mt (ttl, bdy) = "<!DOCTYPE html><html lang=\"ja\">" ++ makeHead ttl
+	++ "<body>" ++ breadcrumb (splitPath fp) ++ makeMeta mt
 	++ "<h1>" ++ ttl ++ "</h1>"
-	++ filter (/= '\n') bdy
-	++ "<p class=\"right\"><a href=\"" ++ pathToCssCheckerUri fp
-	++ "\"><img src=\"http://jigsaw.w3.org/css-validator/images/vcss\" width=\"44\" height=\"15\" alt=\"正当なCSSです!\"/></a>"
-	++ " <a href=\"" ++ pathToCheckerUri fp
-	++ "\"><img src=\"http://www.w3.org/html/logo/badge/html5-badge-h-css3-semantics.png\" width=\"41\" height=\"16\" alt=\"HTML5 Powered with CSS3 / styling, and Semantics\"/></a></p>"
-	++ "</body></html>"
+	++ removeNewline False bdy ++ makeValidIcons fp ++ "</body></html>"
+
+makeHead :: String -> String
+makeHead ttl = "<head><meta charset=\"UTF-8\"><title>" ++ ttl ++ "</title>"
+	++ "<link href=\"/css/basic.css\" rel=\"stylesheet\" type=\"text/css\">"
+	++ "</head>"
+
+breadcrumb :: [String] -> String
+breadcrumb ["/"] = "<small>top</small>"
+breadcrumb ("/" : ps) = "<small><a href=\"/\">top</a> &gt; "
+	++ concat (map pathToHref $ init pairs) ++ last (map fst pairs)
+	++ "</small>"
+	where
+	pathToHref (n, p) = "<a href=\"" ++ p ++ "\">" ++ n ++ "</a> &gt; "
+	pairs = zip
+		<$> map dropTrailingPathSeparator
+		<*> (tail . scanl (++) "/") $ ps
+breadcrumb _ = "<small>bad path</small>"
+
+makeMeta :: UTCTime -> String
+makeMeta mt = "<div class=\"right\"><small>更新日: <time>"
+	++ formatTime defaultTimeLocale "%Y-%m-%dT%H:%M+09:00" (utcToZonedTime japan mt)
+	++ "</time></small></div>"
+	++ "<div class=\"right\"><small>文責: 重城良国</small></div>"
 	where
 	japan :: TimeZone
 	japan = TimeZone 540 False "JST"
 
-	pathToHref :: String -> FilePath -> String
-	pathToHref n p = "<a href=\"" ++ p ++ "\">" ++ n ++ "</a> > "
+removeNewline :: Bool -> String -> String
+removeNewline _ "" = ""
+removeNewline j ('\n' : c : cs)
+	| j || not (isAscii c) = c : removeNewline (not $ isAscii c) cs
+removeNewline _ (c : cs) = c : removeNewline (not $ isAscii c) cs
 
-	getPaths :: FilePath -> [(String, FilePath)]
-	getPaths p = zip (map dropTrailingPathSeparator ps) (tail' $ scanl (++) "" ps)
-		where
-		ps = splitPath p
-
-	tail' :: [a] -> [a]
-	tail' [] = []
-	tail' (_ : t) = t
-
-	last' :: [String] -> String
-	last' [] = ""
-	last' [_] = "top"
-	last' xs = last xs
+makeValidIcons :: FilePath -> String
+makeValidIcons fp = "<p class=\"right\"><a href=\"" ++ pathToCssCheckerUri fp
+	++ "\"><img src=\"http://jigsaw.w3.org/css-validator/images/vcss\" width=\"44\" height=\"15\" alt=\"正当なCSSです!\"/></a>"
+	++ " <a href=\"" ++ pathToCheckerUri fp
+	++ "\"><img src=\"http://www.w3.org/html/logo/badge/html5-badge-h-css3-semantics.png\" width=\"41\" height=\"16\" alt=\"HTML5 Powered with CSS3 / styling, and Semantics\"/></a></p>"
 
 pathToCssCheckerUri :: FilePath -> String
 pathToCssCheckerUri =
