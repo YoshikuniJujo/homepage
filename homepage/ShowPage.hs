@@ -66,13 +66,15 @@ makeHtml fp mt ft ttl bdy = "<!DOCTYPE html><html lang=\"ja\"><head>"
 	++ (last' . map fst $ getPaths fp)
 	++ "</small>"
 	++ "<div class=\"right\"><small>更新日: <time>"
---		++ show (utcToZonedTime japan mt)
 		++ formatTime defaultTimeLocale "%Y-%m-%dT%H:%M+09:00" (utcToZonedTime japan mt)
 		++ "</time></small></div>"
 	++ "<div class=\"right\"><small>文責: 重城良国</small></div>"
 	++ "<h1>" ++ ttl ++ "</h1>"
 	++ filter (/= '\n') bdy
-	++ ft
+	++ "<p class=\"right\"><a href=\"" ++ pathToCheckerUri fp
+	++ "\"><img src=\"http://jigsaw.w3.org/css-validator/images/vcss\" width=\"44\" height=\"15.5\" alt=\"正当なCSSです!\"/></a>"
+	++ " <a href=\"" ++ pathToCheckerUri fp
+	++ "\"><img src=\"http://www.w3.org/html/logo/badge/html5-badge-h-css3-semantics.png\" width=\"41.25\" height=\"16\" alt=\"HTML5 Powered with CSS3 / styling, and Semantics\"/></a></p>"
 	++ "</body></html>"
 	where
 	japan :: TimeZone
@@ -94,3 +96,18 @@ makeHtml fp mt ft ttl bdy = "<!DOCTYPE html><html lang=\"ja\"><head>"
 	last' [] = ""
 	last' [_] = "top"
 	last' xs = last xs
+
+pathToCssCheckerUri :: FilePath -> String
+pathToCssCheckerUri =
+	("http://jigsaw.w3.org/css-validator/validator?uri=http%3A%2F%2Fskami.iocikun.jp" ++)
+		. escapeSlash
+
+pathToCheckerUri :: FilePath -> String
+pathToCheckerUri =
+	("http://validator.w3.org/check?uri=http%3A%2F%2Fskami.iocikun.jp" ++)
+		. escapeSlash
+
+escapeSlash :: FilePath -> String
+escapeSlash "" = ""
+escapeSlash ('/' : cs) = "%2F" ++ escapeSlash cs
+escapeSlash (c : cs) = c : escapeSlash cs
