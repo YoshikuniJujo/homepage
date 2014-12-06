@@ -54,7 +54,9 @@ makeHtml :: FilePath -> UTCTime -> (String, String) -> String
 makeHtml fp mt (ttl, bdy) = "<!DOCTYPE html><html lang=\"ja\">" ++ makeHead ttl
 	++ "<body>" ++ breadcrumb (splitPath fp) ++ makeMeta mt "重城良国"
 	++ "<h1>" ++ ttl ++ "</h1>"
-	++ removeNewline False bdy ++ makeValidIcons fp ++ "</body></html>"
+	++ removeNewline False bdy
+	++ makeValidIcons fp
+	++ "</body></html>"
 
 makeHead :: String -> String
 makeHead ttl = "<head><meta charset=\"UTF-8\"><title>" ++ ttl ++ "</title>"
@@ -64,7 +66,7 @@ makeHead ttl = "<head><meta charset=\"UTF-8\"><title>" ++ ttl ++ "</title>"
 breadcrumb :: [String] -> String
 breadcrumb ["/"] = "<small>top</small>"
 breadcrumb ("/" : ps) = "<small><a href=\"/\">top</a> &gt; "
-	++ concat (map link $ init pairs) ++ last (map fst pairs) ++ "</small>"
+	++ concatMap link (init pairs) ++ last (map fst pairs) ++ "</small>"
 	where
 	link (n, p) = "<a href=\"" ++ p ++ "\">" ++ n ++ "</a> &gt; "
 	pairs = ($ ps) $ zip
@@ -87,13 +89,14 @@ removeNewline _ (c : cs) = c : removeNewline (not $ isAscii c) cs
 
 makeValidIcons :: FilePath -> String
 makeValidIcons fp = "<p class=\"right\"><a href=\"" ++ pathToCssCk fp ++ "\">"
-	++ "<img src=\"http://jigsaw.w3.org/css-validator/images/vcss\" "
+	++ "<img src=\"/images/vcss.png\" "
 	++ "width=\"44\" height=\"15\" alt=\"正当なCSSです!\"/></a>"
 	++ " <a href=\"" ++ pathToCk fp ++ "\">"
-	++ "<img src=\"http://www.w3.org/html/logo/badge/"
+	++ "<img src=\"/images/"
 	++ "html5-badge-h-css3-semantics.png\" "
 	++ "width=\"41\" height=\"16\" "
-	++ "alt=\"HTML5 Powered with CSS3 / styling, and Semantics\"/></a></p>"
+	++ "alt=\"HTML5 Powered with CSS3 / styling, and Semantics\"/></a>"
+	++ "</p>"
 
 pathToCssCk :: FilePath -> String
 pathToCssCk = ("http://jigsaw.w3.org/css-validator/validator" ++) . pathToGetUri
