@@ -2,7 +2,8 @@
 
 module MailToMe (mailFromBS) where
 
-import Data.URLEncoded (URLEncoded, importString, (%!))
+import Data.Maybe (fromMaybe)
+import Data.URLEncoded (importString, (%!))
 import Network.Mail.SMTP (Address(..), sendMail, simpleMail, plainTextPart)
 
 import qualified Data.ByteString.Char8 as BSC
@@ -13,18 +14,14 @@ import qualified Data.Text.Lazy as LT
 mailFromBS :: String -> BSU.ByteString -> IO ()
 mailFromBS addr r = do
 	ue <- importString $ BSC.unpack r
-	maybe (return ()) (\nazo -> do
-			putStrLn nazo
-			mailTo "Administer" (T.pack addr) "nazo" $ LT.pack nazo
-		) $ makeMailBody ue
-
-makeMailBody :: URLEncoded -> Maybe String
-makeMailBody ue =
-	case (ue %! ("name" :: String), ue %! ("address" :: String),
-			ue %! ("body" :: String)) of
-		(Just nm, Just addr, Just bdy) -> Just $ "お名前: " ++ nm ++
-			"\nメールアドレス: " ++ addr ++ "\n\n内容:\n" ++ bdy
-		_ -> Nothing
+	fromMaybe (return ()) $ do
+		nm <- ue %! ("name" :: String)
+		uaddr <- ue %! ("address" :: String)
+		bdy <- ue %! ("body" :: String)
+		return $ mailTo "Administer" (T.pack addr) (T.pack nm)
+			. LT.pack $ "お名前: " ++ nm
+				++ "\nメールアドレス: " ++ uaddr
+				++ "\n\n内容:\n" ++ bdy
 
 mailTo :: T.Text -> T.Text -> T.Text -> LT.Text -> IO ()
 mailTo n a t b = sendMail "skami.iocikun.jp" $ simpleMail
