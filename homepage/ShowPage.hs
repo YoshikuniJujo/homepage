@@ -9,6 +9,7 @@ import Data.Char (isAscii)
 import Data.Time (UTCTime, TimeZone(..), utcToZonedTime, formatTime)
 import Data.HandleLike (HandleLike, HandleMonad)
 import Data.Pipe (Pipe)
+import System.IO (IOMode(..), openBinaryFile, hGetContents)
 import System.Directory (getModificationTime)
 import System.FilePath (splitPath, dropTrailingPathSeparator)
 import System.Locale (defaultTimeLocale)
@@ -20,9 +21,7 @@ import qualified Data.ByteString.UTF8 as BSU
 import qualified Data.ByteString.Lazy as LBS
 
 import MailToMe (mailTo)
-import Tools (
-	readBinaryFile, addIndex, addPathSeparator,
-	getPostData, contentType, isHtml, isBinary )
+import Tools (addIndex, addSep, getPostData, contentType, isHtml, isBinary )
 
 showPage :: (HandleLike h, MonadIO (HandleMonad h)) =>
 	String -> h -> HandleMonad h ()
@@ -32,7 +31,7 @@ showPage ma hdl = do
 	getPostData req >>= liftIO . maybe (return ()) (mailTo ma)
 	let	fp_ = takeWhile (/= '?')
 			. BSC.unpack . (\(Path f) -> f) $ requestPath req
-		fp = "static/" ++ addIndex (addPathSeparator fp_)
+		fp = "static/" ++ addIndex (addSep fp_)
 		tp = contentType fp
 	(cnt, mt) <- liftIO $ (,)
 		<$> (if isBinary tp then readBinaryFile else readFile) fp
@@ -40,6 +39,7 @@ showPage ma hdl = do
 	putResponse hdl (responseH hdl $ LBS.fromChunks [makePage fp_ mt tp cnt])
 		{ responseContentType = tp }
 	where
+	readBinaryFile path = openBinaryFile path ReadMode >>= hGetContents
 	responseH :: HandleLike h => h -> LBS.ByteString -> Response Pipe h
 	responseH = const response
 

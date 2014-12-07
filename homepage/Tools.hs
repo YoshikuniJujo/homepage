@@ -1,29 +1,41 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Tools (
-	readBinaryFile,
-	getPostData,
-
-	isHtml,
-	contentType,
-	isBinary,
-	addIndex,
-	addPathSeparator,
-	) where
+module Tools (addIndex, addSep, contentType, isHtml, isBinary, getPostData) where
 
 import Control.Monad (liftM)
-import System.IO (IOMode(..), openBinaryFile, hGetContents)
-import System.FilePath -- (splitPath, dropTrailingPathSeparator)
-
 import Data.HandleLike (HandleLike, HandleMonad)
 import Data.Pipe (runPipe, (=$=))
 import Data.Pipe.List (toList)
-import Network.TigHTTP.Types -- (Request(..), Path(..), Post(..))
+import System.FilePath (
+	takeBaseName, takeExtension, (</>), addTrailingPathSeparator )
+import Network.TigHTTP.Types (
+	Request(..), Path(..), Post(..), ContentType(..), Type(..), Subtype(..) )
 
 import qualified Data.ByteString.Char8 as BSC
 
-readBinaryFile :: FilePath -> IO String
-readBinaryFile path = openBinaryFile path ReadMode >>= hGetContents
+addIndex, addSep :: FilePath -> FilePath
+addIndex p | null $ takeBaseName p = p </> "index.html" | otherwise = p
+addSep p | null $ takeExtension p = addTrailingPathSeparator p | otherwise = p
+
+contentType :: FilePath -> ContentType
+contentType fp = case takeExtension fp of
+	".ico" -> ico; ".png" -> png; ".jpg" -> jpg; ".svg" -> svg
+	".css" -> css; ".html" -> html; ".hs" -> plain
+	_ -> octet
+
+isHtml, isBinary :: ContentType -> Bool
+isHtml = (== html)
+isBinary = (`elem` [ico, png, jpg, octet])
+
+ico, png, jpg, svg, css, html, plain, octet :: ContentType
+ico = ContentType (TypeRaw "image") (SubtypeRaw "vnd.microsoft.icon") []
+png = ContentType (TypeRaw "image") (SubtypeRaw "png") []
+jpg = ContentType (TypeRaw "image") (SubtypeRaw "jpg") []
+svg = ContentType (TypeRaw "image") (SubtypeRaw "svg") []
+css = ContentType Text Css []
+html = ContentType Text Html []
+plain = ContentType Text Plain []
+octet = ContentType (TypeRaw "application") (SubtypeRaw "octet-stream") []
 
 getPostData :: HandleLike h => Request h -> HandleMonad h (Maybe BSC.ByteString)
 getPostData (RequestPost _ _ Post { postBody = pb }) =
@@ -36,33 +48,3 @@ getPostData (RequestGet (Path p) _ _)
 	myTail "" = ""
 	myTail bs = BSC.tail bs
 getPostData _ = return Nothing
-
-ico, png, jpg, svg, css, html, plain, octet :: ContentType
-ico = ContentType (TypeRaw "image") (SubtypeRaw "vnd.microsoft.icon") []
-png = ContentType (TypeRaw "image") (SubtypeRaw "png") []
-jpg = ContentType (TypeRaw "image") (SubtypeRaw "jpg") []
-svg = ContentType (TypeRaw "image") (SubtypeRaw "svg") []
-css = ContentType Text Css []
-html = ContentType Text Html []
-plain = ContentType Text Plain []
-octet = ContentType (TypeRaw "application") (SubtypeRaw "octet-stream") []
-
-contentType :: FilePath -> ContentType
-contentType fp = case takeExtension fp of
-	".ico" -> ico; ".png" -> png; ".jpg" -> jpg; ".svg" -> svg
-	".css" -> css; ".html" -> html; ".hs" -> plain
-	_ -> octet
-
-isBinary :: ContentType -> Bool
-isBinary = (`elem` [ico, png, jpg, octet])
-
-isHtml :: ContentType -> Bool
-isHtml = (== html)
-
-addIndex, addPathSeparator :: FilePath -> FilePath
-addIndex p
-	| null $ takeBaseName p = p </> "index.html"
-	| otherwise = p
-addPathSeparator p
-	| null $ takeExtension p = addTrailingPathSeparator p
-	| otherwise = p
