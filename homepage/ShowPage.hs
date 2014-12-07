@@ -19,7 +19,7 @@ import qualified Data.ByteString.Char8 as BSC
 import qualified Data.ByteString.UTF8 as BSU
 import qualified Data.ByteString.Lazy as LBS
 
-import MailToMe (mailFromBS)
+import MailToMe (mailTo)
 import Tools (
 	readBinaryFile, addIndex, addPathSeparator,
 	getPostData, contentType, isHtml, isBinary )
@@ -29,7 +29,7 @@ showPage :: (HandleLike h, MonadIO (HandleMonad h)) =>
 showPage ma hdl = do
 	req <- getRequest hdl
 	liftIO . print $ requestPath req
-	getPostData req >>= liftIO . maybe (return ()) (mailFromBS ma)
+	getPostData req >>= liftIO . maybe (return ()) (mailTo ma)
 	let	fp_ = takeWhile (/= '?')
 			. BSC.unpack . (\(Path f) -> f) $ requestPath req
 		fp = "static/" ++ addIndex (addPathSeparator fp_)
