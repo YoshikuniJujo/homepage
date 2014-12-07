@@ -40,11 +40,7 @@ octet = ContentType (TypeRaw "application") (SubtypeRaw "octet-stream") []
 getPostData :: HandleLike h => Request h -> HandleMonad h (Maybe BSC.ByteString)
 getPostData (RequestPost _ _ Post { postBody = pb }) =
 	liftM (fmap BSC.concat) . runPipe $ pb =$= toList
-getPostData (RequestGet (Path p) _ _)
-	| BSC.null rtn = return Nothing
-	| otherwise = return . Just $ myTail rtn
-	where
-	rtn = BSC.dropWhile (/= '?') p
-	myTail "" = ""
-	myTail bs = BSC.tail bs
+getPostData (RequestGet (Path p) _ _) = return $ case BSC.dropWhile (/= '?') p of
+	"" -> Nothing
+	dat -> Just $ BSC.tail dat
 getPostData _ = return Nothing
