@@ -1,0 +1,36 @@
+Hackage: 手動でのドキュメントのアップロード
+
+<h2>問題</h2>
+
+<p>
+Hackageにパッケージをアップすると、しばらくして自動的にドキュメントが作成される。
+しかし、最近、それがうまく動いていないことが多い。
+そのような場合に手動でドキュメントをアップロードすることができる。
+そのための方法を調べた。
+</p>
+
+<p>
+<a href="http://maoe.hatenadiary.jp/entry/2014/09/29/214420"
+	>maoeさんのブログ</a>で同じような現象を扱っている。
+</p>
+
+<h2>解決</h2>
+
+<h3>ドキュメントのアーカイブを作成する</h3>
+
+<ol>
+<li>cabal haddock --hyperlink-source</li>
+<li>cd dist/doc/</li>
+<li>tar -c -v -Hustar -f [アーカイブ名].tar [パッケージ名]</li>
+</ol>
+
+<h3>作成したアーカイブをアップロード</h3>
+
+<ol>
+<li>自分のパッケージのページに行く</li>
+<li>edit package informationをクリック</li>
+<li>Manage documentatin for以降の適切なバージョンをクリック</li>
+<li>上で作成したtarアーカイブをアップロードする</li>
+</ol>
+
+<a href="/computer/haskell/howto">「Haskell:HOWTO」へもどる</a>
