@@ -1,12 +1,13 @@
-{-# LANGUAGE FlexibleContexts, PackageImports #-}
+{-# LANGUAGE OverloadedStrings, FlexibleContexts, PackageImports #-}
 
 module ShowPage (showPage) where
 
 import Control.Applicative ((<$>), (<*>))
 import "monads-tf" Control.Monad.Trans (MonadIO, liftIO)
+import Data.Maybe (fromMaybe)
 import Data.List (isPrefixOf)
 import Data.Char (isAscii)
-import Data.Time (UTCTime, TimeZone(..), utcToZonedTime, formatTime)
+import Data.Time (UTCTime, TimeZone(..), utcToZonedTime, formatTime, getZonedTime)
 import Data.HandleLike (HandleLike, HandleMonad)
 import Data.Pipe (Pipe)
 import System.IO (IOMode(..), openBinaryFile, hGetContents)
@@ -14,7 +15,7 @@ import System.Directory (getModificationTime)
 import System.FilePath (splitPath, dropTrailingPathSeparator)
 import System.Locale (defaultTimeLocale)
 import Network.TigHTTP.Server (getRequest, requestPath, putResponse, response)
-import Network.TigHTTP.Types (Path(..), Response(..), ContentType)
+import Network.TigHTTP.Types -- (Path(..), Response(..), ContentType)
 
 import qualified Data.ByteString.Char8 as BSC
 import qualified Data.ByteString.UTF8 as BSU
@@ -23,11 +24,67 @@ import qualified Data.ByteString.Lazy as LBS
 import MailToMe (mailTo)
 import Tools (addIndex, addSep, getPostData, contentType, isHtml, isBinary )
 
+userAgent :: Request h -> Maybe [Product]
+userAgent (RequestGet _ _ gt) = getUserAgent gt
+userAgent (RequestPost _ _ pst) = postUserAgent pst
+userAgent _ = Nothing
+
+showProduct :: Product -> String
+showProduct (Product p v) =
+	BSC.unpack p ++ "" `fromMaybe` ((' ' :) . BSC.unpack <$> v)
+showProduct (ProductComment c) = BSC.unpack c
+
+testProducts :: [[Product]]
+testProducts = [
+	[
+		Product "Mozilla" (Just "5.0"),
+		ProductComment "X11; Linux i686; rv:24.0",
+		Product "Gecko" (Just "20141006"),
+		Product "Firefox" (Just "24.0") ],
+	[
+		Product "Mozilla" (Just "5.0"),
+		ProductComment "Android; Mobile; rv:34.0",
+		Product "Gecko" (Just "34.0"),
+		Product "Firefox" (Just "34.0") ]
+	]
+
+showRequest :: Request h -> String
+showRequest (RequestGet p v gt) =
+	"RequestGet " ++ show p ++ " " ++ show v ++ " (" ++ show gt ++ ")"
+showRequest (RequestPost p v pst) =
+	"RequestPost " ++ show p ++ " " ++ show v ++ " (" ++ showPost pst ++ ")"
+showRequest (RequestRaw rt p v rw) =
+	"RequestRaw " ++ show rt ++ " " ++ show p ++ show v ++ " " ++ show rw
+
+showPost :: Post h -> String
+showPost _ = "comming soon"
+
+showPath :: Path -> String
+showPath (Path p) = BSC.unpack p
+
 showPage :: (HandleLike h, MonadIO (HandleMonad h)) =>
 	String -> h -> HandleMonad h ()
 showPage ma hdl = do
 	req <- getRequest hdl
-	liftIO . print $ requestPath req
+	liftIO $ do
+		now <- getZonedTime
+		putStr $ show now
+	liftIO . putStr . ('\t' :) . showPath $ requestPath req
+	case userAgent req of
+		Just agent -> if agent `elem` testProducts
+			then liftIO $ putStrLn "\tTEST"
+			else liftIO . putStrLn . ("\n\t" ++)
+				. unwords $ map showProduct agent
+		_ -> return ()
+--	liftIO . putStrLn $ showRequest req
+{-
+	fromMaybe (return ()) $ liftIO . putStrLn . ('\t' :)
+		. show <$> userAgent req
+-}
+{-
+	fromMaybe (return ()) $ liftIO . putStrLn . ('\t' :)
+		. unwords . map showProduct <$> userAgent req
+-}
 	getPostData req >>= liftIO . maybe (return ()) (mailTo ma)
 	let	fp_ = takeWhile (/= '?')
 			. BSC.unpack . (\(Path f) -> f) $ requestPath req
