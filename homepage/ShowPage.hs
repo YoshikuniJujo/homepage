@@ -4,7 +4,7 @@ module ShowPage (showPage) where
 
 import Control.Applicative ((<$>), (<*>))
 import "monads-tf" Control.Monad.Trans (MonadIO, liftIO)
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, fromJust)
 import Data.List (isPrefixOf)
 import Data.Char (isAscii)
 import Data.Time (UTCTime, TimeZone(..), utcToZonedTime, formatTime, getZonedTime)
@@ -34,18 +34,18 @@ showProduct (Product p v) =
 	BSC.unpack p ++ "" `fromMaybe` ((' ' :) . BSC.unpack <$> v)
 showProduct (ProductComment c) = BSC.unpack c
 
-testProducts :: [[Product]]
+testProducts :: [([Product], String)]
 testProducts = [
-	[
+	([
 		Product "Mozilla" (Just "5.0"),
 		ProductComment "X11; Linux i686; rv:24.0",
 		Product "Gecko" (Just "20141006"),
-		Product "Firefox" (Just "24.0") ],
-	[
+		Product "Firefox" (Just "24.0") ], "PC"),
+	([
 		Product "Mozilla" (Just "5.0"),
 		ProductComment "Android; Mobile; rv:34.0",
 		Product "Gecko" (Just "34.0"),
-		Product "Firefox" (Just "34.0") ]
+		Product "Firefox" (Just "34.0") ], "Phone")
 	]
 
 showRequest :: Request h -> String
@@ -71,8 +71,9 @@ showPage ma hdl = do
 		putStr $ show now
 	liftIO . putStr . ('\t' :) . showPath $ requestPath req
 	case userAgent req of
-		Just agent -> if agent `elem` testProducts
-			then liftIO $ putStrLn "\tTEST"
+		Just agent -> if agent `elem` map fst testProducts
+			then liftIO . putStrLn $
+				" " ++ fromJust (lookup agent testProducts)
 			else liftIO . putStrLn . ("\n\t" ++)
 				. unwords $ map showProduct agent
 		_ -> return ()
