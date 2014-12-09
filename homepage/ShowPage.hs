@@ -23,6 +23,7 @@ import qualified Data.ByteString.Lazy as LBS
 
 import MailToMe (mailTo)
 import Tools (addIndex, addSep, getPostData, contentType, isHtml, isBinary )
+import StmFile (update)
 
 userAgent :: Request h -> Maybe [Product]
 userAgent (RequestGet _ _ gt) = getUserAgent gt
@@ -68,15 +69,15 @@ showPage ma hdl = do
 	req <- getRequest hdl
 	liftIO $ do
 		now <- getZonedTime
-		putStr $ show now
-	liftIO . putStr . ('\t' :) . showPath $ requestPath req
-	case userAgent req of
-		Just agent -> if agent `elem` map fst testProducts
-			then liftIO . putStrLn $
-				" " ++ fromJust (lookup agent testProducts)
-			else liftIO . putStrLn . ("\n\t" ++)
-				. unwords $ map showProduct agent
-		_ -> return ()
+		let lg = show now ++ '\t' : showPath (requestPath req) ++
+			case userAgent req of
+				Just agent -> if agent `elem` map fst testProducts
+					then " " ++ fromJust (lookup agent testProducts)
+					else ("\n\t" ++) . unwords $ map showProduct agent
+				_ -> ""
+		putStrLn lg
+		update "tmp" "log/access.log" $
+			(`BSC.append` "\n") . (`BSC.append` BSC.pack lg)
 --	liftIO . putStrLn $ showRequest req
 {-
 	fromMaybe (return ()) $ liftIO . putStrLn . ('\t' :)
