@@ -12,14 +12,15 @@ import System.Posix.User (
 	userID, groupID, setUserID, setGroupID)
 import Network (PortID(..), listenOn, accept)
 
-import ShowPage (showPage)
+import ShowPage (showPage, initLock)
 
 main :: IO ()
 main = do
+	l <- initLock
 	addr : _ <- getArgs
 	soc <- listenOn (PortNumber 80) <* setHomepageID
 	forever $ accept soc >>= void . forkIO
-		. ((>>) <$> showPage addr <*> hClose) . (\(h, _, _) -> h)
+		. ((>>) <$> showPage l addr <*> hClose) . (\(h, _, _) -> h)
 	where setHomepageID = do
 		getGroupEntryForName "homepage" >>= setGroupID . groupID
 		getUserEntryForName "homepage" >>= setUserID . userID

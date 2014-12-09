@@ -1,5 +1,5 @@
 module StmLock (
-	initLock, lock, unlock,
+	Lock, initLock, lock, unlock,
 	) where
 
 import Control.Concurrent.STM

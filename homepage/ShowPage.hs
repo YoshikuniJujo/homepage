@@ -1,9 +1,10 @@
 {-# LANGUAGE OverloadedStrings, FlexibleContexts, PackageImports #-}
 
-module ShowPage (showPage) where
+module ShowPage (showPage, initLock) where
 
 import Control.Applicative ((<$>), (<*>))
 import "monads-tf" Control.Monad.Trans (MonadIO, liftIO)
+import Control.Concurrent.STM (TVar)
 import Data.Maybe (fromMaybe, fromJust)
 import Data.List (isPrefixOf)
 import Data.Char (isAscii)
@@ -24,6 +25,7 @@ import qualified Data.ByteString.Lazy as LBS
 import MailToMe (mailTo)
 import Tools (addIndex, addSep, getPostData, contentType, isHtml, isBinary )
 import StmFile (update)
+import StmLock (Lock, initLock)
 
 userAgent :: Request h -> Maybe [Product]
 userAgent (RequestGet _ _ gt) = getUserAgent gt
@@ -49,6 +51,7 @@ testProducts = [
 		Product "Firefox" (Just "34.0") ], "Phone")
 	]
 
+{-
 showRequest :: Request h -> String
 showRequest (RequestGet p v gt) =
 	"RequestGet " ++ show p ++ " " ++ show v ++ " (" ++ show gt ++ ")"
@@ -59,13 +62,14 @@ showRequest (RequestRaw rt p v rw) =
 
 showPost :: Post h -> String
 showPost _ = "comming soon"
+-}
 
 showPath :: Path -> String
 showPath (Path p) = BSC.unpack p
 
 showPage :: (HandleLike h, MonadIO (HandleMonad h)) =>
-	String -> h -> HandleMonad h ()
-showPage ma hdl = do
+	TVar Lock -> String -> h -> HandleMonad h ()
+showPage l ma hdl = do
 	req <- getRequest hdl
 	liftIO $ do
 		now <- getZonedTime
@@ -75,18 +79,8 @@ showPage ma hdl = do
 					then " " ++ fromJust (lookup agent testProducts)
 					else ("\n\t" ++) . unwords $ map showProduct agent
 				_ -> ""
-		putStrLn lg
-		update "tmp" "log/access.log" $
+		update l "tmp" "log/access.log" $
 			(`BSC.append` "\n") . (`BSC.append` BSC.pack lg)
---	liftIO . putStrLn $ showRequest req
-{-
-	fromMaybe (return ()) $ liftIO . putStrLn . ('\t' :)
-		. show <$> userAgent req
--}
-{-
-	fromMaybe (return ()) $ liftIO . putStrLn . ('\t' :)
-		. unwords . map showProduct <$> userAgent req
--}
 	getPostData req >>= liftIO . maybe (return ()) (mailTo ma)
 	let	fp_ = takeWhile (/= '?')
 			. BSC.unpack . (\(Path f) -> f) $ requestPath req

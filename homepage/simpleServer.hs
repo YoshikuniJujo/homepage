@@ -17,7 +17,7 @@ import Network.PeyoTLS.ReadFile (readKey, readCertificateChain)
 import "crypto-random" Crypto.Random (
 	SystemRNG, createEntropyPool, cprgCreate, cprgFork)
 
-import ShowPage (showPage)
+import ShowPage (showPage, initLock)
 
 keyFile :: String
 keyFile = "../certs/private_2014.key"
@@ -38,6 +38,7 @@ cipherSuites = [
 
 main :: IO ()
 main = do
+	l <- initLock
 	addr : _ <- getArgs
 	kc <- (,) <$> readKey keyFile <*> readCertificateChain certFile
 	soc <- listenOn (PortNumber 443) <* setHomepageID
@@ -47,7 +48,7 @@ main = do
 		liftIO $ do
 			(h, _, _) <- accept soc
 			forkIO . (`run` g) $ open h cipherSuites [kc] Nothing >>=
-				(>>) <$> showPage addr <*> hlClose
+				(>>) <$> showPage l addr <*> hlClose
 	where setHomepageID = do
 		getGroupEntryForName "homepage" >>= setGroupID . groupID
 		getUserEntryForName "homepage" >>= setUserID . userID
