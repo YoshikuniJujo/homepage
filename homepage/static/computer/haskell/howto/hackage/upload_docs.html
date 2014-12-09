@@ -11,7 +11,7 @@ Hackageにパッケージをアップすると、しばらくして自動的に�
 
 <p>
 <a href="http://maoe.hatenadiary.jp/entry/2014/09/29/214420"
-	>maoeさんのブログ</a>で同じような現象を扱っている。
+	>maoeさんのブログ</a>を参考にした。
 </p>
 
 <h2>解決</h2>
@@ -20,8 +20,9 @@ Hackageにパッケージをアップすると、しばらくして自動的に�
 
 <ol>
 <li>cabal haddock --hyperlink-source</li>
-<li>cd dist/doc/</li>
-<li>tar -c -v -Hustar -f [アーカイブ名].tar [パッケージ名]</li>
+<li>cd dist/doc/html/</li>
+<li>mv [パッケージ名] [パッケージ名-バージョン-docs]
+<li>tar -c -v -Hustar -f [アーカイブ名].tar [パッケージ名-バージョン-docs]</li>
 </ol>
 
 <h3>作成したアーカイブをアップロード</h3>
