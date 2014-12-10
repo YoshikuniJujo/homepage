@@ -1,0 +1,51 @@
+POODLE
+
+<p>
+POODLEとはSSLv3に対する中間者攻撃のことである。
+また、その攻撃に対する脆弱性についてもPOODLEと呼んでいる様子。
+</p>
+
+<h2>名前について</h2>
+
+<p>
+Padding Oracle On Downgraded Legacy Encryptionの略。
+</p>
+
+<h2>問題となるサーバ</h2>
+
+<p>
+SSLv3のCBCモード対応のサーバ。
+ただし、実装によっては同様の攻撃に対する脆弱性はTLSであったとしても存在する。
+</p>
+
+<h2>2つの側面</h2>
+
+<p>
+名前にも表されているが、この攻撃には以下の2つの側面がある。
+</p>
+
+<ul>
+<li>ダウングレード攻撃(ODLEの部分: On Downgraded Legacy Encryption)</li>
+<li>パディング部を利用した攻撃(POの部分: Padding Oracle)</li>
+</ul>
+
+<p>
+<a
+href="https://community.qualys.com/blogs/securitylabs/2014/10/15/ssl-3-is-dead-killed-by-the-poodle-attack"
+>SSLv3には規格自体に脆弱性がある</a>のでダウングレードすることで、
+その脆弱性をつくことができてしまう。
+TLSでは規格には脆弱性はないが、<a
+href="https://community.qualys.com/blogs/securitylabs/2014/12/08/poodle-bites-tls"
+>実装のバグによって同様の攻撃が可能</a>である。
+</p>
+
+<p>
+よってTLSの規格に則ったバグのない実装を使っている場合には、
+前者のダウングレードに対する対策をすれば良いということになる。
+</p>
+
+<ul>
+<li>ダウングレード攻撃とその対策</li>
+<li><a href="/computer/web/security/poodle/padding.html"
+	>パディング部を利用した攻撃</a></li>
+</ul>
