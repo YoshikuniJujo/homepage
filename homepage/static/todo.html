@@ -1,15 +1,14 @@
 やること
 
 <ul>
-<li>TLS 1.2のパディングについて<a
-	href="/computer/web/rfc/rfc5246/6_2_3_2_padding.html"
-	>このページ</a>にまとめる</li>
 <li><a href="/computer/haskell/coding/nsc.html"
 		>そんなに本気でない行単位の暗号化ソフト</a>を作成する
 	<ul>
-	<li>「演習の答え」等、すこしだけかくしたい情報用に</li>
-	<li>バージョン管理ソフトと相性が良いようにする</li>
-	<li>名前はnot serious cryptでnscあたりにするか</li>
+	<li>暗号キーからAES型の値を作成する関数を作成する</li>
+	<li>パディング用の関数を作成する</li>
+	<li>Base64のライブラリを試す</li>
+	<li>それぞれの段階の変換を行う関数を作成</li>
+	<li>encrypt、decrypt用のそれぞれのコード(Mainモジュール)を作成する</li>
 	</ul></li>
 <li>RFCをチェックしHTTPのレスポンスコードの一覧を作成する</li>
 <li>tighttpパッケージに上記のレスポンスコードを追加する</li>
@@ -68,8 +67,14 @@
 <li>peyotlsが大きいファイルを扱えるようにする
 	<ul>
 	<li>RFCを読んで最大のブロックを調べる</li>
-	<li>カーブsecp384r1に対応するようにする</li>
 	</ul></li>
+<li>peyotlsでカーブsecp384r1に対応するようにする
+	<ul>
+	<li>適切なRFCを見つけ、適切な場所をまとめる</li>
+	<li>使用しているパッケージについて調べる</li>
+	</ul></li>
+<li><a href="/computer/web/security/poodle/padding.html"
+	>POODLE:パディングのページ</a>に図を加える</li>
 <li><a href="/computer/programming/algorithm"
 	>アルゴリズムのページ</a
 	>のロックに関する説明のなかに図を入れることにする</li>

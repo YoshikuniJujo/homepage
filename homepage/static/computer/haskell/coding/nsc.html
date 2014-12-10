@@ -205,12 +205,27 @@ Prelude Crypto.Hash.SHA256 Data.ByteString&gt; Data.ByteString.length it
 
 <p>Crypto.Hash.SHA256.hashを使えばキーを32バイトに変換できる。</p>
 
+<h4>作成する関数</h4>
+
+<p>
+ユーザが入力した暗号キーをAES型の値に変換する関数。
+initAES . hashでOKだ。
+</p>
+
 <h3>パディングの仕様を決定する</h3>
 
 <p>
 <a href="http://tools.ietf.org/html/rfc5246#section-6.2.3.2"
 >RFC 5246 6.2.3.2</a>に書かれている内容を<a
-href="/computer/web/rfc/rfc5246/6_2_3_2_padding.html">ここ</a>にまとめる予定。
+href="/computer/web/rfc/rfc5246/6_2_3_2_padding.html">ここ</a>にまとめた。
+</p>
+
+<p>
+nscにおけるパディングの仕様も同じようにする。
+</p>
+
+<p>
+[data] [padding] [padding_length]
 </p>
 
 <h3>Base64ライブラリを試す</h3>
