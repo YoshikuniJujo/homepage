@@ -1,0 +1,222 @@
+そんなに本気じゃない暗号化ソフト
+
+<p>(作成中)</p>
+
+<h2>動機</h2>
+
+<p>
+テキストファイルとしてバージョン管理したいが、
+そんなに公けにしたくないファイルがあるとする。
+例えば授業で扱う問題の答えなどはネット上に流したくない。
+それでも、問題と一緒に公開リポジトリに置いておいたほうが便利だ。
+そんなときに、暗号としての強度は低くても、
+簡単に暗号化してバージョン管理ができたら便利だ。
+</p>
+
+<h2>名前</h2>
+
+<p>
+適当に、Not Serious Cryptあたりから一応nscという名前にしておく。
+</p>
+
+<h2>仕様</h2>
+
+<ul>
+<li>行単位で暗号化する
+	<ul>
+	<li>つまり改行は改行のままにする(\nのみに対応)</li>
+	<li>バージョン管理ソフトとの相性が良いので</li>
+	</ul></li>
+<li>結果はBase64で表現する
+	<ul>
+	<li>ASCIIテキストのほうが表示等で扱いやすいため</li>
+	</ul></li>
+<li>暗号化アルゴリズムはAES-CBCとする
+	<ul>
+	<li>一番メジャーなように思うので</li>
+	<li>深い意味はない</li>
+	</ul></li>
+<li>IV(初期化ベクトル)はランダム値として暗号化された行の先頭に付ける
+	<ul>
+	<li>いろいろと良い面があるので
+		<ul>
+		<li>たとえば暗号化や複号化が行単位で並列化できる等</li>
+		<li>しないけど</li>
+		</ul></li>
+	<li>そんなに本気ではないので標準の(暗号化用でない)ランダムを使う</li>
+	</ul></li>
+<li>Hackageでは今は公開しない
+	<ul>
+	<li>公開するほどのソフトでもないため</li>
+	</ul></li>
+<li>cabal化はしておく
+	<ul>
+	<li>必要なパッケージが明らかになるため</li>
+	</ul></li>
+</ul>
+
+<h2>試行錯誤</h2>
+
+<p>
+いろいろと試行錯誤する必要がある。
+<a href="/computer/haskell/coding/nsc.hs">これ</a>が現在のコード。
+必要なパッケージは
+<a href="https://hackage.haskell.org/package/cipher-aes">cipher-aes</a>
+。
+</p>
+
+<h3>暗号化ライブラリを試す</h3>
+
+<h4>使用するパッケージ</h4>
+
+<a href="https://hackage.haskell.org/package/cipher-aes">cipher-aes</a>
+
+<h4>使用する関数</h4>
+
+<pre><code>initAES :: Byteable b => b -> AES
+encryptCBC :: Byteable iv =&gt;
+	AES -&gt; iv -&gt; ByteString -&gt; ByteString
+decryptCBC :: Byteable iv =&gt;
+	AES -&gt; iv -&gt; ByteString -&gt; ByteString</code></pre>
+
+<p>
+Byteable bは「ByteStringにすることができる型b」ということ。
+とりあえずここではbやivをByteStringと考えておけば良い。
+</p>
+
+<h5>initAES</h5>
+
+<p>
+第一引数はAES暗号で使うパスワード。
+<a
+href="https://hackage.haskell.org/package/cipher-aes-0.2.9/docs/Crypto-Cipher-AES.html#g:4"
+>ここ</a>を見るとパスワードのサイズは16, 24, 32のいずれかである必要があるらしい。
+そうでないと未定義の動作になるとのこと。
+パッケージ作者の手抜きである。
+気持ちはよくわかる。
+あとで、そこらへんを保証するwrapperか何かを書く必要がある。
+</p>
+
+<h5>encryptCBC</h5>
+
+<p>
+第二引数はIV(初期化ベクトル)。
+<a
+href="https://hackage.haskell.org/package/cipher-aes-0.2.9/docs/Crypto-Cipher-AES.html#g:6"
+>ここ</a>を見るとIVはAESのブロックサイズと同じ長さである必要があるようだ。
+ブロックサイズの取得関数は<a
+href="https://hackage.haskell.org/package/crypto-cipher-types-0.0.9/docs/Crypto-Cipher-Types.html#t:BlockCipher"
+>ここ</a>を見ればわかる。
+</p>
+
+<h5>decryptCBC</h5>
+
+<a
+href="https://hackage.haskell.org/package/cipher-aes-0.2.9/docs/Crypto-Cipher-AES.html#g:7"
+>ここ</a>を見る。
+AESやIVはencryptCBCと同じものである必要がある。
+
+<h4>適当なファイルを作成する</h4>
+
+<pre><code>% cat nsc.hs
+{-# LANGUAGE OverloadedStrings #-}
+
+import Crypto.Cipher.AES
+import Crypto.Cipher.Types
+
+import qualified Data.ByteString as BS
+
+key :: AES
+key = initAES ("passwordpassword" :: BS.ByteString)
+
+iv :: BS.ByteString
+iv = "this is iv ivivi"</code></pre>
+
+<h4>GHCiで試してみる</h4>
+
+<pre><code>% ghci nsc.hs
+Main&gt; blockSize key
+16
+Main&gt; BS.length iv
+16
+Main&gt; :set -XOverloadedStrings
+Main&gt; encryptCBC key iv "Hello, world!"
+*** Exception: Encryption error:
+input length must be a multiple of block size (16).
+Its length is: 13</code></pre>
+
+<p>
+暗号化するデータはblock sizeの整数倍である必要があるとのこと。
+つまりパディングの処理はこちらでやる必要がある。
+</p>
+
+<pre><code>Main&gt; encryptCBC key iv "Hello, world!ppp"
+Main&gt; decryptCBC key iv it
+"Hello, world!ppp"
+</code></pre>
+
+<p>
+暗号化と復号化ができることがわかった。
+</p>
+
+<h4>わかったこと</h4>
+
+<ul>
+<li>暗号化のキーを適当な長さに変換してやる必要がある</li>
+<li>平文はパディングしてやる必要がある</li>
+</ul>
+
+<h4>するべきこと</h4>
+
+<ul>
+<li>暗号化のキーをハッシュ関数で調度いい長さに変換してやる
+	<ul>
+	<li>SHA-256あたりが良さそうだ
+	</ul></li>
+<li>パディングのやりかたを考える</li>
+	<ul>
+	<li><a href="http://tools.ietf.org/html/rfc5246#section-6.2.3.2"
+		>RFC 5246 6.2.3.2</a>が参考になる</li>
+	</ul></li>
+</ul>
+
+<h3>SHA-256ライブラリを試す</h3>
+
+<h4>使用するパッケージ</h4>
+
+<a href="http://hackage.haskell.org/package/cryptohash" >cryptohash</a>
+
+<h4>試してみる</h4>
+
+<pre><code>% ghci
+Prelude&gt; :m Crypto.Hash.SHA256
+Prelude Crypto.Hash.SHA256&gt;
+Prelude Crypto.Hash.SHA256&gt; :m + Data.ByteString
+Prelude Crypto.Hash.SHA256 Data.ByteString&gt; :t hash
+hash :: ByteString -&gt; ByteString
+Prelude Crypto.Hash.SHA256 Data.ByteString&gt; :set -XOverloadedStrings
+Prelude Crypto.Hash.SHA256 Data.ByteString&gt; hash "hello"
+",\242M\186_...\147\139\152$"
+Prelude Crypto.Hash.SHA256 Data.ByteString&gt; Data.ByteString.length it
+32
+</code></pre>
+
+<h4>わかったこと</h4>
+
+<p>Crypto.Hash.SHA256.hashを使えばキーを32バイトに変換できる。</p>
+
+<h3>パディングの仕様を決定する</h3>
+
+<p>
+<a href="http://tools.ietf.org/html/rfc5246#section-6.2.3.2"
+>RFC 5246 6.2.3.2</a>に書かれている内容を<a
+href="/computer/web/rfc/rfc5246/6_2_3_2_padding.html">ここ</a>にまとめる予定。
+</p>
+
+<h3>Base64ライブラリを試す</h3>
+
+<h4>使用するパッケージ</h4>
+
+<h4>試してみる</h4>
+
+<a href="/computer/haskell/coding">「Haskell: コーディング」にもどる</a>
