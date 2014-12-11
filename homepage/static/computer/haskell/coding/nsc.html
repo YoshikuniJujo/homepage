@@ -135,12 +135,12 @@ iv = "this is iv ivivi"</code></pre>
 <h4>GHCiで試してみる</h4>
 
 <pre><code>% ghci nsc.hs
-Main&gt; blockSize key
+*Main&gt; blockSize key
 16
-Main&gt; BS.length iv
+*Main&gt; BS.length iv
 16
-Main&gt; :set -XOverloadedStrings
-Main&gt; encryptCBC key iv "Hello, world!"
+*Main&gt; :set -XOverloadedStrings
+*Main&gt; encryptCBC key iv "Hello, world!"
 *** Exception: Encryption error:
 input length must be a multiple of block size (16).
 Its length is: 13</code></pre>
@@ -150,10 +150,9 @@ Its length is: 13</code></pre>
 つまりパディングの処理はこちらでやる必要がある。
 </p>
 
-<pre><code>Main&gt; encryptCBC key iv "Hello, world!ppp"
-Main&gt; decryptCBC key iv it
-"Hello, world!ppp"
-</code></pre>
+<pre><code>*Main&gt; encryptCBC key iv "Hello, world!ppp"
+*Main&gt; decryptCBC key iv it
+"Hello, world!ppp"</code></pre>
 
 <p>
 暗号化と復号化ができることがわかった。
@@ -171,14 +170,54 @@ Main&gt; decryptCBC key iv it
 <ul>
 <li>暗号化のキーをハッシュ関数で調度いい長さに変換してやる
 	<ul>
-	<li>SHA-256あたりが良さそうだ
+	<li>SHA-256あたりが良さそうだ</li>
 	</ul></li>
-<li>パディングのやりかたを考える</li>
+<li>パディングのやりかたを考える
 	<ul>
 	<li><a href="http://tools.ietf.org/html/rfc5246#section-6.2.3.2"
 		>RFC 5246 6.2.3.2</a>が参考になる</li>
 	</ul></li>
 </ul>
+
+<h4>ランダムなIVを生成する関数</h4>
+
+<p>
+ここでIVをランダムに生成する関数を作っておく。
+AES型の値とランダムの種をとり、
+ブロックサイズの長さのByteStringと新しいランダムの種を返せば良い。
+</p>
+
+<p>
+<a href="https://hackage.haskell.org/package/random-1.1/docs/System-Random.html"
+>System.Random</a>ライブラリを使用する。
+</p>
+
+<p>
+ランダムなWord8の値をブロックサイズの数だけリストとして用意して、
+それをpackする。
+指定された数だけのリストを用意するために以下の補助関数を作成する。
+</p>
+
+<pre><code>times :: Int (s -&gt; (x, s)) -&gt; s -&gt; ([x], s)
+times n _ s | n &lt;= 0 = ([], s)
+times n f s = let
+	(x, s') = f s
+	(xs, s'') = times (n - 1) f s ' in
+	(x : xs, s'')</code></pre>
+
+<p>これを利用すれば求める関数は簡単に作れる。</p>
+
+<pre><code>randomIv :: RandomGen g =&gt; AES -&gt; g -&gt; (BS.ByteString, g)
+randomIv a g = BS.pack `first` times (blockSize a) random g</code></pre>
+
+<p>試してみよう。</p>
+
+<pre><code>% ghci nsc.hs
+*Main&gt; :set -XOverloadedStrings
+*Main&gt; getStdRandom . randomIv $ mkAes "hoge"
+"\144m&gt;\182\166\162\ACKl.\188\155-P*\231\160"
+*Main&gt; BS.length it
+16</code></pre>
 
 <h3>SHA-256ライブラリを試す</h3>
 
@@ -212,7 +251,12 @@ Prelude Crypto.Hash.SHA256 Data.ByteString&gt; Data.ByteString.length it
 initAES . hashでOKだ。
 </p>
 
-<h3>パディングの仕様を決定する</h3>
+<pre><code>mkAes :: BS.ByteString -&gt; AES
+mkAes = initAES . SHA256.hash</code></pre>
+
+<h3>パディング</h3>
+
+<h4>仕様を決定する</h4>
 
 <p>
 <a href="http://tools.ietf.org/html/rfc5246#section-6.2.3.2"
@@ -220,18 +264,205 @@ initAES . hashでOKだ。
 href="/computer/web/rfc/rfc5246/6_2_3_2_padding.html">ここ</a>にまとめた。
 </p>
 
-<p>
-nscにおけるパディングの仕様も同じようにする。
-</p>
+<p>nscにおけるパディングの仕様も同じようにする。</p>
 
-<p>
-[data] [padding] [padding_length]
-</p>
+<p>[data] [padding] [padding_length]</p>
+
+<h4>関数を作成する</h4>
+
+<h5>最終的な長さを指定</h5>
+
+<p>まずは最終的な長さを指定してパディングを行う関数を作成する。</p>
+
+<pre><code>padToLen :: BS.ByteString -&gt; Int -&gt; BS.ByteString
+padToLen s n = s `BS.append` BS.replicate
+	(n - BS.length s)
+	(fromIntegral $ n - BS.length s - 1)</code></pre>
+
+<h5>ブロックサイズから最終的な長さを計算する</h5>
+
+<p>次にブロックサイズと文字列から最終的な長さを計算する関数を作成する。</p>
+
+<pre><code>blkSzToLen :: Int -&gt; BS.ByteString -&gt; Int
+blkSzToLen b s = (BS.length s `div` b + 1) * b</code></pre>
+
+<h5>ブロックサイズを指定してパディングする</h5>
+
+<p>これらの関数を合わせれば良い。</p>
+
+<pre><code>padding :: Int -&gt; BS.ByteString -&gt; BS.ByteString
+padding b = ($) &lt;$&gt; padToLen &lt;*&gt; blkSzToLen b</code></pre>
 
 <h3>Base64ライブラリを試す</h3>
 
+<h4>Base64について調べる</h4>
+
+<p>
+とりあえず<a href="https://ja.wikipedia.org/wiki/Base64">wikipedia</a>を読む。
+データを64種類の印字可能な英数字のみを用いてエンコードする。
+A-Z, a-z, 0-9, +, /の64文字とパディングのための=を使う。
+本来は76文字ごとに改行コードを入れるらしいが今回の用途ではそれはしない。
+変換のやりかたは以下の通り。
+</p>
+
+<ol>
+<li>元データを6ビットずつに分割する</li>
+<li>6ビットに満たない分は0を追加して6ビットにする</li>
+<li>各6ビットの値を変換表を使って4文字ずつ変換する</li>
+</ol>
+
 <h4>使用するパッケージ</h4>
+
+<a href="https://hackage.haskell.org/package/base64-bytestring"
+>base64-bytestring</a>
+
+<h4>使用する関数</h4>
+
+<a
+href="https://hackage.haskell.org/package/base64-bytestring-1.0.0.1/docs/Data-ByteString-Base64.html"
+>ドキュメント</a>を見るとencodeとdecodeが使えそうだ。
 
 <h4>試してみる</h4>
 
-<a href="/computer/haskell/coding">「Haskell: コーディング」にもどる</a>
+<pre><code>% ghci
+Prelude&gt; :m Data.ByteString.Base64
+Prelude Data.ByteString.Base64&gt; :set -XOverloadedStrings
+Prelude Data.ByteString.Base64&gt; encode "hoge"
+"aG9nZQ=="
+Prelude Data.ByteString.Base64&gt; decode it
+Right "hoge"</code></pre>
+
+<h3>ここまでで用意できた関数</h3>
+
+<dl>
+<dt>mkAes :: BS.ByteString -&gt; AES</dt>
+	<dd>パスワードからAES暗号化用のキーを生成する</dd>
+<dt>randomIv :: RandomGen g =&gt; AES -&gt; g -&gt; (ByteString, g)</dt>
+	<dd>キーから適切な長さのIV(初期化ベクトル)を生成する</dd>
+<dt>encryptCBC :: Byteable iv =&gt; AES -&gt; iv -&gt; ByteString -> ByteString</dt>
+	<dd>与えられたキーとIVでバイト列を暗号化する</dd>
+<dt>decryptCBC :: Byteable iv =&gt; AES -&gt; iv -&gt; ByteString -> ByteString</dt>
+	<dd>与えられたキーとIVでバイト列を復号する</dd>
+<dt>Base64.encode :: ByteString -&gt; ByteString</dt>
+	<dd>与えられたバイト列をBase64にエンコードする</dd>
+<dt>Base64.decode :: ByteString -&gt; Either String ByteString</dt>
+	<dd>与えられたバイト列をBase64としてデコードする</dd>
+</dl>
+
+<h3>出力フォーマットを決定する</h3>
+
+<p>
+だいたい必要な道具はそろったので出力フォーマットの決定に移る。
+以下のようなことを考慮する。
+</p>
+
+<ul>
+<li>nsc用の行でない行は無視する</li>
+<li>nsc用のデータまでのデータは無視する</li>
+<li>nsc用のデータの長さを指定しそれ以降のデータは無視する</li>
+<li>それぞれの行を別々に暗号化、復号化できるようにする</li>
+</ul>
+
+<p>
+それぞれの行はすべて独立したデータとなる。
+</p>
+
+<h4>一行のフォーマット</h4>
+
+<p>
+決定する必要があるのはnsc用のデータのはじまりを示すマーカー。
+以下のようなフォーマットが良いと思われる。
+</p>
+
+<p>[マーカー] [バイト長] [Base64でエンコードされたデータ]</p>
+
+<p>
+[マーカー]はとりあえず"[nsc]"あたりで良いと思う。
+[バイト長]も[]で囲うと良いかもしれない。
+</p>
+
+<p>例: [nsc][8]aG9nZQ==</p>
+
+<p>で、[Base64でエンコードされたデータ]をデコードすると以下のようになる。</p>
+
+<p>[IV] [暗号化されたデータ]</p>
+
+<h3>暗号化関数</h3>
+
+<h4>全体の流れ</h4>
+
+<ol>
+<li>パスワードからAESのキーを作成する</li>
+<li>行単位に分割する</li>
+<li>各行に対して以下を行う
+	<ol>
+	<li>ランダムなIVを取得する</li>
+	<li>暗号化する</li>
+	<li>IVと暗号化文字列を結合しBase64でエンコードする</li>
+	<li>先頭に[nsc][バイト数]をつける</li>
+	</ol></li>
+<li>それぞれの行をひとつにまとめる</li>
+</ol>
+
+<h4>空行の扱い</h4>
+
+<p>
+空行をそのまま暗号化するとセキュリティ的な問題があるように思う。
+空行だけは特別扱いにする。
+たとえば[nsc][0]の固定にしてしまおう。
+</p>
+
+<h4>1行を扱う関数</h4>
+
+<p>
+引数はAESのキーとランダムの種と行の内容。
+返り値は"[nsc][バイト数]"を付加したIVと暗号をBase64エンコードしたもの。
+空行だったら"[nsc][0]"として固定する。
+</p>
+
+<pre><code>
+(作成中)
+</code></pre>
+
+<h3>復号関数</h3>
+
+<h4>全体の流れ</h4>
+
+<ol>
+<li>パスワードからAESのキーを作成する</li>
+<li>プリプロセッサから[Base64でエンコードされたデータ]のリストを入手する</li>
+<li>各行に対して以下を行う
+	<ol>
+	<li>Base64としてデコードする</li>
+	<li>IVと暗号化部とに分ける</li>
+	<li>AESによる復号</li>
+	</ol></li>
+<li>それぞれの行をひとつにまとめる</li>
+</ol>
+
+<h4>プリプロセッサ</h4>
+
+<p>
+[nsc]を含む行だけを残し、また[nsc]以下の適切なバイト数だけを取り出す。
+つまり[Base64でエンコードされたデータ]のみを取り出すということ。
+より処理に近い書きかたをすれば、
+「データを走査し[nsc]が出てきたらその次の[バイト数]を調べ、
+そのバイト数ぶんだけのデータを読み込みリストに追加。
+それをデータがなくなるまでくりかえす」となるだろう。
+将来のことを考えれば\[nsc]は無視するというようにしておいたほうがベター。
+でも今はまだいいか。
+</p>
+
+<h4>空行の扱い</h4>
+
+<p>
+空行は空の文字列となる。
+よってIVを取り出そうとするとエラーが生じるので、
+IVとそれ以下のデータに分ける際に空行をチェックしてやる必要がある。
+</p>
+
+<p>
+(作成中)
+</p>
+
+<p><a href="/computer/haskell/coding">「Haskell: コーディング」にもどる</a></p>
