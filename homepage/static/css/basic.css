@@ -1,7 +1,8 @@
-dt {	padding-left : 0px; padding-right : 0px;
+dt.list {
+	padding-left : 0px; padding-right : 0px;
 	float : left; clear : both; font-weight : bold }
 
-dd {	margin-left : 80px }
+dd.list { margin-left : 80px }
 
 .right { text-align : right }
 
