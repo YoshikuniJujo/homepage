@@ -198,7 +198,7 @@ AES型の値とランダムの種をとり、
 指定された数だけのリストを用意するために以下の補助関数を作成する。
 </p>
 
-<pre><code>times :: Int (s -&gt; (x, s)) -&gt; s -&gt; ([x], s)
+<pre><code>times :: Int -&gt; (s -&gt; (x, s)) -&gt; s -&gt; ([x], s)
 times n _ s | n &lt;= 0 = ([], s)
 times n f s = let
 	(x, s') = f s
@@ -420,8 +420,44 @@ Right "hoge"</code></pre>
 空行だったら"[nsc][0]"として固定する。
 </p>
 
-<pre><code>
-(作成中)
+<pre><code>encrypt1 :: RandomGen g =&gt; AES -&gt; BS.ByteString -&gt; g -&gt; (BS.ByteString, g)
+encrypt1 _ "" g = ("[nsc][0]", g)
+encrypt1 k s g = let
+	(iv, g') = randomIv k g
+	cph = encryptCBC k iv (padding (blockSize k) s) in
+	("[nsc]["
+		`BS.append` BSC.pack (show $ BS.length cph)
+		`BS.append` "]" `BS.append` cph, g')</code></pre>
+
+<p>試してみる。</p>
+
+<pre><code>% ghci nsc.hs
+*Main&gt; :set -XOverloadedStrings
+*Main&gt; encrypt1 (mkAes "password") "hello" (mkStdGen 12)
+("[nsc][16]5g\165\227:]\RSmro\180\166\220{\132\b", 1854610307 1554910725)
+*Main&gt; getStdRandom $ encrypt1 (mkAes "password") "hello"
+"[nsc][16]\RS[w\203\148\&amp;8K\EOT\163\199uFL\130\148\174"
+</code></pre>
+
+<h4>複数行を扱う関数</h4>
+
+<p>monads-tfパッケージのStateモナドを使用するとスマート。</p>
+
+<pre><code>encrypt :: RandomGen g =&gt; AES -&gt; BS.ByteString -&gt; g -&gt; (BS.ByteString, g)
+encrypt k s = runState $ BSC.unlines <$> mapM
+	(\s -&gt; StateT $ Identity . encrypt1 k s)
+	(BSC.lines s)</code></pre>
+
+<p>試してみる。</p>
+
+<pre><code>% ghci nsc.hs
+*Main&gt; :set -XOverloadedStrings
+*Main&gt; encrypt (mkAes "password") "hello\nworld" (mkStdGen 12)
+("[nsc][16]5g\165\227:]\RSmro\180\166\220{\132\b\n[nsc][16]\172\\x\145
+\130\\h\204\152\221\253\136\SOH{}\159\n", 2036434855 1827928504)
+*Main&gt; getStdRandom $ encrypt (mkAes "password") "hello\nworld"
+"[nsc][16]vw9\220sB\130nb\133R4\DEL\175\NUL\240\n[ncs][16]'R\RS070s\140
+\131+\229\243\229H@B\n"
 </code></pre>
 
 <h3>復号関数</h3>
