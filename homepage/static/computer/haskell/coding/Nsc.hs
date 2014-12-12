@@ -1,5 +1,7 @@
 {-# LANGUAGE OverloadedStrings, PackageImports #-}
 
+module Nsc (getStdRandom, mkStdGen, encrypt, decrypt, makeKey) where
+
 import Control.Applicative
 import Control.Arrow
 import "monads-tf" Control.Monad.State
@@ -7,18 +9,12 @@ import "monads-tf" Control.Monad.Identity
 import Data.List
 import System.Random
 import Crypto.Cipher.AES
-import Crypto.Cipher.Types
+import Crypto.Cipher.Types (blockSize)
 
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BSC
 import qualified Data.ByteString.Base64 as Base64
 import qualified Crypto.Hash.SHA256 as SHA256
-
-key :: AES
-key = initAES ("passwordpassword" :: BS.ByteString)
-
--- iv :: BS.ByteString
--- iv = "this is iv ivivi"
 
 randomIv :: RandomGen g => AES -> g -> (BS.ByteString, g)
 randomIv a g = BS.pack `first` times (blockSize a) random g
@@ -30,7 +26,8 @@ times n f s = let
 	(xs, s'') = times (n - 1) f s' in
 	(x : xs, s'')
 
-mkAes :: BS.ByteString -> AES
+makeKey, mkAes :: BS.ByteString -> AES
+makeKey = mkAes
 mkAes = initAES . SHA256.hash
 
 padToLen :: BS.ByteString -> Int -> BS.ByteString
@@ -60,10 +57,6 @@ encrypt k str = runState $ BSC.unlines <$> mapM
 	(\s -> StateT $ Identity . encrypt1 k s)
 	(BSC.lines str)
 
-cipheredExample :: BS.ByteString
-cipheredExample = "This is ciphered example\n"
-	`BS.append` fst (encrypt (mkAes "password") "hello\nworld" (mkStdGen 12))
-
 breakNsc :: BS.ByteString -> Maybe (BS.ByteString, BS.ByteString)
 breakNsc s
 	| Just (n, t) <- nt = Just $ BS.splitAt n t
@@ -78,6 +71,7 @@ decryptPP :: BS.ByteString -> [BS.ByteString]
 decryptPP = unfoldr breakNsc
 
 decrypt1 :: AES -> BS.ByteString -> Maybe BS.ByteString
+decrypt1 _ "" = Just ""
 decrypt1 k l = case Base64.decode l of
 	Right d -> let (iv, cpd) = BS.splitAt 16 d in
 		Just . unpadding $ decryptCBC k iv cpd

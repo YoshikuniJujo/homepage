@@ -1,6 +1,7 @@
 そんなに本気じゃない暗号化ソフト
 
-<p>(その1 <a href="/computer/haskell/coding/nsc2.html">その2</a>)</p>
+<p>(その1 <a href="/computer/haskell/coding/nsc2.html"
+>その2</a> <a href="/computer/haskell/coding/nsc3.html">その3</a>)</p>
 
 <p>(作成中)</p>
 
@@ -233,12 +234,12 @@ randomIv a g = BS.pack `first` times (blockSize a) random g</code></pre>
 Prelude&gt; :m Crypto.Hash.SHA256
 Prelude Crypto.Hash.SHA256&gt;
 Prelude Crypto.Hash.SHA256&gt; :m + Data.ByteString
-Prelude Crypto.Hash.SHA256 Data.ByteString&gt; :t hash
+Prelude (略) Data.ByteString&gt; :t hash
 hash :: ByteString -&gt; ByteString
-Prelude Crypto.Hash.SHA256 Data.ByteString&gt; :set -XOverloadedStrings
-Prelude Crypto.Hash.SHA256 Data.ByteString&gt; hash "hello"
+Prelude (略) Data.ByteString&gt; :set -XOverloadedStrings
+Prelude (略) Data.ByteString&gt; hash "hello"
 ",\242M\186_...\147\139\152$"
-Prelude Crypto.Hash.SHA256 Data.ByteString&gt; Data.ByteString.length it
+Prelude (略) Data.ByteString&gt; Data.ByteString.length it
 32
 </code></pre>
 
@@ -294,6 +295,12 @@ blkSzToLen b s = (BS.length s `div` b + 1) * b</code></pre>
 
 <pre><code>padding :: Int -&gt; BS.ByteString -&gt; BS.ByteString
 padding b = ($) &lt;$&gt; padToLen &lt;*&gt; blkSzToLen b</code></pre>
+
+<h5>パディングを初り捨てる関数</h5>
+
+<pre><code>unpadding :: BS.ByteString -> BS.ByteString
+unpadding p = BS.take
+	(BS.length p - fromIntegral (BS.last p) - 1) p</code></pre>
 
 <h3>Base64ライブラリを試す</h3>
 
@@ -424,11 +431,13 @@ Right "hoge"</code></pre>
 空行だったら"[nsc][0]"として固定する。
 </p>
 
-<pre><code>encrypt1 :: RandomGen g =&gt; AES -&gt; BS.ByteString -&gt; g -&gt; (BS.ByteString, g)
+<pre><code>encrypt1 :: RandomGen g =&gt;
+	AES -&gt; BS.ByteString -&gt; g -&gt; (BS.ByteString, g)
 encrypt1 _ "" g = ("[nsc][0]", g)
 encrypt1 k s g = let
 	(iv, g') = randomIv k g
-	cph = Base64.encode $ encryptCBC k iv (padding (blockSize k) s) in
+	cph = Base64.encode . (iv `BS.append`)
+		$ encryptCBC k iv (padding (blockSize k) s) in
 	("[nsc][" `BS.append` BSC.pack (show $ BS.length cph)
 		`BS.append` "]" `BS.append` cph, g')</code></pre>
 
@@ -437,16 +446,18 @@ encrypt1 k s g = let
 <pre><code>% ghci nsc.hs
 *Main&gt; :set -XOverloadedStrings
 *Main&gt; encrypt1 (mkAes "password") "hello" (mkStdGen 12)
-("[nsc][24]NWel4zpdHm1yb7Sm3HuECA==", 1854610307 1554910725)
+("[nsc][44]q7RVfl49SvfMQJrkOuovJzVnpeM6XR5tcm+0ptx7hAg=",
+1854610307 1554910725)
 *Main&gt; getStdRandom $ encrypt1 (mkAes "password") "hello"
-"[nsc][24]K5gSzsfnUaCeZLttWIZKRg=="
+"[nsc][44]YFJLSLEN1C+hFWJWewZil7bBLUfiSTaM6TcWK3DOfn4="
 </code></pre>
 
 <h4>複数行を扱う関数</h4>
 
 <p>monads-tfパッケージのStateモナドを使用するとスマート。</p>
 
-<pre><code>encrypt :: RandomGen g =&gt; AES -&gt; BS.ByteString -&gt; g -&gt; (BS.ByteString, g)
+<pre><code>encrypt :: RandomGen g =&gt;
+	AES -&gt; BS.ByteString -&gt; g -&gt; (BS.ByteString, g)
 encrypt k s = runState $ BSC.unlines &lt;$&gt; mapM
 	(\s -&gt; StateT $ Identity . encrypt1 k s)
 	(BSC.lines s)</code></pre>
@@ -456,10 +467,12 @@ encrypt k s = runState $ BSC.unlines &lt;$&gt; mapM
 <pre><code>% ghci nsc.hs
 *Main&gt; :set -XOverloadedStrings
 *Main&gt; encrypt (mkAes "password") "hello\nworld" (mkStdGen 12)
-("[nsc][24]NWel4zpdHm1yb7Sm3HuECA==\n[nsc][24]rFx4kYJcaMyY3f2IAXt9nw==\n",
+("[nsc][44]q7RVfl49SvfMQJrkOuovJzVnpeM6XR5tcm+0ptx7hAg=\n
+[nsc][44]HFnaHPx5CMJvHSt003LVmKxceJGCXGjMmN39iAF7fZ8=\n",
 2036434855 1827928504)
 *Main&gt; getStdRandom $ encrypt (mkAes "password") "hello\nworld"
-"[nsc][24]XlNKDk8PGZbzq+Doo5KNlg==\n[nsc][24]XB0cj4Jallcca/wZFrH+Ew==\n"
+"[nsc][44]1TU+07rYthlz/aJcv+z7bjbc2x6sdtHdfOSPZotbGqI=\n
+[nsc][44]sdrTZvBiU2ISQH8WTHPrJqWgyyQAkvs6+KV5p7Qh/bw=\n"
 </code></pre>
 
 <h3>復号関数</h3>
@@ -513,15 +526,17 @@ breakSubstring関数が使えそうだ。
 
 <p>プリプロセッサ関数decryptPPは以下のようになるだろう。</p>
 
-<pre><code>breakNsc :: BS.ByteString -&gt; Maybe (BS.ByteString, BS.ByteString)
+<pre><code>breakNsc ::
+	BS.ByteString -&gt; Maybe (BS.ByteString, BS.ByteString)
 breakNsc s = case nt of
 	| Just (n, t) &lt;- nt = Just $ BS.splitAt n t
 	| otherwise = Nothing
 	where
 	nt = case BS.breakSubstring "[nsc][" s of
 		(_, "") -&gt; Nothing
-		(_, d) -&gt; Just $ read . BSC.unpack *** BS.tail $
-			BSC.span (/= ']') $ BS.drop 6 d
+		(_, d) -&gt; Just $
+			read . BSC.unpack *** BS.tail $
+				BSC.span (/= ']') $ BS.drop 6 d
 decryptPP :: BS.ByteString -&gt; [BS.ByteString]
 decryptPP = unfoldr breakNsc</code></pre>
 
@@ -543,18 +558,90 @@ IVとそれ以下のデータに分ける際に空行をチェックしてやる
 
 <h4>復号関数</h4>
 
-<p>todo</p>
+<pre><code>decrypt1 :: AES -&gt; BS.ByteString -&gt; Maybe BS.ByteString
+decrypt1 _ "" = Just ""
+decrypt1 k l = case Base64.decode l of
+	Right d -&gt; let (iv, cpd) = BS.splitAt 16 d in
+		Just . unpadding $ decryptCBC k iv cpd
+	_ -&gt; Nothing</code></pre>
 
-<ul>
-<li>encrypt1でivを付けるのを忘れていた</li>
-<li>unpadding関数を追加する必要がある</li>
-<li>decrypt1が空行を扱えるようにする必要がある</li>
-</ul>
+<pre><code>decrypt :: AES -&gt; BS.ByteString -&gt; BS.ByteString
+decrypt k = unlines . map (decrypt1 k) . decryptPP</code></pre>
+
+<h2>モジュールの出来上がり</h2>
+
+<p>試行錯誤で出来上がったファイルをモジュールにしてしまおう。</p>
+
+<pre><code>% cp nsc.hs Nsc.hs
+% vi <a href="/computer/haskell/coding/Nsc.hs">Nsc.hs</a>
+(module Nsc (encrypt, decrypt) whereを追加する)
+% ghci -Wall Nsc.hs
+*Nsc&gt; :set -XOverloadedStrings
+*Nsc&gt; let k = makeKey "password"
+*Nsc&gt; getStdRandom $ encrypt k "hello\nworld"
+"[nsc][44]V7+wezE0rb+HwN8j7DQ8ZApWPMJdE/0hVsUD6YGgHfY=\n
+[nsc][44]zcao93KGJCSeCypXISt20gurmozVUZlhKLWt9QM7u1M=\n"
+*Nsc&gt; decrypt k it
+Just "hello\nworld\n"
+</code></pre>
+
+<h2>実行可能ファイルを作成する</h2>
+
+<p>UNIXの伝統に則ってフィルタとして作ることにする。</p>
+
+<h3>暗号化スクリプト</h3>
+
+<pre><code>% cat <a href="/computer/haskell/coding/encrypt.hs">encrypt.hs</a>
+import System.Environment
+
+import qualified Data.ByteString as BS
+import qualified Data.ByteString.Char8 as BSC
+
+import Nsc
+
+main :: IO ()
+main = do
+	ps : _ &lt;- getArgs
+	BS.getContents
+		&gt;&gt;= getStdRandom . encrypt (makeKey ps)
+		&gt;&gt;= BS.putStr</code></pre>
+
+<h3>復号スクリプト</h3>
+
+<pre><code>% cat <a href="/computer/haskell/coding/decrypt.hs">decrypt.hs</a>
+{-# LANGUAGE OverloadedStrings #-}
+
+import Data.Maybe
+import System.Environment
+
+import qualified Data.ByteString as BS
+import qualified Data.ByteString.Char8 as BSC
+
+import Nsc
+
+main :: IO ()
+main = do
+	ps : _ &lt;- getArgs
+	BS.interact . (fromMaybe "" .)
+		. decrypt . makeKey $ BSC.pack ps</code></pre>
+
+<h3>試してみる</h3>
+
+<pre><code>% echo "hello\n\nworld" | runhaskell encrypt.hs password
+[nsc][44]4uHh/lKbNV0PbctzgsVw9+bXnwdRfB4afzzGOFNDfPU=
+[nsc][0]
+[nsc][44]VQtj2/VqzyvKWV+iyKxZST40M5L+sV+6kJA1J2TkL+M=
+% echo "hello\n\nworld" | runhaskell encrypt.hs password | \
+runhaskell decrypt.hs password
+hello
+
+world</code></pre>
 
 <p>
 (作成中)
 </p>
 
-<p><a href="/computer/haskell/coding/nsc2.html">その2へ</a></p>
-
-<p><a href="/computer/haskell/coding">「Haskell: コーディング」にもどる</a></p>
+<p>
+<a href="/computer/haskell/coding">「Haskell: コーディング」にもどる</a>
+<a href="/computer/haskell/coding/nsc2.html">その2へ</a>
+</p>

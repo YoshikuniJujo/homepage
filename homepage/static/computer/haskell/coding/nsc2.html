@@ -1,24 +1,53 @@
 そんなに本気じゃない暗号化ソフト
 
-<p>(<a href="/computer/haskell/coding/nsc.html">その1</a> その2)</p>
+<p>(<a href="/computer/haskell/coding/nsc.html">その1</a>
+ その2
+<a href="/computer/haskell/coding/nsc3.html">その3</a>)</p>
 
 <p>(工事中)</p>
 
 <h2>その2を作る動機</h2>
 
 <p>
-前回までに作った(まだ作成中だが)ソフトはファイル全体を行ごとに暗号化・復号した。
-これは全体を暗号化したい場合には便利だ。
-しかし、「その1」で挙げた動機のように、演習の回答部分を暗号化したい場合に、
-ファイルの一部分だけを暗号化・復号できると便利だ。
-以下のような条件を満たすソフトを作りたい。
+そもそもが、バージョン管理ソフトとの相性が良い暗号化ソフトを作成する
+という目的だった。
+しかし、前回作ったソフトは暗号化するたびに暗号化された値が変化してしまう。
+初期化ベクトルをランダムに生成していたためだ。
+これだとバージョン管理ソフトと相性が良いとは言えない。
+ランダムの種をコマンドライン引数から与えて、
+それを利用してランダム値を作成していくというのが良いのかもしれない。
+これならばランダムの種(適当な整数値)と
+パスワードを指定すれば暗号化後の値は一意に定まる。
 </p>
 
-<ul>
-<li>平文ファイルの暗号化部の範囲を示すマーカーを理解する
-	<ul>
-	<li>マーカーはもともとのファイルのコメント部に書ける</li>
-	<li>行中のどこに書いてあっても良いようにすればできる</li>
-	</ul></li>
-<li>復号の際には[nsc]の存在しない行はそのままにしておけば良い</li>
-</ul>
+<h2>暗号化スクリプト</h2>
+
+<pre><code>% cat <a href="/computer/haskell/coding/encrypt2.hs">encrypt2.hs</a>
+import Control.Applicative
+import System.Environment
+
+import qualified Data.ByteString as BS
+import qualified Data.ByteString.Char8 as BSC
+
+import Nsc
+
+main :: IO ()
+main = do
+	ps : sd : _ &lt;- getArgs
+	flip (encrypt . makeKey $ BSC.pack ps)
+		(mkStdGen $ read sd) &lt;$&gt; BS.getContents
+			&gt;&gt;= BS.putStr . fst</code></pre>
+
+<h2>試してみる。</h2>
+
+<pre><code>% echo "hello\n\nworld" | runhaskell encrypt2.hs password 12
+[nsc][44]q7RVfl49SvfMQJrkOuovJzVnpeM6XR5tcm+0ptx7hAg=
+[nsc][0]
+[nsc][44]HFnaHPx5CMJvHSt003LVmKxceJGCXGjMmN39iAF7fZ8=
+% echo "hello\n\nworld" | runhaskell encrypt2.hs password 12
+[nsc][44]q7RVfl49SvfMQJrkOuovJzVnpeM6XR5tcm+0ptx7hAg=
+[nsc][0]
+[nsc][44]HFnaHPx5CMJvHSt003LVmKxceJGCXGjMmN39iAF7fZ8=</code></pre>
+
+<p><a href="/computer/haskell/coding/nsc.html"
+	>その1へ</a> <a href="/computer/haskell/coding/nsc3.html">その3へ</a></p>
