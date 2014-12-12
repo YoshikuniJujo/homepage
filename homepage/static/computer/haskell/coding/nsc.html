@@ -1,5 +1,7 @@
 そんなに本気じゃない暗号化ソフト
 
+<p>(その1 <a href="/computer/haskell/coding/nsc2.html">その2</a>)</p>
+
 <p>(作成中)</p>
 
 <h2>動機</h2>
@@ -414,6 +416,8 @@ Right "hoge"</code></pre>
 
 <h4>1行を扱う関数</h4>
 
+<a href="/computer/haskell/coding/nsc.hs">現在のコード</a>
+
 <p>
 引数はAESのキーとランダムの種と行の内容。
 返り値は"[nsc][バイト数]"を付加したIVと暗号をBase64エンコードしたもの。
@@ -424,9 +428,8 @@ Right "hoge"</code></pre>
 encrypt1 _ "" g = ("[nsc][0]", g)
 encrypt1 k s g = let
 	(iv, g') = randomIv k g
-	cph = encryptCBC k iv (padding (blockSize k) s) in
-	("[nsc]["
-		`BS.append` BSC.pack (show $ BS.length cph)
+	cph = Base64.encode $ encryptCBC k iv (padding (blockSize k) s) in
+	("[nsc][" `BS.append` BSC.pack (show $ BS.length cph)
 		`BS.append` "]" `BS.append` cph, g')</code></pre>
 
 <p>試してみる。</p>
@@ -434,9 +437,9 @@ encrypt1 k s g = let
 <pre><code>% ghci nsc.hs
 *Main&gt; :set -XOverloadedStrings
 *Main&gt; encrypt1 (mkAes "password") "hello" (mkStdGen 12)
-("[nsc][16]5g\165\227:]\RSmro\180\166\220{\132\b", 1854610307 1554910725)
+("[nsc][24]NWel4zpdHm1yb7Sm3HuECA==", 1854610307 1554910725)
 *Main&gt; getStdRandom $ encrypt1 (mkAes "password") "hello"
-"[nsc][16]\RS[w\203\148\&amp;8K\EOT\163\199uFL\130\148\174"
+"[nsc][24]K5gSzsfnUaCeZLttWIZKRg=="
 </code></pre>
 
 <h4>複数行を扱う関数</h4>
@@ -453,11 +456,10 @@ encrypt k s = runState $ BSC.unlines <$> mapM
 <pre><code>% ghci nsc.hs
 *Main&gt; :set -XOverloadedStrings
 *Main&gt; encrypt (mkAes "password") "hello\nworld" (mkStdGen 12)
-("[nsc][16]5g\165\227:]\RSmro\180\166\220{\132\b\n[nsc][16]\172\\x\145
-\130\\h\204\152\221\253\136\SOH{}\159\n", 2036434855 1827928504)
+("[nsc][24]NWel4zpdHm1yb7Sm3HuECA==\n[nsc][24]rFx4kYJcaMyY3f2IAXt9nw==\n",
+2036434855 1827928504)
 *Main&gt; getStdRandom $ encrypt (mkAes "password") "hello\nworld"
-"[nsc][16]vw9\220sB\130nb\133R4\DEL\175\NUL\240\n[ncs][16]'R\RS070s\140
-\131+\229\243\229H@B\n"
+"[nsc][24]XlNKDk8PGZbzq+Doo5KNlg==\n[nsc][24]XB0cj4Jallcca/wZFrH+Ew==\n"
 </code></pre>
 
 <h3>復号関数</h3>
@@ -500,5 +502,7 @@ IVとそれ以下のデータに分ける際に空行をチェックしてやる
 <p>
 (作成中)
 </p>
+
+<p><a href="/computer/haskell/coding/nsc2.html">その2へ</a></p>
 
 <p><a href="/computer/haskell/coding">「Haskell: コーディング」にもどる</a></p>

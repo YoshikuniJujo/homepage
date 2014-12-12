@@ -47,8 +47,7 @@ encrypt1 _ "" g = ("[nsc][0]", g)
 encrypt1 k s g = let
 	(iv, g') = randomIv k g
 	cph = Base64.encode $ encryptCBC k iv (padding (blockSize k) s) in
-	("[nsc]["
-		`BS.append` BSC.pack (show $ BS.length cph)
+	("[nsc][" `BS.append` BSC.pack (show $ BS.length cph)
 		`BS.append` "]" `BS.append` cph, g')
 
 encrypt :: RandomGen g => AES -> BS.ByteString -> g -> (BS.ByteString, g)
