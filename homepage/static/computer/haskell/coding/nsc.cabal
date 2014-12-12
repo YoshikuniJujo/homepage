@@ -1,0 +1,35 @@
+build-type:	Simple
+cabal-version:	>= 1.8
+
+name:		nsc
+version:	0.0.0.1
+stability:	Experimental
+author:		Yoshikuni Jujo <PAF01143@nifty.ne.jp>
+maintainer:	Yoshikuni Jujo <PAF01143@nifty.ne.jp>
+homepage:	http://skami.iocikun.jp/computer/haskell/coding/nsc.html
+
+license:	BSD3
+license-file:	LICENSE
+
+category:	Crypto
+synopsis:	Not Serious Crypto Tool
+description:
+    nsc-encrypt and nsc-decrypt
+
+executable	nsc-encrypt
+    main-is:	encrypt.hs
+    build-depends:
+        base == 4.*, cryptohash == 0.11.*, base64-bytestring == 1.0.*,
+        bytestring == 0.10.*, crypto-cipher-types == 0.0.*, cipher-aes == 0.2.*,
+        random == 1.0.*, monads-tf == 0.1.*
+    ghc-options: -Wall
+    extensions:	PatternGuards, DoAndIfThenElse
+
+executable	nsc-decrypt
+    main-is:	decrypt.hs
+    build-depends:
+        base == 4.*, cryptohash == 0.11.*, base64-bytestring == 1.0.*,
+        bytestring == 0.10.*, crypto-cipher-types == 0.0.*, cipher-aes == 0.2.*,
+        random == 1.0.*, monads-tf == 0.1.*
+    ghc-options: -Wall
+    extensions:	PatternGuards, DoAndIfThenElse
