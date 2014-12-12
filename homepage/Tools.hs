@@ -20,14 +20,16 @@ addSep p | null $ takeExtension p = addTrailingPathSeparator p | otherwise = p
 contentType :: FilePath -> ContentType
 contentType fp = case takeExtension fp of
 	".ico" -> ico; ".png" -> png; ".jpg" -> jpg; ".svg" -> svg
-	".css" -> css; ".html" -> html; ".hs" -> plain
+	".css" -> css; ".html" -> html; ".hs" -> plain; ".cabal" -> plain
+	".ebuild" -> plain
+	".tar.gz" -> targz
 	_ -> octet
 
 isHtml, isBinary :: ContentType -> Bool
 isHtml = (== html)
 isBinary = (`elem` [ico, png, jpg, octet])
 
-ico, png, jpg, svg, css, html, plain, octet :: ContentType
+ico, png, jpg, svg, css, html, plain, targz, octet :: ContentType
 ico = ContentType (TypeRaw "image") (SubtypeRaw "vnd.microsoft.icon") []
 png = ContentType (TypeRaw "image") (SubtypeRaw "png") []
 jpg = ContentType (TypeRaw "image") (SubtypeRaw "jpg") []
@@ -35,6 +37,7 @@ svg = ContentType (TypeRaw "image") (SubtypeRaw "svg") []
 css = ContentType Text Css []
 html = ContentType Text Html []
 plain = ContentType Text Plain []
+targz = ContentType (TypeRaw "application") (SubtypeRaw "x-tar-gz") []
 octet = ContentType (TypeRaw "application") (SubtypeRaw "octet-stream") []
 
 getPostData :: HandleLike h => Request h -> HandleMonad h (Maybe BSC.ByteString)
