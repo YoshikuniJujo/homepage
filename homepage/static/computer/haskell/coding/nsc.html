@@ -447,7 +447,7 @@ encrypt1 k s g = let
 <p>monads-tfパッケージのStateモナドを使用するとスマート。</p>
 
 <pre><code>encrypt :: RandomGen g =&gt; AES -&gt; BS.ByteString -&gt; g -&gt; (BS.ByteString, g)
-encrypt k s = runState $ BSC.unlines <$> mapM
+encrypt k s = runState $ BSC.unlines &lt;$&gt; mapM
 	(\s -&gt; StateT $ Identity . encrypt1 k s)
 	(BSC.lines s)</code></pre>
 
@@ -472,13 +472,26 @@ encrypt k s = runState $ BSC.unlines <$> mapM
 <li>各行に対して以下を行う
 	<ol>
 	<li>Base64としてデコードする</li>
-	<li>IVと暗号化部とに分ける</li>
+	<li>IVと暗号化部とに分ける
+		<ul>
+		<li>とりあえずIVは16バイトに決め打ち</li>
+		</ul></li>
 	<li>AESによる復号</li>
 	</ol></li>
 <li>それぞれの行をひとつにまとめる</li>
 </ol>
 
 <h4>プリプロセッサ</h4>
+
+<p>
+<a href="/computer/haskell/coding/nsc.hs">現在のコード</a>
+</p>
+
+<p>
+参考: <a
+href="https://hackage.haskell.org/package/bytestring-0.10.4.1/docs/Data-ByteString.html"
+>Data.ByteString</a>
+</p>
 
 <p>
 [nsc]を含む行だけを残し、また[nsc]以下の適切なバイト数だけを取り出す。
@@ -491,6 +504,35 @@ encrypt k s = runState $ BSC.unlines <$> mapM
 でも今はまだいいか。
 </p>
 
+<p>
+breakSubstring関数が使えそうだ。
+</p>
+
+<pre><code>breakSubString ::
+	ByteString -&gt; ByteString -&gt; (ByteString, ByteString)</code></pre>
+
+<p>プリプロセッサ関数decryptPPは以下のようになるだろう。</p>
+
+<pre><code>breakNsc :: BS.ByteString -&gt; Maybe (BS.ByteString, BS.ByteString)
+breakNsc s = case nt of
+	| Just (n, t) &lt;- nt = Just $ BS.splitAt n t
+	| otherwise = Nothing
+	where
+	nt = case BS.breakSubstring "[nsc][" s of
+		(_, "") -&gt; Nothing
+		(_, d) -&gt; Just $ read . BSC.unpack *** BS.tail $
+			BSC.span (/= ']') $ BS.drop 6 d
+decryptPP :: BS.ByteString -&gt; [BS.ByteString]
+decryptPP = unfoldr breakNsc</code></pre>
+
+<small>
+(*) ちなみにbreakNscは部分関数である。
+問題はreadとBS.tailを使っているところにある。
+本来ならそこらへんをきちんとチェックしてNothingを返すか、
+または全体をIOでくくってちゃんとした例外を返してやるべきだ。
+でも、とりあえずは「手抜き」しておく。
+</small>
+
 <h4>空行の扱い</h4>
 
 <p>
@@ -498,6 +540,16 @@ encrypt k s = runState $ BSC.unlines <$> mapM
 よってIVを取り出そうとするとエラーが生じるので、
 IVとそれ以下のデータに分ける際に空行をチェックしてやる必要がある。
 </p>
+
+<h4>復号関数</h4>
+
+<p>todo</p>
+
+<ul>
+<li>encrypt1でivを付けるのを忘れていた</li>
+<li>unpadding関数を追加する必要がある</li>
+<li>decrypt1が空行を扱えるようにする必要がある</li>
+</ul>
 
 <p>
 (作成中)
