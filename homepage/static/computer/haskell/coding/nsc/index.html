@@ -1,7 +1,7 @@
 そんなに本気じゃない暗号化ソフト
 
-<p>(その1 <a href="/computer/haskell/coding/nsc2.html"
->その2</a> <a href="/computer/haskell/coding/nsc3.html">その3</a>)</p>
+<p>(その1 <a href="/computer/haskell/coding/nsc/nsc2.html"
+>その2</a> <a href="/computer/haskell/coding/nsc/nsc3.html">その3</a>)</p>
 
 <p>(作成中)</p>
 
@@ -62,7 +62,7 @@
 
 <p>
 いろいろと試行錯誤する必要がある。
-<a href="/computer/haskell/coding/nsc.hs">これ</a>が現在のコード。
+<a href="/computer/haskell/coding/nsc/nsc.hs">これ</a>が現在のコード。
 必要なパッケージは
 <a href="https://hackage.haskell.org/package/cipher-aes">cipher-aes</a>
 。
@@ -423,7 +423,7 @@ Right "hoge"</code></pre>
 
 <h4>1行を扱う関数</h4>
 
-<a href="/computer/haskell/coding/nsc.hs">現在のコード</a>
+<a href="/computer/haskell/coding/nsc/nsc.hs">現在のコード</a>
 
 <p>
 引数はAESのキーとランダムの種と行の内容。
@@ -497,7 +497,7 @@ encrypt k s = runState $ BSC.unlines &lt;$&gt; mapM
 <h4>プリプロセッサ</h4>
 
 <p>
-<a href="/computer/haskell/coding/nsc.hs">現在のコード</a>
+<a href="/computer/haskell/coding/nsc/nsc.hs">現在のコード</a>
 </p>
 
 <p>
@@ -573,7 +573,7 @@ decrypt k = unlines . map (decrypt1 k) . decryptPP</code></pre>
 <p>試行錯誤で出来上がったファイルをモジュールにしてしまおう。</p>
 
 <pre><code>% cp nsc.hs Nsc.hs
-% vi <a href="/computer/haskell/coding/Nsc.hs">Nsc.hs</a>
+% vi <a href="/computer/haskell/coding/nsc/Nsc.hs">Nsc.hs</a>
 (module Nsc (encrypt, decrypt) whereを追加する)
 % ghci -Wall Nsc.hs
 *Nsc&gt; :set -XOverloadedStrings
@@ -591,7 +591,7 @@ Just "hello\nworld\n"
 
 <h3>暗号化スクリプト</h3>
 
-<pre><code>% cat <a href="/computer/haskell/coding/encrypt.hs">encrypt.hs</a>
+<pre><code>% cat <a href="/computer/haskell/coding/nsc/encrypt.hs">encrypt.hs</a>
 import System.Environment
 
 import qualified Data.ByteString as BS
@@ -608,7 +608,7 @@ main = do
 
 <h3>復号スクリプト</h3>
 
-<pre><code>% cat <a href="/computer/haskell/coding/decrypt.hs">decrypt.hs</a>
+<pre><code>% cat <a href="/computer/haskell/coding/nsc/decrypt.hs">decrypt.hs</a>
 {-# LANGUAGE OverloadedStrings #-}
 
 import Data.Maybe
