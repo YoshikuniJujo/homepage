@@ -1,0 +1,581 @@
+そんなに本気じゃない暗号化ソフト
+
+<p>(その1 <a href="/computer/haskell/coding/nsc/nsc2.html"
+>その2</a> <a href="/computer/haskell/coding/nsc/nsc3.html">その3</a>)</p>
+
+<p>(工事中)</p>
+
+<h2>暗号化ライブラリを試す</h2>
+
+<h3>使用するパッケージ</h3>
+
+<a href="https://hackage.haskell.org/package/cipher-aes">cipher-aes</a>
+
+<h3>使用する関数</h3>
+
+<pre><code>initAES :: Byteable b => b -> AES
+encryptCBC :: Byteable iv =&gt;
+	AES -&gt; iv -&gt; ByteString -&gt; ByteString
+decryptCBC :: Byteable iv =&gt;
+	AES -&gt; iv -&gt; ByteString -&gt; ByteString</code></pre>
+
+<p>
+Byteable bは「ByteStringにすることができる型b」ということ。
+とりあえずここではbやivをByteStringと考えておけば良い。
+</p>
+
+<h4>initAES</h4>
+
+<p>
+第一引数はAES暗号で使うパスワード。
+<a
+href="https://hackage.haskell.org/package/cipher-aes-0.2.9/docs/Crypto-Cipher-AES.html#g:4"
+>ここ</a>を見るとパスワードのサイズは16, 24, 32のいずれかである必要があるらしい。
+そうでないと未定義の動作になるとのこと。
+パッケージ作者の手抜きである。
+気持ちはよくわかる。
+あとで、そこらへんを保証するwrapperを書く必要があるかもしれない。
+</p>
+
+<h4>encryptCBC</h4>
+
+<p>
+第二引数はIV(初期化ベクトル)。
+<a
+href="https://hackage.haskell.org/package/cipher-aes-0.2.9/docs/Crypto-Cipher-AES.html#g:6"
+>ここ</a>を見るとIVはAESのブロックサイズと同じ長さである必要があるようだ。
+ブロックサイズの取得関数は<a
+href="https://hackage.haskell.org/package/crypto-cipher-types-0.0.9/docs/Crypto-Cipher-Types.html#t:BlockCipher"
+>ここ</a>を見ればわかる。
+</p>
+
+<h4>decryptCBC</h4>
+
+<a
+href="https://hackage.haskell.org/package/cipher-aes-0.2.9/docs/Crypto-Cipher-AES.html#g:7"
+>ここ</a>を見る。
+AESやIVはencryptCBCと同じものである。
+
+<h3>適当なファイルを作成する</h3>
+
+<pre><code>% cat nsc.hs
+{-# LANGUAGE OverloadedStrings #-}
+
+import Crypto.Cipher.AES
+import Crypto.Cipher.Types
+
+import qualified Data.ByteString as BS
+
+keySample :: AES
+keySample = initAES ("passwordpassword" :: BS.ByteString)
+
+ivSample :: BS.ByteString
+ivSample = "this is iv ivivi"</code></pre>
+
+<h3>GHCiで試してみる</h3>
+
+<pre><code>% ghci nsc.hs
+*Main&gt; blockSize keySample
+16
+*Main&gt; BS.length ivSample
+16
+*Main&gt; :set -XOverloadedStrings
+*Main&gt; encryptCBC keySample ivSample "Hello, world!"
+*** Exception: Encryption error:
+input length must be a multiple of block size (16).
+Its length is: 13</code></pre>
+
+<p>
+暗号化するデータはブロックサイズ(16)の整数倍でないといけない。
+パディングの処理はこちらでやるということだ。
+</p>
+
+<pre><code>*Main&gt; encryptCBC keySample ivSample "Hello, world!ppp"
+"\206\&amp;2/^\142\141\&amp;2\172\227:\\\164d_\DC4\131"
+*Main&gt; decryptCBC keySample ivSample it
+"Hello, world!ppp"</code></pre>
+
+<p>暗号化と復号化ができた。</p>
+
+<h3>わかったこと</h3>
+
+<ul>
+<li>パスワードを適当な長さ(16, 24, 32)に変換する</li>
+<li>平文はパディングしてブロック長の整数倍にする</li>
+</ul>
+
+<h3>するべきこと</h3>
+
+<ul>
+<li>パスワードをハッシュ関数で調度いい長さに変換してやる
+	<ul>
+	<li>SHA-256あたりが良さそうだ(32バイトになる)</li>
+	</ul></li>
+<li>パディングのやりかたを考える
+	<ul>
+	<li><a href="http://tools.ietf.org/html/rfc5246#section-6.2.3.2"
+		>RFC 5246 6.2.3.2</a>を参考にする</li>
+	</ul></li>
+</ul>
+
+<h3 id="random_iv">ランダムなIVを生成する関数</h3>
+
+<p>
+ここでIVをランダムに生成する関数を作っておく。
+AES型の値とランダムの種をとり、
+ブロックサイズの長さのByteStringと新しいランダムの種を返せば良い。
+<a href="https://hackage.haskell.org/package/random-1.1/docs/System-Random.html"
+>System.Random</a>ライブラリを使用する。
+</p>
+
+<p id="times">
+ランダムなWord8の値をブロックサイズの数だけリストとして用意しそれをpackする。
+指定された数だけのリストを用意するために以下の補助関数を作成する。
+</p>
+
+<pre><code>times :: Int -&gt; (s -&gt; (x, s)) -&gt; s -&gt; ([x], s)
+times n _ s | n &lt;= 0 = ([], s)
+times n f s = let
+	(x, s') = f s
+	(xs, s'') = times (n - 1) f s ' in
+	(x : xs, s'')</code></pre>
+
+<small id="times_with_state">* Stateモナドを使っても良い(<a
+href="/computer/haskell/coding/nsc/times_with_state.html"
+>Stateモナドを使用したtimes関数</a>)</small>
+
+<p>これを利用すれば求める関数は簡単に作れる。</p>
+
+<pre><code>randomIv :: RandomGen g =&gt; AES -&gt; g -&gt; (BS.ByteString, g)
+randomIv a g = BS.pack `first` times (blockSize a) random g</code></pre>
+
+<p>試してみよう。</p>
+
+<pre><code>% ghci nsc.hs
+*Main&gt; :set -XOverloadedStrings
+*Main&gt; getStdRandom . randomIv $ mkAes "hoge"
+"\144m&gt;\182\166\162\ACKl.\188\155-P*\231\160"
+*Main&gt; BS.length it
+16</code></pre>
+
+<h2>SHA-256ライブラリを試す</h2>
+
+<h3>使用するパッケージ</h3>
+
+<a href="http://hackage.haskell.org/package/cryptohash" >cryptohash</a>
+
+<h3>試してみる</h3>
+
+<pre><code>% ghci
+Prelude&gt; :m Crypto.Hash.SHA256
+Prelude Crypto.Hash.SHA256&gt;
+Prelude Crypto.Hash.SHA256&gt; :m + Data.ByteString
+Prelude (略) Data.ByteString&gt; :t hash
+hash :: ByteString -&gt; ByteString
+Prelude (略) Data.ByteString&gt; :set -XOverloadedStrings
+Prelude (略) Data.ByteString&gt; hash "hello"
+",\242M\186_...\147\139\152$"
+Prelude (略) Data.ByteString&gt; Data.ByteString.length it
+32
+</code></pre>
+
+<h3>わかったこと</h3>
+
+<p>Crypto.Hash.SHA256.hashを使えばキーを32バイトに変換できる。</p>
+
+<h3>作成する関数</h3>
+
+<p>
+ユーザが入力した暗号キーをAES型の値に変換する関数。
+initAES . hashでOKだ。
+</p>
+
+<pre><code>mkAes :: BS.ByteString -&gt; AES
+mkAes = initAES . SHA256.hash</code></pre>
+
+<h2>パディング</h2>
+
+<h3>仕様を決定する</h3>
+
+<p>
+<a href="http://tools.ietf.org/html/rfc5246#section-6.2.3.2"
+>RFC 5246 6.2.3.2</a>に書かれている内容を<a
+href="/computer/web/rfc/rfc5246/6_2_3_2_padding.html">ここ</a>にまとめた。
+</p>
+
+<p>nscにおけるパディングの仕様も同じようにする。</p>
+
+<p>[data] [padding] [padding_length]</p>
+
+<h3>関数を作成する</h3>
+
+<h4>最終的な長さを指定</h4>
+
+<p>まずは最終的な長さを指定してパディングを行う関数を作成する。</p>
+
+<pre><code>padToLen :: BS.ByteString -&gt; Int -&gt; BS.ByteString
+padToLen s n = s `BS.append` BS.replicate
+	(n - BS.length s)
+	(fromIntegral $ n - BS.length s - 1)</code></pre>
+
+<h4>ブロックサイズから最終的な長さを計算する</h4>
+
+<p>次にブロックサイズと文字列から最終的な長さを計算する関数を作成する。</p>
+
+<pre><code>blkSzToLen :: Int -&gt; BS.ByteString -&gt; Int
+blkSzToLen b s = (BS.length s `div` b + 1) * b</code></pre>
+
+<h4>ブロックサイズを指定してパディングする</h4>
+
+<p>これらの関数を合わせれば良い。</p>
+
+<pre><code>padding :: Int -&gt; BS.ByteString -&gt; BS.ByteString
+padding b = ($) &lt;$&gt; padToLen &lt;*&gt; blkSzToLen b</code></pre>
+
+<h4>パディングを初り捨てる関数</h4>
+
+<pre><code>unpadding :: BS.ByteString -> BS.ByteString
+unpadding p = BS.take
+	(BS.length p - fromIntegral (BS.last p) - 1) p</code></pre>
+
+<h2>Base64ライブラリを試す</h2>
+
+<h3>Base64について調べる</h3>
+
+<p>
+とりあえず<a href="https://ja.wikipedia.org/wiki/Base64">wikipedia</a>を読む。
+データを64種類の印字可能な英数字のみを用いてエンコードする。
+A-Z, a-z, 0-9, +, /の64文字とパディングのための=を使う。
+本来は76文字ごとに改行コードを入れるらしいが今回の用途ではそれはしない。
+変換のやりかたは以下の通り。
+</p>
+
+<ol>
+<li>元データを6ビットずつに分割する</li>
+<li>6ビットに満たない分は0を追加して6ビットにする</li>
+<li>各6ビットの値を変換表を使って4文字ずつ変換する</li>
+</ol>
+
+<h3>使用するパッケージ</h3>
+
+<a href="https://hackage.haskell.org/package/base64-bytestring"
+>base64-bytestring</a>
+
+<h3>使用する関数</h3>
+
+<a
+href="https://hackage.haskell.org/package/base64-bytestring-1.0.0.1/docs/Data-ByteString-Base64.html"
+>ドキュメント</a>を見るとencodeとdecodeが使えそうだ。
+
+<h3>試してみる</h3>
+
+<pre><code>% ghci
+Prelude&gt; :m Data.ByteString.Base64
+Prelude Data.ByteString.Base64&gt; :set -XOverloadedStrings
+Prelude Data.ByteString.Base64&gt; encode "hoge"
+"aG9nZQ=="
+Prelude Data.ByteString.Base64&gt; decode it
+Right "hoge"</code></pre>
+
+<h2>ここまでで用意できた関数</h2>
+
+<dl>
+<dt>mkAes :: BS.ByteString -&gt; AES</dt>
+	<dd>パスワードからAES暗号化用のキーを生成する</dd>
+<dt>randomIv :: RandomGen g =&gt; AES -&gt; g -&gt; (ByteString, g)</dt>
+	<dd>キーから適切な長さのIV(初期化ベクトル)を生成する</dd>
+<dt>encryptCBC :: Byteable iv =&gt; AES -&gt; iv -&gt; ByteString -> ByteString</dt>
+	<dd>与えられたキーとIVでバイト列を暗号化する</dd>
+<dt>decryptCBC :: Byteable iv =&gt; AES -&gt; iv -&gt; ByteString -> ByteString</dt>
+	<dd>与えられたキーとIVでバイト列を復号する</dd>
+<dt>Base64.encode :: ByteString -&gt; ByteString</dt>
+	<dd>与えられたバイト列をBase64にエンコードする</dd>
+<dt>Base64.decode :: ByteString -&gt; Either String ByteString</dt>
+	<dd>与えられたバイト列をBase64としてデコードする</dd>
+</dl>
+
+<h2>出力フォーマットを決定する</h2>
+
+<p>
+だいたい必要な道具はそろったので出力フォーマットの決定に移る。
+以下のようなことを考慮する。
+</p>
+
+<ul>
+<li>nsc用の行でない行は無視する</li>
+<li>nsc用のデータまでのデータは無視する</li>
+<li>nsc用のデータの長さを指定しそれ以降のデータは無視する</li>
+<li>それぞれの行を別々に暗号化、復号化できるようにする</li>
+</ul>
+
+<p>
+それぞれの行はすべて独立したデータとなる。
+</p>
+
+<h3>一行のフォーマット</h3>
+
+<p>
+決定する必要があるのはnsc用のデータのはじまりを示すマーカー。
+以下のようなフォーマットが良いと思われる。
+</p>
+
+<p>[マーカー] [バイト長] [Base64でエンコードされたデータ]</p>
+
+<p>
+[マーカー]はとりあえず"[nsc]"あたりで良いと思う。
+[バイト長]も[]で囲うと良いかもしれない。
+</p>
+
+<p>例: [nsc][8]aG9nZQ==</p>
+
+<p>で、[Base64でエンコードされたデータ]をデコードすると以下のようになる。</p>
+
+<p>[IV] [暗号化されたデータ]</p>
+
+<h2>暗号化関数</h2>
+
+<h3>全体の流れ</h3>
+
+<ol>
+<li>パスワードからAESのキーを作成する</li>
+<li>行単位に分割する</li>
+<li>各行に対して以下を行う
+	<ol>
+	<li>ランダムなIVを取得する</li>
+	<li>暗号化する</li>
+	<li>IVと暗号化文字列を結合しBase64でエンコードする</li>
+	<li>先頭に[nsc][バイト数]をつける</li>
+	</ol></li>
+<li>それぞれの行をひとつにまとめる</li>
+</ol>
+
+<h3>空行の扱い</h3>
+
+<p>
+空行だけは特別扱いにする。
+たとえば[nsc][0]の固定にしてしまおう。
+</p>
+
+<h3>1行を扱う関数</h3>
+
+<p>
+引数はAESのキーとランダムの種と行の内容。
+返り値は"[nsc][バイト数]"を付加したIVと暗号をBase64エンコードしたもの。
+空行だったら"[nsc][0]"として固定する。
+</p>
+
+<pre><code>encrypt1 :: RandomGen g =&gt;
+	AES -&gt; BS.ByteString -&gt; g -&gt; (BS.ByteString, g)
+encrypt1 _ "" g = ("[nsc][0]", g)
+encrypt1 k s g = let
+	(iv, g') = randomIv k g
+	cph = Base64.encode . (iv `BS.append`)
+		$ encryptCBC k iv (padding (blockSize k) s) in
+	("[nsc][" `BS.append` BSC.pack (show $ BS.length cph)
+		`BS.append` "]" `BS.append` cph, g')</code></pre>
+
+<p>試してみる。</p>
+
+<pre><code>% ghci nsc.hs
+*Main&gt; :set -XOverloadedStrings
+*Main&gt; encrypt1 (mkAes "password") "hello" (mkStdGen 12)
+("[nsc][44]q7RVfl49SvfMQJrkOuovJzVnpeM6XR5tcm+0ptx7hAg=",
+1854610307 1554910725)
+*Main&gt; getStdRandom $ encrypt1 (mkAes "password") "hello"
+"[nsc][44]YFJLSLEN1C+hFWJWewZil7bBLUfiSTaM6TcWK3DOfn4="
+</code></pre>
+
+<h3>複数行を扱う関数</h3>
+
+<p>monads-tfパッケージのStateモナドを使用するとスマート。</p>
+
+<pre><code>encrypt :: RandomGen g =&gt;
+	AES -&gt; BS.ByteString -&gt; g -&gt; (BS.ByteString, g)
+encrypt k str = runState $ BSC.unlines &lt;$&gt; mapM
+	(\s -&gt; StateT $ Identity . encrypt1 k s)
+	(BSC.lines str)</code></pre>
+
+<p>試してみる。</p>
+
+<pre><code>% ghci nsc.hs
+*Main&gt; :set -XOverloadedStrings
+*Main&gt; encrypt (mkAes "password") "hello\nworld" (mkStdGen 12)
+("[nsc][44]q7RVfl49SvfMQJrkOuovJzVnpeM6XR5tcm+0ptx7hAg=\n
+[nsc][44]HFnaHPx5CMJvHSt003LVmKxceJGCXGjMmN39iAF7fZ8=\n",
+2036434855 1827928504)
+*Main&gt; getStdRandom $ encrypt (mkAes "password") "hello\nworld"
+"[nsc][44]1TU+07rYthlz/aJcv+z7bjbc2x6sdtHdfOSPZotbGqI=\n
+[nsc][44]sdrTZvBiU2ISQH8WTHPrJqWgyyQAkvs6+KV5p7Qh/bw=\n"
+</code></pre>
+
+<h2>復号関数</h2>
+
+<h3>全体の流れ</h3>
+
+<ol>
+<li>パスワードからAESのキーを作成する</li>
+<li>プリプロセッサから[Base64でエンコードされたデータ]のリストを入手する</li>
+<li>各行に対して以下を行う
+	<ol>
+	<li>Base64としてデコードする</li>
+	<li>IVと暗号化部とに分ける
+		<ul>
+		<li>とりあえずIVは16バイトに決め打ち</li>
+		</ul></li>
+	<li>AESによる復号</li>
+	</ol></li>
+<li>それぞれの行をひとつにまとめる</li>
+</ol>
+
+<h3>プリプロセッサ</h3>
+
+<p>
+<a href="/computer/haskell/coding/nsc/nsc.hs">現在のコード</a>
+</p>
+
+<p>
+参考: <a
+href="https://hackage.haskell.org/package/bytestring-0.10.4.1/docs/Data-ByteString.html"
+>Data.ByteString</a>
+</p>
+
+<p>
+[nsc]を含む行だけを残し、また[nsc]以下の適切なバイト数だけを取り出す。
+つまり[Base64でエンコードされたデータ]のみを取り出すということ。
+より処理に近い書きかたをすれば、
+「データを走査し[nsc]が出てきたらその次の[バイト数]を調べ、
+そのバイト数ぶんだけのデータを読み込みリストに追加。
+それをデータがなくなるまでくりかえす」となるだろう。
+将来のことを考えれば\[nsc]は無視するというようにしておいたほうがベター。
+でも今はまだいいか。
+</p>
+
+<p>
+breakSubstring関数が使えそうだ。
+</p>
+
+<pre><code>breakSubString ::
+	ByteString -&gt; ByteString -&gt; (ByteString, ByteString)</code></pre>
+
+<p>プリプロセッサ関数decryptPPは以下のようになるだろう。</p>
+
+<pre><code>breakNsc ::
+	BS.ByteString -&gt; Maybe (BS.ByteString, BS.ByteString)
+breakNsc s = case nt of
+	| Just (n, t) &lt;- nt = Just $ BS.splitAt n t
+	| otherwise = Nothing
+	where
+	nt = case BS.breakSubstring "[nsc][" s of
+		(_, "") -&gt; Nothing
+		(_, d) -&gt; Just $
+			read . BSC.unpack *** BS.tail $
+				BSC.span (/= ']') $ BS.drop 6 d
+decryptPP :: BS.ByteString -&gt; [BS.ByteString]
+decryptPP = unfoldr breakNsc</code></pre>
+
+<small>
+(*) ちなみにbreakNscは部分関数である。
+問題はreadとBS.tailを使っているところにある。
+本来ならそこらへんをきちんとチェックしてNothingを返すか、
+または全体をIOでくくってちゃんとした例外を返してやるべきだ。
+でも、とりあえずは「手抜き」しておく。
+</small>
+
+<h3>空行の扱い</h3>
+
+<p>
+空行は空の文字列となる。
+よってIVを取り出そうとするとエラーが生じるので、
+IVとそれ以下のデータに分ける際に空行をチェックしてやる必要がある。
+</p>
+
+<h3>復号関数</h3>
+
+<pre><code>decrypt1 :: AES -&gt; BS.ByteString -&gt; Maybe BS.ByteString
+decrypt1 _ "" = Just ""
+decrypt1 k l = case Base64.decode l of
+	Right d -&gt; let (iv, cpd) = BS.splitAt 16 d in
+		Just . unpadding $ decryptCBC k iv cpd
+	_ -&gt; Nothing</code></pre>
+
+<pre><code>decrypt :: AES -&gt; BS.ByteString -&gt; BS.ByteString
+decrypt k = unlines . map (decrypt1 k) . decryptPP</code></pre>
+
+<h2>モジュールの出来上がり</h2>
+
+<p>試行錯誤で出来上がったファイルをモジュールにしてしまおう。</p>
+
+<pre><code>% cp nsc.hs Nsc.hs
+% vi <a href="/computer/haskell/coding/nsc/Nsc.hs">Nsc.hs</a>
+(module Nsc (encrypt, decrypt) whereを追加する)
+% ghci -Wall Nsc.hs
+*Nsc&gt; :set -XOverloadedStrings
+*Nsc&gt; let k = makeKey "password"
+*Nsc&gt; getStdRandom $ encrypt k "hello\nworld"
+"[nsc][44]V7+wezE0rb+HwN8j7DQ8ZApWPMJdE/0hVsUD6YGgHfY=\n
+[nsc][44]zcao93KGJCSeCypXISt20gurmozVUZlhKLWt9QM7u1M=\n"
+*Nsc&gt; decrypt k it
+Just "hello\nworld\n"
+</code></pre>
+
+<h2>実行可能ファイルを作成する</h2>
+
+<p>UNIXの伝統に則ってフィルタとして作ることにする。</p>
+
+<h2>暗号化スクリプト</h2>
+
+<pre><code>% cat <a href="/computer/haskell/coding/nsc/encrypt.hs">encrypt.hs</a>
+import System.Environment
+
+import qualified Data.ByteString as BS
+import qualified Data.ByteString.Char8 as BSC
+
+import Nsc
+
+main :: IO ()
+main = do
+	ps : _ &lt;- getArgs
+	BS.getContents
+		&gt;&gt;= getStdRandom . encrypt (makeKey ps)
+		&gt;&gt;= BS.putStr</code></pre>
+
+<h2>復号スクリプト</h2>
+
+<pre><code>% cat <a href="/computer/haskell/coding/nsc/decrypt.hs">decrypt.hs</a>
+{-# LANGUAGE OverloadedStrings #-}
+
+import Data.Maybe
+import System.Environment
+
+import qualified Data.ByteString as BS
+import qualified Data.ByteString.Char8 as BSC
+
+import Nsc
+
+main :: IO ()
+main = do
+	ps : _ &lt;- getArgs
+	BS.interact . (fromMaybe "" .)
+		. decrypt . makeKey $ BSC.pack ps</code></pre>
+
+<h2>試してみる</h2>
+
+<pre><code>% echo "hello\n\nworld" | runhaskell encrypt.hs password
+[nsc][44]4uHh/lKbNV0PbctzgsVw9+bXnwdRfB4afzzGOFNDfPU=
+[nsc][0]
+[nsc][44]VQtj2/VqzyvKWV+iyKxZST40M5L+sV+6kJA1J2TkL+M=
+% echo "hello\n\nworld" | runhaskell encrypt.hs password | \
+runhaskell decrypt.hs password
+hello
+
+world</code></pre>
+
+<p>
+(作成中)
+</p>
+
+<p>
+<a href="/computer/haskell/coding/nsc"
+	>「そんなに本気ではない暗号化ソフト」にもどる</a>
+<a href="/computer/haskell/coding/nsc/nsc2.html">その2へ</a>
+</p>
