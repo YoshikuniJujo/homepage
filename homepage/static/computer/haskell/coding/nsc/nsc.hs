@@ -14,11 +14,11 @@ import qualified Data.ByteString.Char8 as BSC
 import qualified Data.ByteString.Base64 as Base64
 import qualified Crypto.Hash.SHA256 as SHA256
 
-key :: AES
-key = initAES ("passwordpassword" :: BS.ByteString)
+keySample :: AES
+keySample = initAES ("passwordpassword" :: BS.ByteString)
 
--- iv :: BS.ByteString
--- iv = "this is iv ivivi"
+ivSample :: BS.ByteString
+ivSample = "this is iv ivivi"
 
 randomIv :: RandomGen g => AES -> g -> (BS.ByteString, g)
 randomIv a g = BS.pack `first` times (blockSize a) random g

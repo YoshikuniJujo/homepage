@@ -1,0 +1,37 @@
+Stateモナドを使用したtimes関数
+
+<p>
+<a href="/computer/haskell/coding/nsc/timesWithState.hs">timesWithState.hs</a>
+</p>
+
+<p>
+「あまり本気ではない暗号化ソフト」の「ランダムなIV(初期化ベクトル)を生成する」で
+作ったtimes関数はStateモナドを使うと、より「美しく」作ることができる。
+</p>
+
+<p>
+「美しさ」の基準として「できるだけ生の再帰を使わない」や
+「できるだけ一般的な枠組みを使う」といったことがある。
+</p>
+
+<p>出来上がった関数は以下のようになる。</p>
+
+<pre><code>times :: Int -&gt; (s -&gt; (x, s)) -&gt; s -&gt; ([x], s)
+times n f = runState . replicateM n . StateT $ Identity . f</code></pre>
+
+<p>
+times関数を状態を次々に渡しながらn回くり返す関数と考える。
+そして「状態を次々に渡す」という部分をStateモナドにまかせる。
+「n回くりかえす」の部分はさまざまなモナドに共通して使えるreplicateMを使用。
+</p>
+
+<p>
+よりわかりやすくは以下のように考えることができる。
+</p>
+
+<pre><code>times n f = runState . replicateM n . State f</code></pre>
+
+<p>
+<a href="/computer/haskell/coding/nsc/#random_iv"
+>「あまり本気ではない暗号化ソフト(その1)」へもどる</a>
+</p>

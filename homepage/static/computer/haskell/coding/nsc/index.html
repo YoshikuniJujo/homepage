@@ -19,10 +19,10 @@
 <h2>名前</h2>
 
 <p>
-適当に、Not Serious Cryptあたりから一応nscという名前にしておく。
+Not Serious Cryptあたりから一応nscという名前にしておく。
 </p>
 
-<h2>仕様</h2>
+<h2>仕様等</h2>
 
 <ul>
 <li>行単位で暗号化する
@@ -39,33 +39,25 @@
 	<li>一番メジャーなように思うので</li>
 	<li>深い意味はない</li>
 	</ul></li>
-<li>IV(初期化ベクトル)はランダム値として暗号化された行の先頭に付ける
+<li>IVはランダム値として暗号化された行の先頭に付ける
 	<ul>
-	<li>いろいろと良い面があるので
+	<li>いろいろと良い面がある
 		<ul>
-		<li>たとえば暗号化や複号化が行単位で並列化できる等</li>
+		<li>暗号化や複号化が行単位で並列化できる等</li>
 		<li>しないけど</li>
 		</ul></li>
-	<li>そんなに本気ではないので標準の(暗号化用でない)ランダムを使う</li>
+	<li>本気でないので標準の(暗号化用でない)ランダムを使う</li>
 	</ul></li>
-<li>Hackageでは今は公開しない
-	<ul>
-	<li>公開するほどのソフトでもないため</li>
-	</ul></li>
-<li>cabal化はしておく
-	<ul>
-	<li>必要なパッケージが明らかになるため</li>
-	</ul></li>
+<li>公開するほどではないので今はHackageで公開しない</li>
+<li>必要なパッケージが明らかになるのでcabal化はしておく</li>
 </ul>
 
 <h2>試行錯誤</h2>
 
 <p>
 いろいろと試行錯誤する必要がある。
-<a href="/computer/haskell/coding/nsc/nsc.hs">これ</a>が現在のコード。
-必要なパッケージは
-<a href="https://hackage.haskell.org/package/cipher-aes">cipher-aes</a>
-。
+<a href="/computer/haskell/coding/nsc/nsc.hs"
+>nsc.hs</a>という名前で試行錯誤の成果を保存していく。
 </p>
 
 <h3>暗号化ライブラリを試す</h3>
@@ -97,7 +89,7 @@ href="https://hackage.haskell.org/package/cipher-aes-0.2.9/docs/Crypto-Cipher-AE
 そうでないと未定義の動作になるとのこと。
 パッケージ作者の手抜きである。
 気持ちはよくわかる。
-あとで、そこらへんを保証するwrapperか何かを書く必要がある。
+あとで、そこらへんを保証するwrapperを書く必要があるかもしれない。
 </p>
 
 <h5>encryptCBC</h5>
@@ -117,7 +109,7 @@ href="https://hackage.haskell.org/package/crypto-cipher-types-0.0.9/docs/Crypto-
 <a
 href="https://hackage.haskell.org/package/cipher-aes-0.2.9/docs/Crypto-Cipher-AES.html#g:7"
 >ここ</a>を見る。
-AESやIVはencryptCBCと同じものである必要がある。
+AESやIVはencryptCBCと同じものである。
 
 <h4>適当なファイルを作成する</h4>
 
@@ -129,75 +121,70 @@ import Crypto.Cipher.Types
 
 import qualified Data.ByteString as BS
 
-key :: AES
-key = initAES ("passwordpassword" :: BS.ByteString)
+keySample :: AES
+keySample = initAES ("passwordpassword" :: BS.ByteString)
 
-iv :: BS.ByteString
-iv = "this is iv ivivi"</code></pre>
+ivSample :: BS.ByteString
+ivSample = "this is iv ivivi"</code></pre>
 
 <h4>GHCiで試してみる</h4>
 
 <pre><code>% ghci nsc.hs
-*Main&gt; blockSize key
+*Main&gt; blockSize keySample
 16
-*Main&gt; BS.length iv
+*Main&gt; BS.length ivSample
 16
 *Main&gt; :set -XOverloadedStrings
-*Main&gt; encryptCBC key iv "Hello, world!"
+*Main&gt; encryptCBC keySample ivSample "Hello, world!"
 *** Exception: Encryption error:
 input length must be a multiple of block size (16).
 Its length is: 13</code></pre>
 
 <p>
-暗号化するデータはblock sizeの整数倍である必要があるとのこと。
-つまりパディングの処理はこちらでやる必要がある。
+暗号化するデータはブロックサイズ(16)の整数倍でないといけない。
+パディングの処理はこちらでやるということだ。
 </p>
 
-<pre><code>*Main&gt; encryptCBC key iv "Hello, world!ppp"
-*Main&gt; decryptCBC key iv it
+<pre><code>*Main&gt; encryptCBC keySample ivSample "Hello, world!ppp"
+"\206\&amp;2/^\142\141\&amp;2\172\227:\\\164d_\DC4\131"
+*Main&gt; decryptCBC keySample ivSample it
 "Hello, world!ppp"</code></pre>
 
-<p>
-暗号化と復号化ができることがわかった。
-</p>
+<p>暗号化と復号化ができた。</p>
 
 <h4>わかったこと</h4>
 
 <ul>
-<li>暗号化のキーを適当な長さに変換してやる必要がある</li>
-<li>平文はパディングしてやる必要がある</li>
+<li>パスワードを適当な長さ(16, 24, 32)に変換する</li>
+<li>平文はパディングしてブロック長の整数倍にする</li>
 </ul>
 
 <h4>するべきこと</h4>
 
 <ul>
-<li>暗号化のキーをハッシュ関数で調度いい長さに変換してやる
+<li>パスワードをハッシュ関数で調度いい長さに変換してやる
 	<ul>
-	<li>SHA-256あたりが良さそうだ</li>
+	<li>SHA-256あたりが良さそうだ(32バイトになる)</li>
 	</ul></li>
 <li>パディングのやりかたを考える
 	<ul>
 	<li><a href="http://tools.ietf.org/html/rfc5246#section-6.2.3.2"
-		>RFC 5246 6.2.3.2</a>が参考になる</li>
+		>RFC 5246 6.2.3.2</a>を参考にする</li>
 	</ul></li>
 </ul>
 
-<h4>ランダムなIVを生成する関数</h4>
+<h4 id="random_iv">ランダムなIVを生成する関数</h4>
 
 <p>
 ここでIVをランダムに生成する関数を作っておく。
 AES型の値とランダムの種をとり、
 ブロックサイズの長さのByteStringと新しいランダムの種を返せば良い。
-</p>
-
-<p>
 <a href="https://hackage.haskell.org/package/random-1.1/docs/System-Random.html"
 >System.Random</a>ライブラリを使用する。
 </p>
 
-<p>
-ランダムなWord8の値をブロックサイズの数だけリストとして用意して、
-それをpackする。
+<p id="times">
+ランダムなWord8の値をブロックサイズの数だけリストとして用意しそれをpackする。
 指定された数だけのリストを用意するために以下の補助関数を作成する。
 </p>
 
@@ -207,6 +194,10 @@ times n f s = let
 	(x, s') = f s
 	(xs, s'') = times (n - 1) f s ' in
 	(x : xs, s'')</code></pre>
+
+<small id="times_with_state">* Stateモナドを使っても良い(<a
+href="/computer/haskell/coding/nsc/times_with_state.html"
+>Stateモナドを使用したtimes関数</a>)</small>
 
 <p>これを利用すれば求める関数は簡単に作れる。</p>
 
@@ -416,14 +407,11 @@ Right "hoge"</code></pre>
 <h4>空行の扱い</h4>
 
 <p>
-空行をそのまま暗号化するとセキュリティ的な問題があるように思う。
 空行だけは特別扱いにする。
 たとえば[nsc][0]の固定にしてしまおう。
 </p>
 
 <h4>1行を扱う関数</h4>
-
-<a href="/computer/haskell/coding/nsc/nsc.hs">現在のコード</a>
 
 <p>
 引数はAESのキーとランダムの種と行の内容。
@@ -458,9 +446,9 @@ encrypt1 k s g = let
 
 <pre><code>encrypt :: RandomGen g =&gt;
 	AES -&gt; BS.ByteString -&gt; g -&gt; (BS.ByteString, g)
-encrypt k s = runState $ BSC.unlines &lt;$&gt; mapM
+encrypt k str = runState $ BSC.unlines &lt;$&gt; mapM
 	(\s -&gt; StateT $ Identity . encrypt1 k s)
-	(BSC.lines s)</code></pre>
+	(BSC.lines str)</code></pre>
 
 <p>試してみる。</p>
 
@@ -645,3 +633,5 @@ world</code></pre>
 <a href="/computer/haskell/coding">「Haskell: コーディング」にもどる</a>
 <a href="/computer/haskell/coding/nsc/nsc2.html">その2へ</a>
 </p>
+
+<a href="#times">テスト</a>

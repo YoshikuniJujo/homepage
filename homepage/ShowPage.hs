@@ -71,6 +71,7 @@ showPage :: (HandleLike h, MonadIO (HandleMonad h)) =>
 	TVar Lock -> String -> h -> HandleMonad h ()
 showPage l ma hdl = do
 	req <- getRequest hdl
+--	liftIO . putStrLn $ showRequest req
 	liftIO $ do
 		now <- getZonedTime
 		let lg = show now ++ '\t' : showPath (requestPath req) ++
