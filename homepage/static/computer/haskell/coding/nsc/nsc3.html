@@ -8,21 +8,24 @@
 
 <p>(工事中)</p>
 
-<h2>その3を作る動機</h2>
+<ol>
+<li><a href="#encrypt2">前回作ったスクリプトでは不十分だ</a></li>
+<li><a href="#package">パッケージ化</a></li>
+</ol>
+
+<h2 id="encrypt2">前回作ったスクリプトでは不十分だ</h2>
 
 <p>
-そもそもが、バージョン管理ソフトとの相性が良い暗号化ソフトを作成する
-という目的だった。
-しかし、前回作ったソフトは暗号化するたびに暗号化された値が変化してしまう。
-初期化ベクトルをランダムに生成していたためだ。
-これだとバージョン管理ソフトと相性が良いとは言えない。
-ランダムの種をコマンドライン引数から与えて、
-それを利用してランダム値を作成していくというのが良いのかもしれない。
-これならばランダムの種(適当な整数値)と
-パスワードを指定すれば暗号化後の値は一意に定まる。
+バージョン管理ソフトとの相性の良い暗号化ソフトを作成するという目的があった。
+前回作ったスクリプトは、
+初期化ベクトルをランダムに生成していたために、
+暗号化のたびに結果が変化してしまう。
+毎回結果が変化してしまうとバージョン管理ソフトとの相性が悪くなる。
+ランダムの種をコマンドライン引数で与えてランダム値を生成していけば良い。
+ランダムの種(適当な整数値)とパスワードを指定すれば結果が一意に定まるようにする。
 </p>
 
-<h2>暗号化スクリプト</h2>
+<h3>新しい暗号化スクリプト</h3>
 
 <pre><code>% cat <a href="/computer/haskell/coding/nsc/encrypt2.hs">encrypt2.hs</a>
 import Control.Applicative
@@ -40,31 +43,35 @@ main = do
 		(mkStdGen $ read sd) &lt;$&gt; BS.getContents
 			&gt;&gt;= BS.putStr . fst</code></pre>
 
-<h2>試してみる。</h2>
+<h3>試してみる。</h3>
 
-<pre><code>% echo "hello\n\nworld" | runhaskell encrypt2.hs password 12
-[nsc][44]q7RVfl49SvfMQJrkOuovJzVnpeM6XR5tcm+0ptx7hAg=
+<pre><code>% echo "hello\n\nworld" | runhaskell encrypt2.hs password 42
+[nsc][44]z0+F+uw3fh8SsyUTFAa4YfLN1RL13xfV0uGkPC8h3DU=
 [nsc][0]
-[nsc][44]HFnaHPx5CMJvHSt003LVmKxceJGCXGjMmN39iAF7fZ8=
-% echo "hello\n\nworld" | runhaskell encrypt2.hs password 12
-[nsc][44]q7RVfl49SvfMQJrkOuovJzVnpeM6XR5tcm+0ptx7hAg=
+[nsc][44]tyeByF5Y9NY0ugrCR+6Ym/XfzN6PTzk+G55ZlcZCc8w=
+% echo "hello\n\nworld" | runhaskell encrypt2.hs password 42
+[nsc][44]z0+F+uw3fh8SsyUTFAa4YfLN1RL13xfV0uGkPC8h3DU=
 [nsc][0]
-[nsc][44]HFnaHPx5CMJvHSt003LVmKxceJGCXGjMmN39iAF7fZ8=</code></pre>
+[nsc][44]tyeByF5Y9NY0ugrCR+6Ym/XfzN6PTzk+G55ZlcZCc8w=</code></pre>
 
-<h2>cabal化</h2>
+<h2 id="package">パッケージ化</h2>
 
-<p>インストールがしやすいようにパッケージ化する。</p>
+<h3>cabal化</h3>
 
-<p><a href="/computer/haskell/coding/nsc/nsc.cabal"
->nsc.cabal</a>を作成し、<code
->cabal build</code>をしながら足りない記述を追加していく。
-<a href="/computer/haskell/coding/nsc/Setup.hs">Setup.hs</a>も用意しておく。
+<p>インストールしやすいようにパッケージ化する。
+空のnsc.cabalを作成し<code
+>cabal build</code>しながら足りない記述を追加していく。
+<a href="/computer/haskell/coding/nsc/Setup.hs"
+>Setup.hs</a>, <a href="/computer/haskell/coding/nsc/LICENSE"
+>LICENSE</a>も用意しておく。
+結果として出来上がったファイルが<a href="/computer/haskell/coding/nsc/nsc.cabal"
+>これ</a>である。
 </p>
 
-<h3>メタ的な情報</h3>
+<h4>メタ的な情報</h4>
 
 <p>
-普通にビルドするよ。cabal自体のバージョンは1.8以上だよ。
+普通(Simple)にビルドするよ。cabal自体のバージョンは1.8以上だよ。
 1.8以上にするのは対応するリポジトリを記述するため(今回はしないけど)。
 </p>
 
@@ -72,7 +79,7 @@ main = do
 cabal-version:	&gt;= 1.8</code></pre>
 
 <p>
-パッケージ名はnscで、バージョンは0.0.0.1、安定度は「実験的」、
+パッケージ名はnscで、バージョンは0.0.0.1、安定度は「実験的(Experimental)」、
 メンテナと作者はYoshikuni Jujoだよ。ホームページは<a
 href="/computer/haskell/coding/nsc">ここ</a>。
 </p>
@@ -99,7 +106,7 @@ synopsis:	Not Serious Crypto tool
 dexcription:
     nsc-encrypt and nsc-decrypt</code></pre>
 
-<h3>実行可能ファイルのレシピ</h3>
+<h4>実行可能ファイルのレシピ</h4>
 
 <p>
 nsc-encryptとnsc-decryptのふたつの実行可能ファイルを作成する。
@@ -128,7 +135,7 @@ ghc-options:	-Wall
 extensions:	PatternGuards, DoAndIfThenElse
 </code></pre>
 
-<h3>配布用のファイルを作成する</h3>
+<h4>配布用のファイルを作成する</h4>
 
 <p><code>cabal sdist</code>で<code
 >dist</code>ディレクトリに以下のファイルが作成される。</p>
@@ -136,7 +143,7 @@ extensions:	PatternGuards, DoAndIfThenElse
 <p><a href="/computer/haskell/coding/nsc/nsc-0.0.0.1.tar.gz"
 	>nsc-0.0.0.1.tar.gz</a></p>
 
-<h2>ebuildの生成</h2>
+<h3>ebuildの生成</h3>
 
 <p>さらにgentooでインストールがしやすいようにebuildを生成する。</p>
 
