@@ -9,6 +9,5 @@ import qualified Data.ByteString.Char8 as BSC
 import Nsc
 
 main :: IO ()
-main = do
-	ps : _ <- getArgs
-	BS.interact . (fromMaybe "" .) . decrypt . makeKey $ BSC.pack ps
+main = getArgs >>= BS.interact . (fromMaybe "" .)
+	. decrypt . makeKey . BSC.pack . head

@@ -9,8 +9,8 @@
 <li><a href="#format">出力フォーマットを決定する</a></li>
 <li><a href="#encrypt">暗号化関数</a></li>
 <li><a href="#decrypt">復号関数</a></li>
-<li><a href="#module">モジュールの作成</a> (工事中)</li>
-<li><a href="#script">スクリプトの作成</a> (工事中)</li>
+<li><a href="#module">モジュールにする</a></li>
+<li><a href="#script">スクリプトの作成</a></li>
 </ol>
 
 <h2 id="format">出力フォーマットを決定する</h2>
@@ -93,10 +93,10 @@ encrypt1 k s g = let
 
 <pre><code>% ghci <a href="/computer/haskell/coding/nsc/nsc3.hs">nsc3.hs</a>
 *Main&gt; :set -XOverloadedStrings
-*Main&gt; encrypt1 (mkAes "password") "hello" (mkStdGen 42)
+*Main&gt; encrypt1 (makeKey "password") "hello" (mkStdGen 42)
 ("[nsc][44]z0+F+uw3fh8SsyUTFAa4YfLN1RL13xfV0uGkPC8h3DU=",
 1178748947 1554910725)
-*Main&gt; getStdRandom $ encrypt1 (mkAes "password") "hello"
+*Main&gt; getStdRandom $ encrypt1 (makeKey "password") "hello"
 "[nsc][44]YFJLSLEN1C+hFWJWewZil7bBLUfiSTaM6TcWK3DOfn4="
 </code></pre>
 
@@ -114,11 +114,11 @@ encrypt k s = runState $ BSC.unlines &lt;$&gt; mapM
 
 <pre><code>% ghci <a href="/computer/haskell/coding/nsc/nsc3.hs">nsc3.hs</a>
 *Main&gt; :set -XOverloadedStrings
-*Main&gt; encrypt (mkAes "password") "hello\nworld" (mkStdGen 42)
+*Main&gt; encrypt (makeKey "password") "hello\nworld" (mkStdGen 42)
 ("[nsc][44]z0+F+uw3fh8SsyUTFAa4YfLN1RL13xfV0uGkPC8h3DU=\n
 [nsc][44]tyeByF5Y9NY0ugrCR+6Ym/XfzN6PTzk+G55ZlcZCc8w=\n",
 293449216 1827928504)
-*Main&gt; getStdRandom $ encrypt (mkAes "password") "hello\nworld"
+*Main&gt; getStdRandom $ encrypt (makeKey "password") "hello\nworld"
 "[nsc][44]1TU+07rYthlz/aJcv+z7bjbc2x6sdtHdfOSPZotbGqI=\n
 [nsc][44]sdrTZvBiU2ISQH8WTHPrJqWgyyQAkvs6+KV5p7Qh/bw=\n"
 </code></pre>
@@ -207,14 +207,14 @@ decrypt1 k l
 <pre><code>decrypt :: AES -&gt; BS.ByteString -&gt; BS.ByteString
 decrypt k = fmap unlines . mapM (decrypt1 k) . decryptPP</code></pre>
 
-<h2 id="module">モジュールの出来上がり</h2>
+<h2 id="module">モジュールにする</h2>
 
-<p>試行錯誤で出来上がったファイルをモジュールにしてしまおう。</p>
+<p>試行錯誤で出来上がったファイルをモジュールにする。</p>
 
 <pre><code>% cp <a href="/computer/haskell/coding/nsc/nsc4.hs">nsc4.hs</a> Nsc.hs
-% vi <a href="/computer/haskell/coding/nsc/Nsc.hs">Nsc.hs</a>
-(module Nsc (encrypt, decrypt) whereを追加する)
-% ghci -Wall Nsc.hs
+% vi Nsc.hs
+(module宣言の追加等いくつかの手直し)
+% ghci -Wall <a href="/computer/haskell/coding/nsc/Nsc.hs">Nsc.hs</a>
 *Nsc&gt; :set -XOverloadedStrings
 *Nsc&gt; let k = makeKey "password"
 *Nsc&gt; getStdRandom $ encrypt k "hello\nworld"
@@ -224,9 +224,9 @@ decrypt k = fmap unlines . mapM (decrypt1 k) . decryptPP</code></pre>
 Just "hello\nworld\n"
 </code></pre>
 
-<h2 id="script">実行可能ファイルを作成する</h2>
+<h2 id="script">スクリプトの作成</h2>
 
-<p>UNIXの伝統に則ってフィルタとして作ることにする。</p>
+<p>UNIXの伝統に則ってフィルタにする。</p>
 
 <h2>暗号化スクリプト</h2>
 
@@ -259,10 +259,8 @@ import qualified Data.ByteString.Char8 as BSC
 import Nsc
 
 main :: IO ()
-main = do
-	ps : _ &lt;- getArgs
-	BS.interact . (fromMaybe "" .)
-		. decrypt . makeKey $ BSC.pack ps</code></pre>
+main = getArgs &gt;&gt;= BS.interact . (fromMaybe "" .)
+	. decrypt . makeKey . BSC.pack . head</code></pre>
 
 <h2>試してみる</h2>
 
@@ -275,10 +273,6 @@ runhaskell decrypt.hs password
 hello
 
 world</code></pre>
-
-<p>
-(作成中)
-</p>
 
 <p>
 <a href="/computer/haskell/coding/nsc/nsc1.html">その1へ</a>

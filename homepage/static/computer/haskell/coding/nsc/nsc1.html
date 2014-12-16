@@ -219,8 +219,8 @@ Prelude (略) Data.ByteString&gt; Data.ByteString.length it
 initAES . hashで大丈夫だ。
 </p>
 
-<pre><code>mkAes :: BS.ByteString -&gt; AES
-mkAes = initAES . SHA256.hash</code></pre>
+<pre><code>makeKey :: BS.ByteString -&gt; AES
+makeKey = initAES . SHA256.hash</code></pre>
 
 <h2 id="padding">パディング</h2>
 
@@ -332,7 +332,7 @@ Right "hoge"</code></pre>
 <h2 id="summary">ここまでで用意できた関数</h2>
 
 <dl>
-<dt>mkAes</dt>
+<dt>makeKey</dt>
 	<dd>:: BS.ByteString -&gt; AES</dd>
 	<dd>パスワードからAES暗号化用のキーを生成</dd>
 <dt>randomIv</dt>

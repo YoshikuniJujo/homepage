@@ -30,8 +30,8 @@ times n f s = let
 	(xs, s'') = times (n - 1) f s' in
 	(x : xs, s'')
 
-mkAes :: BS.ByteString -> AES
-mkAes = initAES . SHA256.hash
+makeKey :: BS.ByteString -> AES
+makeKey = initAES . SHA256.hash
 
 padToLen :: BS.ByteString -> Int -> BS.ByteString
 padToLen s n = s `BS.append`
@@ -62,7 +62,7 @@ encrypt k str = runState $ BSC.unlines <$> mapM
 
 cipheredExample :: BS.ByteString
 cipheredExample = "This is ciphered example\n"
-	`BS.append` fst (encrypt (mkAes "password") "hello\nworld" (mkStdGen 12))
+	`BS.append` fst (encrypt (makeKey "password") "hello\nworld" (mkStdGen 12))
 
 breakNsc :: BS.ByteString -> Maybe (BS.ByteString, BS.ByteString)
 breakNsc s

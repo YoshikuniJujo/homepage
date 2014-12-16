@@ -30,8 +30,8 @@ times n f s = let
 randomIv :: RandomGen g => AES -> g -> (BS.ByteString, g)
 randomIv a = (BS.pack `first`) . times (blockSize a) random
 
-mkAes :: BS.ByteString -> AES
-mkAes = initAES . SHA256.hash
+makeKey :: BS.ByteString -> AES
+makeKey = initAES . SHA256.hash
 
 padToLen :: BS.ByteString -> Int -> BS.ByteString
 padToLen s n = s `BS.append` BS.replicate
