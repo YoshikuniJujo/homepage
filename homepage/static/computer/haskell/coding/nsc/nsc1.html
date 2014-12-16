@@ -10,8 +10,8 @@
 
 <ul>
 <li><a href="#cipher-aes">AES暗号ライブラリ</a></li>
-<li><a href="#sha-256">SHA-256ライブラリ</a> (工事中)</li>
-<li><a href="#padding">パディング</a> (工事中)</li>
+<li><a href="#sha-256">SHA-256ライブラリ</a></li>
+<li><a href="#padding">パディング</a></li>
 <li><a href="#base64">Base64ライブラリ</a> (工事中)</li>
 <li><a href="#summary">用意できた関数</a> (工事中)</li>
 </ul>
@@ -180,7 +180,19 @@ randomIv a = (BS.pack `first`) . times (blockSize a) random</code></pre>
 
 <h3>使用するパッケージ</h3>
 
-<a href="http://hackage.haskell.org/package/cryptohash" >cryptohash</a>
+<p>
+様々なハッシュ関数を含む
+<a href="https://hackage.haskell.org/package/cryptohash" >cryptohashパッケージ</a>
+を使用。
+</p>
+
+<h3>使用する関数</h3>
+
+<p><a
+href="https://hackage.haskell.org/package/cryptohash/docs/Crypto-Hash-SHA256.html#g:2"
+>ドキュメント</a>を参照。以下の関数が使えそうだ。</p>
+
+<pre><code>hash :: ByteString -&gt; ByteString</code></pre>
 
 <h3>試してみる</h3>
 
@@ -205,7 +217,7 @@ Prelude (略) Data.ByteString&gt; Data.ByteString.length it
 
 <p>
 ユーザが入力した暗号キーをAES型の値に変換する関数。
-initAES . hashでOKだ。
+initAES . hashで大丈夫だ。
 </p>
 
 <pre><code>mkAes :: BS.ByteString -&gt; AES
@@ -255,6 +267,25 @@ padding b = ($) &lt;$&gt; padToLen &lt;*&gt; blkSzToLen b</code></pre>
 <pre><code>unpadding :: BS.ByteString -> BS.ByteString
 unpadding p = BS.take
 	(BS.length p - fromIntegral (BS.last p) - 1) p</code></pre>
+
+<h3>試してみる</h3>
+
+<pre><code>% ghci <a href="/computer/haskell/coding/nsc/padding.hs">padding.hs</a>
+*Main&gt; padding 16 "Hello, world!"
+"Hello, world!\STX\STX\STX"
+*Main&gt; let p1 = it
+*Main&gt; BS.length p1
+16
+*Main&gt; unpadding p1
+"Hello, world!"
+*Main&gt; padding 16 "Hello, world! My name is Yoshikuni Jujo."
+"Hello, world! My name is Yoshikuni Jujo.\a\a\a\a\a\a\a\a"
+*Main&gt; let p2 = it
+*Main&gt; BS.length p2
+48
+*Main&gt; unpadding p2
+"Hello, world! My name is Yoshikuni Jujo."
+</code></pre>
 
 <h2 id="base64">Base64ライブラリを試す</h2>
 
