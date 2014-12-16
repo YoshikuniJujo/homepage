@@ -6,9 +6,9 @@
 >その3</a> <a href="/computer/haskell/coding/nsc/nsc4.html">その4</a>)</p>
 
 <ol>
-<li><a href="#format">出力フォーマットを決定する</a> (工事中)</li>
-<li><a href="#encrypt">暗号化関数</a> (工事中)</li>
-<li><a href="#decrypt">復号関数</a> (工事中)</li>
+<li><a href="#format">出力フォーマットを決定する</a></li>
+<li><a href="#encrypt">暗号化関数</a></li>
+<li><a href="#decrypt">復号関数</a></li>
 <li><a href="#module">モジュールの作成</a> (工事中)</li>
 <li><a href="#script">スクリプトの作成</a> (工事中)</li>
 </ol>
@@ -55,13 +55,12 @@
 <h3>全体の流れ</h3>
 
 <ol>
-<li>パスワードからAESのキーを作成する</li>
-<li>行単位に分割する</li>
-<li>各行に対して以下を行う
+<li>パスワードからAESのキーを作成</li>
+<li>行単位に分割</li>
+<li>それぞれの行に対して
 	<ol>
-	<li>ランダムなIVを取得する</li>
-	<li>暗号化する</li>
-	<li>IVと暗号化文字列を結合しBase64でエンコードする</li>
+	<li>ランダムなIVを生成</li>
+	<li>IVと暗号化文字列を結合しBase64でエンコード</li>
 	<li>先頭に[nsc][バイト数]をつける</li>
 	</ol></li>
 <li>それぞれの行をひとつにまとめる</li>
@@ -70,16 +69,14 @@
 <h3>空行の扱い</h3>
 
 <p>
-空行だけは特別扱いにする。
-たとえば[nsc][0]の固定にしてしまおう。
+空行だけは特別扱いで[nsc][0]で固定。
 </p>
 
 <h3>1行を扱う関数</h3>
 
 <p>
-引数はAESのキーとランダムの種と行の内容。
-返り値は"[nsc][バイト数]"を付加したIVと暗号をBase64エンコードしたもの。
-空行だったら"[nsc][0]"として固定する。
+引数はAESのキーと行の内容とランダムの種。
+返り値は"[nsc][バイト数]"を付加したIVと暗号化文字列をBase64エンコードしたもの。
 </p>
 
 <pre><code>encrypt1 :: RandomGen g =&gt;
@@ -94,11 +91,11 @@ encrypt1 k s g = let
 
 <p>試してみる。</p>
 
-<pre><code>% ghci nsc.hs
+<pre><code>% ghci <a href="/computer/haskell/coding/nsc/nsc3.hs">nsc3.hs</a>
 *Main&gt; :set -XOverloadedStrings
-*Main&gt; encrypt1 (mkAes "password") "hello" (mkStdGen 12)
-("[nsc][44]q7RVfl49SvfMQJrkOuovJzVnpeM6XR5tcm+0ptx7hAg=",
-1854610307 1554910725)
+*Main&gt; encrypt1 (mkAes "password") "hello" (mkStdGen 42)
+("[nsc][44]z0+F+uw3fh8SsyUTFAa4YfLN1RL13xfV0uGkPC8h3DU=",
+1178748947 1554910725)
 *Main&gt; getStdRandom $ encrypt1 (mkAes "password") "hello"
 "[nsc][44]YFJLSLEN1C+hFWJWewZil7bBLUfiSTaM6TcWK3DOfn4="
 </code></pre>
@@ -109,18 +106,18 @@ encrypt1 k s g = let
 
 <pre><code>encrypt :: RandomGen g =&gt;
 	AES -&gt; BS.ByteString -&gt; g -&gt; (BS.ByteString, g)
-encrypt k str = runState $ BSC.unlines &lt;$&gt; mapM
-	(\s -&gt; StateT $ Identity . encrypt1 k s)
-	(BSC.lines str)</code></pre>
+encrypt k s = runState $ BSC.unlines &lt;$&gt; mapM
+	(StateT . (Identity .) . encrypt1 k)
+	(BSC.lines s)</code></pre>
 
 <p>試してみる。</p>
 
-<pre><code>% ghci nsc.hs
+<pre><code>% ghci <a href="/computer/haskell/coding/nsc/nsc3.hs">nsc3.hs</a>
 *Main&gt; :set -XOverloadedStrings
-*Main&gt; encrypt (mkAes "password") "hello\nworld" (mkStdGen 12)
-("[nsc][44]q7RVfl49SvfMQJrkOuovJzVnpeM6XR5tcm+0ptx7hAg=\n
-[nsc][44]HFnaHPx5CMJvHSt003LVmKxceJGCXGjMmN39iAF7fZ8=\n",
-2036434855 1827928504)
+*Main&gt; encrypt (mkAes "password") "hello\nworld" (mkStdGen 42)
+("[nsc][44]z0+F+uw3fh8SsyUTFAa4YfLN1RL13xfV0uGkPC8h3DU=\n
+[nsc][44]tyeByF5Y9NY0ugrCR+6Ym/XfzN6PTzk+G55ZlcZCc8w=\n",
+293449216 1827928504)
 *Main&gt; getStdRandom $ encrypt (mkAes "password") "hello\nworld"
 "[nsc][44]1TU+07rYthlz/aJcv+z7bjbc2x6sdtHdfOSPZotbGqI=\n
 [nsc][44]sdrTZvBiU2ISQH8WTHPrJqWgyyQAkvs6+KV5p7Qh/bw=\n"
@@ -131,16 +128,16 @@ encrypt k str = runState $ BSC.unlines &lt;$&gt; mapM
 <h3>全体の流れ</h3>
 
 <ol>
-<li>パスワードからAESのキーを作成する</li>
-<li>プリプロセッサから[Base64でエンコードされたデータ]のリストを入手する</li>
-<li>各行に対して以下を行う
+<li>パスワードからAESのキーを作成</li>
+<li>プリプロセッサで[Base64でエンコードされたデータ]のリストを取得</li>
+<li>それぞれのエンコードされたデータに対して
 	<ol>
-	<li>Base64としてデコードする</li>
+	<li>Base64としてデコード</li>
 	<li>IVと暗号化部とに分ける
 		<ul>
-		<li>とりあえずIVは16バイトに決め打ち</li>
+		<li>IVの長さは16バイトで決め打ち</li>
 		</ul></li>
-	<li>AESによる復号</li>
+	<li>AESで復号</li>
 	</ol></li>
 <li>それぞれの行をひとつにまとめる</li>
 </ol>
@@ -148,28 +145,19 @@ encrypt k str = runState $ BSC.unlines &lt;$&gt; mapM
 <h3>プリプロセッサ</h3>
 
 <p>
-<a href="/computer/haskell/coding/nsc/nsc.hs">現在のコード</a>
-</p>
-
-<p>
-参考: <a
-href="https://hackage.haskell.org/package/bytestring-0.10.4.1/docs/Data-ByteString.html"
->Data.ByteString</a>
-</p>
-
-<p>
 [nsc]を含む行だけを残し、また[nsc]以下の適切なバイト数だけを取り出す。
-つまり[Base64でエンコードされたデータ]のみを取り出すということ。
-より処理に近い書きかたをすれば、
+[Base64でエンコードされたデータ]のみを取り出すということ。
+より処理に近い書きかたをすれば
 「データを走査し[nsc]が出てきたらその次の[バイト数]を調べ、
 そのバイト数ぶんだけのデータを読み込みリストに追加。
-それをデータがなくなるまでくりかえす」となるだろう。
-将来のことを考えれば\[nsc]は無視するというようにしておいたほうがベター。
-でも今はまだいいか。
+データがなくなるまでくりかえす」となる。
+将来のことを考えれば\[nsc]は無視するというようにしておいたほうがベターか。
 </p>
 
 <p>
-breakSubstring関数が使えそうだ。
+<a
+href="https://hackage.haskell.org/package/bytestring-0.10.4.1/docs/Data-ByteString.html#g:15"
+>breakSubstring関数</a>を使う。
 </p>
 
 <pre><code>breakSubString ::
@@ -179,7 +167,7 @@ breakSubstring関数が使えそうだ。
 
 <pre><code>breakNsc ::
 	BS.ByteString -&gt; Maybe (BS.ByteString, BS.ByteString)
-breakNsc s = case nt of
+breakNsc s =
 	| Just (n, t) &lt;- nt = Just $ BS.splitAt n t
 	| otherwise = Nothing
 	where
@@ -188,42 +176,42 @@ breakNsc s = case nt of
 		(_, d) -&gt; Just $
 			read . BSC.unpack *** BS.tail $
 				BSC.span (/= ']') $ BS.drop 6 d
+
 decryptPP :: BS.ByteString -&gt; [BS.ByteString]
 decryptPP = unfoldr breakNsc</code></pre>
 
 <small>
-(*) ちなみにbreakNscは部分関数である。
-問題はreadとBS.tailを使っているところにある。
-本来ならそこらへんをきちんとチェックしてNothingを返すか、
-または全体をIOでくくってちゃんとした例外を返してやるべきだ。
-でも、とりあえずは「手抜き」しておく。
+(*)
+breakNscはreadとBS.tailを使っているので部分関数となる。
+本来ならきちんとチェックしてNothingまたは例外を返すべきだ。
+ここではそこらへんのところを「手抜き」している。
 </small>
 
 <h3>空行の扱い</h3>
 
 <p>
-空行は空の文字列となる。
-よってIVを取り出そうとするとエラーが生じるので、
-IVとそれ以下のデータに分ける際に空行をチェックしてやる必要がある。
+空行は空の文字列となり、そこからIVを取り出そうとするとエラーが生じる。
+IVとそれ以下のデータに分ける際に空行をチェックしなければならない。
 </p>
 
 <h3>復号関数</h3>
 
 <pre><code>decrypt1 :: AES -&gt; BS.ByteString -&gt; Maybe BS.ByteString
 decrypt1 _ "" = Just ""
-decrypt1 k l = case Base64.decode l of
-	Right d -&gt; let (iv, cpd) = BS.splitAt 16 d in
-		Just . unpadding $ decryptCBC k iv cpd
-	_ -&gt; Nothing</code></pre>
+decrypt1 k l
+	| Right d &lt;- Base64.decode l = let
+		(iv, cph) = BS.splitAt 16 d in
+		Just . unpadding $ decryptCBC k iv cph
+	| otherwise = Nothing</code></pre>
 
 <pre><code>decrypt :: AES -&gt; BS.ByteString -&gt; BS.ByteString
-decrypt k = unlines . map (decrypt1 k) . decryptPP</code></pre>
+decrypt k = fmap unlines . mapM (decrypt1 k) . decryptPP</code></pre>
 
 <h2 id="module">モジュールの出来上がり</h2>
 
 <p>試行錯誤で出来上がったファイルをモジュールにしてしまおう。</p>
 
-<pre><code>% cp nsc.hs Nsc.hs
+<pre><code>% cp <a href="/computer/haskell/coding/nsc/nsc4.hs">nsc4.hs</a> Nsc.hs
 % vi <a href="/computer/haskell/coding/nsc/Nsc.hs">Nsc.hs</a>
 (module Nsc (encrypt, decrypt) whereを追加する)
 % ghci -Wall Nsc.hs
