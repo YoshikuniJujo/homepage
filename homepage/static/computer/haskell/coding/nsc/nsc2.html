@@ -1,29 +1,243 @@
 そんなに本気じゃない暗号化ソフト
 
-<p>(<a href="/computer/haskell/coding/nsc/nsc1.html">その1</a>
- その2
-<a href="/computer/haskell/coding/nsc/nsc3.html">その3</a>)</p>
+<p>(<a href="/computer/haskell/coding/nsc"
+>はじめに</a> <a href="/computer/haskell/coding/nsc/nsc1.html"
+>その1</a> その2 <a href="/computer/haskell/coding/nsc/nsc3.html"
+>その3</a> <a href="/computer/haskell/coding/nsc/nsc4.html">その4</a>)</p>
 
 <p>(工事中)</p>
 
-<h2>その2を作る動機</h2>
+<h2>出力フォーマットを決定する</h2>
 
 <p>
-そもそもが、バージョン管理ソフトとの相性が良い暗号化ソフトを作成する
-という目的だった。
-しかし、前回作ったソフトは暗号化するたびに暗号化された値が変化してしまう。
-初期化ベクトルをランダムに生成していたためだ。
-これだとバージョン管理ソフトと相性が良いとは言えない。
-ランダムの種をコマンドライン引数から与えて、
-それを利用してランダム値を作成していくというのが良いのかもしれない。
-これならばランダムの種(適当な整数値)と
-パスワードを指定すれば暗号化後の値は一意に定まる。
+だいたい必要な道具はそろったので出力フォーマットの決定に移る。
+以下のようなことを考慮する。
 </p>
+
+<ul>
+<li>nsc用の行でない行は無視する</li>
+<li>nsc用のデータまでのデータは無視する</li>
+<li>nsc用のデータの長さを指定しそれ以降のデータは無視する</li>
+<li>それぞれの行を別々に暗号化、復号化できるようにする</li>
+</ul>
+
+<p>
+それぞれの行はすべて独立したデータとなる。
+</p>
+
+<h3>一行のフォーマット</h3>
+
+<p>
+決定する必要があるのはnsc用のデータのはじまりを示すマーカー。
+以下のようなフォーマットが良いと思われる。
+</p>
+
+<p>[マーカー] [バイト長] [Base64でエンコードされたデータ]</p>
+
+<p>
+[マーカー]はとりあえず"[nsc]"あたりで良いと思う。
+[バイト長]も[]で囲うと良いかもしれない。
+</p>
+
+<p>例: [nsc][8]aG9nZQ==</p>
+
+<p>で、[Base64でエンコードされたデータ]をデコードすると以下のようになる。</p>
+
+<p>[IV] [暗号化されたデータ]</p>
+
+<h2>暗号化関数</h2>
+
+<h3>全体の流れ</h3>
+
+<ol>
+<li>パスワードからAESのキーを作成する</li>
+<li>行単位に分割する</li>
+<li>各行に対して以下を行う
+	<ol>
+	<li>ランダムなIVを取得する</li>
+	<li>暗号化する</li>
+	<li>IVと暗号化文字列を結合しBase64でエンコードする</li>
+	<li>先頭に[nsc][バイト数]をつける</li>
+	</ol></li>
+<li>それぞれの行をひとつにまとめる</li>
+</ol>
+
+<h3>空行の扱い</h3>
+
+<p>
+空行だけは特別扱いにする。
+たとえば[nsc][0]の固定にしてしまおう。
+</p>
+
+<h3>1行を扱う関数</h3>
+
+<p>
+引数はAESのキーとランダムの種と行の内容。
+返り値は"[nsc][バイト数]"を付加したIVと暗号をBase64エンコードしたもの。
+空行だったら"[nsc][0]"として固定する。
+</p>
+
+<pre><code>encrypt1 :: RandomGen g =&gt;
+	AES -&gt; BS.ByteString -&gt; g -&gt; (BS.ByteString, g)
+encrypt1 _ "" g = ("[nsc][0]", g)
+encrypt1 k s g = let
+	(iv, g') = randomIv k g
+	cph = Base64.encode . (iv `BS.append`)
+		$ encryptCBC k iv (padding (blockSize k) s) in
+	("[nsc][" `BS.append` BSC.pack (show $ BS.length cph)
+		`BS.append` "]" `BS.append` cph, g')</code></pre>
+
+<p>試してみる。</p>
+
+<pre><code>% ghci nsc.hs
+*Main&gt; :set -XOverloadedStrings
+*Main&gt; encrypt1 (mkAes "password") "hello" (mkStdGen 12)
+("[nsc][44]q7RVfl49SvfMQJrkOuovJzVnpeM6XR5tcm+0ptx7hAg=",
+1854610307 1554910725)
+*Main&gt; getStdRandom $ encrypt1 (mkAes "password") "hello"
+"[nsc][44]YFJLSLEN1C+hFWJWewZil7bBLUfiSTaM6TcWK3DOfn4="
+</code></pre>
+
+<h3>複数行を扱う関数</h3>
+
+<p>monads-tfパッケージのStateモナドを使用するとスマート。</p>
+
+<pre><code>encrypt :: RandomGen g =&gt;
+	AES -&gt; BS.ByteString -&gt; g -&gt; (BS.ByteString, g)
+encrypt k str = runState $ BSC.unlines &lt;$&gt; mapM
+	(\s -&gt; StateT $ Identity . encrypt1 k s)
+	(BSC.lines str)</code></pre>
+
+<p>試してみる。</p>
+
+<pre><code>% ghci nsc.hs
+*Main&gt; :set -XOverloadedStrings
+*Main&gt; encrypt (mkAes "password") "hello\nworld" (mkStdGen 12)
+("[nsc][44]q7RVfl49SvfMQJrkOuovJzVnpeM6XR5tcm+0ptx7hAg=\n
+[nsc][44]HFnaHPx5CMJvHSt003LVmKxceJGCXGjMmN39iAF7fZ8=\n",
+2036434855 1827928504)
+*Main&gt; getStdRandom $ encrypt (mkAes "password") "hello\nworld"
+"[nsc][44]1TU+07rYthlz/aJcv+z7bjbc2x6sdtHdfOSPZotbGqI=\n
+[nsc][44]sdrTZvBiU2ISQH8WTHPrJqWgyyQAkvs6+KV5p7Qh/bw=\n"
+</code></pre>
+
+<h2>復号関数</h2>
+
+<h3>全体の流れ</h3>
+
+<ol>
+<li>パスワードからAESのキーを作成する</li>
+<li>プリプロセッサから[Base64でエンコードされたデータ]のリストを入手する</li>
+<li>各行に対して以下を行う
+	<ol>
+	<li>Base64としてデコードする</li>
+	<li>IVと暗号化部とに分ける
+		<ul>
+		<li>とりあえずIVは16バイトに決め打ち</li>
+		</ul></li>
+	<li>AESによる復号</li>
+	</ol></li>
+<li>それぞれの行をひとつにまとめる</li>
+</ol>
+
+<h3>プリプロセッサ</h3>
+
+<p>
+<a href="/computer/haskell/coding/nsc/nsc.hs">現在のコード</a>
+</p>
+
+<p>
+参考: <a
+href="https://hackage.haskell.org/package/bytestring-0.10.4.1/docs/Data-ByteString.html"
+>Data.ByteString</a>
+</p>
+
+<p>
+[nsc]を含む行だけを残し、また[nsc]以下の適切なバイト数だけを取り出す。
+つまり[Base64でエンコードされたデータ]のみを取り出すということ。
+より処理に近い書きかたをすれば、
+「データを走査し[nsc]が出てきたらその次の[バイト数]を調べ、
+そのバイト数ぶんだけのデータを読み込みリストに追加。
+それをデータがなくなるまでくりかえす」となるだろう。
+将来のことを考えれば\[nsc]は無視するというようにしておいたほうがベター。
+でも今はまだいいか。
+</p>
+
+<p>
+breakSubstring関数が使えそうだ。
+</p>
+
+<pre><code>breakSubString ::
+	ByteString -&gt; ByteString -&gt; (ByteString, ByteString)</code></pre>
+
+<p>プリプロセッサ関数decryptPPは以下のようになるだろう。</p>
+
+<pre><code>breakNsc ::
+	BS.ByteString -&gt; Maybe (BS.ByteString, BS.ByteString)
+breakNsc s = case nt of
+	| Just (n, t) &lt;- nt = Just $ BS.splitAt n t
+	| otherwise = Nothing
+	where
+	nt = case BS.breakSubstring "[nsc][" s of
+		(_, "") -&gt; Nothing
+		(_, d) -&gt; Just $
+			read . BSC.unpack *** BS.tail $
+				BSC.span (/= ']') $ BS.drop 6 d
+decryptPP :: BS.ByteString -&gt; [BS.ByteString]
+decryptPP = unfoldr breakNsc</code></pre>
+
+<small>
+(*) ちなみにbreakNscは部分関数である。
+問題はreadとBS.tailを使っているところにある。
+本来ならそこらへんをきちんとチェックしてNothingを返すか、
+または全体をIOでくくってちゃんとした例外を返してやるべきだ。
+でも、とりあえずは「手抜き」しておく。
+</small>
+
+<h3>空行の扱い</h3>
+
+<p>
+空行は空の文字列となる。
+よってIVを取り出そうとするとエラーが生じるので、
+IVとそれ以下のデータに分ける際に空行をチェックしてやる必要がある。
+</p>
+
+<h3>復号関数</h3>
+
+<pre><code>decrypt1 :: AES -&gt; BS.ByteString -&gt; Maybe BS.ByteString
+decrypt1 _ "" = Just ""
+decrypt1 k l = case Base64.decode l of
+	Right d -&gt; let (iv, cpd) = BS.splitAt 16 d in
+		Just . unpadding $ decryptCBC k iv cpd
+	_ -&gt; Nothing</code></pre>
+
+<pre><code>decrypt :: AES -&gt; BS.ByteString -&gt; BS.ByteString
+decrypt k = unlines . map (decrypt1 k) . decryptPP</code></pre>
+
+<h2>モジュールの出来上がり</h2>
+
+<p>試行錯誤で出来上がったファイルをモジュールにしてしまおう。</p>
+
+<pre><code>% cp nsc.hs Nsc.hs
+% vi <a href="/computer/haskell/coding/nsc/Nsc.hs">Nsc.hs</a>
+(module Nsc (encrypt, decrypt) whereを追加する)
+% ghci -Wall Nsc.hs
+*Nsc&gt; :set -XOverloadedStrings
+*Nsc&gt; let k = makeKey "password"
+*Nsc&gt; getStdRandom $ encrypt k "hello\nworld"
+"[nsc][44]V7+wezE0rb+HwN8j7DQ8ZApWPMJdE/0hVsUD6YGgHfY=\n
+[nsc][44]zcao93KGJCSeCypXISt20gurmozVUZlhKLWt9QM7u1M=\n"
+*Nsc&gt; decrypt k it
+Just "hello\nworld\n"
+</code></pre>
+
+<h2>実行可能ファイルを作成する</h2>
+
+<p>UNIXの伝統に則ってフィルタとして作ることにする。</p>
 
 <h2>暗号化スクリプト</h2>
 
-<pre><code>% cat <a href="/computer/haskell/coding/nsc/encrypt2.hs">encrypt2.hs</a>
-import Control.Applicative
+<pre><code>% cat <a href="/computer/haskell/coding/nsc/encrypt.hs">encrypt.hs</a>
 import System.Environment
 
 import qualified Data.ByteString as BS
@@ -33,117 +247,47 @@ import Nsc
 
 main :: IO ()
 main = do
-	ps : sd : _ &lt;- getArgs
-	flip (encrypt . makeKey $ BSC.pack ps)
-		(mkStdGen $ read sd) &lt;$&gt; BS.getContents
-			&gt;&gt;= BS.putStr . fst</code></pre>
+	ps : _ &lt;- getArgs
+	BS.getContents
+		&gt;&gt;= getStdRandom . encrypt (makeKey ps)
+		&gt;&gt;= BS.putStr</code></pre>
 
-<h2>試してみる。</h2>
+<h2>復号スクリプト</h2>
 
-<pre><code>% echo "hello\n\nworld" | runhaskell encrypt2.hs password 12
-[nsc][44]q7RVfl49SvfMQJrkOuovJzVnpeM6XR5tcm+0ptx7hAg=
+<pre><code>% cat <a href="/computer/haskell/coding/nsc/decrypt.hs">decrypt.hs</a>
+{-# LANGUAGE OverloadedStrings #-}
+
+import Data.Maybe
+import System.Environment
+
+import qualified Data.ByteString as BS
+import qualified Data.ByteString.Char8 as BSC
+
+import Nsc
+
+main :: IO ()
+main = do
+	ps : _ &lt;- getArgs
+	BS.interact . (fromMaybe "" .)
+		. decrypt . makeKey $ BSC.pack ps</code></pre>
+
+<h2>試してみる</h2>
+
+<pre><code>% echo "hello\n\nworld" | runhaskell encrypt.hs password
+[nsc][44]4uHh/lKbNV0PbctzgsVw9+bXnwdRfB4afzzGOFNDfPU=
 [nsc][0]
-[nsc][44]HFnaHPx5CMJvHSt003LVmKxceJGCXGjMmN39iAF7fZ8=
-% echo "hello\n\nworld" | runhaskell encrypt2.hs password 12
-[nsc][44]q7RVfl49SvfMQJrkOuovJzVnpeM6XR5tcm+0ptx7hAg=
-[nsc][0]
-[nsc][44]HFnaHPx5CMJvHSt003LVmKxceJGCXGjMmN39iAF7fZ8=</code></pre>
+[nsc][44]VQtj2/VqzyvKWV+iyKxZST40M5L+sV+6kJA1J2TkL+M=
+% echo "hello\n\nworld" | runhaskell encrypt.hs password | \
+runhaskell decrypt.hs password
+hello
 
-<h2>cabal化</h2>
-
-<p>インストールがしやすいようにパッケージ化する。</p>
-
-<p><a href="/computer/haskell/coding/nsc/nsc.cabal"
->nsc.cabal</a>を作成し、<code
->cabal build</code>をしながら足りない記述を追加していく。
-<a href="/computer/haskell/coding/nsc/Setup.hs">Setup.hs</a>も用意しておく。
-</p>
-
-<h3>メタ的な情報</h3>
+world</code></pre>
 
 <p>
-普通にビルドするよ。cabal自体のバージョンは1.8以上だよ。
-1.8以上にするのは対応するリポジトリを記述するため(今回はしないけど)。
-</p>
-
-<pre><code>build-type:	Simple
-cabal-version:	&gt;= 1.8</code></pre>
-
-<p>
-パッケージ名はnscで、バージョンは0.0.0.1、安定度は「実験的」、
-メンテナと作者はYoshikuni Jujoだよ。ホームページは<a
-href="/computer/haskell/coding/nsc">ここ</a>。
-</p>
-
-<pre><code>name:	nsc
-version:	0.0.0.1
-stability:	Experimental
-author:		Yoshikuni Jujo &lt;PAF01143[at]nifty.ne.jp&gt;
-maintainer:	Yoshikuni Jujo &lt;PAF01143[at]nifty.ne.jp&gt;
-homepage:	http://skami.iocikun.jp/computer/haskell/coding/nsc.html</code></pre>
-
-<p>ライセンスはBSD3で、ライセンスを記述したファイルはLICENSE。</p>
-
-<pre><code>license:	BSD3
-license-file:	LICENSE</code></pre>
-
-<p>
-分類としてはCryptoで一言で説明すると「Not Serious Crypto tool」、
-ちゃんとした説明は今のところないので適当に「nsc-encrypt and nsc-decrypt」。
-</p>
-
-<pre><code>category:	Crypto
-synopsis:	Not Serious Crypto tool
-dexcription:
-    nsc-encrypt and nsc-decrypt</code></pre>
-
-<h3>実行可能ファイルのレシピ</h3>
-
-<p>
-nsc-encryptとnsc-decryptのふたつの実行可能ファイルを作成する。
-どちらもレシピは同じようなものなので、nsc-encryptのほうだけ説明する。
+(作成中)
 </p>
 
 <p>
-まずはタイトルを。
+<a href="/computer/haskell/coding/nsc/nsc1.html">その1へ</a>
+<a href="/computer/haskell/coding/nsc/nsc3.html">その3へ</a>
 </p>
-
-<pre><code>executable	nsc-encrypt</code></pre>
-
-<p>
-一段階インデントする(残念なことにタブは禁止されている)。
-実行可能ファイルのソースはencrypt.hs、
-必要なパッケージを列挙し、ghcによるコンパイル時には-Wallオプションをつける。
-また拡張機能としてPatternGuardsとDoAndIfThenElseを使うよ。
-</p>
-
-<pre><code>main-is:	encrypt.hs
-build-depends:
-    base == 4.*, cryptohash == 0.11.*, base64-bytestring == 1.0.*,
-    bytestring == 0.10.*, crypto-cipher-types == 0.0.*, cipher-aes == 0.2.*,
-    random == 1.0.*, monads-tf == 0.1.*
-ghc-options:	-Wall
-extensions:	PatternGuards, DoAndIfThenElse
-</code></pre>
-
-<h3>配布用のファイルを作成する</h3>
-
-<p><code>cabal sdist</code>で<code
->dist</code>ディレクトリに以下のファイルが作成される。</p>
-
-<p><a href="/computer/haskell/coding/nsc/nsc-0.0.0.1.tar.gz"
-	>nsc-0.0.0.1.tar.gz</a></p>
-
-<h2>ebuildの生成</h2>
-
-<p>さらにgentooでインストールがしやすいようにebuildを生成する。</p>
-
-<p>cabal2ebuildパッケージをインストールして、
-.cabalファイルがあるディレクトリで<code>cabal2ebuild</code>コマンドを実行する。</p>
-
-<p><a href="/computer/haskell/coding/nsc/nsc-0.0.0.1.ebuild"
-	>nsc-0.0.0.1.ebuild</a></p>
-
-<p><a href="/computer/haskell/coding/nsc/nsc1.html"
-	>その1へ</a> <a href="/computer/haskell/coding/nsc/nsc3.html"
-	>その3へ</a></p>

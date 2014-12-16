@@ -1,38 +1,151 @@
 そんなに本気じゃない暗号化ソフト
 
-<p>(<a href="/computer/haskell/coding/nsc/nsc1.html">その1</a>
-<a href="/computer/haskell/coding/nsc/nsc2.html">その2</a> その3)</p>
+<p>(<a href="/computer/haskell/coding/nsc">はじめに</a>
+<a href="/computer/haskell/coding/nsc/nsc1.html">その1</a>
+<a href="/computer/haskell/coding/nsc/nsc2.html">その2</a>
+ その3
+<a href="/computer/haskell/coding/nsc/nsc4.html">その4</a>)</p>
 
 <p>(工事中)</p>
 
 <h2>その3を作る動機</h2>
 
 <p>
-前回までに作ったソフトはファイル全体を行ごとに暗号化・復号した。
-これは全体を暗号化したい場合には便利だ。
-しかし、「その1」で挙げた動機のように、演習の回答部分を暗号化したい場合に、
-ファイルの一部分だけを暗号化・復号できると便利だ。
-以下のような条件を満たすソフトを作りたい。
+そもそもが、バージョン管理ソフトとの相性が良い暗号化ソフトを作成する
+という目的だった。
+しかし、前回作ったソフトは暗号化するたびに暗号化された値が変化してしまう。
+初期化ベクトルをランダムに生成していたためだ。
+これだとバージョン管理ソフトと相性が良いとは言えない。
+ランダムの種をコマンドライン引数から与えて、
+それを利用してランダム値を作成していくというのが良いのかもしれない。
+これならばランダムの種(適当な整数値)と
+パスワードを指定すれば暗号化後の値は一意に定まる。
 </p>
 
-<ul>
-<li>平文ファイルの暗号化部の範囲を示すマーカーを理解する
-	<ul>
-	<li>マーカーはもともとのファイルのコメント部に書ける</li>
-	<li>行中のどこに書いてあっても良いようにすればできる</li>
-	</ul></li>
-<li>復号の際には[nsc]の存在しない行はそのままにしておけば良い</li>
-<li>また[nsc]の前の部分や[nsc][バイト数]で残る部分もそのまなにする
-	<ul>
-	<li>あるいはそのような部分は切り捨てる</li>
-	</ul></li>
-<li>それぞれの暗号化部分はそれぞれ独自のランダムの種を持つようにする
-	<ul>
-	<li>それぞれの部分に対する行の追加・削除の影響が局所化される</li>
-	</ul></li>
-</ul>
+<h2>暗号化スクリプト</h2>
+
+<pre><code>% cat <a href="/computer/haskell/coding/nsc/encrypt2.hs">encrypt2.hs</a>
+import Control.Applicative
+import System.Environment
+
+import qualified Data.ByteString as BS
+import qualified Data.ByteString.Char8 as BSC
+
+import Nsc
+
+main :: IO ()
+main = do
+	ps : sd : _ &lt;- getArgs
+	flip (encrypt . makeKey $ BSC.pack ps)
+		(mkStdGen $ read sd) &lt;$&gt; BS.getContents
+			&gt;&gt;= BS.putStr . fst</code></pre>
+
+<h2>試してみる。</h2>
+
+<pre><code>% echo "hello\n\nworld" | runhaskell encrypt2.hs password 12
+[nsc][44]q7RVfl49SvfMQJrkOuovJzVnpeM6XR5tcm+0ptx7hAg=
+[nsc][0]
+[nsc][44]HFnaHPx5CMJvHSt003LVmKxceJGCXGjMmN39iAF7fZ8=
+% echo "hello\n\nworld" | runhaskell encrypt2.hs password 12
+[nsc][44]q7RVfl49SvfMQJrkOuovJzVnpeM6XR5tcm+0ptx7hAg=
+[nsc][0]
+[nsc][44]HFnaHPx5CMJvHSt003LVmKxceJGCXGjMmN39iAF7fZ8=</code></pre>
+
+<h2>cabal化</h2>
+
+<p>インストールがしやすいようにパッケージ化する。</p>
+
+<p><a href="/computer/haskell/coding/nsc/nsc.cabal"
+>nsc.cabal</a>を作成し、<code
+>cabal build</code>をしながら足りない記述を追加していく。
+<a href="/computer/haskell/coding/nsc/Setup.hs">Setup.hs</a>も用意しておく。
+</p>
+
+<h3>メタ的な情報</h3>
 
 <p>
-<a href="/computer/haskell/coding/nsc/nsc2.html">その2へ</a>
-<a href="/computer/haskell/coding">「Haskell: コーディング」にもどる</a>
+普通にビルドするよ。cabal自体のバージョンは1.8以上だよ。
+1.8以上にするのは対応するリポジトリを記述するため(今回はしないけど)。
 </p>
+
+<pre><code>build-type:	Simple
+cabal-version:	&gt;= 1.8</code></pre>
+
+<p>
+パッケージ名はnscで、バージョンは0.0.0.1、安定度は「実験的」、
+メンテナと作者はYoshikuni Jujoだよ。ホームページは<a
+href="/computer/haskell/coding/nsc">ここ</a>。
+</p>
+
+<pre><code>name:	nsc
+version:	0.0.0.1
+stability:	Experimental
+author:		Yoshikuni Jujo &lt;PAF01143[at]nifty.ne.jp&gt;
+maintainer:	Yoshikuni Jujo &lt;PAF01143[at]nifty.ne.jp&gt;
+homepage:	http://skami.iocikun.jp/computer/haskell/coding/nsc.html</code></pre>
+
+<p>ライセンスはBSD3で、ライセンスを記述したファイルはLICENSE。</p>
+
+<pre><code>license:	BSD3
+license-file:	LICENSE</code></pre>
+
+<p>
+分類としてはCryptoで一言で説明すると「Not Serious Crypto tool」、
+ちゃんとした説明は今のところないので適当に「nsc-encrypt and nsc-decrypt」。
+</p>
+
+<pre><code>category:	Crypto
+synopsis:	Not Serious Crypto tool
+dexcription:
+    nsc-encrypt and nsc-decrypt</code></pre>
+
+<h3>実行可能ファイルのレシピ</h3>
+
+<p>
+nsc-encryptとnsc-decryptのふたつの実行可能ファイルを作成する。
+どちらもレシピは同じようなものなので、nsc-encryptのほうだけ説明する。
+</p>
+
+<p>
+まずはタイトルを。
+</p>
+
+<pre><code>executable	nsc-encrypt</code></pre>
+
+<p>
+一段階インデントする(残念なことにタブは禁止されている)。
+実行可能ファイルのソースはencrypt.hs、
+必要なパッケージを列挙し、ghcによるコンパイル時には-Wallオプションをつける。
+また拡張機能としてPatternGuardsとDoAndIfThenElseを使うよ。
+</p>
+
+<pre><code>main-is:	encrypt.hs
+build-depends:
+    base == 4.*, cryptohash == 0.11.*, base64-bytestring == 1.0.*,
+    bytestring == 0.10.*, crypto-cipher-types == 0.0.*, cipher-aes == 0.2.*,
+    random == 1.0.*, monads-tf == 0.1.*
+ghc-options:	-Wall
+extensions:	PatternGuards, DoAndIfThenElse
+</code></pre>
+
+<h3>配布用のファイルを作成する</h3>
+
+<p><code>cabal sdist</code>で<code
+>dist</code>ディレクトリに以下のファイルが作成される。</p>
+
+<p><a href="/computer/haskell/coding/nsc/nsc-0.0.0.1.tar.gz"
+	>nsc-0.0.0.1.tar.gz</a></p>
+
+<h2>ebuildの生成</h2>
+
+<p>さらにgentooでインストールがしやすいようにebuildを生成する。</p>
+
+<p>cabal2ebuildパッケージをインストールして、
+.cabalファイルがあるディレクトリで<code>cabal2ebuild</code>コマンドを実行する。</p>
+
+<p><a href="/computer/haskell/coding/nsc/nsc-0.0.0.1.ebuild"
+	>nsc-0.0.0.1.ebuild</a></p>
+
+<p><a href="/computer/haskell/coding/nsc/nsc2.html"
+	>その2へ</a> <a href="/computer/haskell/coding/nsc/nsc4.html"
+	>その4へ</a></p>

@@ -1,0 +1,41 @@
+そんなに本気じゃない暗号化ソフト
+
+<p>(<a href="/computer/haskell/coding/nsc">はじめに</a>
+<a href="/computer/haskell/coding/nsc/nsc1.html">その1</a>
+<a href="/computer/haskell/coding/nsc/nsc2.html">その2</a>
+<a href="/computer/haskell/coding/nsc/nsc3.html">その3</a>
+ その4)</p>
+
+<p>(工事中)</p>
+
+<h2>その4を作る動機</h2>
+
+<p>
+前回までに作ったソフトはファイル全体を行ごとに暗号化・復号した。
+これは全体を暗号化したい場合には便利だ。
+しかし、「その1」で挙げた動機のように、演習の回答部分を暗号化したい場合に、
+ファイルの一部分だけを暗号化・復号できると便利だ。
+以下のような条件を満たすソフトを作りたい。
+</p>
+
+<ul>
+<li>平文ファイルの暗号化部の範囲を示すマーカーを理解する
+	<ul>
+	<li>マーカーはもともとのファイルのコメント部に書ける</li>
+	<li>行中のどこに書いてあっても良いようにすればできる</li>
+	</ul></li>
+<li>復号の際には[nsc]の存在しない行はそのままにしておけば良い</li>
+<li>また[nsc]の前の部分や[nsc][バイト数]で残る部分もそのまなにする
+	<ul>
+	<li>あるいはそのような部分は切り捨てる</li>
+	</ul></li>
+<li>それぞれの暗号化部分はそれぞれ独自のランダムの種を持つようにする
+	<ul>
+	<li>それぞれの部分に対する行の追加・削除の影響が局所化される</li>
+	</ul></li>
+</ul>
+
+<p>
+<a href="/computer/haskell/coding/nsc/nsc3.html">その3へ</a>
+<a href="/computer/haskell/coding">「Haskell: コーディング」にもどる</a>
+</p>

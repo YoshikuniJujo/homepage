@@ -1,6 +1,10 @@
 そんなに本気じゃない暗号化ソフト
 
-<p>(工事中)</p>
+<p>(はじめに <a href="/computer/haskell/coding/nsc/nsc1.html"
+>その1</a> <a href="/computer/haskell/coding/nsc/nsc2.html"
+>その2</a> <a href="/computer/haskell/coding/nsc/nsc3.html"
+>その3</a> <a href="/computer/haskell/coding/nsc/nsc4.html"
+>その4</a>)</p>
 
 <h2>動機</h2>
 
@@ -16,27 +20,27 @@
 <h2>名前</h2>
 
 <p>
-Not Serious Cryptあたりから一応nscという名前にしておく。
+Not Serious Cryptあたりからnscという名前にしておく。
 </p>
 
 <h2>仕様等</h2>
 
 <ul>
-<li>行単位で暗号化する
+<li>行単位で暗号化
 	<ul>
-	<li>つまり改行は改行のままにする(\nのみに対応)</li>
-	<li>バージョン管理ソフトとの相性が良いので</li>
+	<li>改行は改行のままにする(\nのみに対応)</li>
+	<li>バージョン管理ソフトとの相性が良い</li>
 	</ul></li>
-<li>結果はBase64で表現する
+<li>結果はBase64で表現
 	<ul>
-	<li>ASCIIテキストのほうが表示等で扱いやすいため</li>
+	<li>ASCIIテキストのほうが表示等で扱いやすい</li>
 	</ul></li>
-<li>暗号化アルゴリズムはAES-CBCとする
+<li>暗号化アルゴリズムはAES-CBC
 	<ul>
-	<li>一番メジャーなように思うので</li>
+	<li>一番メジャーなように思う</li>
 	<li>深い意味はない</li>
 	</ul></li>
-<li>IVはランダム値として暗号化された行の先頭に付ける
+<li>IVはランダム値とし暗号化された行の先頭に付ける
 	<ul>
 	<li>いろいろと良い面がある
 		<ul>
@@ -49,12 +53,5 @@ Not Serious Cryptあたりから一応nscという名前にしておく。
 <li>必要なパッケージが明らかになるのでcabal化はしておく</li>
 </ul>
 
-<h2>コーディング</h2>
-
-<ul>
-<li><a href="/computer/haskell/coding/nsc/nsc1.html">その1</a> (工事中)</li>
-<li><a href="/computer/haskell/coding/nsc/nsc2.html">その2</a> (工事中)</li>
-<li><a href="/computer/haskell/coding/nsc/nsc3.html">その3</a> (工事中)</li>
-</ul>
-
-<p><a href="/computer/haskell/coding">「Haskell: コーディング」にもどる</a></p>
+<p><a href="/computer/haskell/coding">「Haskell: コーディング」にもどる</a>
+<a href="/computer/haskell/coding/nsc/nsc1.html">その1へ</a></p>
