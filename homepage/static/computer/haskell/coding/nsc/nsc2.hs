@@ -21,4 +21,4 @@ times n f s = let
 	(x : xs, s'')
 
 randomIv :: RandomGen g => AES -> g -> (BS.ByteString, g)
-randomIv a g = BS.pack `first` times (blockSize a) random g
+randomIv a = (BS.pack `first`) . times (blockSize a) random

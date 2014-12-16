@@ -16,12 +16,12 @@
 <li><a href="#summary">用意できた関数</a> (工事中)</li>
 </ul>
 
-<h2 id="cipher-aes">暗号化ライブラリ</h2>
+<h2 id="cipher-aes">AES暗号ライブラリ</h2>
 
 <h3>使用するパッケージ</h3>
 
 <p>
-AES暗号による暗号化と復号を行うライブラリを含む
+AES暗号による暗号化と復号を行う関数を含む
 <a href="https://hackage.haskell.org/package/cipher-aes">cipher-aesパッケージ</a>
 を使用。
 </p>
@@ -30,15 +30,15 @@ AES暗号による暗号化と復号を行うライブラリを含む
 
 <p>以下の3つの関数を使う。</p>
 
-<pre><code>initAES :: Byteable b => b -> AES
+<pre><code>initAES :: Byteable b =&gt; b -&gt; AES
 encryptCBC ::
 	Byteable iv =&gt; AES -&gt; iv -&gt; ByteString -&gt; ByteString
 decryptCBC ::
 	Byteable iv =&gt; AES -&gt; iv -&gt; ByteString -&gt; ByteString</code></pre>
 
 <p>
-Byteable bは「ByteStringにすることができる型b」ということ。
-とりあえずここではbやivをByteStringと考えておけば良い。
+Byteable bは「ByteStringにすることができる型b」。
+ここではbやivをByteStringと考えておく。
 </p>
 
 <h4>initAES</h4>
@@ -47,9 +47,9 @@ Byteable bは「ByteStringにすることができる型b」ということ。
 第一引数はAES暗号で使うパスワード。
 <a
 href="https://hackage.haskell.org/package/cipher-aes-0.2.9/docs/Crypto-Cipher-AES.html#g:4"
->ドキュメント</a>にパスワードのサイズは16, 24, 32のいずれかとある。
+>ドキュメント</a>にパスワードのサイズは16, 24, 32のいずれかとのこと。
 そうでないと「未定義の動作」になる。
-気持ちはよくわかるが、パッケージ作者の手抜きだ。
+パッケージ作者の手抜きか、または実行効率を重視したためか。
 </p>
 
 <h4>encryptCBC</h4>
@@ -69,9 +69,9 @@ href="https://hackage.haskell.org/package/crypto-cipher-types-0.0.9/docs/Crypto-
 <a
 href="https://hackage.haskell.org/package/cipher-aes-0.2.9/docs/Crypto-Cipher-AES.html#g:7"
 >ドキュメント</a>参照。
-AESやIVはencryptCBCと同じものである。
+AESやIVはencryptCBCと同じものを使用する。
 
-<h3>適当なファイルを作成する</h3>
+<h3>テスト用のファイルを作成する</h3>
 
 <pre><code>% cat <a href="/computer/haskell/coding/nsc/nsc1.hs">nsc1.hs</a>
 {-# LANGUAGE OverloadedStrings #-}
@@ -101,8 +101,8 @@ input length must be a multiple of block size (16).
 Its length is: 13</code></pre>
 
 <p>
-暗号化するデータはブロックサイズ(16)の整数倍でないといけない。
-パディングの処理はこちらでやるということだ。
+暗号化する平文はブロックサイズ(16)の整数倍でないといけない。
+パディングの処理はこちらでやるということ。
 </p>
 
 <pre><code>*Main&gt; encryptCBC keySample ivSample "Hello, world!ppp"
@@ -110,7 +110,7 @@ Its length is: 13</code></pre>
 *Main&gt; decryptCBC keySample ivSample it
 "Hello, world!ppp"</code></pre>
 
-<p>暗号化と復号化ができた。</p>
+<p>これで暗号化と復号化ができる。</p>
 
 <h3>わかったこと</h3>
 
@@ -133,10 +133,10 @@ Its length is: 13</code></pre>
 	</ul></li>
 </ul>
 
-<h3 id="random_iv">ランダムなIVを生成する関数</h3>
+<h3 id="random_iv">ランダムなIVを生成する</h3>
 
 <p>
-ここでIVをランダムに生成する関数を作っておく。
+ここでIVをランダムに生成する関数を作る。
 AES型の値とランダムの種をとり、
 ブロックサイズの長さのByteStringと新しいランダムの種を返せば良い。
 <a href="https://hackage.haskell.org/package/random-1.1/docs/System-Random.html"
@@ -146,7 +146,7 @@ AES型の値とランダムの種をとり、
 <p id="times">
 ランダムなWord8の値をブロックサイズの数だけリストとして用意しそれを
 ByteStringにpackする。
-指定された数だけのWord8を含むリストを用意するために以下の補助関数を作成する。
+指定された数だけのランダムな要素を含むリストを用意するための補助関数を作る。
 </p>
 
 <pre><code>times :: Int -&gt; (s -&gt; (x, s)) -&gt; s -&gt; ([x], s)
@@ -163,7 +163,7 @@ href="/computer/haskell/coding/nsc/times_with_state.html"
 <p>これを利用すれば求める関数は簡単に作れる。</p>
 
 <pre><code>randomIv :: RandomGen g =&gt; AES -&gt; g -&gt; (BS.ByteString, g)
-randomIv a g = BS.pack `first` times (blockSize a) random g</code></pre>
+randomIv a = (BS.pack `first`) . times (blockSize a) random</code></pre>
 
 <p>試してみよう。</p>
 
