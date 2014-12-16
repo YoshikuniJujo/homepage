@@ -6,16 +6,14 @@
 >その3</a> <a href="/computer/haskell/coding/nsc/nsc4.html"
 >その4</a>)</p>
 
-<p>(工事中)</p>
-
 <h2>必要な関数をそろえる</h2>
 
 <ul>
 <li><a href="#cipher-aes">AES暗号ライブラリ</a></li>
-<li><a href="#sha-256">SHA-256ライブラリ</a></li>
-<li><a href="#padding">パディング</a></li>
-<li><a href="#base64">Base64ライブラリ</a></li>
-<li><a href="#summary">用意できた関数</a></li>
+<li><a href="#sha-256">SHA-256ライブラリ</a> (工事中)</li>
+<li><a href="#padding">パディング</a> (工事中)</li>
+<li><a href="#base64">Base64ライブラリ</a> (工事中)</li>
+<li><a href="#summary">用意できた関数</a> (工事中)</li>
 </ul>
 
 <h2 id="cipher-aes">暗号化ライブラリ</h2>
@@ -169,10 +167,12 @@ randomIv a g = BS.pack `first` times (blockSize a) random g</code></pre>
 
 <p>試してみよう。</p>
 
-<pre><code>% ghci nsc.hs
-*Main&gt; :set -XOverloadedStrings
-*Main&gt; getStdRandom . randomIv $ mkAes "hoge"
-"\144m&gt;\182\166\162\ACKl.\188\155-P*\231\160"
+<pre><code>% ghci <a href="/computer/haskell/coding/nsc/nsc2.hs">nsc2.hs</a>
+*Main&gt; randomIv keySample $ mkStdGen 42
+("\207O\133\250\236\&amp;7~`US\DC2\179%\DC3\DC4\ACK\184a",
+1178748947 1554910725)
+*Main&gt; getStdRandom $ randomIv keySample
+"\229*\242iG*%@\192\DLE\DC3\237\130\219\"\DC2"
 *Main&gt; BS.length it
 16</code></pre>
 
