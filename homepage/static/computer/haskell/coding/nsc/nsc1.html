@@ -8,19 +8,35 @@
 
 <p>(工事中)</p>
 
-<h2>暗号化ライブラリを試す</h2>
+<h2>必要な関数をそろえる</h2>
+
+<ul>
+<li><a href="#cipher-aes">AES暗号ライブラリ</a></li>
+<li><a href="#sha-256">SHA-256ライブラリ</a></li>
+<li><a href="#padding">パディング</a></li>
+<li><a href="#base64">Base64ライブラリ</a></li>
+<li><a href="#summary">用意できた関数</a></li>
+</ul>
+
+<h2 id="cipher-aes">暗号化ライブラリ</h2>
 
 <h3>使用するパッケージ</h3>
 
-<a href="https://hackage.haskell.org/package/cipher-aes">cipher-aes</a>
+<p>
+AES暗号による暗号化と復号を行うライブラリを含む
+<a href="https://hackage.haskell.org/package/cipher-aes">cipher-aesパッケージ</a>
+を使用。
+</p>
 
 <h3>使用する関数</h3>
 
+<p>以下の3つの関数を使う。</p>
+
 <pre><code>initAES :: Byteable b => b -> AES
-encryptCBC :: Byteable iv =&gt;
-	AES -&gt; iv -&gt; ByteString -&gt; ByteString
-decryptCBC :: Byteable iv =&gt;
-	AES -&gt; iv -&gt; ByteString -&gt; ByteString</code></pre>
+encryptCBC ::
+	Byteable iv =&gt; AES -&gt; iv -&gt; ByteString -&gt; ByteString
+decryptCBC ::
+	Byteable iv =&gt; AES -&gt; iv -&gt; ByteString -&gt; ByteString</code></pre>
 
 <p>
 Byteable bは「ByteStringにすることができる型b」ということ。
@@ -33,11 +49,9 @@ Byteable bは「ByteStringにすることができる型b」ということ。
 第一引数はAES暗号で使うパスワード。
 <a
 href="https://hackage.haskell.org/package/cipher-aes-0.2.9/docs/Crypto-Cipher-AES.html#g:4"
->ここ</a>を見るとパスワードのサイズは16, 24, 32のいずれかである必要があるらしい。
-そうでないと未定義の動作になるとのこと。
-パッケージ作者の手抜きである。
-気持ちはよくわかる。
-あとで、そこらへんを保証するwrapperを書く必要があるかもしれない。
+>ドキュメント</a>にパスワードのサイズは16, 24, 32のいずれかとある。
+そうでないと「未定義の動作」になる。
+気持ちはよくわかるが、パッケージ作者の手抜きだ。
 </p>
 
 <h4>encryptCBC</h4>
@@ -46,22 +60,22 @@ href="https://hackage.haskell.org/package/cipher-aes-0.2.9/docs/Crypto-Cipher-AE
 第二引数はIV(初期化ベクトル)。
 <a
 href="https://hackage.haskell.org/package/cipher-aes-0.2.9/docs/Crypto-Cipher-AES.html#g:6"
->ここ</a>を見るとIVはAESのブロックサイズと同じ長さである必要があるようだ。
+>ドキュメント</a>に「IVの長さはAESのブロックサイズ」とある。
 ブロックサイズの取得関数は<a
 href="https://hackage.haskell.org/package/crypto-cipher-types-0.0.9/docs/Crypto-Cipher-Types.html#t:BlockCipher"
->ここ</a>を見ればわかる。
+>BlockCipherクラス</a>のblockSizeである。
 </p>
 
 <h4>decryptCBC</h4>
 
 <a
 href="https://hackage.haskell.org/package/cipher-aes-0.2.9/docs/Crypto-Cipher-AES.html#g:7"
->ここ</a>を見る。
+>ドキュメント</a>参照。
 AESやIVはencryptCBCと同じものである。
 
 <h3>適当なファイルを作成する</h3>
 
-<pre><code>% cat nsc.hs
+<pre><code>% cat <a href="/computer/haskell/coding/nsc/nsc1.hs">nsc1.hs</a>
 {-# LANGUAGE OverloadedStrings #-}
 
 import Crypto.Cipher.AES
@@ -77,7 +91,7 @@ ivSample = "this is iv ivivi"</code></pre>
 
 <h3>GHCiで試してみる</h3>
 
-<pre><code>% ghci nsc.hs
+<pre><code>% ghci nsc1.hs
 *Main&gt; blockSize keySample
 16
 *Main&gt; BS.length ivSample
@@ -132,8 +146,9 @@ AES型の値とランダムの種をとり、
 </p>
 
 <p id="times">
-ランダムなWord8の値をブロックサイズの数だけリストとして用意しそれをpackする。
-指定された数だけのリストを用意するために以下の補助関数を作成する。
+ランダムなWord8の値をブロックサイズの数だけリストとして用意しそれを
+ByteStringにpackする。
+指定された数だけのWord8を含むリストを用意するために以下の補助関数を作成する。
 </p>
 
 <pre><code>times :: Int -&gt; (s -&gt; (x, s)) -&gt; s -&gt; ([x], s)
@@ -143,9 +158,9 @@ times n f s = let
 	(xs, s'') = times (n - 1) f s ' in
 	(x : xs, s'')</code></pre>
 
-<small id="times_with_state">* Stateモナドを使っても良い(<a
+<small id="times_with_state">* Stateモナドを使用したバージョンは<a
 href="/computer/haskell/coding/nsc/times_with_state.html"
->Stateモナドを使用したtimes関数</a>)</small>
+>こちら</a></small>
 
 <p>これを利用すれば求める関数は簡単に作れる。</p>
 
@@ -161,7 +176,7 @@ randomIv a g = BS.pack `first` times (blockSize a) random g</code></pre>
 *Main&gt; BS.length it
 16</code></pre>
 
-<h2>SHA-256ライブラリを試す</h2>
+<h2 id="sha-256">SHA-256ライブラリ</h2>
 
 <h3>使用するパッケージ</h3>
 
@@ -196,7 +211,7 @@ initAES . hashでOKだ。
 <pre><code>mkAes :: BS.ByteString -&gt; AES
 mkAes = initAES . SHA256.hash</code></pre>
 
-<h2>パディング</h2>
+<h2 id="padding">パディング</h2>
 
 <h3>仕様を決定する</h3>
 
@@ -241,7 +256,7 @@ padding b = ($) &lt;$&gt; padToLen &lt;*&gt; blkSzToLen b</code></pre>
 unpadding p = BS.take
 	(BS.length p - fromIntegral (BS.last p) - 1) p</code></pre>
 
-<h2>Base64ライブラリを試す</h2>
+<h2 id="base64">Base64ライブラリを試す</h2>
 
 <h3>Base64について調べる</h3>
 
@@ -280,7 +295,7 @@ Prelude Data.ByteString.Base64&gt; encode "hoge"
 Prelude Data.ByteString.Base64&gt; decode it
 Right "hoge"</code></pre>
 
-<h2>ここまでで用意できた関数</h2>
+<h2 id="summary">ここまでで用意できた関数</h2>
 
 <dl>
 <dt>mkAes :: BS.ByteString -&gt; AES</dt>
