@@ -1,4 +1,4 @@
-そんなに本気じゃない暗号化ソフト
+そんなに本気でない暗号化ソフト
 
 <p>(<a href="/computer/haskell/coding/nsc"
 >はじめに</a> その1 <a href="/computer/haskell/coding/nsc/nsc2.html"
@@ -6,15 +6,14 @@
 >その3</a> <a href="/computer/haskell/coding/nsc/nsc4.html"
 >その4</a>)</p>
 
-<h2>必要な関数をそろえる</h2>
-
-<ul>
+<ol>
 <li><a href="#cipher-aes">AES暗号ライブラリ</a></li>
+<li><a href="#random-iv">ランダムなIVを生成する</a></li>
 <li><a href="#sha-256">SHA-256ライブラリ</a></li>
 <li><a href="#padding">パディング</a></li>
-<li><a href="#base64">Base64ライブラリ</a> (工事中)</li>
-<li><a href="#summary">用意できた関数</a> (工事中)</li>
-</ul>
+<li><a href="#base64">Base64ライブラリ</a></li>
+<li><a href="#summary">用意できた関数</a></li>
+</ol>
 
 <h2 id="cipher-aes">AES暗号ライブラリ</h2>
 
@@ -133,7 +132,7 @@ Its length is: 13</code></pre>
 	</ul></li>
 </ul>
 
-<h3 id="random_iv">ランダムなIVを生成する</h3>
+<h2 id="random-iv">ランダムなIVを生成する</h2>
 
 <p>
 ここでIVをランダムに生成する関数を作る。
@@ -292,10 +291,11 @@ unpadding p = BS.take
 <h3>Base64について調べる</h3>
 
 <p>
-とりあえず<a href="https://ja.wikipedia.org/wiki/Base64">wikipedia</a>を読む。
-データを64種類の印字可能な英数字のみを用いてエンコードする。
+<a href="https://ja.wikipedia.org/wiki/Base64">wikipedia</a>によると、
+Base64とは、
+データを64種類の印字可能な英数字のみを用いてエンコードするもの。
 A-Z, a-z, 0-9, +, /の64文字とパディングのための=を使う。
-本来は76文字ごとに改行コードを入れるらしいが今回の用途ではそれはしない。
+本来は76文字ごとに改行する。今回はしない。
 変換のやりかたは以下の通り。
 </p>
 
@@ -307,14 +307,17 @@ A-Z, a-z, 0-9, +, /の64文字とパディングのための=を使う。
 
 <h3>使用するパッケージ</h3>
 
+<p>
+Base64のエンコード、デコードを行う関数を含む
 <a href="https://hackage.haskell.org/package/base64-bytestring"
->base64-bytestring</a>
+>base64-bytestringパッケージ</a>を使用。
+</p>
 
 <h3>使用する関数</h3>
 
 <a
 href="https://hackage.haskell.org/package/base64-bytestring-1.0.0.1/docs/Data-ByteString-Base64.html"
->ドキュメント</a>を見るとencodeとdecodeが使えそうだ。
+>ドキュメント</a>参照。encodeとdecodeが使える。
 
 <h3>試してみる</h3>
 
@@ -329,18 +332,24 @@ Right "hoge"</code></pre>
 <h2 id="summary">ここまでで用意できた関数</h2>
 
 <dl>
-<dt>mkAes :: BS.ByteString -&gt; AES</dt>
-	<dd>パスワードからAES暗号化用のキーを生成する</dd>
-<dt>randomIv :: RandomGen g =&gt; AES -&gt; g -&gt; (ByteString, g)</dt>
-	<dd>キーから適切な長さのIV(初期化ベクトル)を生成する</dd>
-<dt>encryptCBC :: Byteable iv =&gt; AES -&gt; iv -&gt; ByteString -> ByteString</dt>
-	<dd>与えられたキーとIVでバイト列を暗号化する</dd>
-<dt>decryptCBC :: Byteable iv =&gt; AES -&gt; iv -&gt; ByteString -> ByteString</dt>
-	<dd>与えられたキーとIVでバイト列を復号する</dd>
-<dt>Base64.encode :: ByteString -&gt; ByteString</dt>
-	<dd>与えられたバイト列をBase64にエンコードする</dd>
-<dt>Base64.decode :: ByteString -&gt; Either String ByteString</dt>
-	<dd>与えられたバイト列をBase64としてデコードする</dd>
+<dt>mkAes</dt>
+	<dd>:: BS.ByteString -&gt; AES</dd>
+	<dd>パスワードからAES暗号化用のキーを生成</dd>
+<dt>randomIv</dt>
+	<dd>:: RandomGen g =&gt; AES -&gt; g -&gt; (ByteString, g)</dd>
+	<dd>適切な長さのIV(初期化ベクトル)を生成</dd>
+<dt>encryptCBC</dt>
+	<dd>:: Byteable iv =&gt; AES -&gt; iv -&gt; ByteString -&gt; ByteString</dd>
+	<dd>与えられたキーとIVで平文を暗号化</dd>
+<dt>decryptCBC</dt>
+	<dd>:: Byteable iv =&gt; AES -&gt; iv -&gt; ByteString -&gt; ByteString</dd>
+	<dd>与えられたキーとIVで暗号文を復号</dd>
+<dt>Base64.encode</dt>
+	<dd>:: ByteString -&gt; ByteString</dd>
+	<dd>バイト列をBase64にエンコード</dd>
+<dt>Base64.decode</dt>
+	<dd>:: ByteString -&gt; Either String ByteString</dd>
+	<dd>バイト列をBase64としてデコード</dd>
 </dl>
 
 <p>
