@@ -9,7 +9,10 @@ RFC 7230 3.1.2. ステータス行
 
 <pre><code>status-line = HTTP-version SP status-code SP reason-phrase CRLF</code></pre>
 
-<p>SPは単一のスペース。CRLFは"\CR\LF", "\r\n", "\x0d\x0a"。</p>
+<p>
+SPは単一のスペース。CRLFは"\CR\LF", "\r\n", "\x0d\x0a"。
+reason-phraseは空でも良いが、その場合でもその前のスペースは必要なようだ。
+</p>
 
 <h2>HTTP-version</h2>
 
@@ -21,4 +24,21 @@ href="/computer/web/rfc/rfc7230/2_6_protocol_versioning.html"
 
 <h2>status-code</h2>
 
+<pre><code>status-code = 3DIGIT</code></pre>
+
+<p>
+エラー等の応答の種類を表す3桁の数字。
+1桁目が応答の大まかな種類を表す。
+エラーコードの意味は<a href="/computer/web/rfc/rfc7231/6_status_code"
+>RFC 7231 6</a>を参照。
+</p>
+
 <h2>reason-phrase</h2>
+
+<pre><code>reason-phrase = *( HTAB / SP / VCHAR / obs-text )</code></pre>
+
+<p>
+3桁のエラーコードの説明。
+かつて、インタラクティブなテキストクライアントが使われていた時代の名残り。
+クライアントはこれを無視して良い。
+</p>

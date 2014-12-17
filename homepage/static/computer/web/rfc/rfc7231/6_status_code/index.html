@@ -43,3 +43,68 @@ HTTPの応答の1行目(<a href="/computer/web/rfc/rfc7230/3_1_2_status_line.htm
 </p>
 
 <pre><code>status-line = HTTP-version SP status-code SP reason-phrase CRLF</code></pre>
+
+<p>
+ステータス行のなかで応答の意味を示す3桁の数字がstatus-codeである。
+</p>
+
+<pre><code>status-code = 3DIGIT</code></pre>
+
+<h2>ステータスコードの追加</h2>
+
+<p>
+ステータスコードは追加可能である。
+クライアントはすべてのコードの意味を知っている必要はない。
+もちろん知っていたほうが良いけど。
+クライアントはそれぞれのコードを1番目の数字によって分類できれば良い。
+わからないコードはx00として扱えば良いが、
+ただしそれをキャッシュしてはならない。
+</p>
+
+<h2>ステータスコードの分類</h2>
+
+<dl>
+<dt>1xx</dt><dd>情報</dd><dd>処理を継続する</dd>
+<dt>2xx</dt><dd>成功</dd><dd>受理された</dd>
+<dt>3xx</dt><dd>リダイレクション</dd><dd>追加の処理が必要</dd>
+<dt>4xx</dt><dd>クライアントエラー</dd><dd>リクエストに誤りがあった</dd>
+<dt>5xx</dt><dd>サーバエラー</dd><dd>リクエストの処理に失敗した</dd>
+</dl>
+
+<h2>ステータスコードの一覧</h2>
+
+<table>
+<tr><th>Code</th><th>Reason-Phrase</th></tr>
+<tr><td>100</td><td>Continue</td></tr>
+<tr><td>101</td><td>Switching Protocols</td></tr>
+<tr><td>200</td><td>OK</td></tr>
+<tr><td>201</td><td>Created</td></tr>
+<tr><td>202</td><td>Accepted</td></tr>
+<tr><td>203</td><td>Non-Authoritative Information</td></tr>
+<tr><td>204</td><td>No Content</td></tr>
+<tr><td>205</td><td>Reset Content</td></tr>
+<tr><td>206</td><td>Partial Content</td></tr>
+<tr><td>300</td><td>Multiple Choices</td></tr>
+<tr><td>301</td><td>Moved Permanently</td></tr>
+<tr><td>302</td><td>Found</td></tr>
+<tr><td>303</td><td>See Other</td></tr>
+<tr><td>304</td><td>Not Modified</td></tr>
+<tr><td>305</td><td>Use Proxy</td></tr>
+<tr><td>307</td><td>Temporary Redirect</td></tr>
+<tr><td>400</td><td>Bad Request</td></tr>
+<tr><td>401</td><td>Unauthorized</td></tr>
+<tr><td>402</td><td>Payment Required</td></tr>
+<tr><td>403</td><td>Forbidden</td></tr>
+<tr><td>404</td><td>Not Found</td></tr>
+<tr><td>405</td><td>Method Not Allowed</td></tr>
+<tr><td>406</td><td>Not Acceptable</td></tr>
+<tr><td>407</td><td>Proxy Authentication Required</td></tr>
+<tr><td>408</td><td>Request Timeout</td></tr>
+<tr><td>409</td><td>Conflict</td></tr>
+<tr><td>500</td><td>Internal Server Error</td></tr>
+<tr><td>501</td><td>Not Implemented</td></tr>
+<tr><td>502</td><td>Bad Gateway</td></tr>
+<tr><td>503</td><td>Service Unavailable</td></tr>
+<tr><td>504</td><td>Gateway Timeout</td></tr>
+<tr><td>505</td><td>HTTP version Not Supported</td></tr>
+</table>
