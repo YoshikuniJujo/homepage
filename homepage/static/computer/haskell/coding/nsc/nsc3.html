@@ -8,7 +8,7 @@
 
 <ol>
 <li><a href="#encrypt2">前回作ったスクリプトでは不十分だ</a></li>
-<li><a href="#package">パッケージ化</a> (工事中)</li>
+<li><a href="#package">パッケージ化</a></li>
 </ol>
 
 <h2 id="encrypt2">前回作ったスクリプトでは不十分だ</h2>
@@ -57,28 +57,28 @@ main = do
 <h3>cabal化</h3>
 
 <p>インストールしやすいようにパッケージ化する。
-空のnsc.cabalを作成し<code
->cabal build</code>しながら足りない記述を追加していく。
 <a href="/computer/haskell/coding/nsc/Setup.hs"
 >Setup.hs</a>, <a href="/computer/haskell/coding/nsc/LICENSE"
->LICENSE</a>も用意しておく。
+>LICENSE</a>を用意する。
+空のnsc.cabalを作成し<code
+>cabal build</code>しながら足りない記述を追加していく。
 結果として出来上がったファイルが<a href="/computer/haskell/coding/nsc/nsc.cabal"
->これ</a>である。
+>これ</a>。
 </p>
 
 <h4>メタ的な情報</h4>
 
 <p>
-普通(Simple)にビルドするよ。cabal自体のバージョンは1.8以上だよ。
-1.8以上にするのは対応するリポジトリを記述するため(今回はしないけど)。
+普通(Simple)にビルドする。cabal自体のバージョンは1.8以上。
+1.8以上にするのは対応するリポジトリを記述するため(今回はしない)。
 </p>
 
 <pre><code>build-type:	Simple
 cabal-version:	&gt;= 1.8</code></pre>
 
 <p>
-パッケージ名はnscで、バージョンは0.0.0.1、安定度は「実験的(Experimental)」、
-メンテナと作者はYoshikuni Jujoだよ。ホームページは<a
+パッケージ名はnscでバージョンは0.0.0.1、安定度は「実験的(Experimental)」、
+メンテナと作者はYoshikuni Jujo。ホームページは<a
 href="/computer/haskell/coding/nsc">ここ</a>。
 </p>
 
@@ -89,14 +89,14 @@ author:		Yoshikuni Jujo &lt;PAF01143[at]nifty.ne.jp&gt;
 maintainer:	Yoshikuni Jujo &lt;PAF01143[at]nifty.ne.jp&gt;
 homepage:	http://skami.iocikun.jp/computer/haskell/coding/nsc.html</code></pre>
 
-<p>ライセンスはBSD3で、ライセンスを記述したファイルはLICENSE。</p>
+<p>ライセンスはBSD3でライセンスを記述したファイルはLICENSE。</p>
 
 <pre><code>license:	BSD3
 license-file:	LICENSE</code></pre>
 
 <p>
-分類としてはCryptoで一言で説明すると「Not Serious Crypto tool」、
-ちゃんとした説明は今のところないので適当に「nsc-encrypt and nsc-decrypt」。
+分類はCrypto。一言で説明すると「Not Serious Crypto tool」。
+ちゃんとした説明は今のところないのでとりあえず「nsc-encrypt and nsc-decrypt」。
 </p>
 
 <pre><code>category:	Crypto
@@ -107,21 +107,22 @@ dexcription:
 <h4>実行可能ファイルのレシピ</h4>
 
 <p>
-nsc-encryptとnsc-decryptのふたつの実行可能ファイルを作成する。
-どちらもレシピは同じようなものなので、nsc-encryptのほうだけ説明する。
+nsc-encryptとnsc-decryptのふたつの実行可能ファイルがある。
+どちらもレシピは同様なのでnsc-encryptのほうだけ説明する。
 </p>
 
 <p>
-まずはタイトルを。
+まずはタイトル。
 </p>
 
 <pre><code>executable	nsc-encrypt</code></pre>
 
 <p>
-一段階インデントする(残念なことにタブは禁止されている)。
-実行可能ファイルのソースはencrypt.hs、
-必要なパッケージを列挙し、ghcによるコンパイル時には-Wallオプションをつける。
-また拡張機能としてPatternGuardsとDoAndIfThenElseを使うよ。
+一段階インデント(残念なことにタブは禁止されている)。
+実行可能ファイルのソースコードはencrypt.hs。
+必要なパッケージを列挙。
+ghcによるコンパイル時オプションは-Wall。
+使っている拡張機能はPatternGuardsとDoAndIfThenElse。
 </p>
 
 <pre><code>main-is:	encrypt.hs
@@ -143,10 +144,10 @@ extensions:	PatternGuards, DoAndIfThenElse
 
 <h3>ebuildの生成</h3>
 
-<p>さらにgentooでインストールがしやすいようにebuildを生成する。</p>
+<p>gentooでインストールがしやすいようにebuildを自動生成する。</p>
 
-<p>cabal2ebuildパッケージをインストールして、
-.cabalファイルがあるディレクトリで<code>cabal2ebuild</code>コマンドを実行する。</p>
+<p>cabal2ebuildパッケージをインストールして
+.cabalファイルがあるディレクトリで<code>cabal2ebuild</code>コマンドを実行。</p>
 
 <p><a href="/computer/haskell/coding/nsc/nsc-0.0.0.1.ebuild"
 	>nsc-0.0.0.1.ebuild</a></p>
