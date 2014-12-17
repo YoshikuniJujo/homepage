@@ -3,11 +3,12 @@
 module Tools (addIndex, addSep, contentType, isHtml, isBinary, getPostData) where
 
 import Control.Monad (liftM)
+import Data.Char (isLower, isUpper)
 import Data.HandleLike (HandleLike, HandleMonad)
 import Data.Pipe (runPipe, (=$=))
 import Data.Pipe.List (toList)
 import System.FilePath (
-	takeBaseName, takeExtension, (</>), addTrailingPathSeparator )
+	takeFileName, takeBaseName, takeExtension, (</>), addTrailingPathSeparator )
 import Network.TigHTTP.Types (
 	Request(..), Path(..), Post(..), ContentType(..), Type(..), Subtype(..) )
 
@@ -15,9 +16,13 @@ import qualified Data.ByteString.Char8 as BSC
 
 addIndex, addSep :: FilePath -> FilePath
 addIndex p | null $ takeBaseName p = p </> "index.html" | otherwise = p
-addSep p | null $ takeExtension p = addTrailingPathSeparator p | otherwise = p
+addSep p
+	| null (takeExtension p) && any isLower (takeFileName p) =
+		addTrailingPathSeparator p
+	| otherwise = p
 
 contentType :: FilePath -> ContentType
+contentType fp | all isUpper $ takeFileName fp = plain
 contentType fp = case takeExtension fp of
 	".ico" -> ico; ".png" -> png; ".jpg" -> jpg; ".svg" -> svg
 	".css" -> css; ".html" -> html; ".hs" -> plain; ".cabal" -> plain
