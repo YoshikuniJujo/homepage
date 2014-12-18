@@ -1,0 +1,113 @@
+人間用のサイトマップ
+
+<h2>いろいろなサイトマップ</h2>
+
+<p>
+Googleで検索していろいろなサイトのサイトマップをピックアップし分類してみた。
+</p>
+
+<h3>二次元的なページ</h3>
+
+<h4>樹構造を使用しているページ</h4>
+
+<ul>
+<li><a href="http://kakaku.com/sitemap/">価格.com</a></li>
+<li><a href="http://www.mapfan.com/sitemap.html">MapFan</a></li>
+<li><a href="http://www.nec.co.jp/menu.html">NEC</a></li>
+</ul>
+
+<h4>視覚的ボックスタイプ</h4>
+
+<ul>
+<li><a href="http://www.tbs.co.jp/sitemap/">TBS</a></li>
+<li><a href="http://www.tse.or.jp/sitemap/sitemap.html">東証</a></li>
+<li><a href="http://www.mofa.go.jp/mofaj/map/">外務省</a></li>
+<li><a href="http://www.shoshinsha.com/hp/sitemap.html"
+	>1時間で作るホームページ</a></li>
+</ul>
+
+<h4>非視覚的ボックスタイプ</h4>
+
+<ul>
+<li><a href="http://www.toshiba.co.jp/contents/">東芝</a></li>
+<li><a href="http://www.ana.co.jp/sitehelp/dom/sitemap/">ANA国内線</a></li>
+<li><a href="http://www.benesse.co.jp/map/">ベネッセ</a></li>
+<li><a href="http://kageki.hankyu.co.jp/site.html">宝塚</a></li>
+</ul>
+
+<h4>水平タイプ</h4>
+
+<ul>
+<li><a href="http://www.hangame.co.jp/sitemap.nhn">HANGAME</a></li>
+<li><a href="http://liginc.co.jp/sitemap">LIG</a></li>
+<li><a href="http://www.mhlw.go.jp/sitemap/">厚生労働省</a></li>
+<li><a href="http://www.maff.go.jp/j/use/sitemap.html">農林水産省</a></li>
+</ul>
+
+<h3>一次元的なページ</h3>
+
+<ul>
+<li><a href="http://www.softbank.jp/mobile/sitemap/list/">ソフトバンク</a></li>
+<li><a href="http://www.disney.co.jp/onlinehelp/sitemap.html">ディズニー</a></li>
+<li><a href="http://www.moj.go.jp/sitemap.html">法務省</a></li>
+<li><a href="http://www.jma.go.jp/jma/kishou/sitemap.html">気象庁</a></li>
+<li><a href="http://www.cao.go.jp/sitemap.html">内閣府</a></li>
+<li><a href="http://www.waseda.jp/top/sitemap">早稲田大学</a></li>
+</ul>
+
+<h3>画面サイズによって調整するページ</h3>
+
+<ul>
+<li><a href="http://www.sony.jp/contents.html">SONY</a></li>
+<li><a href="http://www.microsoft.com/ja-jp/sitemap.aspx">マイクロソフト</a></li>
+</ul>
+
+<h2>このなかでのベスト</h2>
+
+<p>
+SONYのページがよくできていると思う。
+ブラウザの横幅によって表示を変えている。
+Javascriptでいろいろとごちゃごちゃやっているのだろう。
+めんどくさいので当サイトではこのやりかたは、今は、採用しない。
+</p>
+
+<h2>当サイトではどのようにするか</h2>
+
+<h3>自動生成するか手動で作成するか</h3>
+
+<p>
+自動生成することとすると
+<a href="/computer/web/seo/sitemap_for_human_sample.html"
+>このような感じ</a>になるだろうか。
+もうすこし見た目を考えたほうが良い。
+はじめは手動で作ることも検討する。
+</p>
+
+<h4>自動生成する場合</h4>
+
+<p>
+上で見たように単純にh2, h3, h4といったようにhxタグを使っていくと、
+どうにも見た目が悪くなる。
+まずは(タイトル, アドレス)を要素として持つ樹構造を抽出したうえで、
+深さによって処理を変えながらHTMLを生成するようなコードが必要になるだろう。
+</p>
+
+<p>
+hx要素をそのままリンクにするのはあまり美しくない。
+むしろ普通にindex.htmlとしてディレクトリ下に含まれる感じにしたほうが
+きれいかもしれない。
+また、他のディレクトリを含まないディレクトリ内のファイルに対しては、
+p要素内で','で区切ってごちゃっと入れてしまったほうが、かえってきれいかもしれない。
+</p>
+
+<p>
+専用のCSSを用意してh1, h2, h3 ...をインデントで表現するようにするのもひとつの手か?
+</p>
+
+<h3>すべてのリンクを入れるか</h3>
+
+<p>
+サイト内のすべてのリンクを入れるべきか。
+あるいはある程度まではインデックスページだけで良いか。
+インデックスページだけだとサイトマップの良さが生きてこない気もする。
+</p>
