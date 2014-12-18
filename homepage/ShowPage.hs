@@ -8,11 +8,13 @@ import Control.Concurrent.STM (TVar)
 import Data.Maybe (fromMaybe, fromJust)
 import Data.List (isPrefixOf)
 import Data.Char (isAscii)
-import Data.Time (UTCTime, TimeZone(..), utcToZonedTime, formatTime, getZonedTime)
+import Data.Time (
+	UTCTime, TimeZone(..), utcToZonedTime, formatTime, getZonedTime,
+	getCurrentTime)
 import Data.HandleLike (HandleLike, HandleMonad)
 import Data.Pipe (Pipe)
 import System.IO (IOMode(..), openBinaryFile, hGetContents)
-import System.Directory (getModificationTime)
+import System.Directory (getModificationTime, doesFileExist)
 import System.FilePath (splitPath, dropTrailingPathSeparator)
 import System.Locale (defaultTimeLocale)
 import Network.TigHTTP.Server (getRequest, requestPath, putResponse, response)
@@ -23,7 +25,8 @@ import qualified Data.ByteString.UTF8 as BSU
 import qualified Data.ByteString.Lazy as LBS
 
 import MailToMe (mailTo)
-import Tools (addIndex, addSep, getPostData, contentType, isHtml, isBinary )
+import Tools (
+	addIndex, addSep, getPostData, contentType, isHtml, isBinary, html )
 import StmFile (update)
 import StmLock (Lock, initLock)
 
@@ -87,11 +90,21 @@ showPage l ma hdl = do
 			. BSC.unpack . (\(Path f) -> f) $ requestPath req
 		fp = "static/" ++ addIndex (addSep fp_)
 		tp = contentType fp
-	(cnt, mt) <- liftIO $ (,)
-		<$> (if isBinary tp then readBinaryFile else readFile) fp
-		<*> getModificationTime fp
-	putResponse hdl (responseH hdl $ LBS.fromChunks [makePage fp_ mt tp cnt])
-		{ responseContentType = tp }
+	fe <- liftIO $ doesFileExist fp
+	if fe	then do	(cnt, mt) <- liftIO $ (,)
+				<$> (if isBinary tp
+					then readBinaryFile else readFile) fp
+				<*> getModificationTime fp
+			putResponse hdl (responseH hdl
+					$ LBS.fromChunks [makePage fp_ mt tp cnt])
+				{ responseContentType = tp }
+		else do	now <- liftIO getCurrentTime
+			putResponse hdl (responseH hdl
+					$ LBS.fromChunks [makePage "/404" now html
+						"404 File not found" ]) {
+				responseStatusCode = NotFound,
+				responseContentType = html
+				}
 	where
 	readBinaryFile path = openBinaryFile path ReadMode >>= hGetContents
 	responseH :: HandleLike h => h -> LBS.ByteString -> Response Pipe h

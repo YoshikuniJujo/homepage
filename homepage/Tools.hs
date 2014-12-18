@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Tools (addIndex, addSep, contentType, isHtml, isBinary, getPostData) where
+module Tools (
+	addIndex, addSep, contentType, isHtml, isBinary, getPostData, html) where
 
 import Control.Monad (liftM)
 import Data.Char (isLower, isUpper)
