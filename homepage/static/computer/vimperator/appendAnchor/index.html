@@ -1,0 +1,58 @@
+appendAnchorプラグイン
+
+<h2>目的</h2>
+
+<p>anekosさんの<a
+href="https://github.com/vimpr/vimperator-plugins/blob/master/appendAnchor.js"
+>appendAnchorプラグイン</a>を試してみる。</p>
+
+<h2>プラグインの導入の方法</h2>
+
+<p>
+天井さんの<a href="http://amaisaeta.seesaa.net/article/304643177.html"
+>プラグインの導入についての記事</a>を参照する。
+どうやら、以下のようにすれば良いようだ。
+<ol>
+<li>~/.vimperatorにpluginディレクトリを作成</li>
+<li>導入したい.jsファイルをそこに置く</li>
+<li>.vimperatorrcに":source"コマンドを書く</li>
+</ol>
+</p>
+
+<h2>実際にやってみる</h2>
+
+<p>以下の作業を実際にやってみることにする</p>
+
+<ol>
+<li>mkdir ~/.vimperator/plugin</li>
+<li><a
+href="https://raw.githubusercontent.com/vimpr/vimperator-plugins/master/appendAnchor.js"
+	>ここ</a>から.jsファイルを取得する</li>
+<li>上で取得したファイルをpluginディレクトリに移動させる</li>
+<li>まずはオンザフライで:source appendAnchorをやってみる</li>
+<li>リンクじゃないURIを用意する</li>
+<li>ヒントモードを試してみる</li>
+<li>.vimperatorrcに:source appendAnchorを追加する</li>
+</ol>
+
+<p>テスト用のURI1: https://www.google.co.jp/</p>
+<p>テスト用のURI2: /computer/vimperator</p>
+
+<p>
+結果としては':source appendAnchor'はうまくいかない。
+また、.vimperatorrcに上記を書く必要はなく、
+pluginディレクトリ以下に.jsファイル置いて、
+firefoxを再起動すれば良いようだ。
+</p>
+
+<h2>実際に必要な手順</h2>
+
+<ol>
+<li>mkdir ~/.vimperator/plugin</li>
+<li><a
+href="https://raw.githubusercontent.com/vimpr/vimperator-plugins/master/appendAnchor.js"
+	>ここ</a>から.jsファイルを取得する</li>
+<li>上で取得したファイルをpluginディレクトリに移動させる</li>
+<li>firefoxを再起動する</li>
+<li>:ancコマンドを打つと裸のURIにアンカーがつく</li>
+</ol>
