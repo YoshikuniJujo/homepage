@@ -27,15 +27,15 @@ contentType fp | all isUpper $ takeFileName fp = plain
 contentType fp = case takeExtension fp of
 	".ico" -> ico; ".png" -> png; ".jpg" -> jpg; ".svg" -> svg
 	".css" -> css; ".html" -> html; ".hs" -> plain; ".cabal" -> plain
-	".ebuild" -> plain
-	".gz" -> gz; ".tar.gz" -> targz
+	".ebuild" -> plain; ".txt" -> plain;
+	".gz" -> gz; ".tar.gz" -> targz; ".xpi" -> xpi
 	_ -> octet
 
 isHtml, isBinary :: ContentType -> Bool
 isHtml = (== html)
-isBinary = (`elem` [ico, png, jpg, gz, octet])
+isBinary = (`elem` [ico, png, jpg, gz, octet, xpi])
 
-ico, png, jpg, svg, css, html, plain, gz, targz, octet :: ContentType
+ico, png, jpg, svg, css, html, plain, gz, targz, xpi, octet :: ContentType
 ico = ContentType (TypeRaw "image") (SubtypeRaw "vnd.microsoft.icon") []
 png = ContentType (TypeRaw "image") (SubtypeRaw "png") []
 jpg = ContentType (TypeRaw "image") (SubtypeRaw "jpg") []
@@ -45,6 +45,7 @@ html = ContentType Text Html []
 plain = ContentType Text Plain []
 gz = ContentType (TypeRaw "application") (SubtypeRaw "gzip") []
 targz = ContentType (TypeRaw "application") (SubtypeRaw "x-tar-gz") []
+xpi = ContentType (TypeRaw "application") (SubtypeRaw "x-xpinstall") []
 octet = ContentType (TypeRaw "application") (SubtypeRaw "octet-stream") []
 
 getPostData :: HandleLike h => Request h -> HandleMonad h (Maybe BSC.ByteString)

@@ -1,3 +1,83 @@
 ローカルに拡張機能をインストール
 
-<p>(工事中)</p>
+<p>(要見直し)</p>
+
+<p>
+<a href="http://masahal.web.fc2.com/addon_lecture/"
+>このページ</a>の内容に沿って拡張機能を作成し、
+ローカルにインストールしてみよう。
+内容が古くなっているところがあるので、そこらへんを修正しながらやっていく。
+このページの内容はfirefoxの24.8.0で確認している。
+</p>
+
+<h2>install.rdf</h2>
+
+<p>
+helloworldディレクトリを作成し、そこにinstall.rdfを置く。
+<a href="http://masahal.web.fc2.com/addon_lecture/no_spket.html"
+>このページ</a>のinstall.rdfを参考に以下の修正をした。
+バージョンに関しては<a
+href="https://addons.mozilla.org/ja/firefox/pages/appversions/"
+>ここ</a>を参照。
+また、ここではhelloworld@skami.iocikun.jpだが、
+skami.iocikun.jpの部分は各自自分の持っているドメイン名に変更すること。
+<ul>
+<li>英語版の説明は削除</li>
+<li>helloworld@yourname.netをhelloworld@skami.iocikun.jpに</li>
+<li>minVersionを3.0.1から24.8.0に</li>
+<li>maxVersionを3.*から24.*に</li>
+</ul>
+</p>
+
+<p>修正後の<a href="/computer/firefox/extension/hello/install.rdf.txt"
+>install.rdf</a></p>
+
+<h2>XULファイル</h2>
+
+<p>
+<a href="http://masahal.web.fc2.com/addon_lecture/no_spket_xul.html"
+	>このページ</a>を参考にする。
+</p>
+
+<p>
+適当なディレクトリ(/home/hoge/とする)以下にhelloworldディレクトリを作成する。
+helloworldディレクトリ以下にcontentディレクトリを作成し、<a
+href="/computer/firefox/extension/hello/helloworld.xul.txt"
+>helloworld.xul</a>を置く。
+</p>
+
+<p>
+Firefox 4からはステータスバーが変更され、常時表示されるものではなくなった。
+代わりにアドオンバーが用意された。
+よって以下の変更を行った。
+<ul>
+<li>&lt;statusbar id="status-bar"&gt;を&lt;toolbar id="addon-bar"&gt;に</li>
+</ul>
+</p>
+
+<h2>chrome.manifest</h2>
+
+<p>
+helloworldディレクトリに<a
+href="/computer/firefox/extension/hello/chrome.manifest.txt"
+>chrome.manifest</a>を置く。
+これはとくに変更は不要だった。
+</p>
+
+<h2>helloworld@skami.iocikun.jp</h2>
+
+<p>
+上にも書いたがskami.iocikun.jpは各自
+自分の持っているドメイン名に変更する必要がある。
+プロファイルディレクトリにextensionsディレクトリを作成し、
+helloworld@skami.iocikun.jpをそこに置く。
+このファイルには今まで作ってきたファイルを置いてあるディレクトリ名を書いておく。
+/home/hoge/helloworld/のような一行を書いおくということだ。
+</p>
+
+<h2>ローカルなインストールが完了</h2>
+
+<p>
+<pre><code>% firefox -no-remote -P dev</code></pre>
+で確認してみよう。
+</p>

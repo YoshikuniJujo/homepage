@@ -1,3 +1,21 @@
 .xpiを作成し、リモートに置いて、インストール
 
-<p>(工事中)</p>
+<p>
+<a href="http://masahal.web.fc2.com/addon_lecture/no_spket_xul.html"
+>ここ</a>を参考にする。
+</p>
+
+<p>
+install.rdf、chrome.manifest、content、locale、skin、defaultディレクトリを
+まとめてzip圧縮して、名前をhelloworld.xpiにすれば良いようだ。
+</p>
+
+<pre><code>% zip -r helloworld.xpi content chrome.manifest install.rdf</code></pre>
+
+<p>
+またContent-Typeはapplication/x-xpinstallとするようだ。
+</p>
+
+<p>
+<a href="/computer/firefox/extension/hello/helloworld.xpi">helloworld.xpi</a>
+</p>
