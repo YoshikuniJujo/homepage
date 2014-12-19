@@ -39,7 +39,7 @@ ico, png, jpg, svg, css, html, plain, gz, targz, octet :: ContentType
 ico = ContentType (TypeRaw "image") (SubtypeRaw "vnd.microsoft.icon") []
 png = ContentType (TypeRaw "image") (SubtypeRaw "png") []
 jpg = ContentType (TypeRaw "image") (SubtypeRaw "jpg") []
-svg = ContentType (TypeRaw "image") (SubtypeRaw "svg") []
+svg = ContentType (TypeRaw "image") (SubtypeRaw "svg+xml") []
 css = ContentType Text Css []
 html = ContentType Text Html []
 plain = ContentType Text Plain []
