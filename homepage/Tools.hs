@@ -27,7 +27,7 @@ contentType fp | all isUpper $ takeFileName fp = plain
 contentType fp = case takeExtension fp of
 	".ico" -> ico; ".png" -> png; ".jpg" -> jpg; ".svg" -> svg
 	".css" -> css; ".html" -> html; ".hs" -> plain; ".cabal" -> plain
-	".ebuild" -> plain; ".txt" -> plain;
+	".ebuild" -> plain; ".txt" -> plain; ".mf" -> plain; ".sf" -> plain
 	".gz" -> gz; ".tar.gz" -> targz; ".xpi" -> xpi
 	_ -> octet
 

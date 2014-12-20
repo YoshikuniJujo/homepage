@@ -59,12 +59,15 @@ zigbert.rsaのpkcs7をデコードし、署名を検証する。
 META-INFディレクトリにmanifest.mf, zigbert.sf, zigbert.rsaファイルを作成する。
 </p>
 
-<h2>manifest.ms</h2>
+<h2>manifest.mf</h2>
 
 <p>
 ファイルをMD5とSHA1のハッシュ値をBase64エンコードしたものを
 指定された形式で表現したものをひとつのセクションとする。
 </p>
+
+<p>Yahoo Toolbar: <a href="/computer/firefox/extension/hello/manifest.mf"
+>manifest.mf</a></p>
 
 <h2>zigbert.sf</h2>
 
@@ -73,13 +76,28 @@ META-INFディレクトリにmanifest.mf, zigbert.sf, zigbert.rsaファイルを
 それを同様の形式で表現したもの。
 </p>
 
+<p>Yahoo Toolbar: <a href="/computer/firefox/extension/hello/zigbert.sf"
+>zigbert.sf</a></p>
+
 <h2>zigbert.rsa</h2>
 
 <p>
 zigbert.sfに対するRSAサインを.p7形式で格納したもの。
 </p>
 
+<p><a href="/computer/firefox/extension/hello/decodeBer.hs">BERデコーダ</a></p>
+
+<p>
+Yahoo Toolbar: <a href="/computer/firefox/extension/hello/zigbert.rsa"
+>zigbert.rsa</a> <a href="/computer/firefox/extension/hello/zigbert.rsa.dec.txt"
+>デコード結果</a> <a href="/computer/firefox/extension/hello/zigbert.rsa.dec.html"
+>デコード結果解析</a>
+</p>
+
 <h2>その他</h2>
 
 <p><a href="http://www.asahi-net.or.jp/~aa4t-nngk/postfix-389ds6.html"
 	>プライベートCAの作成、他</a></p>
+
+<p><a href="http://code.google.com/p/verify-sigs/source/browse/asn1/oids.py"
+	>OIDについて</a></p>
