@@ -1,0 +1,354 @@
+<html dir="ltr" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!-- base href="https://adblockplus.org/blog/signing-firefox-extensions-with-python-and-m2crypto" --></head><body><div style="background:#fff;border:1px solid #999;margin:-1px -1px 0;padding:0;"><div style="background:#ddd;border:1px solid #999;color:#000;font:13px arial,sans-serif;font-weight:normal;margin:12px;padding:8px;text-align:left">これは Google に保存されている <a href="https://adblockplus.org/blog/signing-firefox-extensions-with-python-and-m2crypto" style="text-decoration:underline;color:#00c">https://adblockplus.org/blog/signing-firefox-extensions-with-python-and-m2crypto</a> のキャッシュです。 このページは 2014年12月4日 00:29:11 GMT に取得されたものです。 そのため、<a href="https://adblockplus.org/blog/signing-firefox-extensions-with-python-and-m2crypto" style="text-decoration:underline;color:#00c">このページの最新版</a>でない場合があります。 <a href="http://support.google.com/websearch/bin/answer.py?hl=ja&amp;p=cached&amp;answer=1687222" style="text-decoration:underline;color:#00c">詳細</a><br>ヒント: このページで検索キーワードをすばやく見つけるには、<b>Ctrl+F</b> または <b>⌘-F</b>（Mac）を押して検索バーを使用します。<br><br><div style="float:right"><a href="http://webcache.googleusercontent.com/search?q=cache:le6RCaXKb-QJ:https://adblockplus.org/blog/signing-firefox-extensions-with-python-and-m2crypto&amp;client=firefox-a&amp;hs=Wnn&amp;hl=ja&amp;gl=jp&amp;strip=0" style="text-decoration:underline;color:#00c">フルバージョン</a></div>
+<div>&nbsp;</div></div></div><div style="position:relative">
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+    
+
+		
+			
+			
+			
+			
+			
+			
+	
+
+    
+    
+    
+    
+      
+      
+    
+		
+	
+
+		
+	
+
+    <!--[if lt IE 7]>
+      <script src="/_override-static/global/global/js/vendor/DD_belatedPNG.js?697"></script>
+      
+    <![endif]-->
+    <!--[if lt IE 9]>
+      <script src="/_override-static/global/global/js/vendor/html5shiv.js?697"></script>
+      <script src="/_override-static/global/global/js/vendor/respond.min.js?697"></script>
+    <![endif]-->
+    <!--[if lt IE 10]><script src="/_override-static/global/global/js/vendor/cssfx.min.js?697"></script><![endif]-->
+    <!-- Fixes cssfx issues in IE8. -->
+    <!--[if IE 8]>
+      <link rel="stylesheet" href="/_override-static/global/global/css/empty.css?697" class="cssfx"/>
+    <![endif]-->
+  
+  
+  
+  
+  
+  <title>Adblock Plus and (a little) more: Signing Firefox extensions with Python and M2Crypto</title>
+
+
+  
+    
+    
+      <a id="logo" class="sprite" itemprop="image" href="https://adblockplus.org/"></a>
+      
+
+<ul>
+  <li class="install-link first"><a href="https://adblockplus.org/en" hreflang="en">Installation </a></li>
+  <li><a href="https://adblockplus.org/en/about" hreflang="en">About </a></li>
+  <li><a href="https://adblockplus.org/en/features" hreflang="en">Features </a></li>
+  <li><a href="https://adblockplus.org/en/bugs" hreflang="en">Report an issue </a></li>
+  <li><a href="https://adblockplus.org/en/contribute" hreflang="en">Contribute </a></li>
+  <li id="search">
+    
+      
+      
+      Search
+      
+      
+        Search
+      
+    
+  </li>
+</ul>
+      
+    
+
+<div id="content">
+
+<!-- head -->
+<div id="head">
+  <h1><a href="https://adblockplus.org/blog/">Adblock Plus and (a little) more</a></h1>
+  <h2></h2>
+</div>
+
+<!-- right -->
+<div id="sidebar">
+    <p>
+      <a href="https://adblockplus.org/rss/?section=blog" title="RSS feed">RSS</a> / <a href="https://adblockplus.org/atom/?section=blog" title="Atom feed">Atom</a>
+    </p>
+
+<!--
+    <p>
+    Categories<br />
+    <a href="https://adblockplus.org/category/abpwatcher/">abpwatcher</a><br />
+<a href="https://adblockplus.org/category/adblock/">adblock</a><br />
+<a href="https://adblockplus.org/category/adblock-plus/">adblock plus</a><br />
+<a href="https://adblockplus.org/category/adblock-plus-android/">adblock plus android</a><br />
+<a href="https://adblockplus.org/category/adblock-plus-chrome/">adblock plus chrome</a><br />
+<a href="https://adblockplus.org/category/adblock-plus-ie/">adblock plus ie</a><br />
+<a href="https://adblockplus.org/category/adblock-plus-kmeleon/">adblock plus kmeleon</a><br />
+<a href="https://adblockplus.org/category/adblock-plus-opera/">adblock plus opera</a><br />
+<a href="https://adblockplus.org/category/adblock-plus-safari/">adblock plus safari</a><br />
+<a href="https://adblockplus.org/category/customizations/">customizations</a><br />
+<a href="https://adblockplus.org/category/development-builds/">development builds</a><br />
+<a href="https://adblockplus.org/category/easylist/">easylist</a><br />
+<a href="https://adblockplus.org/category/elemhidehelper/">elemhidehelper</a><br />
+<a href="https://adblockplus.org/category/gecko/">gecko</a><br />
+<a href="https://adblockplus.org/category/infrastructure/">infrastructure</a><br />
+<a href="https://adblockplus.org/category/jsdeobfuscator/">jsdeobfuscator</a><br />
+<a href="https://adblockplus.org/category/mozilla/">mozilla</a><br />
+<a href="https://adblockplus.org/category/newsletter/">newsletter</a><br />
+<a href="https://adblockplus.org/category/off-topic/">off-topic</a><br />
+<a href="https://adblockplus.org/category/private/">private</a><br />
+<a href="https://adblockplus.org/category/progress/">progress</a><br />
+<a href="https://adblockplus.org/category/releases/">releases</a><br />
+<a href="https://adblockplus.org/category/roadmap/">roadmap</a><br />
+<a href="https://adblockplus.org/category/security/">security</a><br />
+<a href="https://adblockplus.org/category/songbird/">songbird</a><br />
+<a href="https://adblockplus.org/category/textpattern/">textpattern</a><br />
+<a href="https://adblockplus.org/category/tomtom/">tomtom</a><br />
+<a href="https://adblockplus.org/category/weavesync/">weavesync</a><br />
+<a href="https://adblockplus.org/category/website/">website</a><br />
+<a href="https://adblockplus.org/category/xul/">xul</a>
+    </p>
+-->
+
+    <p>textpattern</p>
+
+  <p class="editlink"><a href="https://adblockplus.org/textpattern/index.php?event=article&amp;step=edit&amp;ID=721">Edit this page</a></p>
+</div>
+
+<!-- center -->
+<div id="main">
+
+  <h3><a rel="bookmark" href="https://adblockplus.org/blog/signing-firefox-extensions-with-python-and-m2crypto">Signing Firefox extensions with Python and M2Crypto</a> · 2011-05-15 00:07 by Wladimir Palant</h3>
+
+	<p>Sadly, signing Firefox extensions isn’t easy. I’ve seen people give 
+up not having mastered even the very first step (install NSS). And after
+ that you have to use its cryptic command line tools to set up a 
+database, import your certificate into it as well as any intermediate or
+ root certificates required, and then actually use signtool to sign your
+ files. Java’s signtool is easier to handle but incompatible (though, I 
+think the only real difference is that it doesn’t put zigbert.rsa first 
+in the archive). So while rewriting my build scripts in Python I took it
+ as a chance and implemented signing in Python using <a href="http://chandlerproject.org/bin/view/Projects/MeTooCrypto">M2Crypto module</a>.
+ One of the advantages for me was that my build script can now package 
+up the extension entirely in memory, without having to write out 
+intermediate results for signing.</p>
+
+	<p>It hasn’t been trivial, finding documentation on both M2Crypto and 
+JAR signatures is surprisingly hard. I owe many thanks to Kevin O’Regan 
+who wrote the only <a href="http://o-regan.org/2007/04/11/firefox-xpi-internal-structure/">description of how JAR signatures work</a>
+ that I could find. Without his hint, would I have guessed that each 
+section of manifest.mf is hashed separately? Probably not. Anyway, once 
+you have all the pieces together it is surprisingly simple, a Python 
+script with less than 70 lines is sufficient. Here it comes:</p>
+
+
+<pre class="python">#!/usr/bin/env python
+import os, sys, re, hashlib, zipfile, base64, M2Crypto
+&nbsp;
+def signDir(source_dir, key_file, output_file):
+  source_dir = os.path.abspath(source_dir)
+&nbsp;
+  # Build file list
+  filelist = []
+  for dirpath, dirs, files in os.walk(source_dir):
+    for file in files:
+      abspath = os.path.join(dirpath, file)
+      relpath = os.path.relpath(abspath, source_dir).replace('\\', '/')
+      handle = open(abspath, 'rb')
+      filelist.append((abspath, relpath, handle.read()))
+      handle.close()
+&nbsp;
+  # Generate manifest.mf and zigbert.sf data
+  manifest_sections = []
+  signature_sections = []
+  def digest(data):
+    md5 = hashlib.md5()
+    md5.update(data)
+    sha1 = hashlib.sha1()
+    sha1.update(data)
+    return 'Digest-Algorithms: MD5 SHA1\nMD5-Digest: %s\nSHA1-Digest: %s\n' % \
+           (base64.b64encode(md5.digest()), base64.b64encode(sha1.digest()))
+  def section(manifest, signature):
+    manifest_sections.append(manifest)
+    signature_sections.append(signature + digest(manifest))
+  section('Manifest-Version: 1.0\n', 'Signature-Version: 1.0\n')
+  for filepath, relpath, data in filelist:
+    section('Name: %s\n%s' % (relpath, digest(data)), 'Name: %s\n' % relpath)
+  manifest = '\n'.join(manifest_sections)
+  signature = '\n'.join(signature_sections)
+&nbsp;
+  # Generate zigbert.rsa (detached zigbert.sf signature)
+  handle = open(key_file, 'rb')
+  key_data = handle.read()
+  handle.close()
+  certstack = M2Crypto.X509.X509_Stack()
+  first = True
+  certificates = re.finditer(r'-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----', key_data, re.S)
+  # Ignore first certificate, we will sign with this one. Rest of them needs to
+  # be added to the stack manually however.
+  certificates.next()
+  for match in certificates:
+    certstack.push(M2Crypto.X509.load_cert_string(match.group(0)))
+&nbsp;
+  mime = M2Crypto.SMIME.SMIME()
+  mime.load_key(key_file)
+  mime.set_x509_stack(certstack)
+  pkcs7 = mime.sign(M2Crypto.BIO.MemoryBuffer(signature),
+                    M2Crypto.SMIME.PKCS7_DETACHED | M2Crypto.SMIME.PKCS7_BINARY)
+  pkcs7_buffer = M2Crypto.BIO.MemoryBuffer()
+  pkcs7.write_der(pkcs7_buffer)
+&nbsp;
+  # Write everything into a ZIP file, with zigbert.rsa as first file
+  zip = zipfile.ZipFile(output_file, 'w', zipfile.ZIP_DEFLATED)
+  zip.writestr('META-INF/zigbert.rsa', pkcs7_buffer.read())
+  zip.writestr('META-INF/zigbert.sf', signature)
+  zip.writestr('META-INF/manifest.mf', manifest)
+  for filepath, relpath, data in filelist:
+    zip.writestr(relpath, data)
+&nbsp;
+if __name__ == '__main__':
+  if len(sys.argv) &lt; 4:
+    print 'Usage: %s source_dir key_file output_file' % sys.argv[0]
+    sys.exit(2)
+  signDir(sys.argv[1], sys.argv[2], sys.argv[3])
+</pre>
+
+	<p>Feel free to use this script or to adapt it for your own build 
+system. Right now it will only pack up a directory and generate a signed
+ XPI file. It uses a “key file” containing your private key followed by 
+your signing certificate as well as any intermediate certificates (all 
+in PEM format). You don’t need the CA root certificate (the browser 
+should know that one already) but the order of intermediate certificates
+ might be important&nbsp;— if you always put a certificate after the one
+ that was signed with it you should be on the safe side.</p>
+
+	<p>If you already have your signing certificate in PKCS#12 format you can easily convert it with OpenSSL using this command:</p>
+
+<pre>openssl pkcs12 -in certificate.p12 -out certificate.pem
+</pre>
+
+	<p>You will need to edit this file to remove the CA root certificate 
+and put the remaining certificates in the correct order. Note also that 
+OpenSSL only exports the private key encrypted so you will have to enter
+ a password. If you later want to use this file in an automated build 
+script where nobody can type in the password you can decrypt a private 
+key with this command:</p>
+
+<pre>openssl rsa -in private_encrypted.pem -out private_decrypted.pem
+</pre>
+
+<p class="tags">
+
+Tags:
+<a rel="tag" href="https://adblockplus.org/category/gecko/">gecko</a>
+
+
+</p>
+<div align="center"></div>
+
+<h3 id="comment"><a href="https://adblockplus.org/blog/signing-firefox-extensions-with-python-and-m2crypto#comment" class="comments_invite">Comment</a> [1]</h3>
+
+<ol class="comments">
+	<li><p class="small"><a href="https://tn123.org/" rel="nofollow">Nils Maier</a> · 2011-05-15 06:18 · <a href="https://adblockplus.org/blog/signing-firefox-extensions-with-python-and-m2crypto#c004037" id="c004037">#</a></p>
+
+	<p>Based on your code, I hacked together a module allowing to sign already packed xpis, either from a file or file-like object.<br>
+I released the code to the public domain. </p>
+
+	<p>Having this on github might also make it more discoverable?!</p>
+
+	<p>https://github.com/nmaier/xpisign.py</p>
+</li>
+</ol>
+
+
+
+
+<p>Commenting is closed for this article.</p>
+
+
+
+<p class="prevLink"><a rel="prev" href="https://adblockplus.org/blog/donations-policy-change" title="Donations policy change">«&nbsp;Donations policy change</a></p>
+<p class="nextLink"><a rel="next" href="https://adblockplus.org/blog/running-linux-in-the-browser" title="Running Linux in the browser">Running Linux in the browser&nbsp;»</a></p>
+
+
+</div>
+
+</div>
+
+
+<div id="footer-content">
+  
+    
+      <h1>Resources</h1>
+      <ul>
+        <li><a href="https://adblockplus.org/en/acceptable-ads" hreflang="en">Acceptable Ads</a></li>
+        <li><a href="https://adblockplus.org/en/documentation" hreflang="en">Documentation</a></li>
+        <li><a href="https://adblockplus.org/en/deployments" hreflang="en">For admins</a></li>
+        <li><a href="https://adblockplus.org/en/privacy" hreflang="en">Privacy policy</a></li>
+        <li><a href="https://adblockplus.org/en/impressum" hreflang="en">Legal notice</a></li>
+      </ul>
+    
+
+    
+      <h1>Community</h1>
+      <ul>
+        <li><a href="https://adblockplus.org/releases/" hreflang="en">Announcements</a></li>
+        <li><a href="https://adblockplus.org/blog/" hreflang="en">Blog</a></li>
+        <li><a href="https://adblockplus.org/forum/" hreflang="en">Forum</a></li>
+        <li><a href="https://adblockplus.org/en/development-builds" hreflang="en">Development builds</a></li>
+      </ul>
+    
+
+    
+      <h1>Development</h1>
+      <ul>
+        <li><a href="https://adblockplus.org/en/source" hreflang="en">Source Code</a></li>
+        <li><a href="https://issues.adblockplus.org/report/13" hreflang="en">Roadmap</a></li>
+        <li><a href="https://adblockplus.org/en/tools" hreflang="en">Tools</a></li>
+      </ul>
+    
+  
+
+  
+    <h1>Follow Us On</h1>
+    <ul id="social-list">
+      <li class="social-entry">
+        <a rel="nofollow" id="social-facebook" class="sprite" href="https://www.facebook.com/adblockplus"></a>
+      </li>
+      <li class="social-entry">
+        <a rel="nofollow" id="social-twitter" class="sprite" href="https://twitter.com/adblockplus"></a>
+      </li>
+      <li class="social-entry">
+        <a rel="nofollow" id="social-gplus" class="sprite" href="https://plus.google.com/110020691898167279887"></a>
+      </li>
+    </ul>
+  
+</div>
+      
+    
+
+    
+    <!-- Workaround for IE6 multiple classes selector bug -->
+    <!--[if lt IE 7]>
+      <script>document.all.content.className += " " + document.all.content.className.split(" ").join("_");</script>
+    <![endif]-->
+  
+</div></body></html>

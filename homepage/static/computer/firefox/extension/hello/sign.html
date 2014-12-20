@@ -1,0 +1,85 @@
+helloworld.xpiに署名をつける
+
+(工事中)
+
+<p>
+<a href="https://developer.mozilla.org/ja/docs/Signing_an_extension">このページ</a>が参考になりそうだ。
+</p>
+
+<p>
+驚くほどに情報が少ない。
+</p>
+
+<p>
+<a
+href="https://adblockplus.org/blog/signing-firefox-extensions-with-python-and-m2crypto"
+>Adblock Plusのページ</a>(<a
+href="/computer/firefox/extension/hello/adblock_plus_txt.html"
+>キャッシュ</a>)が参考になるかもしれない。
+</p>
+
+<h2>計画</h2>
+
+<p>
+Yahooのツールバーのaddonが署名つきだったので、これをサンプルにする。
+</p>
+
+<p>
+Adblock PlusのページのpythonのコードをHaskellで書き直す。
+manifest.mfとzigbert.sfを作成しそれらが実際のものと同じであることを確認する。
+zigbert.rsaのpkcs7をデコードし、署名を検証する。
+</p>
+
+<pre><code>% certtool --p7-info --inder --infile zigbert.rsa &gt; zigbert.rsa.pem
+% certtool --certificate-info --infile zigbert.rsa.pem</code></pre>
+
+<p>
+<a href="https://comodo.jp/navi/mypage">COMODO JAPAN</a>
+ <a href="https://www.certum.eu/certum/cert,offer_code_signing.xml">Certum</a>
+</p>
+
+<p>
+<a href="http://okwave.jp/qa/q4078923.html">署名入りのxpiの紹介</a>
+ <a href="https://addons.mozilla.org/en-US/firefox/addons/policy/0/2032/25065"
+ 	>Yahoo! Toolbar</a>
+ <a href="https://addons.mozilla.org/en-US/firefox/addon/5202"
+ 	>Firefox Companion for eBay</a>
+ <a href="https://addons.mozilla.org/en-US/firefox/addon/gmail-smime/"
+ 	>Gmail S/MIME</a>
+</p>
+
+<p>
+<a href="https://developer.mozilla.org/ja/docs/Signing_a_XPI"
+	>signtoolを使って署名する</a>
+</p>
+
+<p><a href="/computer/firefox/extension/hello/manifest.hs">manifest.hs</a></p>
+
+<p>
+META-INFディレクトリにmanifest.mf, zigbert.sf, zigbert.rsaファイルを作成する。
+</p>
+
+<h2>manifest.ms</h2>
+
+<p>
+ファイルをMD5とSHA1のハッシュ値をBase64エンコードしたものを
+指定された形式で表現したものをひとつのセクションとする。
+</p>
+
+<h2>zigbert.sf</h2>
+
+<p>
+上記のひとつのセクションに対してさらにMD5とSHA1でハッシュ値を求め、
+それを同様の形式で表現したもの。
+</p>
+
+<h2>zigbert.rsa</h2>
+
+<p>
+zigbert.sfに対するRSAサインを.p7形式で格納したもの。
+</p>
+
+<h2>その他</h2>
+
+<p><a href="http://www.asahi-net.or.jp/~aa4t-nngk/postfix-389ds6.html"
+	>プライベートCAの作成、他</a></p>
