@@ -1,0 +1,64 @@
+PKCS#7
+
+<p>(工事中)</p>
+
+<h2>動機</h2>
+
+<p>
+Firefoxの拡張機能のパッケージ(.xpi)に署名をつけたい。
+どうやらMETA-INFディレクトリ以下に、manifest.mf、zigbert.sf、zigbert.rsa
+を用意して一緒にzip圧縮すれば良いようだ。
+manifest.mfとzigbert.sfはMD5とSHA1によるハッシュ値を求められれば良い。
+zigbert.rsaはzigbert.sfに対する署名ファイルのようだが、
+これがPKCS#7のBER形式のファイルになっている。
+</p>
+
+<h2>PKCS#7形式の署名ファイルの構造</h2>
+
+<p>
+PKCS#7形式の署名ファイルの構造は、どうやら、
+X.509形式で格納されたcertificate chainの部分と、
+署名を格納した部分とから成るようだ。
+</p>
+
+<h2>計画</h2>
+
+<p>
+ASN.1のBER形式とASN.1のHaskellデータ構造間の変換には<a
+href="https://hackage.haskell.org/package/asn1-parse"
+>asn1-parseパッケージ</a>が使える。
+</p>
+
+<p>
+また、ASN.1とX.509間の変換については<a
+href="https://hackage.haskell.org/package/x509"
+>x509パッケージ</a>が使える。
+SignedExactをASN1Objectのインスタンスにすることで、
+SignedCertificateとASN.1間でのデータの変換ができるようになる。
+<a
+href="https://hackage.haskell.org/package/x509-1.5.0.1/docs/src/Data-X509-Signed.html#decodeSignedObject"
+>decodeSignedObject</a>, <a
+href="https://hackage.haskell.org/package/x509-1.5.0.1/docs/src/Data-X509-Signed.html#encodeSignedObject"
+>encodeSignedObject</a>関数が参考になるだろう。
+</p>
+
+<p>
+残りは署名部分。
+ここはそんなに複雑ではないので自分で1から作っても大した手間ではないだろう。
+</p>
+
+<h2>手順</h2>
+
+<p>
+<ol>
+<li><a href="/computer/haskell/coding/pkcs7/getCertificate.html"
+	>Yahoo Toolbarの.xpiから証明書を取り出す</a> (工事中)</li>
+<li>上記証明書をPEMファイルに書き出す</li>
+<li>PEMファイルから証明書を読み出してみたりする</li>
+<li>Yahoo Toolbarから証明書以外の部分を取り出す</li>
+<li>証明書と合わせたデータ型を作成する</li>
+<li>それぞれのデータからファイルを作成できるようにする</li>
+<li>ファイルからそれぞれのデータを取得できるようにする</li>
+<li>署名値を計算できるようにする</li>
+</ol>
+</p>
