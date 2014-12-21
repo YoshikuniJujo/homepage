@@ -1,0 +1,33 @@
+PKCS#7: 署名の例
+
+<h2>Yahoo Toolbarの.xpiに対する署名</h2>
+
+<ul>
+<li>被署名ファイル: <a href="/computer/web/rfc/rfc2315/examples/zigbert.sf"
+	>zigbert.sf</a></li>
+<li>署名ファイル(PKCS#7): <a href="/computer/web/rfc/rfc2315/examples/zigbert.rsa"
+	>zigbert.rsa</a>(<a href="/computer/web/rfc/rfc2315/examples/zigbert.rsa.dec.txt"
+	>デコード</a>)</li>
+</ul>
+
+<h3>ダイジェスト値</h3>
+
+<p>
+OID 1.2.840.113549.1.9.3: pkcs7.DigestInfo
+<p>
+
+<p>
+zigbert.rsaのデコード結果の一部:
+<code>
+Start Sequence, OID [1, 2, 840, 113549, 1, 9, 4], Start Set,
+
+OctetString "\ETX\155]\EOTf\155\184;\206&amp;\135\251\151A&lt;\205o\206\177\CAN",
+EndSet, End Sequence,
+</code>
+</p>
+
+<p>
+16進表示すると039b5d04669bb83bce2687fb97413ccd6fceb118
+<pre><code>% sha1sum zigbert.sf
+039b5d04669bb83bce2687fb97413ccd6fceb118</code></pre>
+</p>
