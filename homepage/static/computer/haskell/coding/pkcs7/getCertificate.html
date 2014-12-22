@@ -1,3 +1,35 @@
 Yahoo Toolbarの.xpiから証明書を取り出す
 
 <p>(工事中)</p>
+
+<h2>目標</h2>
+
+<ol>
+<li>zigbert.rsaの3つの証明書のリスト[[ASN1]]を取り出す</li>
+<li>取り出した証明書をSigned Certificate型に変換
+	<ul>
+	<li>Signed Certificate型は新規に作ることを検討中</li>
+	<li>Signed a型をASNObject型のインスタンスに</li>
+	<li>Certificate型もASNObject型のインスタンスに</li>
+	</ul></li>
+<li>ASN1とSigned Certificate型間の相互含換をテスト</li>
+<li>Signed Certificate型とPEMファイル間の相互変換を実装</li>
+</ol>
+
+<h2>流れ</h2>
+
+<ol>
+<li>zigbert.rsaをBERとしてデコード</li>
+<li>サイン付証明書の部分を取り出す</li>
+<li>サイン部分と証明書部分とに分ける
+	<ul>
+	<li>decodeSignedObjectを参考にする</li>
+	</ul></li>
+<li>証明書部分をデコードする</li>
+</ol>
+
+<h2>zigbert.rsaをBERとしてデコード</h2>
+
+<pre><code>% runhaskell <a href="/computer/haskell/coding/pkcs7/decodeBer.hs"
+>decodeBer.hs</a> <a href="/computer/haskell/coding/pkcs7/zigbert.rsa"
+>zigbert.rsa</a></code></pre>

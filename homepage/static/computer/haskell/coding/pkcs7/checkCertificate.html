@@ -1,0 +1,94 @@
+zigbert.rsa内の証明書の確認
+
+<p>(工事中)</p>
+
+<h2>やること</h2>
+
+<p>
+zigbert.rsa内にある証明書が本当に正しいかどうかをチェックしてみる。
+</p>
+
+<h2>GnuTLSを使って証明書を取り出す</h2>
+
+<h3>zigbert.rsaから証明書を取り出す</h3>
+
+<p>GnuTLSを使ってzigbert.rsaから証明書をPEM形式で取り出す</p>
+
+<pre><code
+>certtool --p7-info --inder --infile <a
+href="/computer/haskell/coding/pkcs7/zigbert.rsa"
+>zigbert.rsa</a> &gt; <a
+href="/computer/haskell/coding/pkcs7/certs.pem.txt"
+>certs.pem</a></code></pre>
+
+<h3>チェック用のHaskellスクリプトを作成</h3>
+
+<p>(工事中)</p>
+
+<h3>作成したスクリプトをcerts.pemに適用</h3>
+
+<pre><code>% runhaskell <a
+href="/computer/haskell/coding/pkcs7/checkPem.hs"
+>checkPem.hs</a> certs.pem</code></pre>
+
+<h3>現在明らかになっている問題点</h3>
+
+<ul>
+<li>fromASN1がうまく動かない</li>
+<li>BER形式でのエンコードができない
+	<ul>
+	<li>解決: DER形式でエンコードしておけば良い</li>
+	</ul></li>
+</ul>
+
+<h3>対処法の候補</h3>
+
+<ul>
+<li>新しいバージョンをチェックする</li>
+<li>独自のSignedCertificateを作成する</li>
+</ul>
+
+<h3>調査が必要かもしれない事項</h3>
+
+<ul>
+<li>PKCS#15のパディングのしかた
+	<ul>
+	<li>Crypto.PubKey.RSA.PKCS15が使えれば調査はいらない</li>
+	</ul></li>
+</ul>
+
+<h2>Haskellのコードを使って取り出す</h2>
+
+<h3>すること</h3>
+
+<ol>
+<li>zigbert.rsaをBERデコード</li>
+<li>入手した[ASN1]型の値から証明書部分を取り出す
+	<ul>
+	<li>今の時点ではad-hocなやりかたで良い</li>
+	<li>証明書3つ分のリスト([[ASN1]]型)を取り出す</li>
+	</ul></li>
+<li>署名部分とそれ以外とを([ASN1], sign)のような形に分ける</li>
+<li>[ASN1]部分から公開鍵を取り出して上記の署名の検証</li>
+</ol>
+
+<h3>ASN1型のSequence, Set, Container等をパースする</h3>
+
+<p><a href="/computer/haskell/coding/pkcs7/Asn1Container.hs"
+	>Asn1Container.hs</a></p>
+
+<h3>PEMとzigbert.rsaとから証明書の[ASN.1]を取り出す</h3>
+
+<h3>Certificate型を作成する</h3>
+
+<h3>Signed a型を作成する</h3>
+
+<p>aがASNObjectだった場合に署名の検証をする関数を作成する。</p>
+
+<h3>Signed Certificate型を試す</h3>
+
+<p>署名の検証をしてみる。</p>
+
+<h3>PEMとASN.1の相互変換について調べる</h3>
+
+<h3>PEMで保存された証明書の読み込み、書き込み</h3>

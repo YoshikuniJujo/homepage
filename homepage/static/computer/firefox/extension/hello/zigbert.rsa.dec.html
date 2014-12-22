@@ -1,27 +1,24 @@
 Yahoo Toolbarのzigbert.rsaの解析
 <p>
-Right [ Start Sequence,
-</p>
-
-<p>
-OID [1,2,840,113549,1,7,2], -- pkcs7.SignedData
-</p>
-
-<p>
+[ Start Sequence, OID [1,2,840,113549,1,7,2],
 Start (Container Context 0),
+Start Sequence,IntVal 1,
 </p>
 
 <p>
-Start Sequence,IntVal 1,
+-- OID 1.2.840.113549.1.7.2: pkcs7.SignedData
 </p>
 
 <hr/>
 
 <p>
 Start Set,Start Sequence,OID [1,3,14,3,2,26],Null,End Sequence,End Set,
--- hashlib.sha1</br>
 Start Sequence,OID [1,2,840,113549,1,7,1],End Sequence,
--- pkcs#7 data</br>
+</p>
+
+<p>
+-- OID 1.3.14.3.2.26: hashlib.sha1<br/>
+-- OID 1.2.840.113549.1.7.1: pkcs#7 data
 </p>
 
 <hr/>
@@ -407,12 +404,6 @@ End Sequence, End Set,
 
 <p>
 End Sequence,
-</p>
-
-<p>
 End (Container Context 0),
-</p>
-
-<p>
 End Sequence ]
 </p>
