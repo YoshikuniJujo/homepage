@@ -1,0 +1,66 @@
+4.1. Basic Certificate Fields
+
+<p>(工事中)</p>
+
+<p>
+署名の計算のために、署名される部分はASN.1のDERでエンコードする必要がある。
+</p>
+
+<pre><code>Certificate ::= SEQUENCE {
+	tbsCertificate		TBSCertificate,
+	signatureAlgorithm	AlgorithmIdentifier,
+	signatureValue		BIT STRING }</code></pre>
+
+<pre><code>TBSCertificate ::= SEQUENCE {
+	version			EXPLICIT Version DEFAULT v1,
+	serialNumber		CertificateSerialNumber,
+	signature		AlgorithmIdentifier,
+	issuer			Name,
+	validity		Validity,
+	subject			Name,
+	subjectPublicKeyInfo	SubjectPublicKeyInfo,
+	issuerUniqueID		IMPLICIT UniqueIdentifier OPTIONAL,
+				-- If present, version MUST be v2 or v3
+	subjectUniqueID		IMPLICIT UniqueIdentifier OPTIONAL,
+				-- If present, version MUST be v2 or v3
+	extensions		EXPLICIT Extensions OPTIONAL
+				-- If present, version MUST be v3
+	}</code></pre>
+
+<pre><code>Version ::= INTEGER { v1(0), v2(1), v3(2) }</code></pre>
+
+<pre><code>CertificateSerialNumber ::= INTEGER</code></pre>
+
+<pre><code>Validity ::= SEQUENCE {
+	notBefore	Time,
+	notAfter	Time }</code></pre>
+
+<pre><code>Time ::= CHOICE {
+	utcTime		UTCTime,
+	generalTime	GeneralizedTime }</code></pre>
+
+<pre><code>UniqueIdentifier ::= BIT STRING</code></pre>
+
+<pre><code>SubjectPublicKeyInfo ::= SEQUENCE {
+	algorithm		AlgorithmIdentifier,
+	subjectPublicKey	BIT STRING }</code></pre>
+
+<pre><code>Extensions ::= SEQUENCE SIZE (1..MAX) OF Extension</code></pre>
+
+<pre><code>Extension ::= SEQUENCE {
+	extnID		OBJECT IDENTIFIER,
+	critical	BOOLEAN DEFAULT FALSE,
+	extnValue	OCTET STRING
+			-- contains the DER encoding of an ASN.1 value
+			-- corresponding to the extension type identified
+			-- by extnID
+	}</code></pre>
+
+<ul>
+<li><a
+href="/computer/web/rfc/rfc5280/4_1_basic_certificate_fields/4_1_1_certificate_fields.html"
+	>4.1.1. Certificate Fields</a> (工事中)</li>
+<li><a
+href="/computer/web/rfc/rfc5280/4_1_basic_certificate_fields/4_1_2_tbscertificate"
+	>4.1.2. TBSCertificate</a> (工事中)</li>
+</ul>
