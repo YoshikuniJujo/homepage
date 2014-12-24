@@ -1,0 +1,2 @@
+some :: String
+some = "yet"
