@@ -1,8 +1,117 @@
 RFC 5280
 
-<p>工事中</p>
+<p>(工事中)</p>
 
 <ul>
-<li><a href="/computer/haskell/coding/pkcs7/rfc5280/rfc5280_4_1.hs"
-	>rfc5280_4_1.hs</a> (工事中 0%)</li>
+<li><a href="#4_1_basic_certificate_fields"
+		>4.1. Basic CertificateFields</a>
+	<ul>
+	<li><a href="#4_1_1_certificate_fields"
+			>4.1.1. Certificate Fields</a>
+		<ul>
+		<li><a href="#4_1_1_2_signaturealgorithm"
+			>4.1.1.2. signatureAlgorithm</a></li>
+		<li><a href="#4_1_1_3_signaturevalue"
+			>4.1.1.3. signatureValue</a></li>
+		</ul></li>
+	<li><a href="#4_1_2_tbscertificate"
+			>4.1.2. TBSCertificate</a></li>
+	</ul></li>
 </ul>
+
+<h2 id="4_1_basic_certificate_fields">4.1. Basic Certificate Fields</h2>
+
+<pre><code>data Certificate = Certificate {
+	tbsCertificate :: TBSCertificate,
+	signatureAlgorithm :: AlgorithmIdentifier,
+	signatureValue :: BitString
+	} deriving Show</code></pre>
+
+<p><a href="/computer/haskell/coding/pkcs7/rfc5280/rfc5280_4_1.hs"
+	>rfc5280_4_1.hs</a></p>
+
+<p>
+<a href="/computer/web/rfc/rfc5280/4_1_basic_certificate_fields"
+	>RFC 5280 4.1.</a> (工事中)</p>
+</p>
+
+<h2 id="4_1_1_certificate_fields">4.1.1. Certificate Fields</h2>
+
+<h3 id="4_1_1_2_signaturealgorithm">4.1.1.2 signatureAlgorithm</h3>
+
+<pre><code>AlgorithmIdentifier ::= SEQUENCE {
+	algorithm		OBJECT IDENTIFIER,
+	parameters		ANY DEFINED BY algorithm OPTIONAL }</code></pre>
+
+<p>(作成中)</p>
+
+<p>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+</p>
+
+<h3 id="4_1_1_3_signaturevalue">4.1.1.3 signatureValue</h3>
+
+<p>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+</p>
+
+<p><a
+href="/computer/web/rfc/rfc5280/4_1_basic_certificate_fields/4_1_1_certificate_fields.html"
+>RFC 5280 4.1.1</a></p>
+
+<h2 id="4_1_2_tbscertificate">4.1.2 TBSCertificate</h2>
+
+<p>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+</p>

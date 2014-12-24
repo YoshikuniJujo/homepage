@@ -2,8 +2,56 @@
 
 <p>(工事中)</p>
 
-<h2>4.1.1. Certificate Fields</h2>
+<p>
+証明書は3つのフィールドから構成される。
+それぞれ、証明書本体、署名アルゴリズム、署名となる。
+</p>
 
-<h3>4.1.1.1. tbsCertificate</h3>
-<h3>4.1.1.2. signatureAlgorithm</h3>
-<h3>4.1.1.3. signatureValue</h3>
+<h2>4.1.1.1. tbsCertificate</h2>
+
+<p>
+証明書の本体となるフィールド。
+署名対象と署名者の名前、署名対象の公開鍵、有効期間、その他の情報を含む。
+<a
+href="/computer/web/rfc/rfc5280/4_1_basic_certificate_fields/4_1_2_tbscertificate"
+>4.1.2</a>参照。
+拡張フィールドについては<a
+href="/computer/web/rfc/rfc5280/4_2_certificate_extensions"
+>4.2</a>参照。
+</p>
+
+<h2>4.1.1.2. signatureAlgorithm</h2>
+
+<p>
+CAが証明書に署名した暗号アルゴリズムを指定するフィールド。
+[RFC3279], [RFC4055], [RFC4491]にリストがあるが、
+それ以外の署名アルゴリズムも使って良い。
+</p>
+
+<pre><code>AlgorithmIdentifier ::= SEQUENCE {
+	algorithm		OBJECT IDENTIFIER,
+	parameters		ANY DEFINED BY algorithm OPTIONAL }</code></pre>
+
+<p>
+パラメータフィールドはアルゴリズムによって異なる。
+このフィールドはtbsCertificateのsignatureフィールドと同じでなければならない。
+</p>
+
+<p>
+<a href= "/computer/haskell/coding/pkcs7/rfc5280#4_1_1_2_signaturealgorithm"
+	>rfc5280_4_1_1_2.hs</a> (工事中 0%)
+</p>
+
+<h2>4.1.1.3. signatureValue</h2>
+
+<p>
+DERエンコードしたtbsCertificateフィールドに対する署名値のフィールド。
+署名値はBIT STRINGとしてエンコードされる。
+詳細は[RFC3279], [RFC4055], [RFC4492]参照。
+CAはこの署名によって証明書の正当性を保証する。
+</p>
+
+<p>
+<a href= "/computer/haskell/coding/pkcs7/rfc5280#4_1_1_3_signaturevalue"
+	>rfc5280_4_1_1_3.hs</a> (工事中 0%)
+</p>
