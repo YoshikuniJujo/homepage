@@ -1,0 +1,34 @@
+オレオレ認証局の作成
+
+<p>(工事中)</p>
+
+<p>
+<a href="http://www.webtech.co.jp/blog/developer-news/1159/"
+>このページ</a>が参考になる。ただしGentooではファイルの位置が異なる。
+また、OpenSSLのバージョンの違いによって、
+以下のような変更が必要になる。
+<ul>
+<li>/etc/pki/tls/misc/CA -&gt; /etc/ssl/misc/CA.sh</li>
+<li>/etc/pki/tls/openssl.cnf -&gt; /etc/ssl/openssl.cnf</li>
+</ul>
+</p>
+
+<h2>ディレクトリの作成と必要なファイルのコピー</h2>
+
+<pre><code>% mkdir /home/tatsuya/phd03_white/oreore
+% cd /home/tatsuya/phd03_white/oreore
+% cp /etc/ssl/misc/CA.sh ./
+% cp /etc/ssl/openssl.cnf ./
+% vim CA.sh
+% diff CA.sh /etc/ssl/misc/CA.sh
+30,32d29
+&lt; SSLEAY_CONFIG="-config /home/tatsuya/phd03_white/oreore/openssl.cnf"
+&lt; CATOP="/home/tatsuya/phd03_white/oreore/"
+&lt;
+% vim openssl.cnf
+</code></pre>
+
+<p><a href="/computer/web/security/certificate/myca/CA.sh.diff.txt"
+	>CA.sh.diff</a></p>
+
+<p>(作成中)</p>

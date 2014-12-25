@@ -1,0 +1,4 @@
+30,32d29
+< SSLEAY_CONFIG="-config /home/tatsuya/phd03_white/oreore/openssl.cnf"
+< CATOP="/home/tatsuya/phd03_white/oreore/"
+< 
