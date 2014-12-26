@@ -1,0 +1,20 @@
+42c42
+< dir		= ./demoCA		# Where everything is kept
+---
+> dir		= /home/tatsuya/phd03_white/oreore/	# Where everything is kept
+106c106
+< default_bits		= 1024
+---
+> default_bits		= 2048
+129c129
+< countryName_default		= AU
+---
+> countryName_default		= JP
+134c134
+< stateOrProvinceName_default	= Some-State
+---
+> stateOrProvinceName_default	= Gunma
+139c139
+< 0.organizationName_default	= Internet Widgits Pty Ltd
+---
+> 0.organizationName_default	= Yoshikuni
