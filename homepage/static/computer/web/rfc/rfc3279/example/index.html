@@ -7,6 +7,7 @@ RFC 3279を読むための証明書例
 <p>
 <a href="/computer/web/security/certificate/myca"
 >オレオレ認証局</a>を使って証明書例を作成する。
+</p>
 <pre><code>% cd /home/tatsuya/phd03_white/oreore
 % ./CA.sh -newreq
 % ./CA.sh -sign
@@ -14,7 +15,6 @@ RFC 3279を読むための証明書例
 % mv newkey.pem private/exam_key.pem
 % mv newcert.pem <a href="/computer/web/rfc/rfc3279/example/exam_cert.pem.txt"
 	>certs/exam_cert.pem</a></code></pre>
-</p>
 
 <h2>コメントのSignature Algorithm部分</h2>
 
@@ -30,17 +30,28 @@ RFC 3279を読むための証明書例
     ...
 </code></pre>
 
-<h2>ASN.1としてデコードする</h2>
-
-<p><a href="/computer/web/rfc/rfc3279/example/decodeBer.hs"
-	>decodeBer.hs</a>を参考にしてdecodePem.hsを作成する。</p>
-
-<p>(作成中)</p>
-
 <h2>signatureAlgorithmの部分を抽出</h2>
 
-<p>(作成中)</p>
+<p>
+<a href="/computer/web/rfc/rfc3279/example/decodeBer.hs"
+>decodeBer.hs</a>を参考にしてgetSignatureAlgorithm.hsを作成する。
+<a href="https://hackage.haskell.org/package/pem">pemパッケージ</a>を使用する。
+</p>
+
+<ul>
+<li><a href="/computer/web/rfc/rfc3279/example/getSignatureAlgorithm.hs"
+	>getSignatureAlgorithm.hs</a></li>
+<li><a href="/computer/web/rfc/rfc3279/example/Asn1Container.hs">Asn1Container.hs</a></li>
+</ul>
+
+<pre><code>% runhaskell getSignatureAlgorithm.hs exam_cert.pem
+CntSequence [CntAtom (OID [1,2,840,113549,1,1,5]),CntAtom Null]</code></pre>
+
+<!-- <p><a href="/computer/web/rfc/rfc3279/example/signatureAlgorithm_asnc.txt"
+>結果</a></p> -->
 
 <h2>RFC 3279の該当部分を参照する</h2>
+
+<h3>2.2.1 RSA Signature Algorithm</h3>
 
 <p>(作成中)</p>
