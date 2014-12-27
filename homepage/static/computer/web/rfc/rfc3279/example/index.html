@@ -1,7 +1,5 @@
 RFC 3279を読むための証明書例
 
-<p>(工事中)</p>
-
 <h2>証明書例を作成する</h2>
 
 <p>
@@ -54,4 +52,7 @@ CntSequence [CntAtom (OID [1,2,840,113549,1,1,5]),CntAtom Null]</code></pre>
 
 <h3>2.2.1 RSA Signature Algorithm</h3>
 
-<p>(作成中)</p>
+<pre><code>sha-1WithRSAEncryption OBJECT IDENTIFIER ::= {
+	iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs-1(1) 5 }</code></pre>
+
+<p>AlgorithmIdentifierとして使われる場合にはparameterはASN.1のNULLとなる。</p>
