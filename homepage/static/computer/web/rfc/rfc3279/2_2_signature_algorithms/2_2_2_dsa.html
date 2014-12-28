@@ -1,3 +1,20 @@
-DSA署名アルゴリズム
+RFC 3279 2.2.2 DSA署名アルゴリズム
 
-<p>(工事中)</p>
+<h2>DSA暗号</h2>
+
+<p>DSA暗号については<a href="/computer/web/rfc/fips186-4"
+	>[FIPS 186-4]</a>参照。</p>
+
+<h2>署名アルゴリズムのOID</h2>
+
+<pre><code>id-dsa-with-sha1 OBJECT IDENTIFIER ::= {
+	iso(1) member-body(2) us(840) x9-57(10040)
+	x9cm(4) 3 }</code></pre>
+
+<p>このOIDをASN.1のAlgorithmIdentifierとする場合にはパラメータ部分は省略する。</p>
+
+<h2>署名のデータ構造</h2>
+
+<pre><code>DSS-Sig-Value ::= SEQUENCE {
+	r	INTEGER,
+	s	Integer }</code></pre>

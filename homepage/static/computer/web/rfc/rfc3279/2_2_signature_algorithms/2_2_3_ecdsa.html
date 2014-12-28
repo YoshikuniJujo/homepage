@@ -1,3 +1,27 @@
-楕円曲線デジタル署名アルゴリズム
+ECDSA(楕円曲線デジタル)署名アルゴリズム
 
-<p>(工事中)</p>
+<h2>ECDSA</h2>
+
+<p>ECDSAについては<a
+href="http://webstore.ansi.org/RecordDetail.aspx?sku=ANSI+x9.62:2005"
+>ANSI X9.62</a>(有料$100.00)で定義されている。</p>
+
+<h2>署名アルゴリズムのOID</h2>
+
+<pre><code>ansi-X9-62 OBJECT IDENTIFIER ::= {
+	iso(1) member-body(2) us(840) 10045 }</code></pre>
+
+<pre><code>id-ecSigType OBJECT IDENTIFIER ::= {
+	ansi-X9-62 signatures(4) }</code></pre>
+
+<pre><code>ecdsa-with-SHA1 OBJECT IDENTIFIER ::= {
+	id-ecSigType 1 }</code></pre>
+
+<p>このOIDをASN.1のAlgorithmIdentifierとする場合には
+パラメータ部分は省略しなければならない。</p>
+
+<h2>署名のデータ構造</h2>
+
+<pre><code>Ecdsa-Sig-Value ::= SEQUENCE {
+	r	INTEGER,
+	s	INTEGER }</code></pre>

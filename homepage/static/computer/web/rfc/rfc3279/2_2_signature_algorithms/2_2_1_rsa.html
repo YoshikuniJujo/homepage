@@ -1,3 +1,38 @@
 RFC 3279 2.2.1 RSA署名アルゴリズム
 
-<p>(工事中)</p>
+<h2>RSA暗号</h2>
+
+<p>RSA暗号については<a href="/computer/web/rfc/rfc3447">[RFC3447]</a>参照。</p>
+
+<h2>一方向ハッシュ関数のOID</h2>
+
+<pre><code>md2 OBJECT IDENTIFIER ::= {
+	iso(1) member-body(2) US(840) rsadsi(113549)
+	digestAlgorithm(2) 2 }</code></pre>
+
+<pre><code>md5 OBJECT IDENTIFIER ::= {
+	iso(1) member-body(2) US(840) rsadsi(113549)
+	digestAlgorithm(2) 5 }</code></pre>
+
+<pre><code>id-sha1 OBJECT IDENTIFIER ::= {
+	iso(1) identified-organization(3) oiw(14) secsig(3)
+	algorithms(2) 26 }</code></pre>
+
+<h2>署名アルゴリズムのOID</h2>
+
+<pre><code>md2WithRSAEncryption OBJECT IDENTIFIER ::= {
+	iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
+	pkcs-1(1) 2 }</code></pre>
+
+<pre><code>md5WithRSAEncryption OBJECT IDENTIFIER ::= {
+	iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
+	pkcs-1(1) 4 }</code></pre>
+
+<pre><code>sha-1WithRSAEncryption OBJECT IDENTIFIER ::= {
+	iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
+	pkcs-1(1) 5 }</code></pre>
+
+<p>
+これら3つのOIDをASN.1のAlgorithmIdentifierとする場合には
+パラメータ部分はASN.1のNULL型とする。
+</p>
