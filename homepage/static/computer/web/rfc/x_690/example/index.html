@@ -1,4 +1,4 @@
-X.690: テスト用のファイル
+X.690: テスト用のファイルの作成
 
 <p>
 ASN.1のBER, DER, CERについて調べていくためにテスト用のデータを作成する。
@@ -17,9 +17,51 @@ ASN.1のBER, DER, CERについて調べていくためにテスト用のデー�
 わかりやすいようにtest_ASN_1という文字列をファイル名その他に入れておくことにする。
 </p>
 
-<pre><code>% ./CA.sh -newreq
+<pre><code>% cd [オレオレ認証局を作成したディレクトリ]
+% ./CA.sh -newreq
 % ./CA.sh -sign
 % mv newreq.pem reqs/test_ASN_1_csr.pem
 % mv newkey.pem private/test_ASN_1_key.pem
-% mv newcert.pem certs/test_ASN_1_cert.pem
+% mv newcert.pem <a
+href="/computer/web/rfc/x_690/example/test_ASN_1_cert.pem.txt"
+>certs/test_ASN_1_cert.pem</a>
 </code></pre>
+
+<h2>PEMをデコードする</h2>
+
+<p>
+Haskellの<a href="https://hackage.haskell.org/package/pem"
+>pemパッケージ</a>を利用する。
+</p>
+
+<pre><code>
+% runhaskell <a
+href="/computer/web/rfc/x_690/example/decodePem.hs"
+>decodePem.hs</a> -in certs/test_ASN_1_cert.pem -out <a
+href="/computer/web/rfc/x_690/example/test_ASN_1_cert.der"
+>certs/test_ASN_1_cert.der</a>
+</code></pre>
+
+<h2>出来上がったファイル</h2>
+
+<p><a href="/computer/web/rfc/x_690/example/test_ASN_1_cert.der"
+>certs/test_ASN_1_cert.der</a></p>
+
+<pre><code>% runhaskell <a href="/computer/web/rfc/x_690/example/hexdump.hs"
+	>hexdump.hs</a> certs/test_ASN_1_cert.der
+30 82 03 4e 30 82 02 b7  a0 03 02 01 02 02 09 00
+84 68 c4 73 39 68 a3 84  30 0d 06 09 2a 86 48 86
+f7 0d 01 01 05 05 00 30  44 31 0b 30 09 06 03 55
+04 06 13 02 4a 50 31 0e  30 0c 06 03 55 04 08 0c
+...
+f4 09 e5 be 23 48 c5 02  7f dc 19 e4 c1 bd 90 ac
+f8 66 b0 ec 8d ec c8 68  9c 32 5c 4d ef c8 9b ba
+06 ac
+% runhaskell hexdump.hs certs/test_ASN_1_cert.der &gt; <a
+	href="/computer/web/rfc/x_690/example/test_ASN_1_cert.der.hex.txt"
+	>certs/test_ASN_1_cert.der.hex</a></code></pre>
+
+<p>参考: <a href="https://hackage.haskell.org/package/bytestring"
+	>bytestringパッケージ</a></p>
+
+<p><a href="/computer/web/rfc/x_690">X.690のトップへもどる</a></p>
