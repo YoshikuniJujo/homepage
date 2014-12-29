@@ -1,0 +1,25 @@
+X.690: テスト用のファイル
+
+<p>
+ASN.1のBER, DER, CERについて調べていくためにテスト用のデータを作成する。
+ここでは証明書を作ってそれをテスト用のデータとして使うことにする。
+</p>
+
+<h2>オレオレ認証局を作成</h2>
+
+<p>
+<a href="/computer/web/security/certificate/myca">オレオレ認証局の作成</a>を参照。
+</p>
+
+<h2>テスト用の証明書を作成する</h2>
+
+<p>
+わかりやすいようにtest_ASN_1という文字列をファイル名その他に入れておくことにする。
+</p>
+
+<pre><code>% ./CA.sh -newreq
+% ./CA.sh -sign
+% mv newreq.pem reqs/test_ASN_1_csr.pem
+% mv newkey.pem private/test_ASN_1_key.pem
+% mv newcert.pem certs/test_ASN_1_cert.pem
+</code></pre>

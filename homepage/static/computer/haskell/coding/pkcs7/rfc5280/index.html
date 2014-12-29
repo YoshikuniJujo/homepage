@@ -32,6 +32,8 @@ RFC 5280
 	signatureValue :: BitString
 	} deriving Show</code></pre>
 
+<pre><code>data TBSCertificate = ...</code></pre>
+
 <p><a href="/computer/haskell/coding/pkcs7/rfc5280/rfc5280_4_1.hs"
 	>rfc5280_4_1.hs</a></p>
 
@@ -84,9 +86,9 @@ href="/computer/web/rfc/rfc5280/4_1_basic_certificate_fields/4_1_1_certificate_f
 
 <pre><code>data CryptoId = Rsa | Dsa | Ecdsa deriving Show</code></pre>
 
-<h4>AlgorithmIdentifier型からASN1Containerへのマッピング関数</h4>
+<h4>AlgorithmIdentifier型からAsn1Containerへのマッピング関数</h4>
 
-<pre><code>algIdToAsn1c :: AlgorithmIdentifier -&gt; Maybe ASN1Container
+<pre><code>algIdToAsn1c :: AlgorithmIdentifier -&gt; Maybe Asn1Container
 algIdToAsn1c (AlgorithmIdentifier Md2 Rsa) = Just $
 	CntSequence [CntAtom $ OID [1, 2, 840, 113549, 1, 1, 2], CntAtom Null]
 algIdToAsn1c (AlgorithmIdentifier Md5 Rsa) = Just $
@@ -99,7 +101,7 @@ algIdToAsn1c (AlgorithmIdentifier Sha1 Ecdsa) = Just $
 	CntSequence [CntAtom $ OID [1, 2, 840, 10045, 4, 1]]
 algIdToAsn1c _ = Nothing</code></pre>
 
-<h4>ASN1ContainerからAlgorithmIdentifier型へのマッピング</h4>
+<h4>Asn1ContainerからAlgorithmIdentifier型へのマッピング</h4>
 
 <pre><code>asn1cToAlgId :: Asn1Container -&gt; Maybe AlgorithmIdentifier
 asn1cToAlgId (CntSequence
@@ -120,6 +122,25 @@ asn1cToAlgId (CntSequence
 asn1cToAlgId _ = Nothing</code></pre>
 
 <h3 id="4_1_1_3_signaturevalue">4.1.1.3 signatureValue</h3>
+
+<h4>署名つきデータ</h4>
+
+<pre><code>data Signed = {
+	signedObject :: ByteString,
+	signatureAlgorithm :: AlgorithmIdentifier,
+	signatureValue :: SignatureValue }</code></pre>
+
+<pre><code>data SignatureValue
+	= RsaSignature Integer
+	| DsaSignature {
+		dsaSignatureR :: Integer,
+		dsaSignatureS :: Integer }</code></pre>
+
+<h4>署名の検証</h4>
+
+<pre><code>validate :: SignatureValue -&gt; Bool
+validate sd = digest (signatureAlgorithm sd) (signedObject sd) ==
+	encrypt (signatureAlgorithm sd) (signatureValue sd)</code></pre>
 
 <p>(作成中)</p>
 
