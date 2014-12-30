@@ -2,12 +2,34 @@ X.690: ASN.1のBER方式の共通部分のコーディング
 
 <p>(工事中 15%)</p>
 
+<h2>工事予定</h2>
+
+<p><a href="/computer/haskell/coding/binary_analyzer"
+	>バイナリ解析器</a>を使うように書き直していく</p>
+
+<p><a href="/computer/haskell/coding/binary_analyzer/coding/ListLike.hs"
+	>ListLike.hs</a>
+<a href="/computer/haskell/coding/binary_analyzer/coding/Analyzer.hs"
+	>Analyzer.hs</a></p>
+
 <h2>目標</h2>
 
 <p>
 ASN.1のBER方式の仕様のデータ型に関係ない共通部分まで読んだので、
 ここまでの内容のみをHaskellコード化してみることにする。
 </p>
+
+<h2>使用するモジュール</h2>
+
+<p><a href="/computer/haskell/coding/binary_analyzer"
+>バイナリ解析器の作成</a>で作った以下のモジュールを使用する。</p>
+
+<ul>
+<li><a href="/computer/haskell/coding/binary_analyzer/coding/ListLike.hs"
+	>ListLike.hs</a></li>
+<li><a href="/computer/haskell/coding/binary_analyzer/coding/Analyzer.hs"
+	>Analyzer.hs</a></li>
+</ul>
 
 <h2>データ型の決定</h2>
 
@@ -21,39 +43,6 @@ ASN.1のBER方式の仕様のデータ型に関係ない共通部分まで読ん
 <pre><code>data DataClass = Primitive | Constructed
 	deriving Show</code></pre>
 
-<h2>解析器の型</h2>
-
-<pre><code>type Analyzer a = ByteString -&gt; Maybe (a, ByteString)</code></pre>
-
-<h2>解析用関数</h2>
-
-<h3>基本関数</h3>
-
-<pre><code>infixr 8 `build`
-infixr 7 `next`
-infixr 7 `bind`
-</code></pre>
-
-<pre><code>spot :: (Word8 -&gt; Bool) -&gt; Analyzer Word8
-spot p bs
-	| Just (h, t) &lt;- uncons bs =
-		if p h then Just (h, t) else Nothing
-	| otherwise = Nothing</code></pre>
-
-<pre><code>build :: (a -&gt; b) -&gt; Analyzer a -&gt; Analyzer b
-f `build` a = a `bind` ret . f</code></pre>
-
-<pre><code>next :: Analyzer a -&gt; Analyzer b -&gt; Analyzer (a, b)
-a1 `next` a2 = a1 `bind` \x1 -&gt; (x1 ,) `build` a2</code></pre>
-
-<pre><code>bind :: Analyzer a -&gt; (a -&gt; Analyzer b) -&gt; Analyzer b
-(a1 `bind` a2) bs = case a1 bs of
-	Just (x, r) -&gt; a2 x r
-	_ -&gt; Nothing</code></pre>
-
-<pre><code>ret :: a -&gt; Analyzer a
-ret = (Just .) . (,)</code></pre>
-
 <p>参考: <a href="https://hackage.haskell.org/package/bytestring"
 	>bytestringパッケージ</a></p>
 
@@ -66,14 +55,16 @@ ret = (Just .) . (,)</code></pre>
 href="/computer/web/rfc/x_690/example/test_ASN_1_cert.der.hex.txt"
 >16進ダンプ</a>)</p>
 
-<pre><code>decode1 :: Analyzer Asn1
-decode1 = uncurry Asn1 `build`
-	(decodeTag `next` decodeContents)</code></pre>
+<pre><code>decode1 :: (ListLike a, Element a ~ Word8) =&gt; Analyzer Asn1
+decode1 = Asn1 &lt;$&gt; decodeTag &lt;*&gt; decodeContents</code></pre>
 
-<pre><code>decodeTag :: Analyzer Asn1Tag
+<pre><code>decodeTag :: (ListLike a, Element a ~ Word8) =&gt; Analyzer a Asn1Tag
 decodeTag = undefined</code></pre>
 
-<pre><code>decodeContents :: Analyzer ByteString
+<pre><code>decodeContents :: (ListLike a, Element a ~ Word8) =&gt; Analyzer ByteString
 decodeContents = undefined</code></pre>
+
+<p><a href="/computer/web/rfc/x_690/8_1_common/DecodeAsn1Common.hs"
+	>DecodeAsn1Common.hs</a></p>
 
 <h2>エンコード関数</h2>
