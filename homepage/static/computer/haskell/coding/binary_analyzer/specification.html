@@ -1,0 +1,72 @@
+バイナリ解析器: 仕様
+
+<h2>概要</h2>
+
+<p>
+データを前から順に読んでいき、その結果によって後ろのほうの解釈が影響を受ける。
+たとえば「これから...バイトは文字列として読みます」という形。
+</p>
+
+<h2>どのような形で作るか</h2>
+
+<p>
+解析器の型を作成し、それをモナドの枠組みで組み合わせられるようにする。
+モナドの枠組み以外で必要な関数は条件によって1要素を読み込めれば読み込む
+spot関数と、データの終了を検出するeof関数くらいかと思われる。
+また、しばしば使われるのでspot (const True)をtoken関数として定義しておこう。
+</p>
+
+<h2>BinaryStringへの対応</h2>
+
+<p>
+リストのみではなくBinaryString等も使えるようにしておく必要がある。
+ここをシームレスに行うためにはある程度の技巧が必要になるだろう。
+</p>
+
+<p>
+また、BinaryStringによる実行効率の改善効果を生かすためには、
+複数要様読み込みのtokens関数と条件を満たすあいだ取り出すtokensWhile関数を
+デフォルト値を持つクラス関数として上書き可能にしておく必要がありそうだ。
+</p>
+
+<h2>型の概要</h2>
+
+<p>
+リスト型で考えるならば以下のようになる。とりあえずtypeで見てみよう。
+</p>
+
+<pre><code>type Analizer a b = [a] -&gt; Maybe (b, [a])</code></pre>
+
+<p>
+これをより一般的にByteString等も使えるようにするためにはまずは以下のようにする。
+</p>
+
+<pre><code>type Analizer a b = a -&gt; Maybe (b, a)</code></pre>
+
+<p>
+そして関数を定義するような場合には例えば以下のような感じの型にする。
+</p>
+
+<pre><code>ListLike a =&gt; ... -&gt; Analizer a b -&gt; ...</code></pre>
+
+<p>
+Analizer aをモナドとしたいのでデータ型にする。
+</p>
+
+<pre><code>data Analizer a b = Analizer (a -&gt; Maybe (b, a))</code></pre>
+
+<p>
+Analizer型に対して以下の関数を定義する。
+</p>
+
+<pre><code>spot :: Analizer a (Element a)
+tokens :: Integer -&gt; Analizer a a
+tokensWhile :: (Element a -&gt; Bool) -&gt; Analizer a a
+eof :: Analizer a Bool</code></pre>
+
+<p>
+<a href="/computer/haskell/coding/binary_analyzer"
+	>バイナリ解析器のトップへもどる</a>
+<a href="/computer/haskell/coding/binary_analyzer/coding"
+	>コーディングへ(工事中 25%)</a>
+</p>

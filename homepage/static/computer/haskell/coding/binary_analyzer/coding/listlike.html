@@ -1,0 +1,161 @@
+バイナリ解析器: ListLikeモジュールの作成
+
+<p>(工事中 50%)</p>
+
+<h2>動機</h2>
+
+<p>
+バイナリ解析器は、文字やその他のリストにも使え、ByteStringにも使えるようにしたい。
+そのためには「リストのようなもの」クラスが必要になる。
+</p>
+
+<h2>TypeFamilies拡張</h2>
+
+<p>
+ByteStringをリストのようなものと考えたときに、
+その要素はWord8と考えることができる。
+よって、ByteStringをListLikeクラスのインスタンスにしたとき、
+要素となる値の型はWord8である。
+しかし、別の何かをリストのようなものと考えたときには、
+また別の型の値がその要素となるだろう。
+このように、クラスのインスタンスとなる型から、
+他の型を導き出す必要があることがしばしばある。
+このようなときにはTypeFamilies拡張を使い以下のように書けば良い。
+</p>
+
+<h3>クラス宣言</h3>
+
+<pre><code>class ListLike a where
+	type Element a</code></pre>
+
+<h3>インスタンス宣言</h3>
+
+<pre><code>instance ListLike ByteString where
+	type Element ByteString = Word8</code></pre>
+
+<pre><code>instance ListLike [a] where
+	type Element [a] = a</code></pre>
+
+<h2>リストのようなものに必要な性質</h2>
+
+<h3>必要な性質(クラス関数)</h3>
+
+<p>
+「リストのようなもの」に必要な性質は、
+読み込みに必要な性質と書き出しに必要な性質とに分けられる。
+</p>
+
+<p>
+読み込みに必要な性質は、
+「頭を取ることができる」「残りを取ることができる」「空かどうか調べられる」である。
+これは以下のような関数でこの3つを同時に行うことができる。
+</p>
+
+<pre><code>uncons :: a -&gt; Maybe (Element a, a)</code></pre>
+
+<p>
+書き出しに必要な性質は、
+「頭と[リスト的なもの]とをつなげて新しい[リスト的なもの]を作る」
+「空の[リスト的なもの]」である。
+これはそれぞれ以下のような関数で表現することができる。
+</p>
+
+<pre><code>cons :: Element a -&gt; a -&gt; a</code></pre>
+
+<pre><code>empty :: a</code></pre>
+
+<h3>クラス宣言</h3>
+
+<p>ここまででListLikeクラスは以下のようになる。</p>
+
+<pre><code>class ListLike a where
+	type Element a
+	empty :: a
+	cons :: Element a -&gt; a -&gt; a
+	uncons :: a -&gt; Maybe (Element a, a)</code></pre>
+
+<h2>splitAtの実行効率について</h2>
+
+<h3>splitAtを上述のクラス関数を使って実装する</h3>
+
+<p>
+与えられた「リスト的なもの」を位置を指定して2分割する関数splitAtを定義する。
+以下のようになる。
+</p>
+
+<pre><code>splitAt :: ListLike a =&gt; Integer -&gt; a -&gt; (a, a)
+splitAt n xs
+	| n &lt;= 0 = (empty, xs)
+	| otherwise = case uncons xs of
+		Just (h, t) -&gt; let
+			(t1, t2) = splitAt (n - 1) t in
+			(cons h t1, t2)
+		_ -&gt; (empty, empty)</code></pre>
+
+<h3>ByteStringにおける実行効率</h3>
+
+<p>参照: <a
+href="https://hackage.haskell.org/package/bytestring-0.10.4.1/docs/Data-ByteString.html#g:12"
+>Data.ByteString.splitAt</a></p>
+
+<p>
+ByteStringでは、バイト列におけるいくつかの演算を
+文字のリストであるStringよりも効率的に行うようになっている。
+たとえばData.ByteString.splitAtはO(1)つまり定数時間で実行可能である。
+しかし、上で定義したListLike.splitAtでは、1バイトずつuncons, consしていくので
+実行効率はO(n)となってしまう。
+これだと、ByteStringを使う意味が薄れてしまう。
+</p>
+
+<p>
+これはsplitAtをListLikeのクラス関数にすることで解決する。
+それぞれのインスタンスごとに独自のsplitAtを持つことができる。
+</p>
+
+<h3>splitAtの実行効率が改善しない型の場合</h3>
+
+<p>
+上で定義したままのsplitAtを使ったとしても実行効率に影響が出ない型も多い。
+そのような場合、何度も何度も同じsplitAtの定義を書くというのは非効率である。
+</p>
+
+<h3>デフォルトの定義という解決策</h3>
+
+<p>
+クラス関数としたうえで、それにデフォルトの定義を与えるという方法がある。
+こうすれば効率等に問題がない型ではデフォルトの定義を使い、
+何らかの問題がある場合にだけクラス関数を上書きするというやりかたができる。
+</p>
+
+<pre><code>class ListLike a where
+	type Element a
+	empty :: a
+	cons :: Element a -&gt; a -&gt; a
+	uncons :: a -&gt; Maybe (Element a, a)
+	splitAt :: Integer -&gt; a -&gt; (a, a)
+	splitAt n xs
+		| n &lt;= 0 = (empty, xs)
+		| otherwise = case uncons xs of
+			Just (h, t) -&gt; let
+				(t1, t2) = splitAt (n - 1) t in
+				(cons h t1, t2)
+			_ -&gt; (empty, empty)</code></pre>
+
+<h2>出来上がり</h2>
+
+<p>
+リストとByteStringのインスタンス宣言を加えて、
+最終的に出来上がったモジュールを以下に示す。
+</p>
+
+<p>
+<a href="/computer/haskell/coding/binary_analyzer/coding/ListLike.hs"
+	>ListLike.hs</a>
+</p>
+
+<p>
+<a href="/computer/haskell/coding/binary_analyzer/coding"
+	>解析器コーディングへもどる</a>
+<a href="/computer/haskell/coding/binary_analyzer/coding/analyzer.html"
+	>Analyzerモジュールの作成(工事中 0%)へ</a>
+</p>
