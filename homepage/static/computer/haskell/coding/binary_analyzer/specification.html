@@ -5,15 +5,18 @@
 <p>
 データを前から順に読んでいき、その結果によって後ろのほうの解釈が影響を受ける。
 たとえば「これから...バイトは文字列として読みます」という形。
+後ろのデータは前のデータの解釈に影響を与えない。
+つまり、一度確定したデータはさかのぼって変更されることはない。
 </p>
 
 <h2>どのような形で作るか</h2>
 
 <p>
-解析器の型を作成し、それをモナドの枠組みで組み合わせられるようにする。
-モナドの枠組み以外で必要な関数は条件によって1要素を読み込めれば読み込む
+解析器の型を作成しモナドの枠組みで組み合わせられるようにする。
+モナドの枠組み以外で必要な関数は、次のトークンが正しければ1トークン読み込む
 spot関数と、データの終了を検出するeof関数くらいかと思われる。
-また、しばしば使われるのでspot (const True)をtoken関数として定義しておこう。
+また、しばしば使われるのでspot (const True)をtoken関数とする他、
+いくつかの便利関数を作成しておこう。
 </p>
 
 <h2>BinaryStringへの対応</h2>
@@ -25,7 +28,7 @@ spot関数と、データの終了を検出するeof関数くらいかと思わ�
 
 <p>
 また、BinaryStringによる実行効率の改善効果を生かすためには、
-複数要様読み込みのtokens関数と条件を満たすあいだ取り出すtokensWhile関数を
+数を指定して複数のトークンを読み込むtokens関数を、
 デフォルト値を持つクラス関数として上書き可能にしておく必要がありそうだ。
 </p>
 
@@ -59,14 +62,14 @@ Analizer aをモナドとしたいのでデータ型にする。
 Analizer型に対して以下の関数を定義する。
 </p>
 
-<pre><code>spot :: Analizer a (Element a)
+<pre><code>eof :: Analizer a Bool
+spot :: Analizer a (Element a)
 tokens :: Integer -&gt; Analizer a a
-tokensWhile :: (Element a -&gt; Bool) -&gt; Analizer a a
-eof :: Analizer a Bool</code></pre>
+tokensWhile :: (Element a -&gt; Bool) -&gt; Analizer a a</code></pre>
 
 <p>
 <a href="/computer/haskell/coding/binary_analyzer"
-	>バイナリ解析器のトップへもどる</a>
+	>解析器のトップへもどる</a>
 <a href="/computer/haskell/coding/binary_analyzer/coding"
-	>コーディングへ(工事中 25%)</a>
+	>解析器のコーディングへ</a>
 </p>

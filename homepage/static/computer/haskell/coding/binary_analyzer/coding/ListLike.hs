@@ -1,10 +1,11 @@
 {-# LANGUAGE TypeFamilies #-}
 
-module ListLike (ListLike(..), span) where
+module ListLike (ListLike(..), null, span) where
 
-import Prelude hiding (splitAt, span)
+import Prelude hiding (splitAt, null, span)
 import qualified Prelude as P
 
+import Data.Maybe (isNothing)
 import Data.Word8 (Word8)
 
 import qualified Data.ByteString as BS
@@ -37,7 +38,11 @@ instance ListLike BS.ByteString where
 	uncons = BS.uncons
 	splitAt = BS.splitAt . fromIntegral
 
+null :: ListLike a => a -> Bool
+null = isNothing . uncons
+
 span :: ListLike a => (Element a -> Bool) -> a -> (a, a)
 span p s = case uncons s of
-	Just (h, t) | p h -> let (t1, t2) = span p t in (cons h t1, t2)
+	Just (h, t) | p h -> let (t1, t2) =
+		span p t in (cons h t1, t2)
 	_ -> (empty, s)

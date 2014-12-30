@@ -1,6 +1,110 @@
-バイナリ解析器: Analyzerモジュールの作成
+バイナリ解析器: Analyzerモジュール
 
-<p>(工事中 0%)</p>
+<h2>Analyzer型</h2>
+
+<pre><code>data Analyzer a b =
+	Analyzer { runAnalyzer :: a -&gt; Maybe (b, a) }</code></pre>
+
+<p>
+aをバイト列としbを例えば数値とすると、
+Analyzer型はバイト列から数値をひとつ読み出し
+その数値と残りのバイト列を返す関数として解釈できる。
+予期しない値によって失敗する可能性があるので結果はMaybe型としている。
+</p>
+
+<h2>Monadにする</h2>
+
+<p>
+数値を読んで次に文字を読んで等、連続して解析していくことを考えると、
+Monadクラスのインスタンスにするのが良さそうだ。
+</p>
+
+<pre><code>instance Monad (Analyzer a) where
+	return = Analyzer . (Just .) . (,)
+	a1 &gt;&gt;= a2 = Analyzer $ \s -&gt;
+		case runAnalyzer a1 s of
+			Just (x, s') -&gt; runAnalyzer (a2 x) s'
+			_ -&gt; Nothing
+	fail _ = Analyzer $ const Nothing</code></pre>
+
+<p>
+(&gt;&gt;=)関数は、失敗する可能性を処理したうえで、
+a1から得られる結果をa2に与えながら裏でsを更新している。
+</p>
+
+<h3>Functor, Applicative</h3>
+
+<p>
+現在のHaskellの世界ではMonadは明示的にFunctorやApplicativeの
+インスタンスにする必要がある。これはボイラープレートである。
+いつかHaskellの「約束の地」を見つけた日にはこれらは不要となる。
+</p>
+
+<pre><code>instance Functor (Analyzer a) where fmap = liftM</code></pre>
+<pre><code>instance Applicative (Analyzer a) where pure = return; (<*>) = ap</code></pre>
+
+<p>参考: <a
+href="https://downloads.haskell.org/~ghc/latest/docs/html/libraries/base-4.7.0.1/Control-Monad.html#g:7"
+>Control.Monad.ap</a></p>
+
+<h2>解析用の関数を作成する</h2>
+
+<h3>必要最小限の関数</h3>
+
+<p>解析に必要な関数はMonadのクラス関数以外には以下の2つ。</p>
+
+<pre><code>eof :: ListLike a =&gt; Analyzer a Bool
+eof = Analyzer $ Just . ((,) &lt;$&gt; null &lt;*&gt; id)</code></pre>
+
+<pre><code>spot :: ListLike a =&gt;
+	(Element a -&gt; Bool) -&gt; Analyzer a (Element a)
+spot p = Analyzer $ \s -&gt; case uncons s of
+	Just (h, t) | p h -&gt; Just (h, t)
+	_ -&gt; Nothing</code></pre>
+
+<p>
+eof関数はトークンをすべて消費したかどうかをチェックする。
+spot関数は次のトークンが正しいかどうかチェックしそれを読み出す。
+</p>
+
+<h3>便利関数</h3>
+
+<p>
+上記の関数から導出することができるが
+しばしば使われるので用意しておくと便利な関数。
+ただし、tokensは便利というだけでなく、ByteStringに関しては、
+上記の関数から導出した場合よりも実行効率が高い。
+</p>
+
+<pre><code>token :: ListLike a =&gt; Analyzer a (Element a)
+token = spot $ const True</code></pre>
+
+<pre><code>tokens :: ListLike a =&gt; Analyzer a a
+tokens = Analyzer . (Just .) . splitAt</code></pre>
+
+<pre><code>tokensWhile :: ListLike a =&gt;
+	(Element a -&gt; Bool) -&gt; Analyzer a a
+tokensWhile = Analyzer . (Just .) . span</code></pre>
+
+<pre><code>listAll :: ListLike a =&gt; Analyzer a b -&gt; Analyzer a [b]
+listAll = loopWhile eof</code></pre>
+
+<pre><code>loopWhile :: Monad m =&gt; m Bool -&gt; m a -&gt; m [a]
+loopWhile p m = do
+	e &lt;- p
+	if e then return [] else
+		(:) `liftM` m `ap` loopWhile p m</code></pre>
+
+<p>
+tokenはspot関数からテストを省略。
+tokensは指定した数だけトークンを読み出す。
+tokensWhileは条件を満たすあいだだけトークンを読み出す。
+listAllはtokenを消費しつくすまで同じ解析をくりかえす。
+</p>
+
+<h2>出来上がり</h2>
+
+<p>出来上がったモジュールを以下に示す。</p>
 
 <p>
 <a href="/computer/haskell/coding/binary_analyzer/coding/Analyzer.hs"
