@@ -23,6 +23,11 @@ ASN.1のBER方式の仕様のデータ型に関係ない共通部分まで読ん
 
 <h2>データ型の決定</h2>
 
+<p>
+Asn1はタグ(Asn1Tag)と内容(ByteString)から成る。
+Asn1Tagはタグのクラス(TagClass)とデータのクラス(DataClass)とタグの番号から成る。
+</p>
+
 <pre><code>data Asn1 = Asn1 Asn1Tag ByteString
 	deriving Show</code></pre>
 <pre><code>data Asn1Tag = Asn1Tag TagClass DataClass Integer
@@ -56,6 +61,15 @@ href="/computer/web/rfc/x_690/8_1_common/testDecodeAsn1Common.hs"
 	>DecodeAsn1Common.hs</a></p>
 
 <h4>タグのデコード</h4>
+
+<p>
+タグの1バイト目を解析する。
+8,7ビット目がタグのクラスを、
+6ビット目はデータのクラスを表す。
+残りの5から1ビットが0x1fであれば、
+タグの番号は続くバイト列で決まる。
+そうでなければ、この部分がタグの番号を示す。
+</p>
 
 <pre><code>decodeTag1 :: (ListLike a, Element a ~ Word8) =>
 	Analyzer a (TagClass, DataClass, Maybe Word8)
