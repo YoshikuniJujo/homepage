@@ -2,16 +2,6 @@ X.690: ASN.1のBER方式の共通部分のコーディング
 
 <p>(工事中 15%)</p>
 
-<h2>工事予定</h2>
-
-<p><a href="/computer/haskell/coding/binary_analyzer"
-	>バイナリ解析器</a>を使うように書き直していく</p>
-
-<p><a href="/computer/haskell/coding/binary_analyzer/coding/ListLike.hs"
-	>ListLike.hs</a>
-<a href="/computer/haskell/coding/binary_analyzer/coding/Analyzer.hs"
-	>Analyzer.hs</a></p>
-
 <h2>目標</h2>
 
 <p>
@@ -43,28 +33,77 @@ ASN.1のBER方式の仕様のデータ型に関係ない共通部分まで読ん
 <pre><code>data DataClass = Primitive | Constructed
 	deriving Show</code></pre>
 
-<p>参考: <a href="https://hackage.haskell.org/package/bytestring"
-	>bytestringパッケージ</a></p>
-
 <h2>デコード関数</h2>
+
+<h3>テスト用のファイル</h3>
+
+<ul>
+<li>テスト用証明書: <a
+href="/computer/web/rfc/x_690/example/test_ASN_1_cert.der"
+>test_ASN_1_cert.der</a>(<a
+href="/computer/web/rfc/x_690/example/test_ASN_1_cert.der.hex.txt"
+>16進ダンプ</a>)</li>
+<li>テスト用Mainモジュール: <a
+href="/computer/web/rfc/x_690/8_1_common/testDecodeAsn1Common.hs"
+>testDecodeAsn1Common.hs</a></li>
+</ul>
+
+<h3>関数群の作成</h3>
 
 <p>用意したテスト用ファイルで試しながらデコード関数を作成していく。</p>
 
-<p>テスト用ファイル: <a href="/computer/web/rfc/x_690/example/test_ASN_1_cert.der"
->test_ASN_1_cert.der</a>(<a
-href="/computer/web/rfc/x_690/example/test_ASN_1_cert.der.hex.txt"
->16進ダンプ</a>)</p>
-
-<pre><code>decode1 :: (ListLike a, Element a ~ Word8) =&gt; Analyzer Asn1
-decode1 = Asn1 &lt;$&gt; decodeTag &lt;*&gt; decodeContents</code></pre>
-
-<pre><code>decodeTag :: (ListLike a, Element a ~ Word8) =&gt; Analyzer a Asn1Tag
-decodeTag = undefined</code></pre>
-
-<pre><code>decodeContents :: (ListLike a, Element a ~ Word8) =&gt; Analyzer ByteString
-decodeContents = undefined</code></pre>
-
 <p><a href="/computer/web/rfc/x_690/8_1_common/DecodeAsn1Common.hs"
 	>DecodeAsn1Common.hs</a></p>
+
+<h4>タグのデコード</h4>
+
+<pre><code>decodeTag1 :: (ListLike a, Element a ~ Word8) =>
+	Analyzer a (TagClass, DataClass, Maybe Word8)
+decodeTag1 = do
+	w &lt;- token
+	let	tc = case w `shiftR` 6 of
+			0 -&gt; Universal
+			1 -&gt; Application
+			2 -&gt; ContextSpecific
+			3 -&gt; Private
+			_ -&gt; error "never occur"
+		dc = case (w .&amp;. 0x3f) `shiftR` 5 of
+			0 -&gt; Primitive
+			1 -&gt; Constructed
+			_ -&gt; error "never occur"
+		tn = case w .&amp;. 0x1f of
+			0x1f -&gt; Nothing
+			n	| n &lt; 0x1f -&gt; Just n
+				| otherwise -&gt; error "never occur"
+	return (tc, dc, tn)
+</code></pre>
+
+<pre><code>% ghci testDecodeAsn1Common.hs
+*Main&gt; runAnalyzer decodeTag1 cert
+Just ((Universal,Constructed,Just 16), "\130\ETXN0\130\STX
+<a href="/computer/web/rfc/x_690/8_1_common/result1.txt"
+>...</a>
+\155\186\ACK\172")</code></pre>
+
+<pre><code>decodeTagR :: (ListLike a, Element a ~ Word8) =&gt;
+	Integer -&gt; Analyzer a Integer
+decodeTagR n = do
+	w &lt;- token
+	if testBit w 7
+		then decodeTagR $ n `shiftL` 7 .|. fromIntegral (w .&amp;. 0x7f)
+		else return $ n `shiftL` 7 .|. fromIntegral w</code></pre>
+
+<pre><code>decodeTag :: (ListLike a, Element a ~ Word8) =&gt;
+	Analyzer a Asn1Tag
+decodeTag = do
+	(tc, dc, mtn) &lt;- decodeTag1
+	maybe (Asn1Tag tc dc &lt;$&gt; decodeTagR 0)
+		(return . Asn1Tag tc dc . fromIntegral) mtn</code></pre>
+
+<pre><code>% ghci testDecodeAsn1Common.hs
+*Main> runAnalyzer decodeTag cert
+Just ((Universal,Constructed,16), "\130\ETXN0\130\STX
+<a href="/computer/web/rfc/x_690/8_1_common/result2.txt">...</a>
+\155\186\ACK\172")</code></pre>
 
 <h2>エンコード関数</h2>
