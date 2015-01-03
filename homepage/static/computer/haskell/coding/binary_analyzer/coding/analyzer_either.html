@@ -1,0 +1,28 @@
+バイナリ解析器: MaybeからEither Stringに
+
+<h2>Analyzer型の変更</h2>
+
+<p>MaybeではなくEither Stringを使うようにする。</p>
+
+<pre><code>data Analyzer a b =
+	Analyzer { runAnalyzer :: a -&gt; Either String (b, a) }</code></pre>
+
+<h2>その他の関数の変更</h2>
+
+<p>
+ghciで走らせようとすると型エラーが報告されるので、
+ひとつずつMaybeをEither Stringに、JustをRightに、N
+othingをLeft [メッセージ]に変更していく。
+</p>
+
+<h2>出来上がったモジュール</h2>
+
+<p><a href="/computer/haskell/coding/binary_analyzer/coding/AnalyzerE.hs"
+	>Analyzer.hs</a></p>
+
+<p>
+<a href="/computer/haskell/coding/binary_analyzer/coding/analyzer.html"
+	>Analyzerモジュールの作成へもどる</a>
+<a href="/computer/haskell/coding/binary_analyzer"
+	>バイナリ解析器トップへ</a>
+</p>

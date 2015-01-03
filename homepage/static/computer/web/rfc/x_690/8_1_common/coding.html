@@ -1,6 +1,6 @@
 X.690: ASN.1のBER方式の共通部分のコーディング
 
-<p>(工事中 15%)</p>
+<p>(工事中 20%)</p>
 
 <h2>目標</h2>
 
@@ -17,7 +17,7 @@ ASN.1のBER方式の仕様のデータ型に関係ない共通部分まで読ん
 <ul>
 <li><a href="/computer/haskell/coding/binary_analyzer/coding/ListLike.hs"
 	>ListLike.hs</a></li>
-<li><a href="/computer/haskell/coding/binary_analyzer/coding/Analyzer.hs"
+<li><a href="/computer/haskell/coding/binary_analyzer/coding/AnalyzerE.hs"
 	>Analyzer.hs</a></li>
 </ul>
 
@@ -62,6 +62,8 @@ href="/computer/web/rfc/x_690/8_1_common/testDecodeAsn1Common.hs"
 
 <h4>タグのデコード</h4>
 
+<h5>タグの1バイト目のデコード</h5>
+
 <p>
 タグの1バイト目を解析する。
 8,7ビット目がタグのクラスを、
@@ -92,12 +94,24 @@ decodeTag1 = do
 	return (tc, dc, tn)
 </code></pre>
 
+<p>試してみる。</p>
+
 <pre><code>% ghci testDecodeAsn1Common.hs
 *Main&gt; runAnalyzer decodeTag1 cert
 Just ((Universal,Constructed,Just 16), "\130\ETXN0\130\STX
 <a href="/computer/web/rfc/x_690/8_1_common/result1.txt"
 >...</a>
 \155\186\ACK\172")</code></pre>
+
+<h5>タグの残りのバイトをデコード</h5>
+
+<p>
+8ビット目が1であれば後続のバイトが存在し、
+0であればそこで終了。
+読み込んできた値を保持しておき、
+次のバイトがあれば保持してあった値を7ビット左シフトしたうえで、
+そのバイトの値を足していく。
+</p>
 
 <pre><code>decodeTagR :: (ListLike a, Element a ~ Word8) =&gt;
 	Integer -&gt; Analyzer a Integer
@@ -107,6 +121,11 @@ decodeTagR n = do
 		then decodeTagR $ n `shiftL` 7 .|. fromIntegral (w .&amp;. 0x7f)
 		else return $ n `shiftL` 7 .|. fromIntegral w</code></pre>
 
+<p>
+1バイト目のデコードの結果の長さのフィールドがJust [番号]であれば、
+その[番号]がそのままタグの番号となり、Nothingならば残りのバイトを読み込む。
+</p>
+
 <pre><code>decodeTag :: (ListLike a, Element a ~ Word8) =&gt;
 	Analyzer a Asn1Tag
 decodeTag = do
@@ -114,10 +133,60 @@ decodeTag = do
 	maybe (Asn1Tag tc dc &lt;$&gt; decodeTagR 0)
 		(return . Asn1Tag tc dc . fromIntegral) mtn</code></pre>
 
+<p>試してみる。</p>
+
 <pre><code>% ghci testDecodeAsn1Common.hs
 *Main> runAnalyzer decodeTag cert
 Just ((Universal,Constructed,16), "\130\ETXN0\130\STX
 <a href="/computer/web/rfc/x_690/8_1_common/result2.txt">...</a>
 \155\186\ACK\172")</code></pre>
+
+<h5>タグ番号とデータ形式のエラーチェック</h5>
+
+<p>以下のような制約がある。</p>
+
+<ul>
+<li>番号が30以下の場合、1バイト形式で型番号を指定する</li>
+<li>複数バイトでの指定のとき最上位バイトは0x00ではない</li>
+</ul>
+
+<p>これらの制約をdecodeTagRに織り込む。</p>
+
+<h6>最上位バイトの制約</h6>
+
+<pre><code>decodeTagR :: ...
+decodeTagR 0 = do
+	w &lt;- token
+	when (w == 0x80) $ fail
+		"Redundant byte for tag number"
+	if testBit w 7
+		then decodeTagR $ fromIntegral (w .&amp;. 0x7f)
+		else return $ fromIntegral w
+decodeTagR n = do
+	...</code></pre>
+
+<h6>30以下の場合の制約</h6>
+
+<pre><code>decodeTagR0 :: (ListLike a, Element a ~ Word8) =&gt;
+	Analyzer a Integer
+decodeTagR0 = do
+	n &lt;- decodeTagR 0
+	when (n &lt;= 30) $ fail
+		"Use single byte for tag number 0 - 30"
+	return n</code></pre>
+
+<pre><code>decodeTag :: ...
+decodeTag = do
+	(tc, dc, mtn) &lt;- decodeTag1
+	maybe (Asn1Tag tc dc &lt;$&gt; decodeTagR0)
+		(return . Asn1Tag tc dc . fromIntegral) mtn</code></pre>
+
+<h6>変更後のモジュール</h6>
+<p><a href="/computer/web/rfc/x_690/8_1_common/DecodeAsn1Common_1.hs"
+>DecodeAsn1Common.hs</a></p>
+
+<p>エラー用のテストデータを用意する。</p>
+
+<p>試してみる。</p>
 
 <h2>エンコード関数</h2>

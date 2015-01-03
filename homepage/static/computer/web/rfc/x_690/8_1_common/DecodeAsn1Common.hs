@@ -1,6 +1,7 @@
 {-# LANGUAGE TypeFamilies #-}
 
-module DecodeAsn1Common (runAnalyzer, decode1, decodeTag1, decodeTag) where
+module DecodeAsn1Common (
+	runAnalyzer, decode1, decodeTag1, decodeTag) where
 
 import Control.Applicative
 import Data.Bits
@@ -11,15 +12,22 @@ import qualified Data.ByteString as BS
 import Analyzer
 import qualified ListLike as LL
 
-data Asn1 = Asn1 Asn1Tag BS.ByteString deriving Show
-data Asn1Tag = Asn1Tag TagClass DataClass Integer deriving Show
-data TagClass = Universal | Application | ContextSpecific | Private deriving Show
-data DataClass = Primitive | Constructed deriving Show
+data Asn1 = Asn1 Asn1Tag BS.ByteString
+	deriving Show
+data Asn1Tag = Asn1Tag TagClass DataClass Integer
+	deriving Show
+data TagClass =
+	Universal | Application | ContextSpecific | Private
+	deriving Show
+data DataClass = Primitive | Constructed
+	deriving Show
 
-decode1 :: (LL.ListLike a, LL.Element a ~ Word8) => Analyzer a Asn1
+decode1 :: (LL.ListLike a, LL.Element a ~ Word8) =>
+	Analyzer a Asn1
 decode1 = Asn1 <$> decodeTag <*> decodeContents
 
-decodeTag :: (LL.ListLike a, LL.Element a ~ Word8) => Analyzer a Asn1Tag
+decodeTag :: (LL.ListLike a, LL.Element a ~ Word8) =>
+	Analyzer a Asn1Tag
 decodeTag = do
 	(tc, dc, mtn) <- decodeTag1
 	maybe (Asn1Tag tc dc <$> decodeTagR 0)
@@ -42,15 +50,19 @@ decodeTag1 = do
 		tn = case w .&. 0x1f of
 			0x1f -> Nothing
 			n	| n < 0x1f -> Just n
-				| otherwise -> error "never_occur"
+				| otherwise ->
+					error "never_occur"
 	return (tc, dc, tn)
 
-decodeTagR :: (LL.ListLike a, LL.Element a ~ Word8) => Integer -> Analyzer a Integer
+decodeTagR :: (LL.ListLike a, LL.Element a ~ Word8) =>
+	Integer -> Analyzer a Integer
 decodeTagR n = do
 	w <- token
 	if testBit w 7
-		then decodeTagR $ n `shiftL` 7 .|. fromIntegral (w .&. 0x7f)
-		else return $ n `shiftL` 7 .|. fromIntegral w
+		then decodeTagR $ n `shiftL` 7 .|.
+			fromIntegral (w .&. 0x7f)
+		else return $ n `shiftL` 7 .|.
+			fromIntegral w
 
 decodeContents :: (LL.ListLike a, LL.Element a ~ Word8) =>
 	Analyzer a BS.ByteString
