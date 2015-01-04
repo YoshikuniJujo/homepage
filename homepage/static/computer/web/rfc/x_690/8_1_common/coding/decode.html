@@ -162,6 +162,35 @@ Left "Redundant byte for tag number"
 *Main&gt; runAnalyzer decodeTag under30Error
 Left "Use single byte for tag number 0 - 30"</code></pre>
 
+<h2>データの長さのデコード</h2>
+
+<p>
+長さを指定しない場合にNothingを返すために返すデータはMaybe Integerとする。
+</p>
+
+<h3>データの長さの1バイト目のデコード</h3>
+
+<p>
+以下の3通りに場合分けする。
+</p>
+
+<ul>
+<li>8ビット目が0の場合7から1ビットが直接データ長</li>
+<li>8ビット目が1の場合
+	<ul>
+	<li>7から1ビットが0以外ではデータ長の値のバイト数</li>
+	<li>7から1ビットが0のときは長さを指定しない形式</li>
+	</ul></li>
+</ul>
+
+<p>よって返す値はMaybe (Either Int Int)で良い。</p>
+
+<p>(作成中)</p>
+
+<h3>データの長さの残りのバイトのデコード</h3>
+
+<p>(作成中)</p>
+
 <p>
 <a href="/computer/web/rfc/x_690/8_1_common/coding/data.html"
 	>データ型へもどる</a>
