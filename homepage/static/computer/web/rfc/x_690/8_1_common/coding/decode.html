@@ -11,13 +11,13 @@ href="/computer/web/rfc/x_690/example/test_ASN_1_cert.der"
 href="/computer/web/rfc/x_690/example/test_ASN_1_cert.der.hex.txt"
 >16進ダンプ</a>)</li>
 <li>テスト用Mainモジュール: <a
-href="/computer/web/rfc/x_690/8_1_common/testDecodeAsn1Common.hs"
+href="/computer/web/rfc/x_690/8_1_common/coding/testDecodeAsn1Common.hs"
 >testDecodeAsn1Common.hs</a></li>
 <li>タグのデコード(エラーチェックなし): <a
-href="/computer/web/rfc/x_690/8_1_common/DecodeAsn1Common.hs"
+href="/computer/web/rfc/x_690/8_1_common/coding/DecodeAsn1Common_1.hs"
 >DecodeAsn1Common.hs</a></li>
 <li>タグのデコード(エラーチェックあり): <a
-href="/computer/web/rfc/x_690/8_1_common/DecodeAsn1Common_1.hs"
+href="/computer/web/rfc/x_690/8_1_common/coding/DecodeAsn1Common_2.hs"
 >DecodeAsn1Common.hs</a></li>
 </ul>
 
@@ -61,7 +61,7 @@ decodeTag1 = do
 <pre><code>% ghci testDecodeAsn1Common.hs
 *Main&gt; runAnalyzer decodeTag1 cert
 Just ((Universal,Constructed,Just 16), "\130\ETXN0\130\STX
-<a href="/computer/web/rfc/x_690/8_1_common/result1.txt"
+<a href="/computer/web/rfc/x_690/8_1_common/coding/result1.txt"
 >...</a>
 \155\186\ACK\172")</code></pre>
 
@@ -102,7 +102,7 @@ decodeTag = do
 <pre><code>% ghci testDecodeAsn1Common.hs
 *Main> runAnalyzer decodeTag cert
 Just ((Universal,Constructed,16), "\130\ETXN0\130\STX
-<a href="/computer/web/rfc/x_690/8_1_common/result2.txt">...</a>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/result2.txt">...</a>
 \155\186\ACK\172")</code></pre>
 
 <h3>タグ番号とデータ形式のエラーチェック</h3>
@@ -146,7 +146,7 @@ decodeTag = do
 		(return . Asn1Tag tc dc . fromIntegral) mtn</code></pre>
 
 <h4>変更後のモジュール</h4>
-<p><a href="/computer/web/rfc/x_690/8_1_common/DecodeAsn1Common_1.hs"
+<p><a href="/computer/web/rfc/x_690/8_1_common/coding/DecodeAsn1Common_2.hs"
 >DecodeAsn1Common.hs</a></p>
 
 <p>エラー用のテストデータを用意する。</p>
