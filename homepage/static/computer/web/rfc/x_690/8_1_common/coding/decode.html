@@ -2,7 +2,7 @@ X.690: ASN.1のBER方式の共通部分のデコード関数
 
 <p>(工事中 80%)</p>
 
-<h2>作成するファイル</h2>
+<h2>ここで扱うファイル</h2>
 
 <ul>
 <li>テスト用証明書: <a
@@ -18,6 +18,9 @@ href="/computer/web/rfc/x_690/8_1_common/coding/DecodeAsn1Common_1.hs"
 >DecodeAsn1Common.hs</a></li>
 <li>タグのデコード(エラーチェックあり): <a
 href="/computer/web/rfc/x_690/8_1_common/coding/DecodeAsn1Common_2.hs"
+>DecodeAsn1Common.hs</a></li>
+<li>出来上がり: <a
+href="/computer/web/rfc/x_690/8_1_common/coding/DecodeAsn1Common.hs"
 >DecodeAsn1Common.hs</a></li>
 </ul>
 
@@ -185,11 +188,98 @@ Left "Use single byte for tag number 0 - 30"</code></pre>
 
 <p>よって返す値はMaybe (Either Int Int)で良い。</p>
 
-<p>(作成中)</p>
+<pre><code>decodeLength1 :: (ListLike a, Element a ~ Word8) =>
+	Analyzer a (Maybe (Either Int Int))
+decodeLength1 = do
+	w &lt;- token
+	return $ if not (testBit w 7)
+		then Just . Right $ fromIntegral w
+		else let
+			ln = w .&amp;. 0x7f in
+			if ln == 0
+				then Nothing
+				else Just . Left $
+					fromIntegral ln</code></pre>
+
+<p>HaskellのData.Bitsライブラリではビットを0ビットから数え始めることに注意。</p>
 
 <h3>データの長さの残りのバイトのデコード</h3>
 
-<p>(作成中)</p>
+<p>与えられた数だけのバイトを取り、8ビットずつ左シフトしながらつなげていく。</p>
+
+<pre><code>decodeLengthR :: (ListLike a, Element a ~ Word8) =&gt;
+	Integer -&gt; Int -&gt; Analyzer a Integer
+decodeLengthR ln 0 = return ln
+decodeLengthR ln n = do
+	w &lt;- token
+	decodeLengthR
+		(ln `shiftL` 8 .|. fromIntegral w)
+		(n - 1)</code></pre>
+
+<h3>データの長さのデコード</h3>
+
+<p>
+データの長さを指定しない場合はNothingを指定する場合はIntegerを返す。
+また、Primitiveなデータでデータの長さを指定しない場合はエラーとする。
+</p>
+
+<pre><code>decodeLength :: (ListLike a, Element a ~ Word8) =&gt;
+	DataClass -&gt; Analyzer a (Maybe Integer)
+decodeLength dc = do
+	ln1 &lt;- decodeLength1
+	case ln1 of
+		Just (Right ln) -&gt;
+			return . Just $ fromIntegral ln
+		Just (Left n) -&gt; Just &lt;$&gt; decodeLengthR 0 n
+		_ -&gt; case dc of
+			Primitive -&gt; fail
+				"Primitive needs length."
+			_ -&gt; return Nothing</code></pre>
+
+<h2>データ部分のデコード</h2>
+
+<p>
+長さを指定した場合は、今のところは、生のバイト列を取り出す。
+長さを指定しない形式の場合には、
+再帰的に読み込まないとデータの終わりを検出できない。
+</p>
+
+<pre><code>decodeContents :: Maybe Integer -&gt;
+	Analyzer ByteString Asn1Data
+decodeContents (Just ln) = do
+	dt &lt;- tokens ln
+	return $ Asn1DataRaw dt
+decodeContents _ = do
+	as &lt;- loopWhileM
+		(/= Asn1 (Asn1Tag Universal Primitive 0)
+			(Asn1DataRaw ""))
+		decode1
+	return $ Asn1DataAsn1 as
+</code></pre>
+
+<pre><code>loopWhileM :: Monad m =&gt; (a -&gt; Bool) -&gt; m a -&gt; m [a]
+loopWhileM p m = do
+	x &lt;- m
+	if p x	then (x :) `liftM` loopWhileM p m
+		else return [x]</code></pre>
+
+<h2>全体のデコード</h2>
+
+<h3>再帰フラグ</h3>
+
+<p>
+再帰的にデコードするかどうかを決めるためのフラグが必要。
+このフラグ自体が再帰的に表現されている必要がある。
+</p>
+
+<pre><code>data RecFlag = NoRec | Rec1 [RecFlag] | RecAll deriving Show</code></pre>
+
+<p>
+NoRecは再帰的にデコードしないことを示し、
+RecAllは最深部まで再帰的にデコードすることを示す。
+Rec1はまずは一番上のレベルでデコードし次のレベルもデコードしたうえで、
+それぞれに対して再帰的にデコードするかどうかを再度指定する。
+</p>
 
 <p>
 <a href="/computer/web/rfc/x_690/8_1_common/coding/data.html"
