@@ -1,23 +1,30 @@
 X.690: ASN.1のBER方式の共通部分のデータ型
 
 <p>
-Asn1はタグ(Asn1Tag)と内容(Asn1またはByteString)から成る。
+Asn1はタグ(Asn1Tag)と内容([Asn1]またはByteString)から成る。
 Asn1Tagはタグのクラス(TagClass)とデータのクラス(DataClass)とタグの番号から成る。
 </p>
 
-<pre><code>data Asn1 = Asn1 Asn1Tag Asn1Data
-	deriving Show</code></pre>
-<pre><code>data Asn1Tag = Asn1Tag TagClass DataClass Integer
-	deriving Show</code></pre>
-<pre><code>data TagClass =
-	Universal | Application | ContextSpecific | Private
-	deriving Show</code></pre>
-<pre><code>data DataClass = Primitive | Constructed
-	deriving Show</code></pre>
+<pre><code>data Asn1
+	= Asn1 Asn1Tag Asn1Data
+	deriving (Show, Eq)</code></pre>
+<pre><code>data Asn1Tag
+	= Asn1Tag TagClass DataClass Integer
+	deriving (Show, Eq)</code></pre>
+<pre><code>data TagClass
+	= Universal
+	| Application
+	| ContextSpecific
+	| Private
+	deriving (Show, Eq)</code></pre>
+<pre><code>data DataClass
+	= Primitive
+	| Constructed
+	deriving (Show, Eq)</code></pre>
 <pre><code>data Asn1Data
 	= Asn1DataAsn1 [Asn1]
 	| Asn1DataRaw ByteString
-	deriving Show</code></pre>
+	deriving (Show, Eq)</code></pre>
 
 <p>
 <a href="/computer/web/rfc/x_690/8_1_common/coding"

@@ -1,6 +1,6 @@
 X.690: ASN.1のBER方式の共通部分のデコード関数
 
-<p>(工事中 80%)</p>
+<p>(工事中 85%)</p>
 
 <h2>ここで扱うファイル</h2>
 
@@ -37,27 +37,24 @@ href="/computer/web/rfc/x_690/8_1_common/coding/DecodeAsn1Common.hs"
 そうでなければ、この部分がタグの番号を示す。
 </p>
 
-<pre><code>decodeTag1 :: (ListLike a, Element a ~ Word8) =>
-	Analyzer a (TagClass, DataClass, Maybe Word8)
-decodeTag1 = do
-	w &lt;- token
-	let	tc = case w `shiftR` 6 of
-			0 -&gt; Universal
-			1 -&gt; Application
-			2 -&gt; ContextSpecific
-			3 -&gt; Private
-			_ -&gt; error "never occur"
-		dc = case (w .&amp;. 0x3f) `shiftR` 5 of
-			0 -&gt; Primitive
-			1 -&gt; Constructed
-			_ -&gt; error "never occur"
-		tn = case w .&amp;. 0x1f of
-			0x1f -&gt; Nothing
-			n	| n &lt; 0x1f -&gt; Just n
-				| otherwise -&gt;
-					error "never occur"
-	return (tc, dc, tn)
-</code></pre>
+<pre><code>decodeTag1 :: Analyzer BS.ByteString
+	(TagClass, DataClass, Maybe Word8)
+decodeTag1 = flip fmap token $ \w -> let
+	tc = case w `shiftR` 6 of
+		0 -&gt; Universal
+		1 -&gt; Application
+		2 -&gt; ContextSpecific
+		3 -&gt; Private
+		_ -&gt; error "never occur"
+	dc = if testBit w 5
+		then Constructed
+		else Primitive
+	tn = case w .&amp;. 0x1f of
+		0x1f -&gt; Nothing
+		n	| n &lt; 0x1f -&gt; Just n
+			| otherwise -&gt;
+				error "never occur" in
+	(tc, dc, tn)</code></pre>
 
 <p>試してみる。</p>
 
@@ -78,32 +75,27 @@ Just ((Universal,Constructed,Just 16), "\130\ETXN0\130\STX
 そのバイトの値を足していく。
 </p>
 
-<pre><code>decodeTagR :: (ListLike a, Element a ~ Word8) =&gt;
-	Integer -&gt; Analyzer a Integer
-decodeTagR n = do
-	w &lt;- token
-	if testBit w 7
-		then decodeTagR $ n `shiftL` 7
-			.|. fromIntegral (w .&amp;. 0x7f)
-		else return $ n `shiftL` 7
-			.|. fromIntegral w</code></pre>
+<pre><code>decodeTagR :: Integer -&gt; Analyzer BS.ByteString Integer
+decodeTagR n = token &gt;&gt;= \w -> if testBit w 7
+	then decodeTagR $
+		n `shiftL` 7 .|. fromIntegral (w .&amp;. 0x7f)
+	else return $ n `shiftL` 7 .|. fromIntegral w</code></pre>
 
 <p>
 1バイト目のデコードの結果の長さのフィールドがJust [番号]であれば、
 その[番号]がそのままタグの番号となり、Nothingならば残りのバイトを読み込む。
 </p>
 
-<pre><code>decodeTag :: (ListLike a, Element a ~ Word8) =&gt;
-	Analyzer a Asn1Tag
-decodeTag = do
-	(tc, dc, mtn) &lt;- decodeTag1
-	maybe (Asn1Tag tc dc &lt;$&gt; decodeTagR 0)
-		(return . Asn1Tag tc dc . fromIntegral) mtn</code></pre>
+<pre><code>decodeTag :: Analyzer BS.ByteString Asn1Tag
+decodeTag = decodeTag1 &gt;&gt;= \(tc, dc, mtn) -&gt; maybe
+	(Asn1Tag tc dc &lt;$&gt; decodeTagR 0)
+	(return . Asn1Tag tc dc . fromIntegral)
+	mtn</code></pre>
 
 <p>試してみる。</p>
 
 <pre><code>% ghci testDecodeAsn1Common.hs
-*Main> runAnalyzer decodeTag cert
+*Main&gt; runAnalyzer decodeTag cert
 Just ((Universal,Constructed,16), "\130\ETXN0\130\STX
 <a href="/computer/web/rfc/x_690/8_1_common/coding/result2.txt">...</a>
 \155\186\ACK\172")</code></pre>
@@ -122,31 +114,28 @@ Just ((Universal,Constructed,16), "\130\ETXN0\130\STX
 <h4>最上位バイトの制約</h4>
 
 <pre><code>decodeTagR :: ...
-decodeTagR 0 = do
-	w &lt;- token
+decodeTagR 0 = token &gt;&gt;= \w -&gt; do
 	when (w == 0x80) $ fail
 		"Redundant byte for tag number"
 	if testBit w 7
 		then decodeTagR $ fromIntegral (w .&amp;. 0x7f)
 		else return $ fromIntegral w
-decodeTagR n = do
+decodeTagR n = token &gt;&gt;= if testBit w 7
 	...</code></pre>
 
 <h4>30以下の場合の制約</h4>
 
-<pre><code>decodeTagR0 :: (ListLike a, Element a ~ Word8) =&gt;
-	Analyzer a Integer
-decodeTagR0 = do
-	n &lt;- decodeTagR 0
+<pre><code>decodeTagR0 :: Analyzer BS.ByteString Integer
+decodeTagR0 = decodeTagR 0 &gt;&gt;= \n -&gt; do
 	when (n &lt;= 30) $ fail
 		"Use single byte for tag number 0 - 30"
 	return n</code></pre>
 
 <pre><code>decodeTag :: ...
-decodeTag = do
-	(tc, dc, mtn) &lt;- decodeTag1
-	maybe (Asn1Tag tc dc &lt;$&gt; decodeTagR0)
-		(return . Asn1Tag tc dc . fromIntegral) mtn</code></pre>
+decodeTag = decodeTag1 &gt;&gt;= \(tc, dc, mtn) -&gt; maybe
+	(Asn1Tag tc dc &lt;$&gt; decodeTagR0)
+	(return . Asn1Tag tc dc . fromIntegral)
+	mtn</code></pre>
 
 <h4>変更後のモジュール</h4>
 <p><a href="/computer/web/rfc/x_690/8_1_common/coding/DecodeAsn1Common_2.hs"
@@ -188,18 +177,12 @@ Left "Use single byte for tag number 0 - 30"</code></pre>
 
 <p>よって返す値はMaybe (Either Int Int)で良い。</p>
 
-<pre><code>decodeLength1 :: (ListLike a, Element a ~ Word8) =>
-	Analyzer a (Maybe (Either Int Int))
-decodeLength1 = do
-	w &lt;- token
-	return $ if not (testBit w 7)
-		then Just . Right $ fromIntegral w
-		else let
-			ln = w .&amp;. 0x7f in
-			if ln == 0
-				then Nothing
-				else Just . Left $
-					fromIntegral ln</code></pre>
+<pre><code>decodeLength1 :: Analyzer ByteString
+	(Maybe (Either Word8 Word8))
+decodeLength1 = flip fmap token $ \w -&gt; if not (testBit w 7)
+	then Just $ Right w
+	else let ln = w .&amp;. 0x7f in
+		if ln == 0 then Nothing else Just $ Left ln</code></pre>
 
 <p>HaskellのData.Bitsライブラリではビットを0ビットから数え始めることに注意。</p>
 
@@ -207,14 +190,12 @@ decodeLength1 = do
 
 <p>与えられた数だけのバイトを取り、8ビットずつ左シフトしながらつなげていく。</p>
 
-<pre><code>decodeLengthR :: (ListLike a, Element a ~ Word8) =&gt;
-	Integer -&gt; Int -&gt; Analyzer a Integer
+<pre><code>decodeLengthR ::
+	Integer -&gt; Int -&gt; Analyzer ByteString Integer
 decodeLengthR ln 0 = return ln
-decodeLengthR ln n = do
-	w &lt;- token
-	decodeLengthR
-		(ln `shiftL` 8 .|. fromIntegral w)
-		(n - 1)</code></pre>
+decodeLengthR ln n = token &gt;&gt;= \w -&gt; decodeLengthR
+	(ln `shiftL` 8 .|. fromIntegral w)
+	(n - 1)</code></pre>
 
 <h3>データの長さのデコード</h3>
 
@@ -223,18 +204,11 @@ decodeLengthR ln n = do
 また、Primitiveなデータでデータの長さを指定しない場合はエラーとする。
 </p>
 
-<pre><code>decodeLength :: (ListLike a, Element a ~ Word8) =&gt;
-	DataClass -&gt; Analyzer a (Maybe Integer)
-decodeLength dc = do
-	ln1 &lt;- decodeLength1
-	case ln1 of
-		Just (Right ln) -&gt;
-			return . Just $ fromIntegral ln
-		Just (Left n) -&gt; Just &lt;$&gt; decodeLengthR 0 n
-		_ -&gt; case dc of
-			Primitive -&gt; fail
-				"Primitive needs length."
-			_ -&gt; return Nothing</code></pre>
+<pre><code>decodeLength :: Analyzer ByteString (Maybe Integer)
+decodeLength = decodeLength1 &gt;&gt;= \ln1 -> case ln1 of
+	Just (Right ln) -&gt; return . Just $ fromIntegral ln
+	Just (Left n) -&gt; Just &lt;$&gt; decodeLengthR 0 n
+	_ -&gt; return Nothing</code></pre>
 
 <h2>データ部分のデコード</h2>
 
@@ -262,17 +236,44 @@ Rec1はまずは一番上のレベルでデコードし次のレベルもデコ�
 再帰的に読み込まないとデータの終わりを検出できない。
 </p>
 
-<pre><code>decodeContents :: Maybe Integer -&gt;
-	Analyzer ByteString Asn1Data
-decodeContents (Just ln) = do
+<pre><code>decodeCnt :: DataClass -&gt; RecFlag -&gt;
+	Maybe Integer -&gt; Analyzer ByteString Asn1Data
+decodeCnt Constructed RecAll (Just l) = tokens l &gt;&gt;= \d -&gt;
+	case runAnalyzer (listAll $ decode1 RecAll) d of
+		Right (r, "") -&gt; return $ Asn1DataAsn1 r
+		Left e -&gt; fail e
+		_ -&gt; error "never occur"
+
+...
+(以下を修正中)
+
+decodeCnt dc rf (Just ln) = do
 	dt &lt;- tokens ln
-	return $ Asn1DataRaw dt
-decodeContents _ = do
+	case (dc, rf) of
+		(Constructed, RecAll) -&gt;
+			case runAnalyzer (listAll $ decode1 RecAll) dt of
+				Right (r, "") -&gt; return $ Asn1DataAsn1 r
+				Left e -&gt; fail e
+				_ -&gt; error "never occur"
+		(Constructed, Rec1 rfs) -&gt;
+			case runAnalyzer (listMap decode1 rfs) dt of
+				Right (r, "") -&gt; return $ Asn1DataAsn1 r
+				Left e -&gt; fail e
+				_ -&gt; error "never occur"
+		_ -&gt; return $ Asn1DataRaw dt
+decodeCnt Constructed (Rec1 rfs) _ = do
+	as &lt;- mapWhileM
+		(/= Asn1 (Asn1Tag Universal Primitive 0)
+			(Asn1DataRaw ""))
+		decode1 rfs
+	return $ Asn1DataAsn1 as
+decodeCnt Constructed rf _ = do
 	as &lt;- loopWhileM
 		(/= Asn1 (Asn1Tag Universal Primitive 0)
 			(Asn1DataRaw ""))
-		decode1
+		(decode1 rf)
 	return $ Asn1DataAsn1 as
+decodeCnt _ _ _ = fail "Primitive needs length"
 </code></pre>
 
 <pre><code>loopWhileM :: Monad m =&gt; (a -&gt; Bool) -&gt; m a -&gt; m [a]
@@ -281,7 +282,19 @@ loopWhileM p m = do
 	if p x	then (x :) `liftM` loopWhileM p m
 		else return [x]</code></pre>
 
+<pre><code>mapWhileM :: Monad m =&gt; (b -&gt; Bool) -&gt; (a -&gt; m b) -&gt; [a] -&gt; m [b]
+mapWhileM _ _ [] = return []
+mapWhileM p m (x : xs) = do
+	y &lt;- m x
+	if p y	then (y :) `liftM` mapWhileM p m xs
+		else return [y]</code></pre>
+
 <h2>全体のデコード</h2>
+
+<pre><code>decode1 :: RecFlag -&gt; Analyzer BS.ByteString Asn1
+decode1 rf = do
+	t@(Asn1Tag _ dc _) &lt;- decodeTag
+	Asn1 t &lt;$&gt; (decodeLength &gt;&gt;= decodeCnt dc rf)</code></pre>
 
 <p>
 <a href="/computer/web/rfc/x_690/8_1_common/coding/data.html"
