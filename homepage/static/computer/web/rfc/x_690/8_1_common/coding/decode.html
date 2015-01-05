@@ -238,6 +238,24 @@ decodeLength dc = do
 
 <h2>データ部分のデコード</h2>
 
+<h3>再帰フラグ</h3>
+
+<p>
+再帰的にデコードするかどうかを決めるためのフラグが必要。
+このフラグ自体が再帰的に表現されている必要がある。
+</p>
+
+<pre><code>data RecFlag = NoRec | Rec1 [RecFlag] | RecAll deriving Show</code></pre>
+
+<p>
+NoRecは再帰的にデコードしないことを示し、
+RecAllは最深部まで再帰的にデコードすることを示す。
+Rec1はまずは一番上のレベルでデコードし次のレベルもデコードしたうえで、
+それぞれに対して再帰的にデコードするかどうかを再度指定する。
+</p>
+
+<h3>データ部分のデコード</h3>
+
 <p>
 長さを指定した場合は、今のところは、生のバイト列を取り出す。
 長さを指定しない形式の場合には、
@@ -264,22 +282,6 @@ loopWhileM p m = do
 		else return [x]</code></pre>
 
 <h2>全体のデコード</h2>
-
-<h3>再帰フラグ</h3>
-
-<p>
-再帰的にデコードするかどうかを決めるためのフラグが必要。
-このフラグ自体が再帰的に表現されている必要がある。
-</p>
-
-<pre><code>data RecFlag = NoRec | Rec1 [RecFlag] | RecAll deriving Show</code></pre>
-
-<p>
-NoRecは再帰的にデコードしないことを示し、
-RecAllは最深部まで再帰的にデコードすることを示す。
-Rec1はまずは一番上のレベルでデコードし次のレベルもデコードしたうえで、
-それぞれに対して再帰的にデコードするかどうかを再度指定する。
-</p>
 
 <p>
 <a href="/computer/web/rfc/x_690/8_1_common/coding/data.html"

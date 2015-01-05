@@ -15,6 +15,23 @@ ghciで走らせようとすると型エラーが報告されるので、
 othingをLeft [メッセージ]に変更していく。
 </p>
 
+<h2>mapList関数を追加</h2>
+
+<p>
+以下のようなmapList関数を追加した。
+</p>
+
+<pre><code>listMap :: ListLike b =&gt;
+	(a -&gt; Analyzer b c) -&gt; [a] -&gt; Analyzer b [c]
+listMap = mapWhile eof</code></pre>
+
+<pre><code>mapWhile :: Monad m =&gt; m Bool -&gt; (a -&gt; m b) -&gt; [a] -&gt; [b]
+mapwhile _ _ [] = return []
+mapWhile p m (x : xs) = do
+	e &lt;- p
+	if e then return [] else
+		(:) `liftM` m x `ap` mapWhile p m xs</code></pre>
+
 <h2>出来上がったモジュール</h2>
 
 <p><a href="/computer/haskell/coding/binary_analyzer/coding/AnalyzerE.hs"
