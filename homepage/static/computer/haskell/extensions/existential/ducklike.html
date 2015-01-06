@@ -1,0 +1,77 @@
+言語拡張: 存在型: あひる的な何か
+
+<p>
+ソースコード:
+<a href="/computer/haskell/extensions/existential/duckLike.hs"
+	>duckLike.hs</a>
+</p>
+
+<h2>あひるのように歩き、あひるのように鳴く</h2>
+
+<p>あひる的な何かの持つ性質はwalk関数とquack関数で表現できる。</p>
+
+<pre><code>class DuckLike d where
+	walk :: d -&gt; String
+	quack :: d -&gt; String</code></pre>
+
+<h2>あひると鵞鳥</h2>
+
+<h3>定義</h3>
+
+<p>あひると鵞鳥を定義する。</p>
+
+<pre><code>type Name = String</code></pre>
+
+<pre><code>data Duck = Duck Name deriving Show</code></pre>
+
+<pre><code>data Goose = Goose Name deriving Show</code></pre>
+
+<h3>どちらも「あひる的」である</h3>
+
+<p>DuckLikeクラスのインスタンスにする。</p>
+
+<pre><code>instance DuckLike Duck where
+	walk (Duck n) =
+		"Duck " ++ n ++ " walks like a duck."
+	quack (Duck n) =
+		"Duck " ++ n ++ " quacks like a duck."</code></pre>
+
+<pre><code>instance DuckLike Goose where
+	walk (Goose n) =
+		"Goose " ++ n ++ " walks like a duck."
+	quack (Goose n) =
+		"Goose " ++ n ++ " quacks like a duck."</code></pre>
+
+<h2>「あひる的な何か」を入れる箱を用意</h2>
+
+<h3>定義</h3>
+
+<pre><code>data DuckLikeBox = forall d . DuckLike d =&gt; DuckLikeBox d</code></pre>
+
+<h3>箱に入っていても「あひる的」である</h3>
+
+<pre><code>instance DuckLike DuckLikeBox where
+	walk (DuckLikeBox d) = walk d
+	quack (DuckLikeBox d) = quack d</code></pre>
+
+<h2>「あひる的な何か」を集めたヘテロリスト</h2>
+
+<p>例として以下のリストを定義しておく。</p>
+
+<pre><code>duckLikes :: [DuckLikeBox]
+duckLikes = [
+	DuckLikeBox $ Duck "Mike",
+	DuckLikeBox $ Goose "Taro" ]</code></pre>
+
+<h2>試してみる</h2>
+
+<pre><code>% ghci duckLike.hs
+&gt; map quack duckLikes
+["Duck Mike quacks like a duck.", "Goose Taro quacks like a duck."]</code></pre>
+
+<p>
+<a href="/computer/haskell/extensions/existential/note.html"
+	>「記法」へもどる</a>
+<a href="/computer/haskell/extensions/existential"
+	>存在型のトップへ</a>
+</p>

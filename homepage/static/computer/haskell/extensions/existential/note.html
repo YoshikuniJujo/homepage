@@ -1,0 +1,60 @@
+言語拡張: 存在型: 記法
+
+<h2>拡張機能を有効化する</h2>
+
+<p>以下のいずれかを追加する必要がある。</p>
+
+<ul>
+<li>コマンドライン引数に-XExistentialQuantification</li>
+<li>コードの先頭に{-# LANGUAGE ExistentialQuantification #-}</li>
+<li>.cabalファイルにextensions: ExistentialQuantification</li>
+</ul>
+
+<h2>最も単純で使い道のない定義</h2>
+
+<p>あらゆる型を格納できる型は以下のように宣言できる。</p>
+
+<pre><code>data Object = forall x . Object x</code></pre>
+
+<p>
+Objectに格納されたxには共通に使える関数はほとんどなく、
+このように定義されたObjectにはとくに使い道はない。
+</p>
+
+<p>
+ヘテロリスト(様々な型を含むリスト)的なものを作ることはできる。
+</p>
+
+<pre><code>hetero :: Object
+hetero = [Object (), Object True, Object 8, Object "hello"]</code></pre>
+
+<p>
+しかし、これを使ってできることはほとんど何もない。
+表示することさえできない。
+</p>
+
+<h2>せめて表示くらいは</h2>
+
+<p>
+何はともあれ表示くらいはしたい。
+そのためには「何でも」を「表示できるものなら何でも」にすれば良い。
+</p>
+
+<pre><code>data ShowBox = forall s . Show s =&gt; ShowBox s</code></pre>
+
+<p>こうしておけば以下のように表示関数を作ることができる。</p>
+
+<pre><code>showSB :: ShowBox -&gt; String
+showSB (ShowBox s) = show s</code></pre>
+
+<p>あるいは、ShowBox自体をShowクラスのインスタンスにしてしまっても良い。</p>
+
+<pre><code>instance Show ShowBox where
+	show (ShowBox s) = show s</code></pre>
+
+<p>
+<a href="/computer/haskell/extensions/existential"
+	>存在型のトップへもどる</a>
+<a href="/computer/haskell/extensions/existential/ducklike.html"
+	>「あひる的な何か」へ</a>
+</p>
