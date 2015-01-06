@@ -1,0 +1,51 @@
+言語拡張: 存在型: 中身の取り出し
+
+<p>(工事中 0%)</p>
+
+<h2>動機</h2>
+
+<p>
+今までの枠組みのなかでは、
+存在型を使って統合された型からもとの型を取り出すことはできない。
+それでは不便なので、いくつかの仕組みを使って、
+型を取り出すことができるようにする。
+</p>
+
+<h2>使用する関数</h2>
+
+<p>
+<a
+href="https://downloads.haskell.org/~ghc/latest/docs/html/libraries/base-4.7.0.1/Data-Typeable.html#g:4"
+>Data.Typeableモジュール</a>にcastという名前の関数がある。
+</p>
+
+<pre><code>cast :: forall a b . (Typeable a, Typeable b) =&gt; a -&gt; Maybe b</code></pre>
+
+<p>
+castは実際の型(型a)と求めている型(型b)とが同じであればJust値を返し、
+そうでないならばNothing値を返す。
+</p>
+
+<h3>試してみる</h3>
+
+<pre><code>% ghci
+&gt; :m Data.Typeable
+&gt; cast "hello" :: Maybe String
+Just "hello"
+&gt; cast "hello" :: Maybe Int
+Nothing</code></pre>
+
+<h3>詳細</h3>
+
+<p>
+関数castがどのように作られているのかは
+<a href="/computer/haskell/extensions/existential/cast.html"
+	>「関数castの中身についての説明」(工事中 0%)</a>を参照のこと。
+</p>
+
+<p>
+<a href="/computer/haskell/extensions/existential/ducklike.html"
+	>「あひる的な何か」へもどる</a>
+<a href="/computer/haskell/extensions/existential"
+	>存在型のトップへ</a>
+</p>

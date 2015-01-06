@@ -1,0 +1,20 @@
+X.690: ASN.1のBER方式の共通部分の存在型を利用したコーディング: データ型
+
+<p>(工事中 0%)</p>
+
+<h2>デコード・エンコード可能という性質</h2>
+
+<p>ASN.1のBER方式でデコード・エンコード可能という性質を示すクラスを作成する。</p>
+
+<pre><code>class Asnable a where
+	testTag :: Asn1Tag -&gt; Bool
+	decode :: ByteString -&gt; a
+	encode :: a -&gt; ByteString</code></pre>
+
+<h2>Asnableなものを入れる箱</h2>
+
+<p>Asnableを満たす型を格納する箱を作成する。</p>
+
+<pre><code>data AsnableBox = forall a . Asnable a =&gt; AsnableBox a</code></pre>
+
+<p>(作成中)</p>
