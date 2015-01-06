@@ -243,62 +243,44 @@ decodeCnt Constructed RecAll (Just l) = tokens l &gt;&gt;= \d -&gt;
 		Right (r, "") -&gt; return $ Asn1DataAsn1 r
 		Left e -&gt; fail e
 		_ -&gt; error "never occur"
-
-...
-(以下を修正中)
-
-decodeCnt dc rf (Just ln) = do
-	dt &lt;- tokens ln
-	case (dc, rf) of
-		(Constructed, RecAll) -&gt;
-			case runAnalyzer (listAll $ decode1 RecAll) dt of
-				Right (r, "") -&gt; return $ Asn1DataAsn1 r
-				Left e -&gt; fail e
-				_ -&gt; error "never occur"
-		(Constructed, Rec1 rfs) -&gt;
-			case runAnalyzer (listMap decode1 rfs) dt of
-				Right (r, "") -&gt; return $ Asn1DataAsn1 r
-				Left e -&gt; fail e
-				_ -&gt; error "never occur"
-		_ -&gt; return $ Asn1DataRaw dt
-decodeCnt Constructed (Rec1 rfs) _ = do
-	as &lt;- mapWhileM
-		(/= Asn1 (Asn1Tag Universal Primitive 0)
-			(Asn1DataRaw ""))
-		decode1 rfs
-	return $ Asn1DataAsn1 as
-decodeCnt Constructed rf _ = do
-	as &lt;- loopWhileM
-		(/= Asn1 (Asn1Tag Universal Primitive 0)
-			(Asn1DataRaw ""))
-		(decode1 rf)
-	return $ Asn1DataAsn1 as
+decodeCnt Constructed (Rec1 f) (Just l) = tokens l &gt;&gt;= \d -&gt;
+	case runAnalyzer (listMap decode1 f) d of
+		Right (r, "") -&gt; return $ Asn1DataAsn1 r
+		Left e -&gt; fail e
+		_ -&gt; error "never occur"
+decodeCnt _ _ (Just ln) = Asn1DataRaw &lt;$&gt; tokens ln
+decodeCnt Constructed (Rec1 rfs) _ = Asn1DataAsn1 &lt;$&gt;
+	mapWhileM (/= endOfContents) decode1 rfs
+decodeCnt Constructed rf _ = Asn1DataAsn1 &lt;$&gt;
+	loopWhileM (/= endOfContents) (decode1 rf)
 decodeCnt _ _ _ = fail "Primitive needs length"
 </code></pre>
 
-<pre><code>loopWhileM :: Monad m =&gt; (a -&gt; Bool) -&gt; m a -&gt; m [a]
-loopWhileM p m = do
-	x &lt;- m
-	if p x	then (x :) `liftM` loopWhileM p m
-		else return [x]</code></pre>
+<pre><code>endOfContents :: Asn1
+endOfContents = Asn1
+	(Asn1Tag Universal Primitive 0) (Asn1DataRaw "")</code></pre>
 
-<pre><code>mapWhileM :: Monad m =&gt; (b -&gt; Bool) -&gt; (a -&gt; m b) -&gt; [a] -&gt; m [b]
+<pre><code>loopWhileM :: Monad m =&gt; (a -&gt; Bool) -&gt; m a -&gt; m [a]
+loopWhileM p m = m &gt;&gt;= \x -&gt; if p x
+	then (x :) `liftM` loopWhileM p m
+	else return [x]</code></pre>
+
+<pre><code>mapWhileM :: Monad m =&gt;
+	(b -&gt; Bool) -&gt; (a -&gt; m b) -&gt; [a] -&gt; m [b]
 mapWhileM _ _ [] = return []
-mapWhileM p m (x : xs) = do
-	y &lt;- m x
-	if p y	then (y :) `liftM` mapWhileM p m xs
-		else return [y]</code></pre>
+mapWhileM p m (x : xs) = m x &gt;&gt;= \y -&gt; if p y
+	then (y :) `liftM` mapWhileM p m xs
+	else return [y]</code></pre>
 
 <h2>全体のデコード</h2>
 
 <pre><code>decode1 :: RecFlag -&gt; Analyzer BS.ByteString Asn1
-decode1 rf = do
-	t@(Asn1Tag _ dc _) &lt;- decodeTag
+decode1 rf = decodeTag &gt;&gt;= \t@(Asn1Tag _ dc _) -&gt;
 	Asn1 t &lt;$&gt; (decodeLength &gt;&gt;= decodeCnt dc rf)</code></pre>
 
 <p>
 <a href="/computer/web/rfc/x_690/8_1_common/coding/data.html"
 	>データ型へもどる</a>
-<a href="/computer/web/rfc/x_690/8_1_common/coding/encode.html"
-	>エンコード関数へ (工事中 0%)</a>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/decode_exist.html"
+	>「存在型を使う」へ (工事中 0%)</a>
 </p>
