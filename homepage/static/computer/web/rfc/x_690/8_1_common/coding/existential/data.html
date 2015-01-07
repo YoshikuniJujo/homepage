@@ -1,20 +1,44 @@
 X.690: ASN.1のBER方式の共通部分の存在型を利用したコーディング: データ型
 
-<p>(工事中 0%)</p>
+<p>(工事中 85%)</p>
 
 <h2>デコード・エンコード可能という性質</h2>
 
 <p>ASN.1のBER方式でデコード・エンコード可能という性質を示すクラスを作成する。</p>
 
 <pre><code>class Asnable a where
-	testTag :: Asn1Tag -&gt; Bool
-	decode :: ByteString -&gt; a
+	testTag :: a -&gt; Asn1Tag -&gt; Bool
+	decode :: ByteString -&gt; Either String (a, ByteString)
 	encode :: a -&gt; ByteString</code></pre>
+
+<p>Asn1Tagについては<a href="/computer/web/rfc/x_690/8_1_common/coding/data.html"
+>存在型を使わないコーディングのデータ型</a>を参照。</p>
 
 <h2>Asnableなものを入れる箱</h2>
 
 <p>Asnableを満たす型を格納する箱を作成する。</p>
 
-<pre><code>data AsnableBox = forall a . Asnable a =&gt; AsnableBox a</code></pre>
+<pre><code>data AsnableBox =
+	forall a . (Typeable a, Asnable a) =&gt; AsnableBox a</code></pre>
+
+<h2>基本的なAsnableな型を用意</h2>
+
+<pre><code>data Raw = Raw Asn1Tag ByteString
+	deriving Show</code></pre>
+
+<pre><code>data RawBytes = RawBytes ByteString
+	deriving Show</code></pre>
+
+<pre><code>data RawConstructed = RawConstructed Asn1Tag [AsnableBox]
+	deriving Show</code></pre>
+
+<h2>それぞれの型をAsnableのインスタンスに</h2>
 
 <p>(作成中)</p>
+
+<p>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential"
+	>「存在型を利用」のトップにもどる</a>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential/decode.html"
+	>「デコード関数(工事中 0%)」へ</a>
+</p>
