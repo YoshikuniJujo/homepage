@@ -1,10 +1,129 @@
 関数castの中身についての説明
 
-<p>(工事中 0%)</p>
+<h2>unsafeCoerce関数</h2>
 
-<h2>unsafeCoerce</h2>
+<p><a
+href="https://downloads.haskell.org/~ghc/latest/docs/html/libraries/base-4.7.0.1/Unsafe-Coerce.html"
+>Unsafe.CoerceモジュールのunsafeCoerce</a>を参照。</p>
 
-<h2>Typeable</h2>
+<pre><code>unsafeCoerce :: a -&gt; b</code></pre>
+
+<p>
+この関数は名前の通り安全ではない関数だ。
+内部表現は変えずに型だけを変更する。
+</p>
+
+<pre><code>% ghci
+&gt; unsafeCoerce "hello" :: String
+"hello"
+&gt; unsafeCoerce "hello" :: Int
+-122324793
+&gt; unsafeCoerce "hello" :: (Int, Bool)
+(zsh: segmentation fault  ghci</code></pre>
+
+<p>
+正しくない型を指定するとセグメンテーションフォールトを起こすこともある。
+</p>
+
+<h2>Typeableクラス</h2>
+
+<p><a
+href="https://downloads.haskell.org/~ghc/latest/docs/html/libraries/base-4.7.0.1/Data-Typeable.html#g:1"
+>Data.Typeable</a>を参照。
+</p>
+
+<p>
+Typeableクラスのインスタンスである型の値は
+typeOf関数でそのタイプを調べることができる。
+</p>
+
+<pre><code>typeOf :: Typeable a =&gt; a -&gt; TypeRep</code></pre>
+
+<pre><code>% ghci
+&gt; :m Data.Typeable
+&gt; typeOf 8
+Integer
+&gt; typeOf 3.0
+Double
+&gt; typeOf "hello"
+[Char]</code></pre>
+
+<h3>deriving Typeable</h3>
+
+<p>
+DeriveDataTypeable拡張を使うと自分で使った型をTypeableクラスのインスタンスに
+することができる。
+</p>
+
+<pre><code>data MyType = MyType deriving Typeable</code></pre>
+
+<p>
+derivingを使わずに自分でTypeableクラスのインスタンスにすることもできるが、
+これは推奨されていない。
+</p>
+
+<small>
+自分への(注):「自分で作った型をTypeableクラスのインスタンスにする場合、
+明示的なinstance宣言は避けてderiving節を使うべきだという議論の
+ソースを探す必要がある。
+</small>
+
+<h2>cast関数</h2>
+
+<pre><code>cast :: (Typeable a, Typeable b) =&gt; a -&gt; Maybe b</code></pre>
+
+<p>
+cast関数は与えられた値の型が求めている値の型と同じならJust値を、
+そうでなければNothing値を返す。
+</p>
+
+<pre><code>% ghci
+&gt; :m Data.Typeable
+&gt; cast "hello" :: Maybe String
+Just "hello"
+&gt; cast "hello" :: Maybe Int
+Nothing</code></pre>
+
+<h3>素直に作ると型エラーが起こる</h3>
+
+<p>普通に考えると以下のようなコードで良さそうだ。</p>
+
+<pre><code>cast :: (Typeable a, Typeable b) =&gt; a -&gt; Maybe b
+cast x = r
+	where
+	r = if typeOf x == typeOf (fromJust r)
+		then Just x
+		else Nothing</code></pre>
+
+<p>
+返す値の型ともとの値の型とを比較して
+型が同じならJust値を異なればNothing値を返している。
+しかし、これは型エラーとなる。
+if文のthen節とelse節の型は常に同じでなければならない。
+たとえ、それが評価されない場合でも、だ。
+上の定義では、
+型aと型bとが異なる型だった場合、Just xの型はMaybe aであるのに対して、
+Nothingの型はMaybe bとなり型の不整合が発生する。
+</p>
+
+<h3>unsafeCoerceを使う</h3>
+
+<p>正しくは以下のような定義となる。</p>
+
+<pre><code>cast :: ...
+cast x = r
+	where
+	r = if typeOf x == typeOf (fromJust r)
+		then Just $ unsafeCoerce x
+		else Nothing</code></pre>
+
+<p><a href="/computer/haskell/extensions/existential/cast.hs">cast.hs</a></p>
+
+<p>
+こうしておけば、いかなる時もthen節とelse節の型は一致する。
+unsafeCoerce関数は、型が異なるときには評価されないので、
+実質的には何もしていない。
+</p>
 
 <p>
 <a href="/computer/haskell/extensions/existential/get.html"

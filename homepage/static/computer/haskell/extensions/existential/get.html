@@ -1,7 +1,5 @@
 言語拡張: 存在型: 中身の取り出し
 
-<p>(工事中 0%)</p>
-
 <h2>動機</h2>
 
 <p>
@@ -40,7 +38,26 @@ Nothing</code></pre>
 <p>
 関数castがどのように作られているのかは
 <a href="/computer/haskell/extensions/existential/cast.html"
-	>「関数castの中身についての説明」(工事中 0%)</a>を参照のこと。
+	>「関数castの中身についての説明」</a>を参照のこと。
+</p>
+
+<h2>値の取り出し</h2>
+
+<pre><code>data Object = forall x . Typeable x =&gt; Object x</code></pre>
+
+<pre><code>getObject :: Typeable x =&gt; Object -&gt; Maybe x
+getObject (Object x) = cast x</code></pre>
+
+<p><a href="/computer/haskell/extensions/existential/get.hs"
+	>get.hs</a></p>
+
+<p>
+(Object x)という形でObject型から中身の値を取り出している。
+しかし、このときxの型はTypeableクラスのインスタンスのうちのどれかである。
+「どれかである」というのは「どれでも良い」のではない。
+「どれかである」といった形での型付けはHaskellでは許されていないので、
+cast関数を使うことで「どれかである」という型を
+「どれでも良い」という型に変換している。
 </p>
 
 <p>
