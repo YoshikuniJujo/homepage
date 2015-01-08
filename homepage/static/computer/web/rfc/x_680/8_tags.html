@@ -1,0 +1,90 @@
+8. タグ
+
+<h2>8.1</h2>
+
+<p>
+タグはクラスとそのクラス内での番号で指定する。
+クラスは以下のうちのどれかである。
+</p>
+
+<ul>
+<li>universal</li>
+<li>application</li>
+<li>private</li>
+<li>context-specific</li>
+</ul>
+
+<h2>8.2</h2>
+
+<p>番号は非負整数で十進数表記で指定する。</p>
+
+<h2>8.3</h2>
+
+<p>使用者によって付加されるタグの制約は31.2で定める。</p>
+
+<small>
+NOTE - Subclause 31.2 includes the restriction that users of this notation are
+not allowed to explicitly specify universal class tags in their ASN.1
+specifications.
+There is no formal difference between use of tags from the other three classes.
+Where application class tags are employed,
+a private or context-specific class tag could generally be applied instead,
+as a matter of user choice and style.
+The presence of the three classes is largely for historical reaseons,
+but guidance is given in G.2.12 on the way in which the classes are
+usually employed.
+</small>
+
+<h2>8.4</h2>
+
+<h2>8.6</h2>
+
+<h2>8.5</h2>
+
+<p>
+タグの正統な順序を必要とする符号化規則がある。
+一意性を提供するためにタグの正統な順序を8.6に定める。
+</p>
+
+<h2>8.6</h2>
+
+<p>
+タグの正統な順序はそれぞれの型の最外タグを見て以下の規則によって定める。
+</p>
+
+<ul>
+<li>a) 要素や選択肢は、
+universalクラスタグが最初に来て、applicationクラスタグ、
+context-specificクラスタグ、privateクラスタグと続く。</li>
+<li>b) それぞれのタグのクラス内では、
+これらの要素または選択肢はタグ番号の昇順で配置される。</li>
+</ul>
+
+<p>表1 - universalクラスタグの割り合て</p>
+
+<table>
+<tr><td>UNIVERSAL 0</td><td>符号化規則による使用のために予約</td></tr>
+<tr><td>UNIVERSAL 1</td><td>真偽値型</td></tr>
+<tr><td>UNIVERSAL 2</td><td>整数型</td></tr>
+<tr><td>UNIVERSAL 3</td><td>ビット列型</td></tr>
+<tr><td>UNIVERSAL 4</td><td>オクテット列型</td></tr>
+<tr><td>UNIVERSAL 5</td><td>虚無型</td></tr>
+<tr><td>UNIVERSAL 6</td><td>オブジェクト識別子(OID)型</td></tr>
+<tr><td>UNIVERSAL 7</td><td>オブジェクト記述子型</td></tr>
+<tr><td>UNIVERSAL 8</td><td>External type and Instance-of type</td></tr>
+<tr><td>UNIVERSAL 9</td><td>実数型</td></tr>
+<tr><td>UNIVERSAL 10</td><td>Enumerated type</td></tr>
+<tr><td>UNIVERSAL 11</td><td>Embedded-pdv type</td></tr>
+<tr><td>UNIVERSAL 12</td><td>UTF8文字列型</td></tr>
+<tr><td>UNIVERSAL 13</td><td>相対オブジェクト識別子(OID)型</td></tr>
+<tr><td>UNIVERSAL 14</td><td>The time type</td></tr>
+<tr><td>UNIVERSAL 15</td><td>この勧告(国際標準)の将来の版用に予約</td></tr>
+<tr><td>UNIVERSAL 16</td><td>Sequence型とSequence-of型</td></tr>
+<tr><td>UNIVERSAL 17</td><td>Set型とSet-of型</td></tr>
+<tr><td>UNIVERSAL 18-22,25-30</td><td>いろいろな文字列型</td></tr>
+<tr><td>UNIVERSAL 23-24</td><td>UTCTimeとGeneralizedTime</td></tr>
+<tr><td>UNIVERSAL 31-34</td><td>それぞれDATE, TIME-OF-DAY, DATE-TIME, DURATION</td></tr>
+<tr><td>UNIVERSAL 35</td><td>OID国際化資源識別子型</td></tr>
+<tr><td>UNIVERSAL 36</td><td>相対OID国際化資源識別子型</td></tr>
+<tr><td>UNIVERSAL 37-...</td><td>この勧告(国際標準)の補足のために予約</td></tr>
+</table>

@@ -1,18 +1,23 @@
 X.690: ASN.1のBER方式の共通部分の存在型を利用したコーディング: データ型
 
-<p>(工事中 85%)</p>
+<!-- <p>(工事中 85%)</p> -->
+<p>(修正中 0%)</p>
 
-<h2>デコード・エンコード可能という性質</h2>
+<h2>ASN.1で符号化可能という性質</h2>
 
-<p>ASN.1のBER方式でデコード・エンコード可能という性質を示すクラスを作成する。</p>
+<p>
+ASN.1で符号化可能という性質を示すクラスを作成する。
+実際には、ここで定義するのは、符号化できるという性質ではなく、
+AsnableBoxから出すために、Asn1Tagで判別可能という性質である。
+</p>
 
 <pre><code>class Asnable a where
-	testTag :: a -&gt; Asn1Tag -&gt; Bool
-	decode :: ByteString -&gt; Either String (a, ByteString)
-	encode :: a -&gt; ByteString</code></pre>
+	getAsn1Tag :: a -&gt; Asn1Tag</code></pre>
 
 <p>Asn1Tagについては<a href="/computer/web/rfc/x_690/8_1_common/coding/data.html"
 >存在型を使わないコーディングのデータ型</a>を参照。</p>
+
+<p>(ここまで修正)</p>
 
 <h2>Asnableなものを入れる箱</h2>
 
@@ -40,5 +45,5 @@ X.690: ASN.1のBER方式の共通部分の存在型を利用したコーディ�
 <a href="/computer/web/rfc/x_690/8_1_common/coding/existential"
 	>「存在型を利用」のトップにもどる</a>
 <a href="/computer/web/rfc/x_690/8_1_common/coding/existential/decode.html"
-	>「デコード関数(工事中 0%)」へ</a>
+	>「デコード関数(工事中 1%)」へ</a>
 </p>
