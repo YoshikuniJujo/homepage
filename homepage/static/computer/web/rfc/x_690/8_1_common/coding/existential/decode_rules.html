@@ -1,10 +1,21 @@
 X.690: ASN.1のBER方式の共通部分の存在型を利用したコーディング: デコードルールの追加
 
-<p>(工事中 20%)</p>
+<p>(工事中 50%)</p>
 
-<p>出来上がったコード: <a
+<ul>
+<li>出来上がったコード: <a
 	href="/computer/web/rfc/x_690/8_1_common/coding/existential/Asnable.hs"
-	>Asnable.hs</a></p>
+	>Asnable.hs</a></li>
+<li>テスト用のファイル: <a
+	href="/computer/web/rfc/x_690/example/test_ASN_1_cert.der"
+	>test_ASN_1_cert.der</a>(<a
+	href="/computer/web/rfc/x_690/example/test_ASN_1_cert.der.hex.txt"
+	>16進ダンプ</a>)
+	</li>
+<li>テスト用のコード: <a
+	href="/computer/web/rfc/x_690/8_1_common/coding/existential/testAsnable.hs"
+	>testAsnable.hs</a></li>
+</ul>
 
 <h2>SEQUENCEを読み込みリストにする</h2>
 
@@ -12,17 +23,79 @@ X.690: ASN.1のBER方式の共通部分の存在型を利用したコーディ�
 	getAsn1Tag _ = Asn1Tag Universal Constructed 16</code></pre>
 
 <pre><code>sequenceRule :: RuleType
-sequenceRule r t@(Asn1Tag Universal Constructed 16) ln =
+sequenceRule rl t@(Asn1Tag Universal Constructed 16) ln =
 	Just $ do
-		rc &lt;- fromJust $ recRule r t ln
-		let Just (RawConstructed _ as) =
-			getAsnable rc
+		Just (RawConstructed _ s) &lt;- getAsnable &lt;$&gt;
+			fromJust (recRule rl t ln)
 		return $ AsnableBox as
 sequenceRule _ _ _ = Nothing</code></pre>
 
+<h3>試してみる</h3>
+
+<pre><code>% ghci testAsnable.hs
+Main&gt; :set -XOverloadedStrings
+Main&gt; let Right (ab, "") = runAnalyzer (decodeWith [Rule sequenceRule, Rule recRule]) cert
+Main&gt; let Just as = getAsnable ab :: Maybe [AsnableBox]
+Main&gt; length as
+3
+Main&gt; getAsn1Tag $ as !! 1
+Asn1Tag Universal Constructed 16
+Main&gt; let Just as1 = getAsnable $ as !! 1 :: Maybe [AsnableBox]
+Main&gt; length as1
+2
+Main&gt; getAsn1Tag $ as1 !! 0
+Asn1Tag Universal Primitive 6
+Main&gt; getAsn1Tag $ as1 !! 1
+Asn1Tag Universal Primitive 5
+Main&gt; getAsnable $ as1 !! 0 :: Maybe Raw
+Just (Raw (Asn1Tag Universal Primitive 6) "*\134H\134\247r\SOH\SOH\ENQ")
+Main&gt; getAsnable $ as1 !! 1 :: Maybe Raw
+Just (Raw (Asn1Tag Universal Primitive 5) "")</code></pre>
+
 <h2>Bool値を読み込む</h2>
 
+<pre><code>instance Asnable Bool where
+	getAsn1Tag _ = Asn1Tag Universal Primitive 1</code></pre>
+
+<pre><code>boolRule :: RuleType
+boolRule rl t@(Asn1Tag Universal Primitive 1) ln@(Just 1) =
+	Just $ do
+		Just (Raw _ bs) &lt;- getAsnable &lt;$&gt;
+			fromJust (rawRule rl t ln)
+		return . AsnableBox $ bs /= "\x00"
+boolRule _ _ _ = Nothing</code></pre>
+
+<h3>試してみる</h3>
+
+<p>(作成中)</p>
+
 <h2>整数値を読み込む</h2>
+
+<pre><code>integerRule :: RuleType
+integerRule r t@(Asn1Tag Universal Primitive 2)
+	ln@(Just _) = Just $ do
+		Just (Raw _ bs) &lt;- getAsnable &lt;$&gt;
+			fromJust (rawRule r t ln)
+		return . AsnableBox $ readInteger bs
+integerRule _ _ _ = Nothing</code></pre>
+
+<pre><code>readInteger :: ByteString -&gt; Integer
+readInteger bs = case BS.uncons bs of
+	Just (h, t) -&gt; if testBit h 7
+		then readIntegerR
+			(fromIntegral h - 0x100) t
+		else readIntegerR (fromIntegral h) t
+	_ -&gt; 0</code></pre>
+
+<pre><code>readIntegerR :: Integer -&gt; ByteString -&gt; Integer
+readIntegerR n bs = case uncons bs of
+	Just (h, t) -&gt; readIntegerR
+		(n `shiftL` 8 .|. fromIntegral h) t
+	_ -&gt; n</code></pre>
+
+<h3>試してみる</h3>
+
+<p>(作成中)</p>
 
 <p>
 <a href="/computer/web/rfc/x_690/8_1_common/coding/existential/decode.html"
