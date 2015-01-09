@@ -1,0 +1,55 @@
+deriving Show
+
+<p><a href="/computer/haskell/standard/show/derivingShow.hs"
+	>derivingShow.hs</a></p>
+
+<h2>自動で括弧をつけてくれる</h2>
+
+<p>
+自分でデータ型を定義したとき、特に理由がなければ、
+とりあえずderiving Showをしておけば良い。
+</p>
+
+<pre><code>% cat derivingShow.hs
+data MyT = MyT Int Bool Char deriving Show</code></pre>
+
+<pre><code>% ghci derivingShow.hs
+Main&gt; MyT 8 False 'c'
+MyT 8 False 'c'
+Main&gt; Just it
+Just (MyT 8 False 'c')</code></pre>
+
+<p>
+単に表示してくれるだけでなく括弧が必要なときには括弧をつけてくれる。
+</p>
+
+<h2>演算子の結合力も考えてくれる</h2>
+
+<pre><code>infix 2 :-&lt;
+infix 5 :-|
+infix 8 :-&gt;</code></pre>
+
+<pre><code>data WeekOp = Int :-&lt; Bool deriving Show
+data MiddleOp = WeekOp :-| StrongOp deriving Show
+data StrongOp = Char :-&gt; Double deriving Show</code></pre>
+
+<pre><code>ghci derivingShow.hs
+Main&gt; (8 :-&lt; False) :-| 'c' :-&gt; 10
+(8 :-&lt; False) :-| 'c' :-&gt; 10.0</code></pre>
+
+<p>演算子の結合力を考慮して必要なところだけに括弧をつけてくれている。</p>
+
+<h2>左結合や右結合については考えてくれない</h2>
+
+<pre><code>data RecOp = RecOp :- Int | Empty deriving Show</code></pre>
+
+<pre><code>ghci derivingShow.hs
+Main&gt; Empty :- 8 :- 9
+(Empty :- 8) :- 9</code></pre>
+
+<p>演算子:-は左結合なので括弧はいらないはずだが、括弧がついている。</p>
+
+<p>
+<a href="/computer/haskell/standard/show">「Showクラス」のトップへもどる</a>
+<a href="/computer/haskell/standard/show/simple.html">「単純な定義」へ</a>
+</p>

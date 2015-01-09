@@ -1,0 +1,35 @@
+Showクラス: 文字列の結合の効率のために
+
+<h2>差分リスト</h2>
+
+<p>
+<a href="/computer/programming/algorithm/difference_list"
+	>差分リストの説明</a>、
+<a
+href="https://downloads.haskell.org/~ghc/latest/docs/html/libraries/base-4.7.0.1/Text-Show.html#t:ShowS"
+>GHCのShowSの説明</a>を参照。
+</p>
+
+<p>
+文字列は文字のリストである。
+リストの結合は右結合で行わないと効率が悪い。
+しかし、コードの書きかたとしては左結合で書きたい場合もある。
+そのような場合、差分リストを使うと、どのような結合にしても、
+最終的なリストの結合は右結合で行ってくれる。
+</p>
+
+<h2>shows関数</h2>
+
+<p>
+shows関数を使うと以下のように左結合で定義したとしても、
+文字列結合は右結合で行ってくれる。
+</p>
+
+<pre><code>(shows 8 . (" " ++) . shows True) . (" " ++) . shows 'c'</code></pre>
+
+<p>
+<a href="/computer/haskell/standard/show/simple.html"
+	>「単純なインスタンス定義」へもどる</a>
+<a href="/computer/haskell/standard/show/sprec.html"
+	>「括弧の自動化(工事中 0%)」へ</a>
+</p>

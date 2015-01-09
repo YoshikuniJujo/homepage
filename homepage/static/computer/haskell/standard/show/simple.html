@@ -1,0 +1,28 @@
+単純なShowクラスのインスタンスの例
+
+<p>
+<a href="/computer/haskell/standard/show/simpleShow.hs">simpleShow.hs</a>
+</p>
+
+<h2>括弧の面倒は見てくれない</h2>
+
+<p>最も簡単なやりかたはクラス関数show定義してやることだ。</p>
+
+<pre><code>instance Show MyT where
+	show (MyT i b c) = "MyT " ++
+		show i ++ " " ++ show b ++ " " ++ show c</code></pre>
+
+<pre><code>% ghci simpleShow.hs
+Main&gt; MyT 8 False 'c'
+MyT 8 False 'c'
+Main&gt; Just it
+Just MyT 8 False 'c'</code></pre>
+
+<p>この場合、括弧の面倒は見てくれない。</p>
+
+<p>
+<a href="/computer/haskell/standard/show/deriving.html"
+	>「deriving Show」へもどる</a>
+<a href="/computer/haskell/standard/show/difflist.html"
+	>「結合の効率化のために」へ</a>
+</p>
