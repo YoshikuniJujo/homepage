@@ -1,15 +1,8 @@
 X.690: ASN.1のBER方式の共通部分の存在型を利用したコーディング: デコード関数
 
-<p>(工事中 1%)</p>
-
-<p>
-<a href="/computer/web/rfc/x_690/8_1_common/coding/existential/Asnable.hs"
-	>Asnable.hs</a>
-<a href="/computer/web/rfc/x_690/8_1_common/coding/existential/testAsnable.hs"
-	>testAsnable.hs</a>
-<a href="/computer/web/rfc/x_690/8_1_common/coding/existential/test_ASN_1_cert.der"
-	>test_ASN_1_cert.der</a>
-</p>
+<p>出来上がったコード: <a
+href="/computer/web/rfc/x_690/8_1_common/coding/existential/Asnable.hs"
+>Asnable.hs</a></p>
 
 <h2>decodeTag, decodeLength関数</h2>
 
@@ -135,9 +128,57 @@ notEndOfContents =
 
 <h3>テスト用の証明書を用意する</h3>
 
+<p>作成の仕方は<a href="/computer/web/rfc/x_690/example"
+>「X.690: テスト用のファイルの作成」</a>を参照。</p>
+
+<p>
+<a href="/computer/web/rfc/x_690/example/test_ASN_1_cert.der"
+>test_ASN_1_cert.der</a>(<a
+href="/computer/web/rfc/x_690/example/test_ASN_1_cert.der.hex.txt"
+>16進ダンプ</a>)
+</p>
+
 <h3>テスト用のMainモジュールを用意する</h3>
 
+<p>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential/testAsnable.hs"
+	>testAsnable.hs</a>
+</p>
+
+<p>
+テスト用のファイルを読み込む等。
+また、テストのためにRawやRawConstructedを含むAsnableBoxを
+表示しやすいRw型に変換する関数を定義した。
+</p>
+
+<pre><code>data Rw = RC Asn1Tag [Rw] | RP Asn1Tag ByteString
+	deriving Show</code></pre>
+
+<pre><code>toRw :: AsnableBox -&gt; Rw
+toRw ab = case getAsn1Tag ab of
+	t@(Asn1Tag _ Constructed _) -&gt; let
+		Just (RawConstructed _ as) = getAsnable ab in
+		RC t $ map toRw as
+	t -&gt; let
+		Just (Raw _ bs) = getAsnable ab in
+		RP t bs</code></pre>
+
 <h3>ghciで試してみる</h3>
+
+<pre><code>% ghci testAsnable.hs
+Main&gt; :set -XOverloadedStrings
+Main&gt; Right (ab, "") = runAnalyzer (decodeWith [recRule]) cert
+Main&gt; toRw ab
+RC (Asn1Tag Universal Constructed 16) [RC (Asn1Tag Universal
+Constructed 16) [RC (Asn1Tag ContextSpecific Constructed 0) [
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential/ret.txt">...</a>
+\DEL\220\EM\228\193\189\144\172\248f\176\236\141\236\200h\156
+\&amp;2\\M\239\200\155\186\ACK\172"]
+Main&gt; Right (ab, "") = runAnalyzer (decodeWith [recRule]) ind_test
+Main&gt; toRw ab
+RC (Asn1Tag Universal Constructed 16) [RP (Asn1Tag Universal
+Primitive 1) "\136"]
+</code></pre>
 
 <p>
 <a href="/computer/web/rfc/x_690/8_1_common/coding/existential/data.html"
