@@ -1,0 +1,32 @@
+X.690: ASN.1のBER方式の共通部分の存在型を利用したコーディング: デコードルールの追加
+
+<p>(工事中 20%)</p>
+
+<p>出来上がったコード: <a
+	href="/computer/web/rfc/x_690/8_1_common/coding/existential/Asnable.hs"
+	>Asnable.hs</a></p>
+
+<h2>SEQUENCEを読み込みリストにする</h2>
+
+<pre><code>instance Asnable [a] where
+	getAsn1Tag _ = Asn1Tag Universal Constructed 16</code></pre>
+
+<pre><code>sequenceRule :: RuleType
+sequenceRule r t@(Asn1Tag Universal Constructed 16) ln =
+	Just $ do
+		rc &lt;- fromJust $ recRule r t ln
+		let Just (RawConstructed _ as) =
+			getAsnable rc
+		return $ AsnableBox as
+sequenceRule _ _ _ = Nothing</code></pre>
+
+<h2>Bool値を読み込む</h2>
+
+<h2>整数値を読み込む</h2>
+
+<p>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential/decode.html"
+	>「デコード関数」へもどる</a>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential"
+	>「存在型を利用」トップへ</a>
+</p>

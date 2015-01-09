@@ -8,7 +8,8 @@ module Asnable (
 	Asnable(..), AsnableBox(..), getAsnable,
 	Asn1Tag(..), TagClass(..), DataClass(..),
 	Raw(..), RawConstructed(..),
-	Rule(..), decodeWith, rawRule, recRule, sequenceRule,
+	Rule(..), RuleType, decodeWith, rawRule, recRule,
+	sequenceRule, boolRule, integerRule,
 	) where
 
 import Control.Applicative
@@ -187,8 +188,53 @@ instance Asnable [a] where
 	getAsn1Tag _ = Asn1Tag Universal Constructed 16
 
 sequenceRule :: RuleType
-sequenceRule r t@(Asn1Tag Universal Constructed 16) ln@(Just _) = Just $ do
-	rc <- fromJust $ recRule r t ln
-	let Just (RawConstructed _ as) = getAsnable rc
-	return $ AsnableBox as
+sequenceRule r t@(Asn1Tag Universal Constructed 16) ln =
+	Just $ do
+		rc <- fromJust $ recRule r t ln
+		let Just (RawConstructed _ as) =
+			getAsnable rc
+		return $ AsnableBox as
 sequenceRule _ _ _ = Nothing
+
+instance Asnable Bool where
+	getAsn1Tag _ = Asn1Tag Universal Primitive 1
+
+boolRule :: RuleType
+boolRule r t@(Asn1Tag Universal Primitive 1) (Just 1) =
+	Just $ do
+		rc <- fromJust $ rawRule r t (Just 1)
+		let Just (Raw _ bs) = getAsnable rc
+		return . AsnableBox $ case bs of
+			"\x00" -> False; _ -> True
+boolRule _ _ _ = Nothing
+
+instance Asnable Integer where
+	getAsn1Tag _ = Asn1Tag Universal Primitive 2
+
+integerRule :: RuleType
+integerRule r t@(Asn1Tag Universal Primitive 2)
+	ln@(Just _) = Just $ do
+		rc <- fromJust $ rawRule r t ln
+		let Just (Raw _ bs) = getAsnable rc
+		return . AsnableBox $ readInteger bs
+integerRule _ _ _ = Nothing
+
+readInteger :: BS.ByteString -> Integer
+readInteger bs = case BS.uncons bs of
+	Just (h, t) -> if testBit h 7
+		then readIntegerRM
+			(fromIntegral h - 0x100) t
+		else readIntegerR (fromIntegral h) t
+	_ -> 0
+
+readIntegerR :: Integer -> BS.ByteString -> Integer
+readIntegerR n bs = case BS.uncons bs of
+	Just (h, t) -> readIntegerR
+		(n `shiftL` 8 .|. fromIntegral h) t
+	_ -> n
+
+readIntegerRM :: Integer -> BS.ByteString -> Integer
+readIntegerRM n bs = case BS.uncons bs of
+	Just (h, t) -> readIntegerRM
+		(n `shiftL` 8 .|. fromIntegral h) t
+	_ -> n
