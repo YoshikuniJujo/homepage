@@ -1,3 +1,100 @@
 結合性を考慮して括弧をつける
 
-<p>(工事中 0%)</p>
+<h2>戦略</h2>
+
+<h3>結合の効率のために</h3>
+
+<p>
+表示関数の定義内で差分リストを使い、返り値も差分リストとする。
+</p>
+
+<h3>括弧の自動化</h3>
+
+<p>
+今どの程度の結合力のなかにいるかを知る必要がある。
+結合力が強い値構築子内にいれば外側の括弧が必要になるし、
+結合力が弱い値構築子内であれば外側の括弧は不要となる。
+また、一番外側にいるのであれば常に括弧は不要となる。
+</p>
+
+<h2>便利な関数</h2>
+
+<h3>showString関数</h3>
+
+<p>
+showString関数は普通の文字列を差分文字列に変換する。
+</p>
+
+<h3>showParen関数</h3>
+
+<p>
+showParen関数は第一引数のBool値で括弧をつけるかつけないかを決める。
+</p>
+
+<h2>showsPrec関数</h2>
+
+<pre><code>showsPrec :: Show a =&gt; Int -&gt; a -&gt; ShowS</code></pre>
+
+<p>
+第一引数のInt値が「今いる場所の結合力+1」となる。
+</p>
+
+<h2>インスタンス例</h2>
+
+<p><a href="/computer/haskell/standard/show/sprecShow.hs"
+	>sprecShow.hs</a></p>
+
+<h3>型構築子</h3>
+
+<p>
+型構築演算子の結合力は0から9なので、型構築子の結合力はそれより強い10となる。
+</p>
+
+<pre><code>instance Show MyT where
+	showsPrec d (MyT i b c) = showParen (d &gt; 10) $
+		showsPrec 11 i . showString " " .
+		showsPrec 11 b . showString " " .
+		showsPrec 11 c</code></pre>
+
+<pre><code>% ghci sprecShow.hs
+Main&gt; MyT 8 False 'c'
+MyT 8 False 'c'
+Main&gt; Just it
+Just (MyT 8 False 'c')</code></pre>
+
+<h3>型構築演算子</h3>
+
+<pre><code>instance Show WeekOp where
+	showsPrec d (i :-&lt; b) = showParen (d &gt; 2) $
+		showsPrec 3 i . showString " :-&lt; " .
+		showsPrec 3 b</code></pre>
+
+<pre><code>instance Show MiddleOp where
+	showsPrec d (w :-| s) = showParen (d &gt; 5) $
+		showsPrec 6 w . showString " :-| " .
+		showsPrec 6 s</code></pre>
+
+<pre><code>instance Show StrongOp where
+	showsPrec d (c :-&gt; f) = showParen (d &gt; 8) $
+		showsPrec 9 c . showString " :-&gt; " .
+		showsPrec 9 f</code></pre>
+
+<pre><code>% ghci sprecShow.hs
+Main&gt; (8 :-&lt; False) :-| 'c' :-&gt; 10
+(8 :-&lt; False) :-| 'c' :-&gt; 10.0</code></pre>
+
+<p>
+適切に扱われている。
+</p>
+
+<small>
+<a href="/computer/haskell/standard/show/lecture20.hs"
+	>lecture20.hs</a>
+</small>
+
+<p>
+<a href="/computer/haskell/standard/show/difflist.html"
+	>「結合の効率化のために」へもどる</a>
+<a href="/computer/haskell/standard/show"
+	>「Showクラス」のトップへ</a>
+</p>
