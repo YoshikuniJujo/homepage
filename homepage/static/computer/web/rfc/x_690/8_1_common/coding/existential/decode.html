@@ -2,14 +2,6 @@ X.690: ASN.1のBER方式の共通部分の存在型を利用したコーディ�
 
 <p>(工事中 1%)</p>
 
-<h2>decodeTag, decodeLength関数</h2>
-
-<p>
-decodeTag, decodeLength関数は
-<a href="/computer/web/rfc/x_690/8_1_common/coding/decode.html"
->存在型を使わないデコード関数</a>と同じ。
-</p>
-
 <p>
 <a href="/computer/web/rfc/x_690/8_1_common/coding/existential/Asnable.hs"
 	>Asnable.hs</a>
@@ -18,6 +10,134 @@ decodeTag, decodeLength関数は
 <a href="/computer/web/rfc/x_690/8_1_common/coding/existential/test_ASN_1_cert.der"
 	>test_ASN_1_cert.der</a>
 </p>
+
+<h2>decodeTag, decodeLength関数</h2>
+
+<p>
+decodeTag, decodeLength関数は
+<a href="/computer/web/rfc/x_690/8_1_common/coding/decode.html"
+>存在型を使わないデコード関数</a>と同じ。
+</p>
+
+<h2>復号のルール</h2>
+
+<p>
+復号関数に引数として与える復号のルールの型を定義する。
+再帰的に同じ型を引数として取る必要があるので代数的データ型とする。
+</p>
+
+<pre><code>data Rule = Rule { runRule :: RuleType }</code></pre>
+
+<pre><code>type RuleType = [Rule] -&gt; Asn1Tag -&gt; Maybe Integer -&gt;
+	Maybe (Analyzer ByteString AsnableBox)</code></pre>
+
+<p>
+復号のルールは再帰的に中身を復号していく場合に渡すためにルール自体を
+第一引数として取る。
+第二、第三引数はデータの型と長さであり、
+返り値は中身に適用する復号ルーチンである。
+</p>
+
+<h2>復号関数</h2>
+
+<p>
+復号のルールを取って復号ルーチンを返す関数である。
+実際の復号は復号ルーチンをrunAnalyzerで走らせることで行われる。
+</p>
+
+<pre><code>decodeWith :: [Rule] -&gt; Analyzer ByteString AsnableBox
+decodeWith rl = do
+	t &lt;- decodeTag
+	l &lt;- decodeLength
+	fromJust . fromJust . find isJust $
+		map (($ l) . ($ t) . ($ rl) . runRule) rl</code></pre>
+
+<p>
+タグを復号し長さを復号したうえで、
+複数のルールのなかからJustになるものを選び実行する。
+</p>
+
+<h2>基本的なルール</h2>
+
+<h3>表面のみを復号するルール</h3>
+
+<pre><code>rawRule :: RuleType
+rawRule _ t (Just l) =
+	Just $ AsnableBox . Raw t &lt;$&gt; tokens l
+rawRule _ _ _ = Just $ fail "Raw needs length"</code></pre>
+
+<h3>再帰的にPrimitiveなデータにまで復号するルール</h3>
+
+<p>まずはend-of-contentsが長さ0でなかった場合をエラーにする。</p>
+
+<pre><code>recRule :: RuleType
+recRule _ (Asn1Tag Universal Primitive 0) (Just l)
+	| l /= 0 = fail "Bad end-of-contents"
+recRule _ (Asn1Tag Universal Primitive 0) Nothing =
+	fail "Bad end-of-contents"</code></pre>
+
+<p>Primitiveで長さの指定があった場合にはRawを返す。</p>
+
+<pre><code>recRule _ t@(Asn1Tag _ Primitive _) (Just l) =
+	Just $ AsnableBox . Raw t &lt;$&gt; tokens l</code></pre>
+
+<p>
+Constructedで長さの指定があった場合には、その長さぶん切り出してから、
+再帰的に復号する。
+</p>
+
+<pre><code>recRule r t (Just l) = Just $ do
+	s &lt;- tokens l
+	let eas = runAnalyzer (listAll $ decodeWith r) s
+	case eas of
+		Left em -&gt; fail em
+		Right (as, "") -&gt; return .
+			AsnableBox $ RawConstructed t as
+		_ -&gt; error "never occur"</code></pre>
+
+<p>
+Constructedで長さの指定がなかった場合には、
+end-of-contentsに到るまで復号を続ける。
+loopWhileMとnotEndOfContentsについては後述する。
+</p>
+
+<pre><code>recRule r t@(Asn1Tag _ Constructed _) _ = Just $ do
+	as &lt;- loopWhileM notEndOfContents $ decodeWith r
+	return . AsnableBox $ RawConstructed t as</code></pre>
+
+<p>Primitiveで長さの指定がなかった場合にはエラーとなる。</p>
+
+<pre><code>recRule _ _ _ = fail "Primitive needs length"</code></pre>
+
+<h3>Constructedで長さの指定なしの場合の補助関数</h3>
+
+<h4>loopWhileM関数</h4>
+
+<p>
+返り値が条件を満たすあいだモナドをくりかえし実行する。
+条件を満たさなくなった場合にモナドを終了する。
+</p>
+
+<pre><code>loopWhileM :: Monad m =&gt; (a -&gt; Bool) -&gt; m a -&gt; m [a]
+loopWhileM p m = m &gt;&gt;= \x -&gt; if p x
+	then (x :) `liftM` loopWhileM p m
+	else return []</code></pre>
+
+<h4>notEndOfContents関数</h4>
+
+<p>AsnableBoxがend-of-contentsではないことをチェックする。</p>
+
+<pre><code>notEndOfContents :: AsnableBox -&gt; Bool
+notEndOfContents =
+	(/= Asn1Tag Universal Primitive 0) . getAsn1Tag</code></pre>
+
+<h2>試してみる</h2>
+
+<h3>テスト用の証明書を用意する</h3>
+
+<h3>テスト用のMainモジュールを用意する</h3>
+
+<h3>ghciで試してみる</h3>
 
 <p>
 <a href="/computer/web/rfc/x_690/8_1_common/coding/existential/data.html"
