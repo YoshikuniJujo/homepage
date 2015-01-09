@@ -34,6 +34,9 @@ AsnableBoxから出すために、Asn1Tagで判別可能という性質である
 
 <h3>箱から取り出す関数</h3>
 
+<p><a href="/computer/haskell/extensions/existential/get.html"
+	>「存在型: 中身の取り出し」</a>を参照。</p>
+
 <pre><code>getAsnable :: Typeable a =&gt; AsnableBox -&gt; Maybe a
 getAsnable (AsnableBox a) = cast a</code></pre>
 
