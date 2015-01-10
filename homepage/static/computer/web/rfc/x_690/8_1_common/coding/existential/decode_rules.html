@@ -1,6 +1,4 @@
-X.690: ASN.1のBER方式の共通部分の存在型を利用したコーディング: デコードルールの追加
-
-<p>(工事中 50%)</p>
+X.690: ASN.1のBER方式の共通部分の存在型を利用したコーディング: デコードルール例の追加
 
 <ul>
 <li>出来上がったコード: <a
@@ -34,13 +32,15 @@ sequenceRule _ _ _ = Nothing</code></pre>
 
 <pre><code>% ghci testAsnable.hs
 Main&gt; :set -XOverloadedStrings
-Main&gt; let Right (ab, "") = runAnalyzer (decodeWith [Rule sequenceRule, Rule recRule]) cert
+Main&gt; let Right (ab, "") = runAnalyzer (decodeWith [Rule
+sequenceRule, Rule recRule]) cert
 Main&gt; let Just as = getAsnable ab :: Maybe [AsnableBox]
 Main&gt; length as
 3
 Main&gt; getAsn1Tag $ as !! 1
 Asn1Tag Universal Constructed 16
-Main&gt; let Just as1 = getAsnable $ as !! 1 :: Maybe [AsnableBox]
+Main&gt; let Just as1 = getAsnable $ as !! 1 :: Maybe
+[AsnableBox]
 Main&gt; length as1
 2
 Main&gt; getAsn1Tag $ as1 !! 0
@@ -48,7 +48,8 @@ Asn1Tag Universal Primitive 6
 Main&gt; getAsn1Tag $ as1 !! 1
 Asn1Tag Universal Primitive 5
 Main&gt; getAsnable $ as1 !! 0 :: Maybe Raw
-Just (Raw (Asn1Tag Universal Primitive 6) "*\134H\134\247r\SOH\SOH\ENQ")
+Just (Raw (Asn1Tag Universal Primitive 6)
+"*\134H\134\247r\SOH\SOH\ENQ")
 Main&gt; getAsnable $ as1 !! 1 :: Maybe Raw
 Just (Raw (Asn1Tag Universal Primitive 5) "")</code></pre>
 
@@ -67,7 +68,15 @@ boolRule _ _ _ = Nothing</code></pre>
 
 <h3>試してみる</h3>
 
-<p>(作成中)</p>
+<pre><code>ghci testAsnable.hs
+Main&gt; :set -XOverloadedStrings
+Main&gt; let Right (ab, "") = runAnalyzer (decodeWith [Rule
+boolRule, Rule sequenceRule, Rule recRule]) ind_test
+Main&gt; let Just as = getAsnable ab :: Maybe [AsnableBox]
+Main&gt; length as
+1
+Main&gt; getAsnable $ as !! 0 :: Maybe Bool
+Just True</code></pre>
 
 <h2>整数値を読み込む</h2>
 
@@ -95,7 +104,22 @@ readIntegerR n bs = case uncons bs of
 
 <h3>試してみる</h3>
 
-<p>(作成中)</p>
+<pre><code>% ghci testAsnable.hs
+Main&gt; :set -XOverloadedStrings
+Main&gt; let Right (ab, "") = runAnalyzer (decodeWith [Rule
+integerRule, Rule sequenceRule, Rule recRule]) cert
+Main&gt; let Just as = getAsnable ab :: Maybe [AsnableBox]
+Main&gt; length as
+3
+Main&gt; getAsn1Tag $ as !! 0
+Asn1Tag Universal Constructed 16
+Main&gt; let Just as0 = getAsnable $ as !! 0 :: Maybe [AsnableBox]
+Main&gt; length as0
+8
+Main&gt; getAsn1Tag $ as0 !! 1
+Asn1Tag Universal Primitive 2
+Main&gt; getAsnable $ as0 !! 1 :: Maybe Integer
+Just 9541091809747837828</code></pre>
 
 <p>
 <a href="/computer/web/rfc/x_690/8_1_common/coding/existential/decode.html"
