@@ -1,7 +1,69 @@
 X.690: ASN.1のBER方式の共通部分のタグやデータ長のエンコード
 
-<p>(工事中 0%)</p>
+<p>(工事中 50%)</p>
+
+<p><a
+href="/computer/web/rfc/x_690/8_1_common/coding/existential/AsnableNg.hs"
+>AsnableNg.hs</a></p>
 
 <h2>タグのエンコード関数</h2>
 
+<p>
+上位3ビットはタグやデータのクラスを表現する。
+タグ番号が31未満なら、残りの5ビットで表現できる。
+31以上の場合、残りの5ビットはすべて1で埋めて、
+続くバイト列でタグ番号を表現する。
+</p>
+
+<pre><code>encodeTag :: Asn1Tag -&gt; ByteString
+encodeTag (Asn1Tag tc dc n)
+	| n &lt; 31 = BS.pack [c .|. fromIntegral n]
+	| otherwise = BS.pack $ (c .|. 0x1f) : encodeTagR n
+	where
+	c = fromIntegral $ fromEnum tc `shiftL` 6 .|.
+		fromEnum dc `shiftL` 5</code></pre>
+
+<p>
+残るバイト列は以下のように31以上のタグ番号を表現する。
+最上位ビットが継続を意味するブール値であり、
+残る7ビットをつなげ合わせたものがタグ番号となる。
+</p>
+
+<pre><code>encodeTagR :: Integer -&gt; [Word8]
+encodeTagR n = map (0x80 .|.) (reverse ws) ++ [w]
+	where
+	w : ws = integerToWord7s n</code></pre>
+
+<pre><code>integerToWord7s :: Integer -&gt; [Wrod8]
+integerToWord7s 0 = []
+integerToWord7s n = fromIntegral (n .&. 0x7f) :
+	integerToWord7s (n `shiftR` 7)</code></pre>
+
 <h2>データ長のエンコード関数</h2>
+
+<p>
+データ長を指定しない形式の場合、データ長のフィールドは1バイトの"\x80"となる。
+データ長が128未満であれば、そのまま1バイトでデータ長を表現する。
+128以上の場合、最上位ビットを1にセットしたうえで、
+残りの7ビットでデータ長を表現するバイト列のバイト数を表現する。
+</p>
+
+<pre><code>encodeLength :: Maybe Integer -&gt; BS.ByteString
+encodeLength (Just n)
+	| n &lt; 0 = error "No negative length"
+	| n &lt; 128 = BS.pack [fromIntegral n]
+	| otherwise = BS.pack $
+		(0x80 .|. fromIntegral (length ws)) : ws
+encodeLength _ = "\x80"</code></pre>
+
+<pre><code>integerToWod8s :: Integer -&gt; [Word8]
+integerToWord8s 0 = []
+integerToWord8s n = fromIntegral (n .&amp;. 0xff) :
+	integerToWord8s (n `shiftR` 8)</code></pre>
+
+<p>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential/decode_rules.html"
+	>「デコード関数の拡張」へもどる</a>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential/data_encode.html"
+	>「データ型の見直し」へ</a>
+</p>
