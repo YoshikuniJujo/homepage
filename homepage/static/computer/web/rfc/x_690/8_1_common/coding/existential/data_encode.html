@@ -1,12 +1,111 @@
 X.690: ASN.1のBER方式の共通部分の存在型を利用したデコード関数のためのデータ型
 
-<p>(工事中 0%)</p>
+<p><a href="/computer/web/rfc/x_690/8_1_common/coding/existential/AsnableNg.hs"
+	>AsnableNg.hs</a></p>
 
-<h2>Asnableクラスにencode関数を追加する</h2>
+<h2>AsnableクラスへのencodeDer関数の追加</h2>
 
-<h2>AsnableBoxに対するencode関数の追加</h2>
+<p>AsnableクラスにDER形式でエンコードする関数を追加した。</p>
 
-<h2>基本的な型に対するencode関数</h2>
+<pre><code>class Asnable a where
+	getAsn1Tag :: a -&gt; Asn1Tag
+	encodeDer :: a -&gt; ByteString</code></pre>
+
+<h2>AsnableBoxに対するencodeDer関数の追加</h2>
+
+<p>AsnableBoxをエンコードするには、中身をエンコードすれば良い。</p>
+
+<pre><code>instance Asnable AsnableBox where
+	getAsn1Tag (AsnableBox a) = getAsn1Tag a
+	encodeDer (AsnableBox a) = encodeDer a</code></pre>
+
+<h2>RawBytes型の追加</h2>
+
+<p>
+一度読み込んだタグやデータ長を最度バイト列に追加して一塊のデータとすることが
+必要な場合がある。
+そのためのデータ構造をRawBytes型とした。
+</p>
+
+<pre><code>data RawBytes = RawBytes ByteString
+	deriving (Show, Typeable)</code></pre>
+
+<h2>基本的な型に対するencodeDer関数</h2>
+
+<p>
+RawBytesはすでにencodeDerされていると考えられる。
+</p>
+
+<pre><code>instance Asnable RawBytes where
+	getAsn1Tag (RawBytes bs) = let
+		Right (t, _) = runAnalyzer decodeTag bs in t
+	encodeDer (RawBytes bs) = bs</code></pre>
+
+<p>
+タグとデータ長を表すバイト列を追加すれば良い。
+</p>
+
+<pre><code>instance Asnable Raw where
+	getAsn1Tag (Raw t _) = t
+	encodeDer (Raw t bs) = encodeTag t
+		`append` encodeLength
+			(Just . fromIntegral $ length bs)
+		`append` bs</code></pre>
+
+<p>
+下位のAsnableBoxを復号したうえでタグとデータ長を示すバイト列を追加する。
+</p>
+
+<pre><code>instance Asnable RawConstructed where
+	getAsn1Tag (RawConstructed t _) = t
+	encodeDer (RawConstructed t as) = encodeTag t
+		`append` encodeLength
+			(Just . fromIntegral $ length bs)
+		where
+		bs = concat $ map encodeDer as</code></pre>
+
+<h2>その他の型に対するencodeDer関数</h2>
+
+<pre><code>instance Asnable a =&gt; Asnable [a] where
+	getAsn1Tag _ = Asn1Tag Universal Constructed 16
+	encodeDer as = encodeTag (getAsn1Tag as)
+		`append` encodeLength
+			(Just . fromIntegral $ length bs)
+		`append` bs
+		where
+		bs = concat $ map encodeDer as</code></pre>
+
+<pre><code>instance Asnable Bool where
+	getAsn1Tag _ = Asn1Tag Universal Primitive 1
+	encodeDer b = encodeTag (getAsn1Tag b)
+		`append` encodeLength (Just 1)
+		`append` (if b then "\xff" else "\x00")</code></pre>
+
+<pre><code>instance Asnable Integer where
+	getAsn1Tag _ = Asn1Tag Universal Primitive 2
+	encodeDer n = encodeTag (getAsn1Tag n)
+		`append` encodeLength
+			(Just . fromIntegral $ length bs')
+		`append` bs'
+		where
+		bs' = pack $ if testBit b 7 then 0 : bs else bs
+		bs@(b : _)	| 0 &lt;- n = [0]
+				| otherwise = reverse $
+					integerToWord8s n</code></pre>
+
+<h2>試してみる</h2>
+
+<p><a href="/computer/web/rfc/x_690/8_1_common/coding/existential/testAsnableNg.hs"
+	>testAsnableNg.hs</a></p>
+
+<pre><code>% ghci testAsnableNg.hs
+Main&gt; :set -XOverloadedStrings
+Main&gt; let Right (ab, "") = decodeWith [Rule integerRule,
+Rule sequenceRule, Rule recRule] cert
+Main&gt; decodeDer ab
+"0\130...
+Main&gt; it == cert
+True</code></pre>
 
 <p>
 <a href="/computer/web/rfc/x_690/8_1_common/coding/existential/encode.html"
