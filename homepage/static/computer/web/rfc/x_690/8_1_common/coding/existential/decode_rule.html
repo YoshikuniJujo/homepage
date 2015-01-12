@@ -1,0 +1,65 @@
+X.690: ASN.1のBER方式の共通部分の存在型を利用したコーディング: デコードルールをクラス関数にする
+
+<p>(工事中 40%)</p>
+
+<p>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential/AsnableNg2.hs"
+	>AsnableNg2.hs</a>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential/testAsnableNg2.hs"
+	>testAsnableNg2.hs</a>
+</p>
+
+<h2>動機</h2>
+
+<h3>ルールをクラス関数にする動機</h3>
+
+<h4>デコードルールの作成を警告できる</h4>
+
+<p>
+今までの作りだと、ある型をASN.1でデコードする場合、
+Asnableクラスのインスタンスにするだけでは不十分である。
+その型用のデコードルールを作成する必要がある。
+もしも、デコードルールをAsnableクラスのクラス関数にしておけば、
+デコードルールを作成するように処理系が警告してくれる。
+</p>
+
+<h4>名前を節約できる</h4>
+
+<p>
+複数の名前空間を使えば、名前を贅沢に使うことは可能だ。
+しかし、それでも名前を節約することには価値がある。
+rawRule, recRule, boolRule, instanceRuleといった型ごとの名前を使うよりも、
+decodeRuleというクラス関数で名前をまとめておくのは省資源の観点から好ましい。
+</p>
+
+<h3>ルールをクラス関数にすることの欠点</h3>
+
+<p>
+ルールをクラス関数にすることは、必要なことではなく、本質的なことでもない。
+また、使用する際にはdecodeRule (undefined :: Integer)のような形で余分な引数が
+必要になりタイプ量が増えてしまう。
+</p>
+
+<h3>やってみる</h3>
+
+<p>
+どっちか迷ったら、とりあえずやってみる。
+やってから考えれば良い。
+</p>
+
+<h2>Asnableクラスへの追加</h2>
+
+<pre><code>class Asnable a where
+	...
+	decodeRule :: a -&gt; Rule</code></pre>
+
+<h2>既存の型にdecodeRule関数を追加する</h2>
+
+<p>処理系からの警告を参考にしてdecodeRule関数を追加していく。</p>
+
+<p>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential/data_encode.html"
+	>「エンコード用のデータ型」へもどる</a>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential"
+	>「存在型を利用」トップへ</a>
+</p>
