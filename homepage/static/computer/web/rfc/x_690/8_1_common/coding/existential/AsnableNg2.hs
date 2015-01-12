@@ -283,11 +283,12 @@ instance Asnable Integer where
 	decodeRule _ = Rule integerRule
 	encodeDer n = encodeTag (getAsn1Tag n)
 		`BS.append` encodeLength
-			(Just . fromIntegral $ BS.length bs')
-		`BS.append` bs'
+			(Just . fromIntegral $ BS.length s')
+		`BS.append` s'
 		where
-		bs' = BS.pack $ if testBit b 7 then 0 : bs else bs
-		bs@(b : _)	| 0 <- n = [0]
+		s' = BS.pack $
+			if testBit b 7 then 0 : s else s
+		s@(b : _)	| 0 <- n = [0]
 				| otherwise = reverse $ integerToWord8s n
 
 integerRule :: RuleType

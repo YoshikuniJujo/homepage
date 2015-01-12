@@ -1,7 +1,5 @@
 X.690: ASN.1のBER方式の共通部分の存在型を利用したコーディング: デコードルールをクラス関数にする
 
-<p>(工事中 40%)</p>
-
 <p>
 <a href="/computer/web/rfc/x_690/8_1_common/coding/existential/AsnableNg2.hs"
 	>AsnableNg2.hs</a>
@@ -51,15 +49,61 @@ decodeRuleというクラス関数で名前をまとめておくのは省資源�
 
 <pre><code>class Asnable a where
 	...
-	decodeRule :: a -&gt; Rule</code></pre>
+	decodeRule :: a -&gt; Rule
+	...</code></pre>
 
 <h2>既存の型にdecodeRule関数を追加する</h2>
 
+<h3>基本的な型にdecodeRule関数を追加</h3>
+
+<pre><code>instance Asnable RawBytes where
+	...
+	decodeRule _ = Rule rawBytesRule
+	...</code></pre>
+
+<pre><code>instance Asnable Raw where
+	...
+	decodeRule _ = Rule rawRule
+	...</code></pre>
+
+<pre><code>instance Asnable RawConstructed where
+	...
+	decodeRule _ = Rule recRule
+	...</code></pre>
+
+<h4>関数recRuleでRaw型を扱わないようにする</h4>
+
+<pre><code>recRule :: RuleType
+...
+recRule _ (Asn1Tag Universal Primitive 0) Nothing =
+	fail "Bad end-of-contents"
+-- recRule _ t@(Asn1Tag _ Primitive _) (Just l)の部分を削除 
+-- 次のパターンマッチにConstructedを追加 
+recRule r t@(Asn1Tag _ Constructed _) (Just l) = Just $ do
+...</code></pre>
+
+<h3>追加の型にdecodeRule関数を追加</h3>
+
 <p>処理系からの警告を参考にしてdecodeRule関数を追加していく。</p>
+
+<pre><code>instance Asnable a =&gt; Asnable [a] where
+	...
+	decodeRule _ = Rule sequenceRule
+	...</code></pre>
+
+<pre><code>instance Asnable Bool where
+	...
+	decodeRule _ = Rule boolRule
+	...</code></pre>
+
+<pre><code>instance Asnable Instance where
+	...
+	decodeRule _ = Rule instanceRule
+	...</code></pre>
 
 <p>
 <a href="/computer/web/rfc/x_690/8_1_common/coding/existential/data_encode.html"
 	>「エンコード用のデータ型」へもどる</a>
-<a href="/computer/web/rfc/x_690/8_1_common/coding/existential"
-	>「存在型を利用」トップへ</a>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential/sep_modules.html"
+	>「モジュールに分ける(工事中 10%)」へ</a>
 </p>

@@ -1,0 +1,60 @@
+X.690: ASN.1のBER方式の共通部分の存在型を利用したコーディング: モジュールに分ける
+
+<p>(工事中 10%)</p>
+
+<h2>動機</h2>
+
+<h3>現在のモジュール内での層</h3>
+
+<p>
+現在のAsnableモジュール内ですでにある程度の層構造がある。
+decodeTagやdecodeLength、IntegerとByteStringとの変換関数等は、
+より下の層と考えられる。
+そして、class Asnableやinstance Asnableはより上の層にすることができる。
+つまり、すでに自然な切れ目があるということだ。
+</p>
+
+<h3>今後大きくなる</h3>
+
+<h4>orphan instance問題</h4>
+
+<p>
+<a href="http://maoe.hatenadiary.jp/entry/20100902/1283358286"
+>maoeさんのブログ: Orphan Instances</a>参照。
+</p>
+
+<p>
+orphan instanceという問題児がいる。
+これはクラスが定義されている場所でも、データ型が定義されている場所でもない
+場所にあるインスタンス宣言であり、予期しない問題を引き起こす。
+</p>
+
+<h3>orphan instnace問題の予防</h3>
+
+<p>
+orphan instance問題を予防するためには、よく使われる型については、
+クラス宣言をしたモジュールでインスタンス宣言してやる必要がある。
+このため、クラス宣言をしたモジュールはある程度肥大化する宿命にある。
+</p>
+
+<h3>Asnableクラス</h3>
+
+<p>
+AsnableモジュールではAsnableクラスを宣言している。
+よって、このモジュール内によく使われる型に対するインスタンス宣言を
+つめ込む必要がある。
+</p>
+
+<h3>だからモジュールを分割する</h3>
+
+<p>
+上述の2つの理由、「自然な切れ目がある」「今後大きくなる」ことより、
+モジュールを2つに分けることが適当と判断した。
+</p>
+
+<p>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential/decode_rule.html"
+	>「ルールをクラスに」へもどる</a>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential"
+	>「存在型を利用」トップへ</a>
+</p>
