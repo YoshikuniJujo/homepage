@@ -1,0 +1,55 @@
+X.690: ASN.1のBER方式の共通部分の存在型を利用したコーディング: エンコード関数を値自体に
+
+<p>(中断 1%)</p>
+
+<h2>Berクラス</h2>
+
+<pre><code>class Ber b where
+	...
+	encodeRule :: b -&gt; BS.ByteString
+	setEncodeRule :: b -&gt; (b -&gt; BS.ByteString) -&gt; b</code></pre>
+
+<p>
+今回のバージョンでは長さの表現にバリエーションがあることから、
+encodeRuleは長さの部分のエンコードも含むことにする。
+ただしタグの部分は一意に決まるので、ここはクラス関数外にくくり出すことにした。
+</p>
+
+<h2>encode関数</h2>
+
+<pre><code>encode :: Ber b =&gt; b -&gt; BS.ByteString
+encode b = encodeTag (getAsn1Tag b) `append` encodeRule b</code></pre>
+
+<h2>RawConstructedのデータ型にエンコード関数を追加する</h2>
+
+<pre><code>data RawConstructed = RawConstructed
+	(Maybe (RawConstructed -&gt; BS.ByteString))
+	Asn1Tag [BerBox]</code></pre>
+
+<h2>Derクラス</h2>
+
+<p>
+Derクラスは値に対してDerエンコード関数を設定する方法を定義する。
+</p>
+
+<pre><code>class Der d where
+	setDerRule :: b -&gt; b</code></pre>
+
+<h2>RawConstructedの値にエンコード関数を設定する</h2>
+
+<p>無限後退の予感:-(</p>
+
+<h2>やめたやめた</h2>
+
+<p>
+この路線ではうまくいかない。
+たいていにおいてデコードとエンコードはうまくペアにならないのだ。
+それならば、デコードの結果専用の型とエンコード専用の型を作って、
+デコード専用の型から型Tへの変換関数と、
+型Tからエンコード専用の型への変換関数を作るほうが良さそうだ。
+</p>
+
+<p>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential"
+	>「存在型を利用」トップへ</a>
+</p>

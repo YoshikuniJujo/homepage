@@ -1,0 +1,145 @@
+X.690: ASN.1のBER方式の共通部分の存在型を利用したコーディング: エンコード
+
+<p>(工事中 10%)</p>
+
+<h2>動機</h2>
+
+<p>
+たいていにおいてデコードよりもエンコードの方が簡単だ。
+しかし、エンコード後のデータの形を指定しようとすると、
+エンコードはとたんに難しくなる。
+デコードのついでにエンコードなんて「ちょいちょい」と作ってしまおうと考えていたが、
+そうもいかないようなので、本腰を入れて作ることにした。
+</p>
+
+<h2>encodeTag, encodeLength</h2>
+
+<p>まずは前に定義したencodeTagとencodeLengthを別モジュールに分けておく。</p>
+
+<p>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential/Asn1Tag.hs"
+	>Asn1Tag.hs</a>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential/BasicEncoder.hs"
+	>BasicEncoder.hs</a>
+</p>
+
+<p>
+encodeLengthのほうは最小桁数を示すMaybe Integerを引数として取るように、
+変更する必要がある。
+</p>
+
+<h2>encodeLengthの変更</h2>
+
+<p>
+長さについては何通りかの選択子がある。
+</p>
+
+<ul>
+<li>長さを指定しない(終了型で終了させる)</li>
+<li>128未満では全体で1バイトで表現可</li>
+<li>最低限必要なバイト数から126桁までの長さを表す値の桁数</li>
+</ul>
+
+<p>
+長さを指定するかしないかについては長さの値をMaybe Integerとすることで対応する。
+「全体を1バイトで表現」を0とし、
+長さを表す値の桁数を別に引数として与える。
+それを最低限の桁数として扱う。
+</p>
+
+<p>
+与えた値が0ならばもともとのencodeLengthと同じような動作とする。
+</p>
+
+<p>
+そうでない場合は以下のような動作をさせる。
+まずはIntegerをバイト列で表現する。
+そのバイト列の長さと引数として与えた値とを比較して、
+長いほうを採用し、引数として与えた値のほうが大きければ、
+適切にパディングする。
+</p>
+
+<pre><code>encodeLength :: Int -&gt; Maybe Integer -&gt; ByteString
+encodeLength _ (Just l)
+	| l &lt; 0 = error "No negative length"
+encodeLength 0 (Just l)
+	| l &lt; 128 = pack [fromIntegral l]
+	| otherwise = pack $
+		(0x80 .|. fromIntegral (length ws)) : ws
+	where
+	ws = reverse $ integerToWord8s l
+encodeLength n (Just l)
+	| ln &gt;= n = pack $
+		(0x80 .|. fromIntegral ln) : ws
+	| otherwise = pack $ (0x80 .|. fromIntegral n) :
+		replicate (n - ln) 0x00 ++ ws
+	where
+	ws = reverse $ integerToWord8s l
+	ln = length ws
+encodeLength _ _ = "\x80"</code></pre>
+
+<pre><code>integerToWord8s :: Integer -&gt; [Word8]
+integerToWord8s 0 = []
+integerToWord8s n = fromIntegral (n .&amp;. 0xff) :
+	integerToWord8s (n `shiftR` 8)</code></pre>
+
+<h2>注意点</h2>
+
+<p>
+CER方式では1000バイトを越えるかどうかで、PrimitiveかConstructedかを
+決定するアルゴリズムが必要な箇所がある。
+</p>
+
+<h2>形式の指定子を表すデータ型</h2>
+
+<p>
+以下のどれを選択するかを決める必要がある。
+</p>
+
+<ul>
+<li>PrimitiveかConstructedか
+	<ul>
+	<li>これはPrimitiveの場合のデータ長から決定する必要がある</li>
+	</ul></li>
+<li>Constructedならば長さを指定するかどうか</li>
+<li>長さを指定するならば長さを表す値の桁数の最小限</li>
+</ul>
+
+<p>
+また、これは樹構造を取れる必要がある。
+以下のような指定子を定義してみる。
+</p>
+
+<pre><code>type TypeNumber = Integer</code></pre>
+
+<pre><code>data Sel
+	= SelPrimitive
+	| SelConstructed (Maybe Int) [Selector]</code></pre>
+
+<pre><code>data Selector = Selector
+	(TypeNumber -&gt; Integer -&gt; Sel)</code></pre>
+
+<p>リストは子要素に対して適用する指定子を示す。</p>
+
+<h2>BerEncodeクラスを定義してみる</h2>
+
+<p>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential/Encoder.hs"
+	>Encoder.hs</a>
+</p>
+
+<pre><code>class BerEncode b where
+	encode :: Selector -&gt; b -&gt; ByteString</code></pre>
+
+<h2>Bool型をエンコードしてみる</h2>
+
+<h3>インスタンス宣言</h3>
+
+<pre><code></code></pre>
+
+<h3>試してみる</h3>
+
+<p>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential"
+	>「存在型を利用」トップへ</a>
+</p>
