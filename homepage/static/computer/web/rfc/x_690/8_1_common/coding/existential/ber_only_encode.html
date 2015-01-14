@@ -116,12 +116,11 @@ CER方式では1000バイトを越えるかどうかで、PrimitiveかConstructe
 	= SelPrimitive
 	| SelConstructed (Maybe Int) [Selector]</code></pre>
 
-<pre><code>data Selector = Selector
-	(TypeNumber -&gt; Integer -&gt; Sel)</code></pre>
+<pre><code>data Selector = Selector (TypeNumber -&gt; Integer -&gt; Sel)</code></pre>
 
 <p>リストは子要素に対して適用する指定子を示す。</p>
 
-<h2>BerEncodeクラスを定義してみる</h2>
+<h2>BerEncodeクラスの定義</h2>
 
 <p>
 <a href="/computer/web/rfc/x_690/8_1_common/coding/existential/Encoder.hs"
@@ -131,13 +130,122 @@ CER方式では1000バイトを越えるかどうかで、PrimitiveかConstructe
 <pre><code>class BerEncode b where
 	encode :: Selector -&gt; b -&gt; ByteString</code></pre>
 
-<h2>Bool型をエンコードしてみる</h2>
+<h2>Bool型のエンコード</h2>
 
 <h3>インスタンス宣言</h3>
 
-<pre><code></code></pre>
+<pre><code>instance BerEncode Bool where
+	encode _ b = encodeTag
+			(Asn1Tag Universal Primitive 1)
+		`append` encodeLength 0 (Just 1)
+		`append` (if b then "\xff" else "\x00")</code></pre>
 
 <h3>試してみる</h3>
+
+<pre><code>% ghci Encoder.hs
+Encoder&gt; encode Undefined True
+"\SOH\SOH\255"
+Encoder&gt; encode Undefined False
+"\SOH\SOH\NUL"</code></pre>
+
+<h2>Integer型のエンコード</h2>
+
+<h3>インスタンス宣言</h3>
+
+<pre><code>instance BerEncode Integer where
+	encode _ n = encodeTag
+			(Asn1 Universal Primitive 2)
+		`append` encodeLength 0
+			(Just . fromIntegral $ length bs)
+		`append` bs
+		where
+		bs = integerToBS n</code></pre>
+
+<pre><code>integerToBS :: Integer -&gt; ByteString
+integerToBS n = BS.pack $ if testBit b 7 then 0 : s else s
+	where
+	s@(b : _) | 0 &lt;- n = [0] | otherwise =
+		reverse $ integerToWord8s n</code></pre>
+
+<h3>試してみる</h3>
+
+<pre><code>ghci Encoder.hs
+Encoder&gt; encode undefined 0x7f
+"\STX\SOH\DEL"
+Encoder&gt; encode undefined 0x80
+"\STX\STX\NUL\128"
+Encoder&gt; encode undefined 0x8080
+"\STX\ETX\NUL\128\128"</code></pre>
+
+<h2>リストのエンコード</h2>
+
+<h3>インスタンス宣言</h3>
+
+<pre><code>instance BerEncode b =&gt; BerEncode [b] where
+	encode (Selector sel) cs = encodeTag
+			(Asn1Tag Universal Constructed 16)
+		`append` case sel 16 undefined of
+			SelConstructed (Just n) sels -&gt;
+				encodeSequenceD n sels cs
+			SelConstructed _ sels -&gt;
+				encodeSequenceU sels cs
+			_ -&gt; error "Bad selector"</code></pre>
+
+<pre><code>encodeSequenceD :: BerEncode b =&gt;
+	Int -&gt; [Selector] -&gt; [b] -&gt; BS.ByteString
+encodeSequencdD n sels cs = encodeLength n
+	(Just . formIntegral $ length bs) `append` bs
+	where
+	bs = concat $ zipWith encode sels cs</code></pre>
+
+<pre><code>encodeSequenceU :: BerEncode b =&gt;
+	[Selector] -&gt; [b] -&gt; BS.ByteString
+encodeSequenceU sels cs = encodeLength 0 Nothing
+	`append` bs `append` "\x00\x00"
+	where
+	bs = concat $ zipWith encode sels cs</code></pre>
+
+<h3>テスト用の指定子の定義</h3>
+
+<pre><code>testSel, testSel2 :: Selector
+testSel = Selector $ \t _ -&gt; case t of
+	1 -&gt; SelPrimitive
+	2 -&gt; SelPrimitive
+	16 -&gt; SelConstructed (Just 0) $ repeat testSel
+	_ -&gt; error "not yet defined"
+testSel2 = Selector $ \t _ -&gt; case t of
+	1 -&gt; SelPrimitive
+	2 -&gt; SelPrimitive
+	16 -&gt; SelConstructed Nothing $ repeat testSel2
+	_ -&gt; error "not yet defined"</code></pre>
+
+<h3>試してみる</h3>
+
+<pre><code>ghci Encoder.hs
+Encoder&gt; encode testSel [0x7e, 0x7f]
+"0\ACK\STX\SOH~\STX\SOH\DEL"
+Encoder&gt; encode testSel2 [0x7e, 0x7f]
+"0\128\STX\SOH~\STX\SOH\DEL\NUL\NUL"
+Encoder&gt; encode testSel [True, False]
+"0\ACK\SOH\SOH\255\SOH\SOH\NUL"
+Encoder&gt; encode testSel2 [True, False]
+"0\128\SOH\SOH\255\SOH\SOH\NUL\NUL\NUL"</code></pre>
+
+<h2>BerBoxの定義</h2>
+
+<h3>インスタンス宣言</h3>
+
+<pre><code>data BerBox =
+	forall b . (Typeable b, BerEncode b) =&gt; BerBox b</code></pre>
+
+<pre><code>instance BerEncode BerBox where
+	encode s (BerBox b) = encode s b</code></pre>
+
+<h3>試してみる</h3>
+
+<pre><code>% ghci Encoder.hs
+Encoder&gt; encode testSel [BerBox 0x7f, BerBox True]
+"0\ACK\STX\SOH\DEL\SOH\SOH\255"</code></pre>
 
 <p>
 <a href="/computer/web/rfc/x_690/8_1_common/coding/existential"
