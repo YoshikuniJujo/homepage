@@ -1,0 +1,148 @@
+X.690: ASN.1のBER方式の共通部分の存在型を利用したコーディング: デコード
+
+<h2>decodeTag, decodeLength関数</h2>
+
+<p>
+decodeTagとdecodeLength関数を含む独立したモジュールを作成。
+</p>
+
+<p>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential/BasicDecoder.hs"
+	>BasicDecoder.hs</a>
+</p>
+
+<h2>BerDecodeクラス</h2>
+
+<p>
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential/Decoder.hs"
+	>Decoder.hs</a>
+</p>
+
+<pre><code>class BerDecode a where
+	getAsn1Tag :: a -&gt; Asn1Tag
+	decodeRule :: a -&gt; Rule</code></pre>
+
+<pre><code>data Rule = Rule { runRule :: RuleType }</code></pre>
+
+<pre><code>type RuleType = [Rule] -&gt; Asn1Tag -&gt; Maybe Integer -&gt;
+	Maybe (Analyzer ByteString BerDecodeBox)</code></pre>
+
+<h2>デコード関数</h2>
+
+<pre><code>decodeWith :: [Rule] -&gt; Analyzer ByteString BerDecodeBox
+decodeWith rl = do
+	t &lt;- decodeTag
+	l &lt;- decodeLength
+	fromJust . fromJust . find isJust $
+		map (($ l) . ($ t) . ($ rl) . runRule) rl</code></pre>
+
+<h2>BerDecodeBoxの定義</h2>
+
+<pre><code>data BerDecodeBox = forall a .
+	(Typeable a, BerDecode a) =&gt; BerDecodeBox a
+	deriving Typeable</code></pre>
+
+<pre><code>instance BerDecode BerDecodeBox where
+	getAsn1Tag (BerDecodeBox a) = getAsn1Tag a
+	decodeRule (BerDecodeBox a) = decodeRule a</code></pre>
+
+<pre><code>getBerDecode :: Typeable a =&gt; BerDecodeBox -&gt; Maybe a
+getBerDecode (BerDecodeBox a) = cast a</code></pre>
+
+<h2>基本的な型の定義</h2>
+
+<h3>Raw</h3>
+
+<pre><code>data Raw = Raw Asn1Tag ByteString
+	deriving (Show, Typeable)</code></pre>
+
+<pre><code>instance BerDecode Raw where
+	getAsn1Tag (Raw t _) = t
+	decodeRule _ = Rule rawRule</code></pre>
+
+<pre><code>rawRule :: RuleType
+rawRule _ t (Just l) =
+	Just $ BerDecodeBox . Raw t &lt;$&gt; tokens l
+rawRule _ _ _ = Just $ fail "Raw needs length"</code></pre>
+
+<h3>RawBytes</h3>
+
+<pre><code>data RawBytes = RawBytes ByteString
+	deriving (Show, Typeable)</code></pre>
+
+<pre><code>instance BerDecode RawBytes where
+	getAsn1Tag (RawBytes bs)
+		| Right (t, _) &lt;-
+			runAnalyzer decodeTag bs in t
+		| otherwise = error "Bad RawBytes"
+	decodeRule _ = Rule rawBytesRule</code></pre>
+
+<pre><code>rawBytesRule :: RuleType
+rawBytesRule _ t (Just l) =
+	Just $ BerDecodeBox . RawBytes &lt;$&gt; do
+		bs &lt;- tokens l
+		return $ encodeTag t
+			`append` encodeLength 0 (Just .
+				fromIntegral $ length bs)
+			`append` bs
+rawBytesRule _ _ _ = Just $ fail "RawBytes needs length"</code></pre>
+
+<h3>RawConstructed</h3>
+
+<pre><code>data RawConstructed = RawConstructed Asn1Tag [BerDecodeBox]
+	deriving Typeable</code></pre>
+
+<pre><code>instance Show RawConstructed where
+	showsPrec d (RawConstructed t _) =
+		showParen (d &gt; 10) $
+			showString "RawConstructed " .
+			showsPrec 11 t . showString " [...]"</code></pre>
+
+<pre><code>instance BerDecode RawConstructed where
+	getAsn1Tag (RawConstructed t _) = t
+	decodeRule _ = Rule rcRule</code></pre>
+
+<pre><code>rcRule :: RuleType
+rcRule _ (Asn1Tag Universal Primitive 0) (Just l)
+	| l /= 0 = fail "Bad end-of-contents"
+rcRule _ (Asn1Tag Universal Primitive 0) Nothing =
+	fail "Bad end-of-contents"
+rcRule r t@(Asn1Tag _ Constructed _) (Just l) = Just $ do
+	s &lt;- tokens l
+	let eas = runAnalyzer (listAll $ decodeWith r) s
+	case eas of
+		Left em -&gt; fail em
+		Right (as, "") -&gt; return .
+			BerDecodeBox $ RawConstructed t as
+		_ -&gt; error "never occur"
+rcRule r t@(Asn1Tag _ Constructed _) _ = Just $ do
+	as &lt;- loopWhileM notEndOfContents $ decodeWith r
+	return . BerDecodeBox $ RawConstructed t as
+rcRule _ _ _ = fail "Primitive needs length"</code></pre>
+
+<pre><code>loopWhileM :: Monad m =&gt; (a -&gt; Bool) -&gt; m a -&gt; m [a]
+loopWhileM p m = m &gt;&gt;= \x -&gt; if p x
+	then (x :) `liftM` loopWhileM p m
+	else return []</code></pre>
+
+<pre><code>notEndOfContents :: BerDecodeBox -&gt; Bool
+notEndOfContents =
+	(/= Asn1Tag Universal Primitive 0) . getAsn1Tag</code></pre>
+
+<h2>試してみる</h2>
+
+<pre><code>% ghci <a
+href="/computer/web/rfc/x_690/8_1_common/coding/existential/testDecoder.hs"
+	>testDecoder.hs</a>
+Decoder&gt; :set -XOverloadedStrings
+Decoder&gt; let Right (ab, "") = runAnalyzer (decodeWith
+[decodeRule (undefined :: RawConstructed), decodeRule
+(undefined :: Raw)] cert
+Decoder&gt; toRw ab
+RC (Asn1Tag Universal Constructed 16) ...</code></pre>
+
+<p>
+「」へもどる
+<a href="/computer/web/rfc/x_690/8_1_common/coding/existential"
+	>「存在型を利用」トップへ</a>
+</p>

@@ -1,7 +1,5 @@
 X.690: ASN.1のBER方式の共通部分の存在型を利用したコーディング: エンコード
 
-<p>(工事中 10%)</p>
-
 <h2>動機</h2>
 
 <p>
@@ -231,20 +229,20 @@ Encoder&gt; encode testSel [True, False]
 Encoder&gt; encode testSel2 [True, False]
 "0\128\SOH\SOH\255\SOH\SOH\NUL\NUL\NUL"</code></pre>
 
-<h2>BerBoxの定義</h2>
+<h2>BerEncodeBoxの定義</h2>
 
 <h3>インスタンス宣言</h3>
 
-<pre><code>data BerBox =
-	forall b . (Typeable b, BerEncode b) =&gt; BerBox b</code></pre>
+<pre><code>data BerEncodeBox =
+	forall b . (Typeable b, BerEncode b) =&gt; BerEncodeBox b</code></pre>
 
-<pre><code>instance BerEncode BerBox where
-	encode s (BerBox b) = encode s b</code></pre>
+<pre><code>instance BerEncode BerEncodeBox where
+	encode s (BerEncodeBox b) = encode s b</code></pre>
 
 <h3>試してみる</h3>
 
 <pre><code>% ghci Encoder.hs
-Encoder&gt; encode testSel [BerBox 0x7f, BerBox True]
+Encoder&gt; encode testSel [BerEncodeBox 0x7f, BerEncodeBox True]
 "0\ACK\STX\SOH\DEL\SOH\SOH\255"</code></pre>
 
 <p>
