@@ -3,7 +3,6 @@
 module ListLike (ListLike(..), null, span) where
 
 import Prelude hiding (splitAt, null, span)
-import qualified Prelude as P
 
 import Data.Maybe (isNothing)
 import Data.Word8 (Word8)

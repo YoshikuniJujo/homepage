@@ -41,6 +41,23 @@ href="/computer/web/rfc/x_690/8_1_common/coding/existential/make_modules/test_AS
 	>test_ASN_1_cert.der</a>
 </p>
 
+<h2>エクスポートする型、関数、値について検討</h2>
+
+<p>
+モジュールのインターフェースとなる部分を検討していく。
+Ber.hsモジュールのエクスポートリストの部分を見てみる。
+</p>
+
+<pre><code>module Ber (
+	Asn1Tag(..), TagClass(..), DataClass(..),
+	runAnalyzer,
+	BerDecode(..), BerDecodeBox(..), getBerDecode,
+	Rule(..), RuleType, decodeWith,
+	Raw(..), RawBytes(..), RawConstructed(..),
+	BerEncode(..), BerEncodeBox(..),
+	Selector(..), Sel(..), testSel, testSel2,
+	) where</code></pre>
+
 <p>
 <a href="/computer/web/rfc/x_690/8_1_common/coding/existential"
 	>「存在型を利用」トップへ</a>
