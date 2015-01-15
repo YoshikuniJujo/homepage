@@ -1,0 +1,134 @@
+バイナリ解析器: リファクタリング
+
+<p>(工事中 10%)</p>
+
+<h2>動機</h2>
+
+<p>
+コードを書いていると、いろいろと汚ない部分が出てくる。
+パッケージ化する前に、全体的に見ながらきれいにしていきたい。
+バグが見つかることもある。
+</p>
+
+<h2>流れ</h2>
+
+<p>
+まずは-Wallによる警告をつぶしていく。
+そしてhlintによる警告を消す。
+その後はコードを一行ずつ検討していく。
+とくにコードを作成しているときにはimportリストを省略してしまうが、
+公開するコードではimportリストをきちんと明示するか、
+あるいはqualifiedな形でimportするべきだ。
+</p>
+
+<p>
+型や値、関数の名前についても検討する必要がある。
+また、パッケージ名やモジュール名、モジュール構造についても考える必要がある。
+</p>
+
+<h2>-Wallとhlintによる警告をチェック</h2>
+
+<pre><code>% ghci -Wall testAnalyzer.hs
+(特に警告はない)</code></pre>
+
+<pre><code>% hlint .
+No suggestion</code></pre>
+
+<p>特に問題ないようだ。</p>
+
+<h2>ListLikeモジュールのリファクタリング</h2>
+
+<p><a href="/computer/haskell/coding/binary_analyzer/package/ListLike.hs"
+	>ListLike.hs</a></p>
+
+<h3>エクスポートリストのリファクタリング</h3>
+
+<pre><code>module ListLike (ListLike(..), null, span) where</code></pre>
+
+<p>
+特に問題ない。
+ListLike(..)の部分ではListLikeのクラス関数がエクスポートされている。
+Element型族と以下の関数だ。
+</p>
+
+<ul>
+<li>empty</li>
+<li>cons</li>
+<li>uncons</li>
+<li>splitAt</li>
+</ul>
+
+<p>基本的にリストやByteStringの関数名を参考にしたので特に問題ないだろう。</p>
+
+<h3>インポートリストのリファクタリング</h3>
+
+<p>特に問題ない。</p>
+
+<h3>全体の構成についてのリファクタリング</h3>
+
+<p>
+初めにクラス宣言が来て、次にリスト、バイト列のインスタンス宣言が来ている。
+続いてnull関数とspan関数の定義。
+問題なさそうだ。
+</p>
+
+<h3>クラス宣言のリファクタリング</h3>
+
+<p>
+Element型族やempty, cons, uncons関数に関しては問題ない。
+splitAt関数のデフォルト定義をすこし見ていくことにする。
+</p>
+
+<pre><code>	splitAt n xs | n &lt;= 0 = (empty, xs) | otherwise =
+		case uncons xs of
+			Just (h, t) -&gt; let
+				(u, v) = splitAt (n - 1) t
+				in (cons h u, v)
+			_ -&gt; (empty, empty)</code></pre>
+
+<p>
+Haskellではタブの使用は推奨されていないようだが、
+<a href="https://www.kernel.org/doc/Documentation/CodingStyle"
+>リーナス・トーバルズの書いたコーディング規約</a>を
+読んでから僕は8文字タブ派だ。
+また、もちろん可読性も十分考慮したうえでということだが、
+できるだけ小さな長方形にコードが入るようにしたい。
+そこで、n &lt;= 0のガードを関数名と同じ行にし、
+また横60文字に納まるようにinを(u, v) = ...の行と分けた。
+</p>
+
+<h3>インスタンス宣言のリファクタリング</h3>
+
+<p>特に問題ない。</p>
+
+<h3>問題定義部分のリファクタリング</h3>
+
+<p>span関数の形をすこし整えた。</p>
+
+<pre><code>span p s = case uncons s of
+	Just (h, t) | p h -&gt;
+		let (u, v) = span p t in (cons h u, v)
+	_ -&gt; (empty, s)</code></pre>
+
+<p>
+条件をチェックする関数である引数を受ける変数は一文字の場合pとすることが多い。
+premize(前提)あたりから、か。
+sはsequenceのs。
+sをh(head)とt(tail)に分けて、そのtをさらにuとvに分けている。
+uとvを使ったのはアルファベット順でtuvと続くことから。
+</p>
+
+<p>
+この時点でコード行数を数えてみる。
+空白行やエクスポートリストの部分は数に含めない。
+自分で作った<a href="https://hackage.haskell.org/package/hssourceinfo"
+>hssourceinfoパッケージ</a>を使う。
+</p>
+
+<pre><code>% hscodelines .
+testAnalyzer.hs				68
+ListLike.hs				35
+Analyzer.hs				44
+total					147</code></pre>
+
+<h2>Analyzerモジュールのリファクタリング</h2>
