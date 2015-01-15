@@ -41,7 +41,7 @@ No suggestion</code></pre>
 <p><a href="/computer/haskell/coding/binary_analyzer/package/ListLike.hs"
 	>ListLike.hs</a></p>
 
-<h3>エクスポートリストのリファクタリング</h3>
+<h3>エクスポートリスト</h3>
 
 <pre><code>module ListLike (ListLike(..), null, span) where</code></pre>
 
@@ -60,11 +60,11 @@ Element型族と以下の関数だ。
 
 <p>基本的にリストやByteStringの関数名を参考にしたので特に問題ないだろう。</p>
 
-<h3>インポートリストのリファクタリング</h3>
+<h3>インポートリスト</h3>
 
 <p>特に問題ない。</p>
 
-<h3>全体の構成についてのリファクタリング</h3>
+<h3>全体の構成について</h3>
 
 <p>
 初めにクラス宣言が来て、次にリスト、バイト列のインスタンス宣言が来ている。
@@ -72,7 +72,7 @@ Element型族と以下の関数だ。
 問題なさそうだ。
 </p>
 
-<h3>クラス宣言のリファクタリング</h3>
+<h3>クラス宣言</h3>
 
 <p>
 Element型族やempty, cons, uncons関数に関しては問題ない。
@@ -97,11 +97,11 @@ Haskellではタブの使用は推奨されていないようだが、
 また横60文字に納まるようにinを(u, v) = ...の行と分けた。
 </p>
 
-<h3>インスタンス宣言のリファクタリング</h3>
+<h3>インスタンス宣言</h3>
 
 <p>特に問題ない。</p>
 
-<h3>問題定義部分のリファクタリング</h3>
+<h3>関数定義部分</h3>
 
 <p>span関数の形をすこし整えた。</p>
 
@@ -132,3 +132,64 @@ Analyzer.hs				44
 total					147</code></pre>
 
 <h2>Analyzerモジュールのリファクタリング</h2>
+
+<p><a href="/computer/haskell/coding/binary_analyzer/package/Analyzer.hs"
+	>Analyzer.hs</a></p>
+
+<h3>エクスポートリスト</h3>
+
+<pre><code>module Analyzer (
+	Analyzer, runAnalyzer, eof, spot, token,
+	tokens, tokensWhile, listAll, listMap ) where</code></pre>
+
+<p>特に問題ないようだ。</p>
+
+<h3>インポートリスト</h3>
+
+<p>特に問題ないようだ。</p>
+
+<h3>全体の構成</h3>
+
+<p>
+Analyzer型を定義し、それをMonadのインスタンスにする。
+それを使ってFunctorやApplicativeのクラス関数を定義している。
+その後は関数定義が続く。
+</p>
+
+<p>構成に問題はないようだ。</p>
+
+<h3>Analyzer型の定義</h3>
+
+<pre><code>data Analyzer s a = Analyzer {
+	runAnalyzer :: s -&gt; Either String (a, s) }</code></pre>
+
+<p>
+(Analyzer s a)型の値は型sの並びからいくつか取り、
+そこから型aの値を取り出す関数。
+sはsequenceの意味。
+エラーが生じたら文字列で報告する。
+</p>
+
+<h3>インスタンス宣言</h3>
+
+<pre><code>instance Monad (Analyzer s) where
+	return = Analyzer . (Right .) . (,)
+	a &gt;&gt;= b = Analyzer $ \s -&gt;
+		case runAnalyzer a s of
+			Right (x, t) -&gt; runAnalyzer (b x) t
+			Left err -&gt; Left err
+	fail = Analyzer . const . Left</code></pre>
+
+<p>変数名等をいくつか変更した。</p>
+
+<h3>関数定義</h3>
+
+<pre><code>eof = Analyzer $ Right . ((,) &lt;$&gt; LL.null &lt;*&gt; id)</code></pre>
+
+<p>
+(f &lt;$&gt; a &lt;*&gt; b)のようにすると、
+\x -&gt; f (a x) (b x)をポイントフリースタイルで表現できる。
+bがidの場合は\x -&gt; f (a x) xということになる。
+</p>
+
+<pre><code>...</code></pre>
