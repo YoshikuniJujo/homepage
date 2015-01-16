@@ -88,6 +88,6 @@ decodeLengthN ::
 decodeLengthN n ln
 	| n >= 0x7f = fail $ "Der.decodeLengthN: " ++
 		"the value 0b11111111 shall not be used"
-	| n <= 0 = error "Indefinite form isn't implemented"
+	| n <= 0 = return ln
 	| otherwise = token >>= decodeLengthN (n - 1) .
 		(ln `shiftL` 8 .|.) . fromIntegral

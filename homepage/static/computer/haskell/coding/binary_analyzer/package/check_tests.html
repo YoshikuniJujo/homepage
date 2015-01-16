@@ -1,7 +1,5 @@
 バイナリ解析器: テスト用のファイルの見直し
 
-<p>(工事中 20%)</p>
-
 <h2>動機</h2>
 
 <p>
@@ -172,17 +170,66 @@ primitiveなデータのデコードは単に得た長さ分のByteStringを取�
 </p>
 
 <pre><code>decodeCnst :: Analyzer BS.ByteString [Asn1]
-decodeCnst ...</code></pre>
+decodeCnst = decodeLength &gt;&gt;= tokens &gt;&gt;= \bs -&gt;
+	case runAnalyzer decode bs of
+		Right (as, "") -&gt; return as
+		Left err -&gt; fail err
+		_ -&gt; error "Der.decodeCnst: never occur"</code></pre>
 
-<pre><code>decodeLength :: ...</code></pre>
+<p>
+取り出したByteStringを再帰的にdecodeしている。
+長さを指定して取り出したByteStringを明示的にデコードするためには、
+解析器にrunAnalyzerを適用して関数を取り出す必要がある。
+また、decodeはlistAllしているので、入力を消費しきらないで解析に成功することはない。
+よって、エラーメッセージを"never occur"としている。
+</p>
 
-<pre><code>decodeLengthN :: ...</code></pre>
+<pre><code>decodeLength :: Analyzer BS.ByteString Integer
+decodeLength = token &gt;&gt;= \w -&gt; if testBit w 7
+	then decodeLengthN (w .&amp;. 0x7f) 0
+	else return $ fromIntegral w</code></pre>
 
-<p>(作成中)</p>
+<p>
+1バイト読み出してその最上位ビットが1であれば、
+桁数を指定して続きのバイト列をデータ長として読み出す。
+そうでなければ、そのままの値がデータ長となる。
+</p>
+
+<pre><code>decodeLengthN ::
+	Word8 -&gt; Integer -&gt; Analyzer BS.ByteString Integer
+decodeLengthN n ln
+	| n &gt;= 0x7f = fail $ "Der.decodeLengthN: " ++
+		"the value 0b11111111 shall not be used"
+	| n &lt;= 0 = return ln
+	| otherwise = token &gt;&gt;= decodeLengthN (n - 1) .
+		(ln `shiftL` 8 .|.) . fromIntegral</code></pre>
+
+<p>
+前半部分はエラーチェック。
+後半は蓄積変数を8ビット左シフトした値に読み出した値を足している。
+</p>
 
 <h2>testDer.hs</h2>
 
-<p>(作成中)</p>
+<p><a href="/computer/haskell/coding/binary_analyzer/package/testDer.hs"
+	>testDer.hs</a></p>
+
+<p>
+unsafePerformIOを利用して、test_ASN_1_cert.derの内容をcert変数に格納している。
+</p>
+
+<h2>テストしてみる</h2>
+
+<pre><code>% runhaskell testDer.hs
+Right ([Asn1Cnst (Asn1Tag Universal Constructed 16)
+[Asn1Cnst (Asn1Tag Universal Constructed 16) [Asn1Cnst
+(Asn1Tag ContextSpecific Constructed 0) [Asn1Prim (Asn1Tag
+Universal Primitive 2) "\STX"],Asn1Prim (Asn1Tag Universal
+Primitive 2) "\NUL\132h\196s9h\163\132",Asn1Cnst (Asn1Tag
+<a
+href="/computer/haskell/coding/binary_analyzer/package/test_result.txt"
+>...</a>
+\236\141\236\200h\156\&amp;2\\M\239\200\155\186\ACK\172"]],"")</code></pre>
 
 <p>
 <a href="/computer/haskell/coding/binary_analyzer/package/refactoring.html"
