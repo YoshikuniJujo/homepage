@@ -7,6 +7,9 @@ import Control.Monad (liftM, ap)
 
 import qualified ListLike as LL
 
+moduleName :: String
+moduleName = "Analyzer"
+
 data Analyzer s a = Analyzer {
 	runAnalyzer :: s -> Either String (a, s) }
 
@@ -24,41 +27,41 @@ instance Functor (Analyzer s) where
 instance Applicative (Analyzer s) where
 	pure = return; (<*>) = ap
 
-eof :: LL.ListLike a => Analyzer a Bool
+eof :: LL.ListLike s => Analyzer s Bool
 eof = Analyzer $ Right . ((,) <$> LL.null <*> id)
 
-spot :: LL.ListLike a =>
-	(LL.Element a -> Bool) -> Analyzer a (LL.Element a)
+spot :: LL.ListLike s =>
+	(LL.Element s -> Bool) -> Analyzer s (LL.Element s)
 spot p = Analyzer $ \s -> case LL.uncons s of
 	Just (h, t) | p h -> Right (h, t)
-	_ -> Left "spot error"
+	_ -> Left $ moduleName ++ ".spot: parse error"
 
-token :: LL.ListLike a => Analyzer a (LL.Element a)
+token :: LL.ListLike s => Analyzer s (LL.Element s)
 token = spot $ const True
 
-tokens :: LL.ListLike a => Integer -> Analyzer a a
+tokens :: LL.ListLike s => Integer -> Analyzer s s
 tokens = Analyzer . (Right .) . LL.splitAt
 
-tokensWhile :: LL.ListLike a =>
-	(LL.Element a -> Bool) -> Analyzer a a
+tokensWhile :: LL.ListLike s =>
+	(LL.Element s -> Bool) -> Analyzer s s
 tokensWhile = Analyzer . (Right .) . LL.span
 
-listAll :: LL.ListLike a => Analyzer a b -> Analyzer a [b]
-listAll = loopWhile eof
+listAll :: LL.ListLike s => Analyzer s a -> Analyzer s [a]
+listAll = loopUntil eof
 
-loopWhile :: Monad m => m Bool -> m a -> m [a]
-loopWhile p m = do
+loopUntil :: Monad m => m Bool -> m a -> m [a]
+loopUntil p m = do
 	e <- p
 	if e then return [] else
-		(:) `liftM` m `ap` loopWhile p m
+		(:) `liftM` m `ap` loopUntil p m
 
 listMap :: LL.ListLike b =>
 	(a -> Analyzer b c) -> [a] -> Analyzer b [c]
-listMap = mapWhile eof
+listMap = mapUntil eof
 
-mapWhile :: Monad m => m Bool -> (a -> m b) -> [a] -> m [b]
-mapWhile _ _ [] = return []
-mapWhile p m (x : xs) = do
+mapUntil :: Monad m => m Bool -> (a -> m b) -> [a] -> m [b]
+mapUntil _ _ [] = return []
+mapUntil p m (x : xs) = do
 	e <- p
 	if e then return [] else
-		(:) `liftM` m x `ap` mapWhile p m xs
+		(:) `liftM` m x `ap` mapUntil p m xs

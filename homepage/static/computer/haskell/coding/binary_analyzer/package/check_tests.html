@@ -1,0 +1,128 @@
+バイナリ解析器: テスト用のファイルの見直し
+
+<p>(工事中 20%)</p>
+
+<h2>動機</h2>
+
+<p>
+バイナリ解析器のテストのためにASN.1のDER方式の簡単なデコーダを作成した。
+テストや用例として良い素材なので、読みやすくして、Analyzerパッケージの
+exampleとして付属させたい。
+十分短くできたなら.cabalファイルのdescriptionフィールドにも使えるかもしれない。
+</p>
+
+<p>
+また、デコード例のためのDER形式の証明書についても、
+作りかた等をリンクで示す等したい。
+</p>
+
+<h2>テスト用の証明書</h2>
+
+<p>
+<a href="/computer/web/rfc/x_690/example/test_ASN_1_cert.der"
+>test_ASN_1_cert.der</a>(<a
+href="/computer/web/rfc/x_690/example/test_ASN_1_cert.der.hex.txt"
+>16進ダンプ</a>)
+</p>
+
+<p>
+<a href="/computer/web/rfc/x_690/example"
+>「X.690: テスト用ファイルの作成」</a>参照。
+</p>
+
+<h2>テストコード</h2>
+
+<p>
+<a href="/computer/haskell/coding/binary_analyzer/package/testAnalyzer.hs"
+>testAnalyzer.hs</a>
+</p>
+
+<h3>インポート部分</h3>
+
+<p>インポートリストを明記する。</p>
+
+<h3>モジュールを分割</h3>
+
+<p>
+DERデコードライブラリの部分と、そのテストの部分とにモジュールを分割する。
+</p>
+
+<ul>
+<li><a href="/computer/haskell/coding/binary_analyzer/package/Der.hs"
+	>Der.hs</a></li>
+<li><a href="/computer/haskell/coding/binary_analyzer/package/testDer.hs"
+	>testDer.hs</a></li>
+</ul>
+
+<h2>Der.hs</h2>
+
+<h3>エクスポートリスト</h3>
+
+<pre><code>module Der (
+	Asn1(..), Asn1Tag(..), TagClass(..), DataClass(..),
+	decode ) where</code></pre>
+
+<p>
+デコード関数とデコードで返される値の型をエクスポートしている。
+runAnalyzerもエクスポートしても良いと思うが、
+ここでは使用者側でAnalyzerモジュールをインポートしてもらうことにした。
+</p>
+
+<h3>インポートリスト</h3>
+
+<p>特に問題ない。</p>
+
+<h3>データ型の定義</h3>
+
+<pre><code>data Asn1
+	= Asn1Cnst Asn1Tag [Asn1]
+	| Asn1Prim Asn1Tag BS.ByteString
+	deriving Show</code></pre>
+
+<p>
+比較的単純な樹構造のデータ型である。
+タグが付いている以外にはAsn1Cnstが節であり、
+Asn1Primが葉であるような樹構造。
+ちなみにAsn1Cnstは「ASN.1 Constructed」で
+Asn1Primは「ASN.1 Primitive」ということ。
+</p>
+
+<pre><code>data Asn1Tag
+	= Asn1Tag TagClass DataClass Integer
+	deriving Show</code></pre>
+
+<p>
+TagClassは4種類のうちどのクラスのタグかを指定する。
+DataClassはデータ部が再帰的にASN.1の構造を取っているか、
+単純なデータであるかを指定する。
+Integerはタグ番号であり、この番号でデータの型が指定される。
+タグ番号を表すデータ型を作成するか、型シノニムを定義しても良かったが、
+今回は省略した。
+</p>
+
+<p>TagClassとDataClassは単純な列挙型。</p>
+
+<h3>デコード関数の定義</h3>
+
+<h4>全体</h4>
+
+<p>(作成中)</p>
+
+<h4>タグ</h4>
+
+<p>(作成中)</p>
+
+<h4>データ</h4>
+
+<p>(作成中)</p>
+
+<h2>testDer.hs</h2>
+
+<p>(作成中)</p>
+
+<p>
+<a href="/computer/haskell/coding/binary_analyzer/package/refactoring.html"
+	>「リファクタリング」へもどる</a>
+<a href="/computer/haskell/coding/binary_analyzer/package"
+	>「パッケージの作成」トップへ</a>
+</p>

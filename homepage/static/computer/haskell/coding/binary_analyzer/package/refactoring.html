@@ -1,7 +1,5 @@
 バイナリ解析器: リファクタリング
 
-<p>(工事中 10%)</p>
-
 <h2>動機</h2>
 
 <p>
@@ -184,6 +182,14 @@ sはsequenceの意味。
 
 <h3>関数定義</h3>
 
+<pre><code>eof :: LL.ListLike s =&gt; Analyzer s Bool</code></pre>
+
+<p>
+Analyzer aをAnalyzer sにした。
+以降他の関数でも同様にaをsに変えた。
+sはsequenceの意味。
+</p>
+
 <pre><code>eof = Analyzer $ Right . ((,) &lt;$&gt; LL.null &lt;*&gt; id)</code></pre>
 
 <p>
@@ -192,4 +198,64 @@ sはsequenceの意味。
 bがidの場合は\x -&gt; f (a x) xということになる。
 </p>
 
-<pre><code>...</code></pre>
+<pre><code>spot p = Analyzer $ \s -&gt; case LL.uncons s of
+	Just (h, t) | p h -&gt; Right (h, t)
+	_ -&gt; Left "Analyzer.spot: parse error"</code></pre>
+
+<p>
+エラーメッセージをどうするか。
+とりあえず[モジュール名].[関数名]は必要だと思う。
+メッセージはたとえばparse errorとかで良いのかもしれない。
+エラーの生じた位置については、今のところは、保存しないことにする。
+</p>
+
+<pre><code>loopWhile p m = do
+	e &lt;- p
+	if e then return [] else
+		(:) `liftM` m `ap` loopWhile p m</code></pre>
+
+<p>
+これは問題だ。
+関数名と動作が逆になっている。
+loopUntilに名前を変える必要がある。
+</p>
+
+<pre><code>loopUntil p m = do
+	e &lt;- p
+	if e then return [] else
+		(:) `liftM` m `ap` loopUntil p m</code></pre>
+
+同様にmapWhileもmapUntilに改名する。
+
+<pre><code>mapUntil _ _ [] = return []
+mapUntil p m (x : xs) = do
+	e &lt;- p
+	if e then return [] else
+		(:) `liftM` m x `ap` mapUntil p m xs</code></pre>
+
+<h3>エラーメッセージのモジュール名について</h3>
+
+<p>
+エラーメッセージのモジュール名はモジュール構成を変えると変化するので、
+moduleNameという変数に束縛しておいたほうが良いかもしれない。
+</p>
+
+<p>
+以下のように定義しておく。
+</p>
+
+<pre><code>moduleName :: String
+moduleName = "Analyzer"</code></pre>
+
+<p>
+以下のように使用する。
+</p>
+
+<pre><code>	_ -&gt; Left $ moduleName ++ ".spot: parse error"</code></pre>
+
+<p>
+<a href="/computer/haskell/coding/binary_analyzer/package"
+	>「パッケージ化」トップへもどる</a>
+<a href="/computer/haskell/coding/binary_analyzer/package/check_tests.html"
+	>「テストの見直し (工事中 20%)」へ</a>
+</p>
