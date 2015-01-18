@@ -57,6 +57,20 @@ BSD2またはBSD3、そして作者と西暦年を指定するとLICENSEファ�
 "&lt;OWNER&gt;"や"&lt;YEAR&gt;"を置き換えるような関数を作成しよう。
 </p>
 
+<pre><code>transpose ::
+	[(String, String)] -&gt; String -&gt; Either String String
+transpose _ "" = return ""
+transpose tbl ('&lt;' : cs) = case span (/= '&gt;') cs of
+	(k, '&gt;' : r) -&gt; maybe
+		(fail $ "No such key: " ++ k)
+		((&lt;$&gt; transpose tbl r) . (++)) $ lookup k tbl
+	_ -&gt; fail "There are not '&gt;'"
+transpose tbl (c : cs) = (c :) &lt;$&gt; transpose tbl cs</code></pre>
+
+<p>
+(transpose関数の説明をここに入れる)
+</p>
+
 <p>
 <a href="/computer/haskell/coding">「コーディング」トップへもどる</a>
 </p>
