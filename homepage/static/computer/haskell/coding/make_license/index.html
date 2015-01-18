@@ -1,0 +1,62 @@
+コーディング: ライセンスファイルを作成する
+
+<p>(工事中 1%)</p>
+
+<p><a href="/computer/haskell/coding/make_license/makeLicense.hs"
+	>makeLicense.hs</a></p>
+
+<h2>動機</h2>
+
+<p>
+作者と西暦年を指定することでBSDライセンスの文書を作成するソフトウェアを作る。
+単純に文字列を置き換えればいいだけなので簡単だが、
+頭を休めるためには調度いい感じだ。
+</p>
+
+<h2>仕様</h2>
+
+<p>
+とりあえずBSD2とBSD3に対応する。
+BSD2またはBSD3、そして作者と西暦年を指定するとLICENSEファイルを作成するようにする。
+ただし、何も指定しなければ標準出力に出力するようにし、
+ファイルを指定するとそのファイルに出力するようにする。
+デフォルトのファイル名をLICENSEにするかどうかは考え中。
+</p>
+
+<h2>備考</h2>
+
+<p>
+非常に単純なプログラムなので、いろいろと本質的でない部分にこだわることにする。
+たとえばSystem.Console.GetOptを使う、等。
+</p>
+
+<h2>参照するリソース</h2>
+
+<ul>
+<li><a href="http://opensource.org/licenses/BSD-3-Clause"
+	>3条項BSDライセンスの雛形</a></li>
+<li><a href="http://opensource.org/licenses/BSD-2-Clause"
+	>2条項BSDライセンスの雛形</a></li>
+</ul>
+
+<h2>雛形の用意</h2>
+
+<p><a href="/computer/haskell/coding/make_license/template_bsd3.txt"
+	>template/bsd3.txt</a></p>
+
+<p>
+&lt;YEAR&gt;と&lt;OWNER&gt;とを残した3条項BSDライセンスの雛形を作成した。
+2条項BSDライセンスは3条目を消去することで作ることにする。
+</p>
+
+<h2>置換関数の作成</h2>
+
+<p>
+より一般的な関数を作成する。
+ここでは[("OWNER", "Yoshikuni"), ("YEAR", "2015")]といった引数を与えることで、
+"&lt;OWNER&gt;"や"&lt;YEAR&gt;"を置き換えるような関数を作成しよう。
+</p>
+
+<p>
+<a href="/computer/haskell/coding">「コーディング」トップへもどる</a>
+</p>
