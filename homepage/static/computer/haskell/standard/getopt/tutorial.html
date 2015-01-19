@@ -1,7 +1,5 @@
 GetOptモジュール: チュートリアル
 
-<p>(工事中 0%)</p>
-
 <h2>コマンドライン引数を入手する</h2>
 
 <p>
@@ -96,6 +94,9 @@ option `--o' is umbigous; could be one of:
 
 <h2>冗長なコピーコマンド: 引数を持つオプションの例</h2>
 
+<p><a href="/computer/haskell/standard/getopt/copy.hs"
+	>copy.hs</a></p>
+
 <h3>仕様</h3>
 
 <p>以下のように実行するコピーコマンドを作成する。</p>
@@ -110,7 +111,19 @@ option `--o' is umbigous; could be one of:
 
 <h3>Infile, Outfileデータ型の作成</h3>
 
+<p>
+オプションとして取得するためのデータ型を定義する。
+</p>
+
 <pre><code>data IOFile = Infile FilePath | Outfile FilePath</code></pre>
+
+<p>
+リストからInfileやOutfileを抽出するためにチェック関数を作成する。
+</p>
+
+<pre><code>isInfile, isOutfile :: IOFile -&gt; Bool
+isInfile (Infile _) = True; isInfile _ = False
+isOutfile (Outfile _) = True; isOutfile _ = False</code></pre>
 
 <h3>コピー関数の作成</h3>
 
@@ -118,14 +131,72 @@ option `--o' is umbigous; could be one of:
 	>System.Directory</a>を参照。</p>
 
 <pre><code>copy :: IOFile -&gt; IOFile -&gt; IO ()
-copy (Infile if) (Outfile of) = copyFile if of
+copy (Infile i) (Outfile o) = copyFile i o
 copy _ _ = error "You must copy from Infile to Outfile."</code></pre>
+
+<p>InfileからOutfileではないパターンはエラーとする。</p>
 
 <h3>オプションの解析</h3>
 
 <p>
 オプションを解析する関数を作成する。
 </p>
+
+<pre><code>option :: [String] -&gt; Either String [IOFile]
+option args = case getOpt RequireOrder [
+		Option ['i'] ["infile"]
+			(ReqArg Infile "file path")
+			"input file",
+		Option ['o'] ["outfile"]
+			(ReqArg Outfile "file path")
+			"output file"
+	args of
+	(ss, [], []) -&gt; Right ss
+	(_, as, []) -&gt; Left $
+		"Naked arguments: " ++ unwords as
+	(_, _, es) -&gt; Left $ concat es</code></pre>
+
+<p>
+ReqArgの引数としてInfileやOutfileを指定している。
+これによって返り値はInfile [ファイル名]やOutfile [ファイル名]のようになる。
+</p>
+
+<h3>リストから入力ファイル、出力ファイルを抽出</h3>
+
+<p>補助関数としてMaybe型をEither型に変換する関数を定義しておく。</p>
+
+<pre><code>maybeToEither :: String -&gt; Maybe a -&gt; Either String a
+maybeToEither _ (Just x) = Right x
+maybeToEither msg _ = Left msg</code></pre>
+
+<p>IOFileのリストからInfileとOutfileをひとつずつ抽出する。</p>
+
+<pre><code>getIOFiles :: [IOFile] -&gt; Either String (IOFile, IOFile)
+getIOFiles iofs = (,)
+	&lt;$&gt; maybeToEither
+		"No input files" (find isInfile iofs)
+	&lt;*&gt; maybeToEither
+		"No output files" (find isOutfile iofs)</code></pre>
+
+<h3>main関数</h3>
+
+<pre><code>main = do
+	args &lt;- getArgs
+	either putStrLn (uncurry copy) $
+		option args &gt;&gt;= getIOFiles</code></pre>
+
+<p>
+コマンドライン引数のオプションを処理し、入力用、出力用のファイル名を抽出する。
+オプションからそれらが抽出できなかった場合には、
+エラーメッセージを表示し、そうでなければcopy関数を適用する。
+</p>
+
+<h3>試してみる</h3>
+
+<pre><code>% echo 'Hello, world!' &gt; hello.txt
+% runhaskell copy.hs -i hello.txt -o copied.txt
+% cat copied.txt
+Hello, world!</code></pre>
 
 <p>
 <a href="/computer/haskell/standard/getopt/document.html"
