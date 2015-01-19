@@ -7,6 +7,8 @@
 
 <h2>置換関数の作成</h2>
 
+<h3>&lt;hoge&gt;の置換</h3>
+
 <p>
 より一般的な関数を作成する。
 ここでは[("OWNER", "Yoshikuni"), ("YEAR", "2015")]といった引数を与えることで、
@@ -33,6 +35,13 @@ transpose tbl (c : cs) = (c :) &lt;$&gt; transpose tbl cs</code></pre>
 <pre><code>% ghci makeLicense.hs
 Main&gt; transpose [("HL", "Hello"), ("WD", "world")] "&lt;HL&gt;, &lt;WD&gt;!"
 "Hello, World!"</code></pre>
+
+<h3>条件判断</h3>
+
+<p>
+&lt;if A=B&gt;...&lt;else&gt;...&lt;end&gt;のような形で条件判断ができるようにする。
+こうしておくとBSD2のときに3条項目を消去することができる。
+</p>
 
 <h2>雛形ファイルを用意</h2>
 
@@ -82,6 +91,20 @@ THE\nPOSSIBILITY OF SUCH DAMAGE.\n"</code></pre>
 	>「GetOptモジュールの説明」</a>を参照。</p>
 
 <h3>オプション</h3>
+
+<p>
+オプションの指定のしかたを決める。
+とりあえず以下のような感じで考えておく。
+</p>
+
+<pre><code>makeLicense
+-l(--license) BSD3
+-o(--owner) "Yoshikuni Jujo"
+-y(--year) 2015</code></pre>
+
+<p>
+また、出力ファイル名の指定は-f(--file) LICENSEのような感じにする。
+</p>
 
 <p>
 <a href="/computer/haskell/coding/make_license"
