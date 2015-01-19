@@ -2,9 +2,6 @@
 
 <p>(工事中 1%)</p>
 
-<p><a href="/computer/haskell/coding/make_license/makeLicense.hs"
-	>makeLicense.hs</a></p>
-
 <h2>動機</h2>
 
 <p>
@@ -48,37 +45,12 @@ BSD2またはBSD3、そして作者と西暦年を指定するとLICENSEファ�
 	>2条項BSDライセンスの雛形</a></li>
 </ul>
 
-<h2>雛形の用意</h2>
+<h2>作成</h2>
 
-<p><a href="/computer/haskell/coding/make_license/template_bsd3.txt"
-	>template/bsd3.txt</a></p>
-
-<p>
-&lt;YEAR&gt;と&lt;OWNER&gt;とを残した3条項BSDライセンスの雛形を作成した。
-2条項BSDライセンスは3条目を消去することで作ることにする。
-</p>
-
-<h2>置換関数の作成</h2>
-
-<p>
-より一般的な関数を作成する。
-ここでは[("OWNER", "Yoshikuni"), ("YEAR", "2015")]といった引数を与えることで、
-"&lt;OWNER&gt;"や"&lt;YEAR&gt;"を置き換えるような関数を作成しよう。
-</p>
-
-<pre><code>transpose ::
-	[(String, String)] -&gt; String -&gt; Either String String
-transpose _ "" = return ""
-transpose tbl ('&lt;' : cs) = case span (/= '&gt;') cs of
-	(k, '&gt;' : r) -&gt; maybe
-		(fail $ "No such key: " ++ k)
-		((&lt;$&gt; transpose tbl r) . (++)) $ lookup k tbl
-	_ -&gt; fail "There are not '&gt;'"
-transpose tbl (c : cs) = (c :) &lt;$&gt; transpose tbl cs</code></pre>
-
-<p>
-(transpose関数の説明をここに入れる)
-</p>
+<ul>
+<li><a href="/computer/haskell/coding/make_license/coding.html"
+	>コーディング</a> (工事中 5%)</li>
+</ul>
 
 <p>
 <a href="/computer/haskell/coding">「コーディング」トップへもどる</a>

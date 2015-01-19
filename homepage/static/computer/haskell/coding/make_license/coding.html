@@ -1,0 +1,90 @@
+ライセンスファイルを作成する: コーディング
+
+<p>(工事中 5%)</p>
+
+<p><a href="/computer/haskell/coding/make_license/makeLicense.hs"
+	>makeLicense.hs</a></p>
+
+<h2>置換関数の作成</h2>
+
+<p>
+より一般的な関数を作成する。
+ここでは[("OWNER", "Yoshikuni"), ("YEAR", "2015")]といった引数を与えることで、
+"&lt;OWNER&gt;"や"&lt;YEAR&gt;"を置き換えるような関数を作成しよう。
+</p>
+
+<pre><code>transpose ::
+	[(String, String)] -&gt; String -&gt; Either String String
+transpose _ "" = return ""
+transpose tbl ('&lt;' : cs) = case span (/= '&gt;') cs of
+	(k, '&gt;' : r) -&gt; maybe
+		(fail $ "No such key: " ++ k)
+		((&lt;$&gt; transpose tbl r) . (++)) $ lookup k tbl
+	_ -&gt; fail "There are not '&gt;'"
+transpose tbl (c : cs) = (c :) &lt;$&gt; transpose tbl cs</code></pre>
+
+<p>
+'&lt;'があったら'&gt;'までを読み込み、それをキーとして辞書を引く。
+残りの文字列もtransposeを行い、辞書から引いた値と結合する。
+</p>
+
+<p>試してみる。</p>
+
+<pre><code>% ghci makeLicense.hs
+Main&gt; transpose [("HL", "Hello"), ("WD", "world")] "&lt;HL&gt;, &lt;WD&gt;!"
+"Hello, World!"</code></pre>
+
+<h2>雛形ファイルを用意</h2>
+
+<p><a href="http://opensource.org/licenses/BSD-3-Clause"
+>3条項BSDライセンスの雛形</a>を参照。</p>
+
+<p>
+&lt;YEAR&gt;と&lt;OWNER&gt;とを残した3条項BSDライセンスの雛形を作成した。
+2条項BSDライセンスは3条目を消去することで作ることにする。
+</p>
+
+<p>
+作成した雛形ファイル: <a
+href="/computer/haskell/coding/make_license/templates_bsd3.txt"
+	>templates/bsd3.txt</a></p>
+
+<p>試してみる。</p>
+
+<pre><code>ghci makeLicense.hs
+Main&gt; t &lt;- readFile "templates/bsd3.txt"
+Main&gt; transpose [("YEAR", "2015"), ("OWNER", "Yoshikuni")] t
+Right "Copyright (x) 2015, Yoshikuni\nAll rights reserved.\n
+\nRedistribution and use in source and binary forms, with
+<a href="/computer/haskell/coding/make_license/result_1.txt"
+>...</a>
+THE\nPOSSIBILITY OF SUCH DAMAGE.\n"</code></pre>
+
+<h2>コマンドライン引数の取得</h2>
+
+<h3>何が必要か</h3>
+
+<p>
+まずはライセンスの種類を表す引数が必要。
+今のところはBSD2とBSD3のみに対応とする。
+また西暦年と所有者名も引数から与える必要がある。
+</p>
+
+<p>
+ライセンスの種類用に以下のようなデータ型を作成しておく。
+</p>
+
+<pre><code>data License = BSD2 | BSD3 deriving Show</code></pre>
+
+<h3>GetOptモジュール</h3>
+
+<p><a
+href="https://downloads.haskell.org/~ghc/latest/docs/html/libraries/base-4.7.0.2/System-Console-GetOpt.html"
+>System.Console.GetOptのドキュメント</a>を参照。</p>
+
+<h3>オプション</h3>
+
+<p>
+<a href="/computer/haskell/coding/make_license"
+	>「ライセンスファイルの作成」トップへもどる</a>
+</p>
