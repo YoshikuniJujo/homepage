@@ -1,0 +1,90 @@
+GetOptモジュール: ドキュメント
+
+<h2>getOpt関数</h2>
+
+<pre><code>getOpt ::
+	ArgOrder a -&gt;
+	[OptDescr a] -&gt;
+	[String] -&gt;
+	([a], [String], [String])</code></pre>
+
+<p>
+第1引数はオプション引数と非オプション引数がまざっても良いかどうかを指定する。
+以下のような値を取る。
+</p>
+
+<ul>
+<li>RequireOrder: オプションは非オプションの前のみに置ける</li>
+<li>Permute: オプションと非オプションはまざっていても良い</li>
+<li>ReturnInOrder (String -&gt; a):
+	与えられた関数で非オプションをオプションに変換する</li>
+</ul>
+
+<p>
+第2引数はそれぞれのオプションをどのように解析するかを決めるリスト。
+</p>
+
+<p>
+第3引数は実際のコマンドライン引数。
+</p>
+
+<p>
+返り値はそれぞれ、解析したオプションのリスト、非オプションのリスト、
+エラーメッセージのリスト、となる。
+</p>
+
+<h2>OptDescr</h2>
+
+<p>
+getOptの第2引数はOptDescr型の値となる。
+</p>
+
+<pre><code>data OptDescr a = Option [Char] [String] (ArgDescr a) String</code></pre>
+
+<p>
+第1引数は1文字オプションのリストで第2引数が1文字以上のオプションのリスト。
+たとえばOption ['a', 'b'] ["abc", "def"]のように指定した場合には、
+このOptDescrは'-a', '-b', '--abc', '--def'のような引数に対して適用される。
+</p>
+
+<p>
+これらのオプションをどのような値として解析するのかを決めるのが、
+第3引数のArgDescr a型の値である。
+</p>
+
+<p>
+第4引数は該当するオプションの説明。
+</p>
+
+<h2>ArgDescr</h2>
+
+<p>
+実際にオプションに対してどのような値を返すのかを指定する型。
+オプションに対して引数が必要かどうかによって3種類の値がある。
+</p>
+
+<ul>
+<li>NoArg a: 引数は不要で指定した値を返す</li>
+<li>ReqArg (String -&gt; a) String: 引数は必要でその引数から返す値を作成する</li>
+<li>OptArg (Maybe String -&gt; a) String: 引数を取っても良い。
+	引数がある場合はJust値から、無い場合はNothing値で返す値を作成する</li>
+</ul>
+
+<h2>getOpt'関数</h2>
+
+<p>
+返り値が([a], [String], [String], [String])となっている以外はgetOpt関数と同じ。
+タプルの3番目に認識できなかったオプション引数のリストを返す。
+</p>
+
+<h2>usageInfo関数</h2>
+
+<pre><code>usageInfo :: String -&gt; [OptDescr a] -&gt; String</code></pre>
+
+<p>
+第1引数のヘッダとともに使用法の表示のための文字列を返す。
+</p>
+
+<p>
+<a href="/computer/haskell/standard/getopt">「GetOptモジュール」トップへもどる</a>
+</p>
