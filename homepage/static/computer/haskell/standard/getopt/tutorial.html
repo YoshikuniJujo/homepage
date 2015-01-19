@@ -1,0 +1,135 @@
+GetOptモジュール: チュートリアル
+
+<p>(工事中 0%)</p>
+
+<h2>コマンドライン引数を入手する</h2>
+
+<p>
+解析する前にまずはコマンドライン引数を入手してみよう。
+コマンドライン引数を入手するにはSystem.EnvironmentモジュールのgetArgsを使う。
+</p>
+
+<pre><code>getArgs :: IO [String]</code></pre>
+
+<p>以下のようなファイルを試してみよう。</p>
+
+<pre><code>% cat <a href="/computer/haskell/standard/getopt/testArgs.hs"
+>testArgs.hs</a>
+import System.Environment
+
+main :: IO ()
+main = do
+	args &lt;- getArgs
+	print args
+% runhaskell testArgs.hs hello world
+["hello", "world"]</code></pre>
+
+<h2>OffとOn: 引数を持たないオプションの例</h2>
+
+<p><a href="/computer/haskell/standard/getopt/testOpt.hs"
+	>testOpt.hs</a></p>
+
+<h3>仕様を決める</h3>
+
+<p>
+オプションでOffとOnという2つの値のどちらかを指定できるようにする。
+Offは'-0'または'--off'で指定し、Onは'-1'または'--on'で指定する。
+はじめの非オプション引数の後はすべて非オプションとして扱うものとする。
+</p>
+
+<h3>OffとOnを持つデータ型を定義</h3>
+
+<p>
+Bool型を使っても良いが、
+意味をはっきりさせるためには独自のデータ型を定義したほうが良い。
+</p>
+
+<pre><code>data Switch = Off | On deriving Show</code></pre>
+
+<h3>option関数</h3>
+
+<p>
+オプションの処理をするoption関数を定義する。
+</p>
+
+<pre><code>option :: [String] -&gt; Either String ([Switch], [String])</code></pre>
+
+<p>
+コマンドライン引数を処理し、エラーが無ければ
+Right ([オプションのリスト], [オプション以外の引数])を返し、
+エラーが生じた場合にはエラー文字列をすべて結合した文字列を返すようにする。
+</p>
+
+<pre><code>option args = case getOpt RequireOrder [
+		Option ['0'] ["off"] (NoArg Off) "swith off",
+		Option ['1'] ["on"] (NoArg On) "swith on" ]
+	args of
+	(ss, as, []) -&gt; Right (ss, as)
+	(_, _, es) -&gt; Left $ concat es</code></pre>
+
+<h3>main関数の定義</h3>
+
+<pre><code>main = do
+	args &lt;- getArgs
+	case option args of
+		Right (ss, as) -&gt; putStrLn $
+			"OPTIONS: " ++ show ss ++ "\n" ++
+			"ARGS   : " ++ show as ++ "\n"</code></pre>
+
+<h3>試してみる</h3>
+
+<pre><code>% runhaskell testOpt.hs -1100 --on --off hige --on
+OPTIONS: [On, On, Off, Off, On, Off]
+ARGS   : ["hige", "--on"]
+% runhaskell testOpt.hs -1100 -1021 -123 --hoge --of hige --onn
+unrecognized option `-2'
+unrecognized option `-2'
+unrecognized option `-3'
+unrecognized option `--hoge'
+% runhaskell testOpt.hs --off --of --on
+OPTIONS: [Off, Off, On]
+ARGS   : []
+% runhaskell testOpt.hs --o
+option `--o' is umbigous; could be one of:
+  -0  --off  switch off
+  -1  --on   switch on</code></pre>
+
+<h2>冗長なコピーコマンド: 引数を持つオプションの例</h2>
+
+<h3>仕様</h3>
+
+<p>以下のように実行するコピーコマンドを作成する。</p>
+
+<pre><code>copy --infile foo.txt --outfile bar.txt</code></pre>
+<pre><code>copy -i foo.txt -o bar.txt</code></pre>
+
+<p>
+裸のコマンドライン引数があったらエラーとする。
+また入力ファイル、出力ファイルともに、最初に指定したもの以外は無視する。
+</p>
+
+<h3>Infile, Outfileデータ型の作成</h3>
+
+<pre><code>data IOFile = Infile FilePath | Outfile FilePath</code></pre>
+
+<h3>コピー関数の作成</h3>
+
+<p><a href="https://downloads.haskell.org/~ghc/latest/docs/html/libraries/directory-1.2.1.0/System-Directory.html"
+	>System.Directory</a>を参照。</p>
+
+<pre><code>copy :: IOFile -&gt; IOFile -&gt; IO ()
+copy (Infile if) (Outfile of) = copyFile if of
+copy _ _ = error "You must copy from Infile to Outfile."</code></pre>
+
+<h3>オプションの解析</h3>
+
+<p>
+オプションを解析する関数を作成する。
+</p>
+
+<p>
+<a href="/computer/haskell/standard/getopt/document.html"
+	>「ドキュメント」へもどる</a>
+<a href="/computer/haskell/standard/getopt"
+	>「GetOptモジュール」トップへ</a>
+</p>
