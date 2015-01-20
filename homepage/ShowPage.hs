@@ -49,9 +49,9 @@ testProducts = [
 		Product "Firefox" (Just "24.0") ], "PC"),
 	([
 		Product "Mozilla" (Just "5.0"),
-		ProductComment "Android; Mobile; rv:34.0",
-		Product "Gecko" (Just "34.0"),
-		Product "Firefox" (Just "34.0") ], "Phone")
+		ProductComment "Android; Mobile; rv:35.0",
+		Product "Gecko" (Just "35.0"),
+		Product "Firefox" (Just "35.0") ], "Phone")
 	]
 
 {-
