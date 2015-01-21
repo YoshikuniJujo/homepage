@@ -1,11 +1,9 @@
 文脈自由文法
 
-<p>(工事中 0%)</p>
+<h2>文脈自由文法とは</h2>
 
 <p><a href="https://ja.wikipedia.org/wiki/文脈自由文法"
 	>ウィキペディアの文脈自由文法の説明</a></p>
-
-<h2>文脈自由文法とは</h2>
 
 <p>
 構文解析の規則を表現する方法のひとつである。
@@ -28,6 +26,88 @@ wは構造やそれを構成する部品の列である。
 </p>
 
 <h2>バッカス・ナウア記法</h2>
+
+<p><a href="https://ja.wikipedia.org/wiki/バッカス・ナウア記法"
+	>ウィキペディアのバッカス・ナウア記法の説明</a></p>
+
+<p>
+表記法にはいくつかの変種があり、
+オリジナルのBNF以外ではEBNFやABNFが有名である。
+EBNFではBNFの記法上のいくつかの問題を解決し、
+またオプションやくりかえしといった表現を追加している。
+ここでは以下の記法のみを使うことにする。
+</p>
+
+<ul>
+<li>=: 定義</li>
+<li>;: 終端</li>
+<li>|: 選択</li>
+<li>,: 連結</li>
+<li>(): グループ化</li>
+<li>"": 終端文字</li>
+</ul>
+
+<h2>簡単な例</h2>
+
+<p>
+単純なくりかえし(正規文法の範囲)以上の再帰的な文法が定義できることの例として、
+aとbが同数ずつ並ぶような文字列を表現する文法を定義してみよう。
+この文法では、たとえば"ab"や"aaabbb"等が正しいとされる。
+</p>
+
+<h3>文法</h3>
+
+<pre><code>AB = "a" , AB , "b" | ""</code></pre>
+
+<h3>構文解析の例</h3>
+
+<p>aaabbbを構文解析してみよう。</p>
+
+<ol>
+<li>ABから始める</li>
+<li>ABは"a", AB, "b"となる</li>
+<li>そのABが"a", AB, "b"となる</li>
+<li>さらにそのABも"a", AB, "b"となる</li>
+<li>今後は規則の右側を使ってABが""となる</li>
+<li>最初のABをaaabbbに置き換えることができた</li>
+</ol>
+
+<h2>足し算、かけ算の例</h2>
+
+<h3>文法</h3>
+
+<p>
+これらを使って変数x, y, zを使った足し算とかけ算の文法を表記してみよう。
+</p>
+
+<ol>
+<li>EXPRESSION = TERM | EXPRESSION , "+", TERM;</li>
+<li>TERM = FACTOR | TERM , "*" , FACTOR;</li>
+<li>FACTOR = VARIABLE | "(" , EXPRESSION, ")";</li>
+<li>VARIABLE = "x" | "y" | "z";</li>
+</ol>
+
+<h3>構文解析の例</h3>
+
+<p>
+x+y*zを解析してみよう。
+</p>
+
+<ol>
+<li>EXPRESSIONから始める</li>
+<li>規則1の右側からEXPRESSION(1) , "+" , TERM(1)となる</li>
+<li>EXPRESSION(1)を規則1の左側でTERM(2)とする</li>
+<li>TERM(2)を規則2の左側でFACTOR(1)とする</li>
+<li>FACTOR(1)を規則3の左側でVARIABLE(1)とする</li>
+<li>VARIABLE(1)を規則4の左側で"x"とする</li>
+<li>TERM(1)を規則2の右側でTERM(3) "*" FACTOR(2)とする</li>
+<li>TERM(3)を規則2の右側でFACTOR(3)とする</li>
+<li>FACTOR(3)を規則3の左側でVARIABLE(2)とする</li>
+<li>VARIABLE(2)を規則4の真ん中で"y"とする</li>
+<li>FACTOR(2)を規則(3)の左側でVARIABLE(3)とする</li>
+<li>VARIABLE(3)を規則4の右側で"z"とする</li>
+<li>EXPRESSIONをx+y*zに置き換えることができた</li>
+</ol>
 
 <p>
 <a href="/computer/programming/algorithm/parse"
