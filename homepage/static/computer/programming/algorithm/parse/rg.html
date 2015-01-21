@@ -1,14 +1,12 @@
 正規文法
 
-<p>(工事中 5%)</p>
-
 <p><a href="https://ja.wikipedia.org/wiki/正規文法"
 	>ウィキペディアの正規文法の説明</a></p>
 
 <h2>正規文法とは</h2>
 
 <p>
-ざっくり言えば「単純な規則とそのくりかえしだけで作成できる文法」である。
+ざっくり言えば「文字列のくりかえしだけで作成できる文法」である。
 文脈自由文法より狭い範囲の文法であり、
 正規文法で表現できる文法はすべて文脈自由文法でも表現可能である。
 </p>
@@ -20,7 +18,7 @@
 <h3>右正規文法</h3>
 
 <p>
-以下のような文法。
+書き換え規則で書くと以下のようになる文法。
 </p>
 
 <pre><code>A -&gt; a
@@ -28,14 +26,14 @@ A -&gt; aB
 A -&gt; ε</code></pre>
 
 <p>
-空であるという規則の左側に要素をつけ加えていくことで生成される文法。
+規則の左側に要素をつけ加えていくことで生成される文法。
 再帰的な定義を使用することで単純なくりかえしが表現できる。
 </p>
 
 <h3>左正規文法</h3>
 
 <p>
-以下のような文法。
+書き換え規則で書くと以下のようになる文法。
 </p>
 
 <pre><code>A -&gt; a
@@ -43,7 +41,7 @@ A -&gt; Ba
 A -&gt; ε</code></pre>
 
 <p>
-空であるという規則の右側に要素をつけ加えていくことで生成される文法。
+規則の右側に要素をつけ加えていくことで生成される文法。
 </p>
 
 <h3>正規文法の左と右</h3>
@@ -59,6 +57,96 @@ A -&gt; ε</code></pre>
 
 <p><a href="https://ja.wikipedia.org/wiki/正規表現"
 	>ウィキペディアの正規表現の説明</a></p>
+
+<p>
+正規文法の範囲の言語を簡単に表現できる方法として正規表現がある。
+最近の正規表現は拡張されていて正規文法の範囲を越えた範囲まで
+表現できるようになっているが、ここでは単純なもののみを扱う。
+</p>
+
+<p>以下のような記号が使われる。</p>
+
+<ul>
+<li>|: 選言</li>
+<li>(): グループ分け</li>
+<li>?: 直前の表現が0または1個存在する</li>
+<li>*: 直前の表現が0個以上存在する</li>
+<li>+: 直前の表現が1個以上存在する</li>
+</ul>
+
+<p>
+例えば「(g|yah)o+(gle)?」は以下の文字列にマッチする。
+gogle, google, yahoo,gooooooo, yahoooooooogle。
+日本語で言えば「gまたはyahに続いて1個以上のoが来る。
+その後にgleが来ても来なくても良い」となる。
+</p>
+
+<h2>正規表現の書き換え規則への変換例</h2>
+
+<p>
+上記「(g|yah)o+(gle)?」を書き換え規則で書き直してみる。
+ここでは右正規文法のほうを使う。
+</p>
+
+<ol>
+<li>YAHOOGLE -&gt; g OOGLE</li>
+<li>YAHOOGLE -&gt; y AHOOGLE</li>
+<li>AHOOGLE -&gt; a HOOGLE</li>
+<li>HOOGLE -&gt; h OOGLE</li>
+<li>OOGLE -&gt; o OOGLE</li>
+<li>OOGLE -&gt; o GLE</li>
+<li>GLE -&gt; g LE</li>
+<li>LE -&gt; l E</li>
+<li>E -&gt; e</li>
+<li>GLE -&gt; ε</li>
+</ol>
+
+<p>
+gogleで置き換え規則を試してみよう。
+</p>
+
+<ol>
+<li>YAHOOGLEから開始する</li>
+<li>規則1からg OOGLEとなる</li>
+<li>OOGLEを規則6によってo GLEとする</li>
+<li>GLEを規則7でg LEとする</li>
+<li>LEを規則8でl Eとする</li>
+<li>Eを規則9でeとする</li>
+<li>YAHOOGLEを置き換え規則に従ってgogleにすることができた</li>
+</ol>
+
+次はgoで試してみる。
+
+<ol>
+<li>YAHOOGLEから開始する</li>
+<li>規則1からg OOGLEとなる</li>
+<li>OOGLEを規則6でo GLEとする</li>
+<li>GLEを規則10でε(空文字列)とする</li>
+<li>これでYAHOOGLEをgoに置き換えることができた</li>
+</ol>
+
+次はgooooで試してみよう。
+
+<ol>
+<li>YAHOOGLEから開始する</li>
+<li>規則1からg OOGLEとする</li>
+<li>OOGLEを規則5でo OOGLEとする</li>
+<li>OOGLEを規則5でo OOGLEとする</li>
+<li>OOGLEを規則5でo OOGLEとする</li>
+<li>OOGLEを規則6でo GLEとする</li>
+<li>GLEを規則10でε(空文字列)とする</li>
+<li>YHOOGLEをgooooに置き換えられた</li>
+</ol>
+
+<h2>オートマトンとの関係</h2>
+
+<p><a href="https://ja.wikipedia.org/wiki/チョムスキー階層"
+	>ウィキペディアのチョムスキー階層</a>を参照。</p>
+
+<p>
+正規文法は有限オートマトンに対応する。
+有限オートマトンについては後で説明のページを作成する予定。
+</p>
 
 <p>
 <a href="/computer/programming/algorithm/parse"
