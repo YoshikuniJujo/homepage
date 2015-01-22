@@ -2,12 +2,14 @@
 
 <p>(工事中 0%)</p>
 
-<p>
-<a href="https://ja.wikipedia.org/wiki/パックラット構文解析"
-	>ウィキペディアのパックラット構文解析の説明</a>
-<a href="http://ponjbogri.github.io/cll-ja/peg/peg_summary.txt"
-	>ロジバン関連で書かれたPEGの説明</a>
-</p>
+<ul>
+<li><a href="https://ja.wikipedia.org/wiki/パックラット構文解析"
+	>ウィキペディアのパックラット構文解析の説明</a></li>
+<li><a href="http://ponjbogri.github.io/cll-ja/peg/peg_summary.txt"
+	>ロジバン関連で書かれたPEGの説明</a></li>
+<li><a href="http://pdos.csail.mit.edu/~baford/packrat/thesis"
+	>pappy(Haskell製パックラットパーサ)の説明(英語)</a></li>
+</ul>
 
 <h2>パックラット構文解析とは</h2>
 
@@ -30,7 +32,71 @@ PEG文法は仮想的なコンピュータの動作に対応しているため�
 <p>
 パックラット構文解析による解析は、
 ひとつの表を作っていく作業と考えられる。
+その表は横が位置となり縦が文法規則となる。
 </p>
+
+<p>
+構文解析が終わったとき、その表は虫食い状態になっている。
+つまり、必要なマス目だけうめられるということ。
+</p>
+
+<h2>解析の例</h2>
+
+<p>
+4つのトークン、hello、goodBye、world、yoshikuniから成る列を解析する例を考える。
+文法は以下のようになっているものとする。
+</p>
+
+<pre><code>MESSAGE = GREETING NAME
+GREETING = hello / goodBye
+NAME = world / yoshikuni</code></pre>
+
+<p>
+このような文法でトークン列[hello, yoshikuni]を解析するとする。
+解析は以下の表を順にうめていく作業と考えることができる。
+</p>
+
+<table border="1">
+<tr><th>規則</th><th>位置1</th><th>位置2</th></tr>
+<tr><td>MESSAGE</td><td>(a)</td><td>(b)</td></tr>
+<tr><td>GREETING</td><td>(c)</td><td>(d)</td></tr>
+<tr><td>NAME</td><td>(e)</td><td>(f)</td></tr>
+</table>
+
+<p>
+位置はトークンの現れる場所を示す。
+[hello, yoshikuni]の例では位置1にはhelloがあり、位置2にはyoshikuniがある。
+それぞれのマスには解析結果が入る。
+全体の解析結果はMESSAGEという規則を列の先頭に適用した結果なので、
+(a)に入ることになる。
+</p>
+
+<ol>
+<li>求める結果は(a)に入る値ということになる</li>
+<li>MESSAGE規則ではGREETINGを位置1に適用する必要がある</li>
+<li>よって(c)の値が必要になる</li>
+<li>GREETINGはhelloを受け入れるので(c)の値はhelloとなる</li>
+<li>GREETINGはトークンを1つ消費したので位置を1つ進める</li>
+<li>MESSAGE規則の残りはNAMEを位置2に適用したものである</li>
+<li>これは(f)のマスに入る</li>
+<li>位置2にはyoshikuniがありNAMEはこれを受け入れる</li>
+<li>よって(f)はyoshikuniとなる</li>
+</ol>
+
+<p>上記の解析終了後に表は以下のようになる。</p>
+
+<table border="1">
+<tr><th>規則</th><th>位置1</th><th>位置2</th></tr>
+<tr><td>MESSAGE</td><td>hello yoshikuni</td><td>(b)</td></tr>
+<tr><td>GREETING</td><td>hello</td><td>(d)</td></tr>
+<tr><td>NAME</td><td>(e)</td><td>yoshikuni</td></tr>
+</table>
+
+<p>
+表の(b), (d), (e)はうめられていないことがポイントである。
+</p>
+
+<h2>解析例をHaskellで表現する</h2>
 
 <p>
 <a href="/computer/programming/algorithm/parse"
