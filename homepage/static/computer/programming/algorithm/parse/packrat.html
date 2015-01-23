@@ -1,7 +1,5 @@
 パックラット構文解析
 
-<p>(工事中 0%)</p>
-
 <ul>
 <li><a href="https://ja.wikipedia.org/wiki/パックラット構文解析"
 	>ウィキペディアのパックラット構文解析の説明</a></li>
@@ -97,6 +95,61 @@ NAME = world / yoshikuni</code></pre>
 </p>
 
 <h2>解析例をHaskellで表現する</h2>
+
+<p>
+Haskellの遅延性を生かすことで、このアルゴリズムは簡潔に書くことができる。
+このコードの説明は、また別のページで書いていく予定。
+</p>
+
+<pre><code>data Token
+	= Hello
+	| GoodBye
+	| World
+	| Yoshikuni</code></pre>
+
+<pre><code>data Result v
+	= Parsed v Derivs
+	| NoParse</code></pre>
+
+<pre><code>data Derivs = Derivs {
+	dvMessage :: Result (Token, Token),
+	dvGreeting :: Result Token,
+	dvName :: Result Token,
+	dvToken :: Result Token }</code></pre>
+
+<pre><code>eval :: [Token] -&gt; Maybe (Token, Token)
+eval ts = case dvMessage (parse ts) of
+	Parsed v rem -&gt; Just v
+	_ -&gt; Nothing</code></pre>
+
+<pre><code>parse :: [Token] -&gt; Derivs
+parse ts = d where
+	d = Derivs message greeting name token
+	message = pMessage d
+	greeting = pGreeting d
+	name = pName d
+	token = case ts of
+		(t : ts') -&gt; Parsed t (parse ts')
+		_ -&gt; NoParse</code></pre>
+
+<pre><code>pMessage :: Derivs -&gt; Result (Token, Token)
+pMessage d = case dvGreeting d of
+	Parsed g d' -&gt; case dvName d of
+		Parsed n d'' -&gt; Parsed (g, n) d''
+		_ -&gt; NoParse
+	_ -&gt; NoParse</code></pre>
+
+<pre><code>pGreeting :: Derivs -&gt; Result Token
+pGreeting d = case dvToken d of
+	Parsed Hello d' -&gt; Parsed Hello d'
+	Parsed GoodBye d' -&gt; Parsed GoodBye d'
+	_ -&gt; NoParse</code></pre>
+
+<pre><code>pName :: Derivs -&gt; Result Token
+pName d = case dvToken d of
+	Parsed World d' -&gt; Parsed World d'
+	Parsed Yoshikuni d' -&gt; Parsed Yoshikuni d'
+	_ -&gt; NoParse</code></pre>
 
 <p>
 <a href="/computer/programming/algorithm/parse"
