@@ -1,0 +1,26 @@
+papillonに到るまで: 最初の例
+
+<p>(工事中 0%)</p>
+
+<p>
+まずは非常に単純な例を作成してみよう。
+この例ではパックラット構文解析の良さはわからないが、
+どのような処理をするかを知るための単純な例である。
+</p>
+
+<p>
+まずは単純な再帰下降構文解析器を示す。
+そして、それをどう変化させれば、メモ化が実現できるかを示そう。
+以下の文法を例として使うことにする。
+Haskellのコードに合わせて、大文字、小文字の使いかたは
+慣用的な使いかたとは逆にしてある。
+</p>
+
+<pre><code>message = greeting name
+greeting = Hello / GoodBye
+name = World / Yoshikuni</code></pre>
+
+<p>
+<a href="/computer/haskell/packages/papillon/steps_to"
+	>「papillonに到るまで」トップへもどる</a>
+</p>
