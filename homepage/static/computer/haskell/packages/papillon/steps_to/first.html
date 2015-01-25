@@ -20,6 +20,44 @@ Haskellのコードに合わせて、大文字、小文字の使いかたは
 greeting = Hello / GoodBye
 name = World / Yoshikuni</code></pre>
 
+<h2>単純な再帰下降構文解析器</h2>
+
+<p><a href="/computer/haskell/packages/papillon/steps_to/helloRecurse.hs"
+	>helloRecurse.hs</a></p>
+
+<pre><code>data Token = Hello | GoodBye | World | Yoshikuni deriving Show</code></pre>
+
+<pre><code>pMessage :: [Token] -&gt; Maybe ((Token, Token), [Token])
+pMessage ts = case pGreeting ts of
+	Just (g, ts') -&gt; case pName ts' of
+		Just (n, ts'') -&gt; Just ((g, n), ts'')
+		_ -&gt; Nothing
+	_ -&gt; Nothing</code></pre>
+
+<pre><code>pGreeting :: [Token] -&gt; Maybe (Token, [Token])
+pGreeting (Hello : ts) = Just (Hello, ts)
+pGreeting (GoodBye : ts) = Just (GoodBye, ts)
+pGreeting _ = Nothing</code></pre>
+
+<pre><code>pName :: [Token] -&gt; Maybe (Token, [Token])
+pName (World : ts) = Just (World, ts)
+pName (Yoshiukni : ts) = Just (Yoshikuni, ts)
+pName _ = Nothing</code></pre>
+
+<h2>Maybeモナドを利用する</h2>
+
+<p><a href="/computer/haskell/packages/papillon/steps_to/helloMonad.hs"
+	>helloMonad.hs</a></p>
+
+<p>とくに深い意味はないがMaybeモナドを利用するとよりすっきりと書ける。</p>
+
+<pre><code>pMessage ts = do
+	(g, ts') &lt;- pGreeting ts
+	(n, ts'') &lt;- pName ts'
+	return ((g, n), ts'')</code></pre>
+
+<h2>メモ化する</h2>
+
 <p>
 <a href="/computer/haskell/packages/papillon/steps_to"
 	>「papillonに到るまで」トップへもどる</a>

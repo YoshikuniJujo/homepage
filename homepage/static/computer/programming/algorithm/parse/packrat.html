@@ -134,7 +134,7 @@ parse ts = d where
 
 <pre><code>pMessage :: Derivs -&gt; Result (Token, Token)
 pMessage d = case dvGreeting d of
-	Parsed g d' -&gt; case dvName d of
+	Parsed g d' -&gt; case dvName d' of
 		Parsed n d'' -&gt; Parsed (g, n) d''
 		_ -&gt; NoParse
 	_ -&gt; NoParse</code></pre>
