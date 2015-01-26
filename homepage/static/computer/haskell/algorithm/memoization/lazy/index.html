@@ -1,6 +1,19 @@
 Haskell: 遅延型を利用したメモ化
 
-<p>(工事中 20%)</p>
+<p>(工事中 70%)</p>
+
+<h2>このページでは</h2>
+
+<p>
+このページでは以下のような内容を扱う。
+</p>
+
+<p>
+単純な再帰的関数では非常に時間がかかってしまう処理を
+遅延型を利用したメモ化を使うことで効率的に実行することができる。
+そのような手法を「単純な機械の例」を使って説明する。
+素直な実装では200億年かかる演算がメモ化を使うことで0.2秒で終了することを示す。
+</p>
 
 <h2>弱頭部正規形までの評価</h2>
 
@@ -186,10 +199,13 @@ system 90% cpu 2.686 total</code></pre>
 <h3>メモ化による効率化</h3>
 
 <p>
-<a href="/computer/haskell/algorithm/memoization/lazy/machine_memo.hs"
+<a
+href="/computer/haskell/algorithm/memoization/lazy/machine_memo.hs"
 	>machine_memo.hs</a>
-(<a href="/computer/haskell/algorithm/memoization/lazy/code_ex_machine_memo.html"
-	>コード解説</a> 工事中 0%)
+(<a
+href="/computer/haskell/algorithm/memoization/lazy/code_ex_machine_memo.html"
+id="link_to_code_ex_machine_memo"
+	>コード解説</a> 工事中 40%)
 </p>
 
 <pre><code>type Result v = Maybe (v, Derivs)</code></pre>
@@ -225,4 +241,50 @@ pRule d0 = msum [ do
 	return (n - fromDigit c, d''),
 	return (0, d0) ]</code></pre>
 
-<p>(作成中)<p>
+<p>試してみる。</p>
+
+<pre><code>% time ghc -e 'run $ sample 0' machine_memo.hs
+Just 0
+ghc -e 'run $ sample 0' machine_memo.hs 0.20s user 0.02s
+system 96% cpu 0.224 total</code></pre>
+
+<pre><code>% time ghc -e 'run $ sample 76' machine_memo.hs
+Just (-330)
+ghc -e 'run $ sample 76' machine_memo.hs 0.21s user 0.01s
+system 95% cpu 0.228 total</code></pre>
+
+<pre><code>% time ghc -e 'run $ sample 100000' machine_memo.hs
+Just (-450000)
+ghc -e 'run $ sample 100000' machine_memo.hs 1.12s user 0.04s
+System 90% cpu 1.283 total</code></pre>
+
+<pre><code>% time ghc -e 'run $ sample 200000' machine_memo.hs
+Just (-900000)
+ghc -e 'run $ sample 200000' machine_memo.hs 2.10s user 0.05s
+System 87% cpu 2.452 total</code></pre>
+
+<pre><code>% time ghc -e 'run $ sample 400000' machine_memo.hs
+Just (-1800000)
+ghc -e 'run $ sample 400000' machine_memo.hs 3.97s user 0.09s
+System 83% cpu 4.870 total</code></pre>
+
+<table border="1">
+<tr><th>数字の列の長さ</th><th>実行時間</th><th>長さ0との差</th></tr>
+<tr><td>0</td><td>0.20s</td><td>0s</td></tr>
+<tr><td>76</td><td>0.21s</td><td>0.01s</td></tr>
+<tr><td>100000</td><td>1.12s</td><td>0.92s</td></tr>
+<tr><td>200000</td><td>2.10s</td><td>1.90s</td></tr>
+<tr><td>400000</td><td>3.97s</td><td>3.77s</td></tr>
+<tr><td>...</td><td>...</td><td>...</td></tr>
+<tr><td>1億</td><td>15分</td><td>15分</td></tr>
+</table>
+
+<p>
+長さ1億のデータは理論値である。
+メモ化なしでは200億年かかる演算がメモ化することにより、0.2秒で終了する。
+長さ10万についての計算が1秒で終了し、長さ40万については4秒で終了する。
+予想通りO(n)、つまり線形時間で終了するようになった。
+</p>
+
+<p><a href="/computer/haskell/algorithm/memoization"
+	>「メモ化」トップへもどる</a></p>

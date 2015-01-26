@@ -1,6 +1,6 @@
 machine_memo.hsのコード解説
 
-<p>(工事中 0%)</p>
+<p>(工事中 40%)</p>
 
 <h2>Derivs型</h2>
 
@@ -12,6 +12,7 @@ machine_memo.hsのコード解説
 
 <p>
 Derivs型はある特定の位置におけるメモの内容を保存している型である。
+Result型は結果の型と次の位置におけるDerivs型を含む。
 </p>
 
 <p>(作成中)</p>
@@ -21,6 +22,11 @@ Derivs型はある特定の位置におけるメモの内容を保存してい�
 <pre><code>run :: String -&gt; Maybe Int
 run src | Just (n, _) &lt;- rule $ derivs src = Just n
 run _ = Nothing</code></pre>
+
+<p>
+関数derivsによって文字列からDerivs型の値を作る。
+この値のruleフィールドに求める結果が入っているので、それを取り出している。
+</p>
 
 <p>(作成中)</p>
 
@@ -32,6 +38,17 @@ derivs src = d
 	ch = case src of
 		c : cs -&gt; Just (c, derivs cs)
 		_ -&gt; Nothing</code></pre>
+
+<p>
+文字列からDerivs型の値を作成している。
+charフィールドの定義のところで、
+文字列のtailを関数derivsに渡すことによって、
+次の位置におけるDerivs型の値を作成している。
+</p>
+
+<p>
+またpRuleを使うことでDerivs型の値からruleフィールドの値を作成している。
+</p>
 
 <p>(作成中)</p>
 
@@ -51,4 +68,28 @@ pRule d0 = msum [ do
 	return (n - fromDigit c, d''),
 	return (0, d0) ]</code></pre>
 
+<p>
+単純な再帰関数版のほうのrule関数とよく似ている。
+再帰関数版のほうのrule関数ではStringであったものがこちらではDerivsになっている。
+</p>
+
+<p>
+"(n, d') &lt;- rule d"という行を見てみる。
+このdはその上の行の"(c, d) &lt;- char d0"のdである。
+つまり、Derivs型の値d0のcharフィールドの値の2要素目がdであり、
+"rule d"はその値dのruleフィールドの値を引き出してきている。
+</p>
+
+<p>
+このように関数pRuleにおいて、
+葉要素の取り出しはDerivs型の値d0への参照になっている。
+つまり値d0のフィールドが1度評価されてしまえば、
+その後は単なる参照としてO(1)でのアクセスが可能ということになる。
+</p>
+
 <p>(作成中)</p>
+
+<p>
+<a href="/computer/haskell/algorithm/memoization/lazy#link_to_code_ex_machine_memo"
+	>「遅延型を利用したメモ化」トップへもどる</a>
+</p>
