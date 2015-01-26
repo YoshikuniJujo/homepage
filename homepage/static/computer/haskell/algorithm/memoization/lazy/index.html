@@ -101,19 +101,32 @@ fibs@(_ : tfibs) = 0 : 1 : zipWith (+) fibs tfibs</code></pre>
 (<a
 href="/computer/haskell/algorithm/memoization/lazy/code_ex_machine_rec.html"
 id="link_to_code_ex_machine_rec"
-	>コード解説</a> 工事中 0%)
+	>コード解説</a>)
 </p>
 
-<pre><code>type Parse v = String -&gt; Maybe (v, String)</code></pre>
+<pre><code>type Result v = Maybe (v, String)</code></pre>
 
-<pre><code>run :: Parse Int
-run s@(c : cs) | isDigit c = msum [ do
-	(n, '+' : cs') &lt;- run cs
-	return (n + fromDigit c, cs'), do
-	(n, '-' : cs') &lt;- run cs
-	return (n - fromDigit c, cs'),
-	return (0, s) ]
-run s = return (0, s)</code></pre>
+<pre><code>char :: String -&gt; Result Char
+char (x : xs) = Just (x, xs)
+char _ = Nothing</code></pre>
+
+<pre><code>run :: String -&gt; Maybe Int
+run src | Just (n, _) &lt;- rule src = Just n
+run _ = Nothing</code></pre>
+
+<pre><code>rule :: String -&gt; Result Int
+rule s0 = msum [ do
+	(c, s) &lt;- char s0
+	guard $ isDigit c
+	(n, s') &lt;- rule s
+	('+', s'') &lt;- char s'
+	return (n + fromDigit c, s''), do
+	(c, s) &lt;- char s0
+	guard $ isDigit c
+	(n, s') &lt;- rule s
+	('-', s'') &lt;- char s'
+	return (n - fromDigit c, s''),
+	return (0, s0) ]</code></pre>
 
 <pre><code>fromDigit :: Char -&gt; Int
 fromDigit '0' = 0
@@ -123,42 +136,50 @@ fromDigit '9' = 9
 fromDigit c = error $ show c ++ " is not digit."</code></pre>
 
 <p>
-試してみる。
+サンプル入力作成用の関数を作成して試してみる。
 </p>
 
-<pre><code>% time ghc -e 'run ""' machine_rec.hs
-(0, "")
-ghc -e 'run ""' machine_rec.hs 0.19s user 0.02s system 94%
-cpu 0.223 total</code></pre>
+<pre><code>sample n = take n (concat $ repeat "0123456789")
+	++ replicate n '-'</code></pre>
 
-<pre><code>% time ghc -e 'run "0123456789012345"' machine_rec.hs
-(-60, "")
-ghc -e 'run "0123456789012345"' machine_rec.hs 0.35s user
-0.02s system 94% cpu 0.385 total</code></pre>
+<pre><code>% time ghc -e 'run $ sample 0' machine_rec.hs
+Just 0
+ghc -e 'run $ sample 0' machine_rec.hs 0.20s user 0.01s
+system 94% cpu 0.224 total</code></pre>
 
-<pre><code>% time ghc -e 'run "01234567890123456"' machine_rec.hs
-(-66, "")
-ghc -e 'run "01234567890123456"' machine_rec.hs 0.51s user
-0.02s system 93% cpu 0.573 total</code></pre>
+<pre><code>% time ghc -e 'run $ sample 16' machine_rec.hs
+Just (-60)
+ghc -e 'run $ sample 16' machine_rec.hs 0.74s user 0.02s
+system 90% cpu 0.841 total</code></pre>
 
-<pre><code>% time ghc -e 'run "012345678901234567"' machine_rec.hs
-(-73, "")
-ghc -e 'run "012345678901234567"' machine_rec.hs 0.83s user
-0.02s system 95% cpu 0.901 total</code></pre>
+<pre><code>% time ghc -e 'run $ sample 17' machine_rec.hs
+Just (-66)
+ghc -e 'run $ sample 17' machine_rec.hs 1.29s user 0.02s
+system 93% cpu 1.406 total</code></pre>
+
+<pre><code>% time ghc -e 'run $ sample 18' machine_rec.hs
+Just (-73)
+ghc -e 'run $ sample 18' machine_rec.hs 2.40s user 0.02s
+system 90% cpu 2.686 total</code></pre>
 
 <p>実行時間を表にすると以下のようになる。</p>
 
 <table border="1">
 <tr><th>数字の列の長さ</th><th>実行時間</th><th>長さ0との差</th></tr>
-<tr><td>0</td><td>0.19s</td><td>0s</td></tr>
-<tr><td>16</td><td>0.35s</td><td>0.16s</td></tr>
-<tr><td>17</td><td>0.51s</td><td>0.32s</td></tr>
-<tr><td>18</td><td>0.83s</td><td>0.64s</td></tr>
+<tr><td>0</td><td>0.20s</td><td>0s</td></tr>
+<tr><td>16</td><td>0.74s</td><td>0.54s</td></tr>
+<tr><td>17</td><td>1.29s</td><td>1.09s</td></tr>
+<tr><td>18</td><td>2.40s</td><td>2.20s</td></tr>
 </table>
 
 <p>
 数字の列の長さが1増えると実行時間が2倍になっているのがわかる。
 つまりO(2^n)であり、指数関数時間がかかっているということになる。
 </p>
+
+<h3>メモ化による効率化</h3>
+
+<p><a href="/computer/haskell/algorithm/memoization/lazy/machine_memo.hs"
+	>machine_memo.hs</a></p>
 
 <p>(作成中)<p>

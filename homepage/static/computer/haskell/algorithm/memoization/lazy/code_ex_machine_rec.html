@@ -1,22 +1,30 @@
 machine_rec.hsのコード解説
 
-<p>(工事中 0%)</p>
-
 <h2>全体</h2>
 
 <p><a href="/computer/haskell/algorithm/memoization/lazy/machine_rec.hs"
 	>machine_rec.hs</a></p>
 
-<pre><code>type Parse v = String -&gt; Maybe (v, String)</code></pre>
+<pre><code>type Result v = Maybe (v, String)</code></pre>
 
-<pre><code>run :: Parse Int
-run s@(c : cs) | isDigit c = msum [ do
-	(n, '+' : cs') &lt;- run cs
-	return (n + fromDigit c, cs'), do
-	(n, '-' : cs') &lt;- run cs
-	return (n - fromDigit c, cs'),
-	return (0, s) ]
-run s = return (0, s)</code></pre>
+<pre><code>run :: String -&gt; Result Int
+run s0 = msum [ do
+	(c, s) &lt;- char s0
+	guard $ isDigit c
+	(n, s') &lt;- run s
+	('+', s'') &lt;- char s'
+	return (n + fromDigit c, s''), do
+	(c, s) &lt;- char s0
+	guard $ isDigit c
+	(n, s') &lt;- run s
+	('-', s'') &lt;- char s'
+	return (n - fromDigit c, s''),
+	return (0, s0) ]
+</code></pre>
+
+<pre><code>char :: String -&gt; Result Char
+char (x : xs) = Just (x, xs)
+char _ = Nothing</code></pre>
 
 <pre><code>fromDigit :: Char -&gt; Int
 fromDigit '0' = 0
@@ -27,9 +35,27 @@ fromDigit c = error $ show c ++ " is not digit."</code></pre>
 
 <h2>関数runの説明</h2>
 
-<p>まずは一文字目が数字かどうかチェック(isDigit c)している。</p>
+<p>
+msum [...]は1番初めに出てきたJust ...を返すものと考えて良い。
+次々に試していき初めに成功した値を返すイメージ。
+</p>
 
-<p>(作成中)</p>
+<p>
+msumの中身はまずは'+'を試し、次に'-'を試し、どちらも一致がなければ、
+文字列を消費せずに0を返すといった処理になっている。
+</p>
+
+<p>
+'+'を試す部分は以下のようになる。
+まずは1文字目が数字かどうかチェック(isDigit c)している。
+関数runを再帰的に残りの文字列に適用する。
+その結果の残りの文字の1文字目が'+'であること('+', s')を確認し、
+結果nにはじめにチェックしたcを数値にしたものを足したものを結果として返している。
+</p>
+
+<p>
+'-'を試す部分もほぼ同じことを行っている。
+</p>
 
 <p>
 <a href="/computer/haskell/algorithm/memoization/lazy#link_to_code_ex_machine_rec"
