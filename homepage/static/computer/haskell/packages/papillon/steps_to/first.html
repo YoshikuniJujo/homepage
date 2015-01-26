@@ -1,6 +1,6 @@
 papillonに到るまで: 最初の例
 
-<p>(工事中 0%)</p>
+<p>(工事中 20%)</p>
 
 <p>
 まずは非常に単純な例を作成してみよう。
@@ -65,6 +65,47 @@ pName _ = Nothing</code></pre>
 <a href="/computer/haskell/packages/papillon/steps_to/helloMemo.hs"
 	>helloMemo.hs</a>
 </p>
+
+<pre><code>data Derivs = Derivs {
+	message :: Maybe ((Token, Token), Derivs),
+	greeting :: Maybe (Token, Derivs),
+	name :: Maybe (Token, Derivs),
+	token :: Maybe (Token, Derivs) }</code></pre>
+
+<pre><code>parse :: [Token] -&gt; Derivs
+parse ts = d
+	where
+	d = Derivs m g n t
+	m = pMessage d
+	g = pGreeting d
+	n = pName d
+	t = case ts of
+		(t : ts') -&gt; Just (t, parse ts')
+		_ -&gt; Nothing</code></pre>
+
+<pre><code>pMessage :: Derivs -&gt; Maybe ((Token, Token), Derivs)
+pMessage d = do
+	(g, d') &lt;- greeting d
+	(n, d'') &lt;- name d'
+	return ((g, n), d'')</code></pre>
+
+<pre><code>pGreeting :: Maybe (Token, Derivs)
+pGreeting d = do
+	(t, d') &lt;- token d
+	case t of
+		Hello -&gt; return (t, d')
+		GoodBye -&gt; return (t, d')
+		_ -&gt; fail "not parsed"</code></pre>
+
+<pre><code>pName :: Derivs -&gt; Maybe (Token, Derivs)
+pName d = do
+	(t, d') &lt;- token d
+	case t of
+		World -&gt; return (t, d')
+		Yoshikuni -&gt; return (t, d')
+		_ -&gt; fail "not parsed"</code></pre>
+
+<p>(作成中)</p>
 
 <p>
 <a href="/computer/haskell/packages/papillon/steps_to"
