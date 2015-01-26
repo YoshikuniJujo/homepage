@@ -77,10 +77,88 @@ fibs@(_ : tfibs) = 0 : 1 : zipWith (+) fibs tfibs</code></pre>
 かかってしまうことになる。
 </p>
 
-<h3>結果が位置とルールから完全に決まるような場合</h3>
+<h2>入力列から値を作成する機械の例</h2>
 
 <p>
-ある入力列をたどりながら、値を蓄積していっているような状況を考える。
+入力列をたどりながら値を作成する機械を考える。
+まずは数字の列を取り、それに続いて'+'または'-'の文字列を取る。
+結果は数字の列と逆順に'+'または'-'を適用していったものとする。
+たとえば"3456+-++"ならば3(4(5(6+)-)+)+のように解釈され、結果は
+0+6-5+4+3で8になる。
+これはスタックマシンを使えば効率的に実装できる。
+</p>
+
+<h3>再帰的処理による実装</h3>
+
+<p>
+ここではあえて再帰的処理によって実装し、
+それが指数関数時間になることを見ていこう。
+</p>
+
+<p>
+<a href="/computer/haskell/algorithm/memoization/lazy/machine_rec.hs"
+	>machine_rec.hs</a>
+(<a
+href="/computer/haskell/algorithm/memoization/lazy/code_ex_machine_rec.html"
+id="link_to_code_ex_machine_rec"
+	>コード解説</a> 工事中 0%)
+</p>
+
+<pre><code>type Parse v = String -&gt; Maybe (v, String)</code></pre>
+
+<pre><code>run :: Parse Int
+run s@(c : cs) | isDigit c = msum [ do
+	(n, '+' : cs') &lt;- run cs
+	return (n + fromDigit c, cs'), do
+	(n, '-' : cs') &lt;- run cs
+	return (n - fromDigit c, cs'),
+	return (0, s) ]
+run s = return (0, s)</code></pre>
+
+<pre><code>fromDigit :: Char -&gt; Int
+fromDigit '0' = 0
+fromDigit '1' = 1
+...
+fromDigit '9' = 9
+fromDigit c = error $ show c ++ " is not digit."</code></pre>
+
+<p>
+試してみる。
+</p>
+
+<pre><code>% time ghc -e 'run ""' machine_rec.hs
+(0, "")
+ghc -e 'run ""' machine_rec.hs 0.19s user 0.02s system 94%
+cpu 0.223 total</code></pre>
+
+<pre><code>% time ghc -e 'run "0123456789012345"' machine_rec.hs
+(-60, "")
+ghc -e 'run "0123456789012345"' machine_rec.hs 0.35s user
+0.02s system 94% cpu 0.385 total</code></pre>
+
+<pre><code>% time ghc -e 'run "01234567890123456"' machine_rec.hs
+(-66, "")
+ghc -e 'run "01234567890123456"' machine_rec.hs 0.51s user
+0.02s system 93% cpu 0.573 total</code></pre>
+
+<pre><code>% time ghc -e 'run "012345678901234567"' machine_rec.hs
+(-73, "")
+ghc -e 'run "012345678901234567"' machine_rec.hs 0.83s user
+0.02s system 95% cpu 0.901 total</code></pre>
+
+<p>実行時間を表にすると以下のようになる。</p>
+
+<table border="1">
+<tr><th>数字の列の長さ</th><th>実行時間</th><th>長さ0との差</th></tr>
+<tr><td>0</td><td>0.19s</td><td>0s</td></tr>
+<tr><td>16</td><td>0.35s</td><td>0.16s</td></tr>
+<tr><td>17</td><td>0.51s</td><td>0.32s</td></tr>
+<tr><td>18</td><td>0.83s</td><td>0.64s</td></tr>
+</table>
+
+<p>
+数字の列の長さが1増えると実行時間が2倍になっているのがわかる。
+つまりO(2^n)であり、指数関数時間がかかっているということになる。
 </p>
 
 <p>(作成中)<p>

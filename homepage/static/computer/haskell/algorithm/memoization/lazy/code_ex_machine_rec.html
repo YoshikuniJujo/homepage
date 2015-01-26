@@ -1,0 +1,37 @@
+machine_rec.hsのコード解説
+
+<p>(工事中 0%)</p>
+
+<h2>全体</h2>
+
+<p><a href="/computer/haskell/algorithm/memoization/lazy/machine_rec.hs"
+	>machine_rec.hs</a></p>
+
+<pre><code>type Parse v = String -&gt; Maybe (v, String)</code></pre>
+
+<pre><code>run :: Parse Int
+run s@(c : cs) | isDigit c = msum [ do
+	(n, '+' : cs') &lt;- run cs
+	return (n + fromDigit c, cs'), do
+	(n, '-' : cs') &lt;- run cs
+	return (n - fromDigit c, cs'),
+	return (0, s) ]
+run s = return (0, s)</code></pre>
+
+<pre><code>fromDigit :: Char -&gt; Int
+fromDigit '0' = 0
+fromDigit '1' = 1
+...
+fromDigit '9' = 9
+fromDigit c = error $ show c ++ " is not digit."</code></pre>
+
+<h2>関数runの説明</h2>
+
+<p>まずは一文字目が数字かどうかチェック(isDigit c)している。</p>
+
+<p>(作成中)</p>
+
+<p>
+<a href="/computer/haskell/algorithm/memoization/lazy#link_to_code_ex_machine_rec"
+	>「遅延型を利用したメモ化」へもどる</a>
+</p>
