@@ -1,39 +1,24 @@
 machine_rec.hsのコード解説
 
-<h2>全体</h2>
-
 <p><a href="/computer/haskell/algorithm/memoization/lazy/machine_rec.hs"
 	>machine_rec.hs</a></p>
 
-<pre><code>type Result v = Maybe (v, String)</code></pre>
+<h2>関数ruleの説明</h2>
 
-<pre><code>run :: String -&gt; Result Int
-run s0 = msum [ do
+<pre><code>rule :: String -&gt; Result Int
+rule s0 = msum [ do
 	(c, s) &lt;- char s0
 	guard $ isDigit c
-	(n, s') &lt;- run s
+	(n, s') &lt;- rule s
 	('+', s'') &lt;- char s'
 	return (n + fromDigit c, s''), do
 	(c, s) &lt;- char s0
 	guard $ isDigit c
-	(n, s') &lt;- run s
+	(n, s') &lt;- rule s
 	('-', s'') &lt;- char s'
 	return (n - fromDigit c, s''),
 	return (0, s0) ]
 </code></pre>
-
-<pre><code>char :: String -&gt; Result Char
-char (x : xs) = Just (x, xs)
-char _ = Nothing</code></pre>
-
-<pre><code>fromDigit :: Char -&gt; Int
-fromDigit '0' = 0
-fromDigit '1' = 1
-...
-fromDigit '9' = 9
-fromDigit c = error $ show c ++ " is not digit."</code></pre>
-
-<h2>関数runの説明</h2>
 
 <p>
 msum [...]は1番初めに出てきたJust ...を返すものと考えて良い。
@@ -48,7 +33,7 @@ msumの中身はまずは'+'を試し、次に'-'を試し、どちらも一致�
 <p>
 '+'を試す部分は以下のようになる。
 まずは1文字目が数字かどうかチェック(isDigit c)している。
-関数runを再帰的に残りの文字列に適用する。
+関数ruleを再帰的に残りの文字列に適用する。
 その結果の残りの文字の1文字目が'+'であること('+', s')を確認し、
 結果nにはじめにチェックしたcを数値にしたものを足したものを結果として返している。
 </p>

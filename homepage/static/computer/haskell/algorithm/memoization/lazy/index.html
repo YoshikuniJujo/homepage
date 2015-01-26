@@ -1,6 +1,6 @@
 Haskell: 遅延型を利用したメモ化
 
-<p>(工事中 2%)</p>
+<p>(工事中 20%)</p>
 
 <h2>弱頭部正規形までの評価</h2>
 
@@ -170,16 +170,59 @@ system 90% cpu 2.686 total</code></pre>
 <tr><td>16</td><td>0.74s</td><td>0.54s</td></tr>
 <tr><td>17</td><td>1.29s</td><td>1.09s</td></tr>
 <tr><td>18</td><td>2.40s</td><td>2.20s</td></tr>
+<tr><td>...</td><td>...</td><td>...</td></tr>
+<tr><td>76</td><td>200億年</td><td>200億年</td></tr>
 </table>
 
 <p>
 数字の列の長さが1増えると実行時間が2倍になっているのがわかる。
 つまりO(2^n)であり、指数関数時間がかかっているということになる。
+なお、長さ76のデータは理論値である。
+宇宙が始まったのが138億年前と言われている
+(<a href="https://ja.wikipedia.org/wiki/宇宙の年表"
+>ウィキペディア:宇宙の年表</a>参照)。
 </p>
 
 <h3>メモ化による効率化</h3>
 
-<p><a href="/computer/haskell/algorithm/memoization/lazy/machine_memo.hs"
-	>machine_memo.hs</a></p>
+<p>
+<a href="/computer/haskell/algorithm/memoization/lazy/machine_memo.hs"
+	>machine_memo.hs</a>
+(<a href="/computer/haskell/algorithm/memoization/lazy/code_ex_machine_memo.html"
+	>コード解説</a> 工事中 0%)
+</p>
+
+<pre><code>type Result v = Maybe (v, Derivs)</code></pre>
+
+<pre><code>data Derivs = Derivs {
+	rule :: Result Int,
+	char :: Result Char }</code></pre>
+
+<pre><code>run :: String -&gt; Maybe Int
+run src | Just (n, _) &lt;- rule $ derivs src = Just n
+run _ = Nothing</code></pre>
+
+<pre><code>derivs :: String -&gt; Derivs
+derivs src = d
+	where
+	d = Derivs rl ch
+	rl = pRule d
+	ch = case src of
+		c : cs -&gt; Just (c, derivs cs)
+		_ -&gt; Nothing</code></pre>
+
+<pre><code>pRule :: Derivs -&gt; Result Int
+pRule d0 = msum [ do
+	(c, d) &lt;- char d0
+	guard $ isDigit c
+	(n, d') &lt;- rule d
+	('+', d'') &lt;- char d'
+	return (n + fromDigit c, d''), do
+	(c, d) &lt;- char d0
+	guard $ isDigit c
+	(n, d') &lt;- rule d
+	('-', d'') &lt;- char d'
+	return (n - fromDigit c, d''),
+	return (0, d0) ]</code></pre>
 
 <p>(作成中)<p>

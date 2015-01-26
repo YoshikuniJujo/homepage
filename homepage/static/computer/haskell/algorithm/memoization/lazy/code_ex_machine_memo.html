@@ -1,0 +1,54 @@
+machine_memo.hsのコード解説
+
+<p>(工事中 0%)</p>
+
+<h2>Derivs型</h2>
+
+<pre><code>type Result v = Maybe (v, Derivs)</code></pre>
+
+<pre><code>data Derivs = Derivs {
+	rule :: Result Int,
+	char :: Result Char }</code></pre>
+
+<p>
+Derivs型はある特定の位置におけるメモの内容を保存している型である。
+</p>
+
+<p>(作成中)</p>
+
+<h2>駆動用の関数</h2>
+
+<pre><code>run :: String -&gt; Maybe Int
+run src | Just (n, _) &lt;- rule $ derivs src = Just n
+run _ = Nothing</code></pre>
+
+<p>(作成中)</p>
+
+<pre><code>derivs :: String -&gt; Derivs
+derivs src = d
+	where
+	d = Derivs rl ch
+	rl = pRule d
+	ch = case src of
+		c : cs -&gt; Just (c, derivs cs)
+		_ -&gt; Nothing</code></pre>
+
+<p>(作成中)</p>
+
+<h2>ルール定義関数</h2>
+
+<pre><code>pRule :: Derivs -&gt; Result Int
+pRule d0 = msum [ do
+	(c, d) &lt;- char d0
+	guard $ isDigit c
+	(n, d') &lt;- rule d
+	('+', d'') &lt;- char d'
+	return (n + fromDigit c, d''), do
+	(c, d) &lt;- char d0
+	guard $ isDigit c
+	(n, d') &lt;- rule d
+	('-', d'') &lt;- char d'
+	return (n - fromDigit c, d''),
+	return (0, d0) ]</code></pre>
+
+<p>(作成中)</p>
