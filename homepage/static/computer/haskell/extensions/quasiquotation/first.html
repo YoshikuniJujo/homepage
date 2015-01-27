@@ -1,0 +1,160 @@
+Quasiquotation: はじめの一歩
+
+<p><a
+href="https://downloads.haskell.org/~ghc/latest/docs/html/libraries/template-haskell-2.9.0.0/Language-Haskell-TH-Quote.html"
+>Language.Haskell.TH.Quoteモジュールの説明</a></p>
+
+<h2>Quasiquotationの説明</h2>
+
+<p>
+名前hogeに文字列から構文木を作成する関数を関連づけておく。
+そして[hoge| ... |]のようにすると...の部分を引数としてその関数を呼び、
+できた構文木をHaskellの定義として評価してくれるという機能。
+</p>
+
+<p>
+Haskellのコード中に別の自作言語を埋め込めるということ。
+</p>
+
+<h2>はじめてのQuasiquote</h2>
+
+<p>
+単純な例として、改行を含む文字列をコードに埋め込む例を見てみよう。
+以下の内容のファイルを作成する。
+</p>
+
+<p><a href="/computer/haskell/extensions/quasiquotation/StringQQ.hs"
+	>StringQQ.hs</a></p>
+
+<pre><code>module StringQQ (string) where
+
+import Language.Haskell.TH
+import Language.Haskell.TH.Quote
+
+string :: QuasiQuoter
+string = QuasiQuoter {
+	quoteExp = litE . stringL,
+	quotePat = undefined,
+	quoteType = undefined,
+	quoteDec = undefined }</code></pre>
+
+<p>
+stringの定義のquoteExpフィールドを見てみよう。
+quoteExpフィールドは「式」が必要な場所にstring
+quoteが出てきた場合の処理を記述する。
+ここでは単に文字列リテラルを意味する構文木を返している。
+</p>
+
+<p>使用例を以下に示す。</p>
+
+<p><a href="/computer/haskell/extensions/quasiquotation/useStringQQ.hs"
+	>useStringQQ.hs</a></p>
+
+<pre><code>{-# LANGUAGE QuasiQuotes #-}
+
+import StringQQ
+
+soundOfSilence :: String
+soundOfSilence = [string|The Sound Of Silence
+
+Hello darkness, my old friend
+I've come to talk with you again
+Because a vision softly creeping
+Left its seeds while I was sleeping
+And the vision that was planted in my brain
+Still remains
+Within the sound of silence
+|]</code></pre>
+
+<p>試してみる。</p>
+
+<pre><code>ghci useStringQQ.hs
+*Main&gt; putStr soundOfSilence
+The Sound Of Silence
+
+Hello darkness, my old friend
+I've come to talk with you again
+...
+Within the sound of silence</code></pre>
+
+<p>
+この例ではソースを文字列として解釈するという
+「言語」をコードに埋め込んだことになる。
+</p>
+
+<h2>QuasiQuoterのフィールドの説明</h2>
+
+<p>QuasiQuoter型は以下のように定義されている。</p>
+
+<pre><code>data QuasiQuoter = QuasiQuoter {
+	quoteExp :: String -&gt; Q Exp,
+	quotePat :: String -&gt; Q Pat,
+	quoteType :: String -&gt; Q Type,
+	quoteDec :: String -&gt; Q [Dec] }</code></pre>
+
+<p>
+そのquoteが、それぞれ式、パターン、型、宣言として扱われた場合の定義を意味している。
+よく使われるのはquoteDecであり、これを使うことで、
+独自の「言語」から関数定義等を作成することができる。
+quotePatやquoteTypeはあまり使い道を思いつかない。
+</p>
+
+<p>
+無理矢理だが全部のフィールドを埋めてみる。
+</p>
+
+<p><a href="/computer/haskell/extensions/quasiquotation/ListQQ.hs"
+	>ListQQ.hs</a></p>
+
+<pre><code>list :: QuasiQuoter
+list = QuasiQuoter {
+	quoteExp = listE . map (litE . stringL) . words,
+	quotePat = listP . map (varP . mkName) . words,
+	quoteType = (listT `appT`) . conT . mkName,
+	quoteDec = \s -&gt; (: []) &lt;$&gt; valD
+		(varP $ mkName "hoge")
+		(normalB (listE . map (litE . stringL) $
+			words s))
+		[] }</code></pre>
+
+<p>上の定義の場合、それぞれのquoteは以下のようになる。</p>
+
+<ul>
+<li>式: ソースを単語に区切りリストにする</li>
+<li>パターン: ソース単語で区切りリストにしたパターン</li>
+<li>型: 型をその型のリストに変換</li>
+<li>宣言: 式で述べたリストで変数hogeを束縛</li>
+</ul>
+
+<p>使用例を以下に示す。</p>
+
+<p><a href="/computer/haskell/extensions/quasiquotation/useListQQ.hs"
+	>useListQQ.hs</a></p>
+
+<pre><code>{-# LANGUAGE QuasiQuotes #-}
+import ListQQ
+[list|
+	hello
+	world and you |]</code></pre>
+
+<p>試してみる。</p>
+
+<pre><code>% ghci useListQQ.hs
+*Main&gt; :set -XQuasiQuotes
+*Main&gt; [list| hello world |]
+["hello", "world"]
+*Main&gt; let [list| a b c |] = "HAL"
+*Main&gt; a
+'H'
+*Main&gt; c
+'L'
+*Main&gt; [1, 2, 3] :: [list|Int|]
+*Main&gt; :t it
+it :: [Int]
+*Main&gt; hoge
+["hello","world","and","you"]</code></pre>
+
+<p>
+<a href="/computer/haskell/extensions/quasiquotation"
+	>「Quasiquotation」トップへもどる</a>
+</p>
