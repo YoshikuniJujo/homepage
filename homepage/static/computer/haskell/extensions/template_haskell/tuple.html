@@ -1,3 +1,106 @@
 Template Haskell: タプルの例
 
-<p>(工事中 0%)</p>
+<h2>はじめに</h2>
+
+<p>
+Template Haskellを利用したコードは
+[e| ... |]等を使って自分の求めるコードの構文木を入手し、
+<a href="https://downloads.haskell.org/~ghc/latest/docs/html/libraries/template-haskell-2.9.0.0/Language-Haskell-TH.html"
+>Language.Haskell.THモジュールの説明</a>を調べながら組み立てていく。
+この説明ではできるだけ試行錯誤の跡を残していきたい。
+</p>
+
+<h2>何を作るか</h2>
+
+<p>
+タプルの長さと求める値のある場所を指定することで、
+タプルの要素を取得する関数を作成するマクロ。
+fstやsndをより一般的なものにしたもの。
+以下のように使えるようにする。
+</p>
+
+<pre><code>&gt; $(sel 3 1) (5, True, 'c')
+True</code></pre>
+
+<h2>求める構文木を調べる</h2>
+
+<p>
+$(sel 3 1)が以下のような値に展開されれば良い。
+</p>
+
+<pre><code>\(_, x, _) -&gt; x</code></pre>
+
+<p>[e| ... |]を使って調べてみよう。</p>
+
+<pre><code>% ghci
+Prelude&gt; :set -XTemplateHaskell
+Prelude&gt; :m Language.Haskell.TH
+Prelude Language.Haskell.TH&gt; runQ [e| \(_, x, _) -&gt; x |]
+LamE [TupP[WildP,VarP x_0,WildP]] (VarE x_0)</code></pre>
+
+<h2>より単純化した例を作ってみる</h2>
+
+<p>
+構文木がどのような形になるのかがわかった。
+より単純化した以下のような例を作ってみよう。
+</p>
+
+<pre><code>\x -&gt; x</code></pre>
+
+<p>
+変数xは、できたら今まで使ったことのない新しい名前のほうが望ましい。
+そのような場合、newNameを使うことができる。
+上記の構文木を作成するには以下のようにすれば良い。
+</p>
+
+<pre><code>newName "x" &gt;&gt;= \x -&gt; lamE [varP x] $ varE x</code></pre>
+
+<p>
+ちなみにこれは以下のようにポイントフリースタイルに書き換えることができる。
+</p>
+
+<pre><code>newName "x" &gt;&gt;= lamE &lt;$&gt; (: []) . varP &lt;*&gt; varE</code></pre>
+
+<p>が、まあ、今はこれは使わない。</p>
+
+<p>
+上記をpprで表示してみる。
+pprはpretty printerであり、pretty printerとはある値を「いい感じ」に表示してくれる。
+</p>
+
+<pre><code>Prelude Language.Haskell.TH&gt; runIO $ newName "x" &gt;&gt;= \x -&gt; lamE [varP x] $ varE x
+LamE [VarP x_0] (VarE x_0)
+Prelude Language.Haskell.TH&gt; ppr it
+\x_0 -&gt; x_0
+</code></pre>
+
+<h2>求める関数selを作成する</h2>
+
+<p>
+だいたいどんな感じかわかったので求める関数selが作れそうだ。
+</p>
+
+<pre><code>sel :: Int -&gt; Int -&gt; ExpQ
+sel n i = do
+	x &lt;- newName "x"
+	lamE [tupP $ bws ++ [varP x] ++ aws] $ verE x
+	where
+	bws = replicate i wildP
+	aws = replicate (n - i - 1) wildP
+	</code></pre>
+
+<p>これを適当なファイル(<a
+href="/computer/haskell/extensions/template_haskell/tuple.hs"
+>tuple.hs</a>)に保存し試してみる。</p>
+
+<pre><code>% ghci tuple.hs
+*Main&gt; :set -XTemplateHaskell
+*Main&gt; $(sel 1 3) (1, False, 'c')
+False</code></pre>
+
+<p>
+<a href="/computer/haskell/extensions/template_haskell/first.html"
+	>「はじめの一歩」へもどる</a>
+<a href="/computer/haskell/extensions/template_haskell"
+	>「Template Haskell」トップへ</a>
+</p>
