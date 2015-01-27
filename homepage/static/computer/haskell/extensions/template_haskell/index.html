@@ -1,0 +1,27 @@
+Template Haskell
+
+<p>(工事中 0%)</p>
+
+<h2>これは何か?</h2>
+
+<p>
+一言で言えばマクロ。
+Lispを知っている人ならば理解しやすいだろう。
+C言語のマクロにも近い。
+C言語のマクロは本質的に「文字列」レベルの操作であるために、
+様々な予想外の問題を引き起こしがちなのに対して、
+Template Haskellは構文木レベルでの操作なので、
+やっかいな問題のうちのいくつかは未然に防がれている。
+</p>
+
+<h2>必要な言語拡張</h2>
+
+<p>
+必要な言語拡張の名前はTemplateHaskellであり以下のいずれかをする必要がある。
+</p>
+
+<ul>
+<li>コマンドライン引数に-XTemplateHaskell</li>
+<li>コードの先頭に{-# LANGUAGE TemplateHaskell #-}</li>
+<li>.cabalファイルにextensions: TemplateHaskell</li>
+</ul>
