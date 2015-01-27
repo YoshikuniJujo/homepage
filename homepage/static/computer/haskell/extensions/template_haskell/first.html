@@ -1,0 +1,146 @@
+Template Haskell: はじめの一歩
+
+<h2>考えかた</h2>
+
+<p>
+Haskellの代数的データ型によって定義された専用の型を使用して
+構文木を作成する。
+作成した構文木の前に'$'をつけてやると、それを解釈して実行してくれる。
+</p>
+
+<p>
+より正確に言うと、
+「専用の型の値として作成された構文木を、専用のモナドに包んだものを、
+Template Haskellの処理系に与えてやると、それを解釈して実行してくれる」となる。
+</p>
+
+<h3>なぜモナドで包むのか</h3>
+
+<p>
+構文木を作成しているときに「新しい名前」を使いたいときはよくある。
+しかし「新しい名前」を作るためには、今までに使った名前についての情報が必要になる。
+そのような情報を提供するために構文木をモナドで包んでいる。
+</p>
+
+<h2>最も単純な例</h2>
+
+<p>
+まずはとても単純な例を扱ってみよう。
+リテラルな整数値3をコードとして生成してみよう。
+</p>
+
+<pre><code>% ghci
+Prelude&gt; :set -XTemplateHaskell
+Prelude Language.Haskell.TH&gt; :m Language.Haskell.TH
+Prelude Language.Haskell.TH&gt; $(litE $ integerL 3)
+3</code></pre>
+
+<p>このリテラル整数値3を表す構文木の型を調べてみよう。</p>
+
+<pre><code>Prelude Language.Haskell.TH&gt; :t litE $ integerL 3
+litE $ integerL 3 :: ExpQ
+Prelude Language.Haskell.TH&gt; :info ExpQ
+type ExpQ = Q Exp</code></pre>
+
+<p>
+構文木の型はQモナドに包まれたExp型であることがわかる。
+Qモナドから値を取り出すにはrunQを使うことができる。
+3を表す構文木からExp型の値を取り出してみよう。
+</p>
+
+<pre><code>Prelude Language.Haskell.TH&gt; runQ . litE $ integerL 3
+LitE (IntegerL 3)</code></pre>
+
+<p>
+つまり'litE $ integerL 3'はLitE (IntegerL 3)をQモナドで包んだものだった。
+よって以下のように書くこともできる。
+</p>
+
+<pre><code>Prelude Language.Haskell.TH&gt; $(return . LitE $ IntegerL 3)
+3</code></pre>
+
+<p>
+実は、litEやintegerLといった関数はいちいちreturnを書かなくていいように、
+便宜上用意された関数であり、中でしていることは
+「構文木を作成してreturn」ということである。
+</p>
+
+<h2>Haskellのコード上の表現と構文木の対応</h2>
+
+<p>
+Haskellのコード上の表現(上の例で言うなら'3')と
+構文木(上の例で言うならLitE (IntegerL 3))との対応を知るにはどうしたらいいだろうか。
+Template Haskellでは普通のコード上の表現を構文木に変換してくれる記法を用意している。
+</p>
+
+<p>
+Haskellの構文木には大きく分けて4種類の型がある。
+式、パターン、型、宣言である。
+それぞれに対して専用の記法がある。
+</p>
+
+<ul>
+<li>式: [e| ... |]または[| ... |]</li>
+<li>パターン: [p| ... |]</li>
+<li>型: [t| ... |]</li>
+<li>宣言: [d| ... |]</li>
+</ul>
+
+<p>
+'3'は「式」なので[e| 3 |]として対応する構文木を入手することができる。
+'3'を構文木に直したうえでそれを'$'で実行してみる。
+</p>
+
+<pre><code>Prelude Language.Haskell.TH&gt; $([e| 3 |])
+3</code></pre>
+
+<p>
+構文木はQモナドで包まれた形となっているので、値を取り出すにはrunQが必要である。
+</p>
+
+<pre><code>Prelude Language.Haskell.TH&gt; runQ [e| 3 |]
+LitE (IntegerL 3)</code></pre>
+
+<p>
+「このコード、構文木ではどう表現されるのかな?」と思ったときにはこれを使えば良い。
+以下にいくつかの例を示す。
+</p>
+
+<pre><code>Prelude Language.Haskell.TH&gt; runQ [e| print "hello" |]
+AppE (VarE System.IO.print) (LitE (StringL "hello"))
+Prelude Language.Haskell.TH&gt; runQ [d| main = print "hello" |]
+[ValD (VarP main_0) (NormalB (AppE (VarE System.IO.print)
+(LitE (StringL "hello")))) []]
+Prelude Language.Haskell.TH&gt; runQ [t| IO () |]
+AppT (ConT GHC.Types.IO) (TupleT 0)
+Prelude Language.Haskell.TH&gt; runQ [p| x : xs |]
+InfixP (VarP x_1) GHC.Types.: (VarP xs_2)</code></pre>
+
+<h2>名前クォート</h2>
+
+<p>
+定義ずみの名前を使用する場合「名前クォート」の機能を使うことができる。
+</p>
+
+<pre><code>Prelude Language.Haskell.TH&gt; 'print
+System.IO.print
+Prelude Language.Haskell.TH&gt; :t 'print
+'print :: Name</code></pre>
+
+<p>
+使いたい名前が型名の場合にはクォートを2つつける。
+</p>
+
+<pre><code>Prelude Language.Haskell.TH&gt; ''IO
+GHC.Types.IO</code></pre>
+
+<p>
+名前クォートをどのように使うかは後述の例を参照のこと。
+</p>
+
+<p>
+<a href="/computer/haskell/extensions/template_haskell"
+	>「Template Haskell」トップへもどる</a>
+<a href="/computer/haskell/extensions/template_haskell/tuple.html"
+	>「タプルの例 (工事中 0%)」へ</a>
+</p>
