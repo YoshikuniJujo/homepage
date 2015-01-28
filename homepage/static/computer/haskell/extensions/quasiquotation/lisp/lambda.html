@@ -1,0 +1,61 @@
+Lispっぽく表記: lambda
+
+<h2>Lexerモジュールへの変更</h2>
+
+<p>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/version_3/Lexer.hs"
+	>Lexer.hs</a>
+</p>
+
+<pre><code>data Token
+	= OP | CP
+	| Setq | Lambda
+	| Var String | Nat Integer | Str String
+	deriving Show</code></pre>
+
+<pre><code>...
+lexer ('l' : 'a' : 'm' : 'b' : 'd' : 'a' : cs@(c : _))
+	| not $ isAlphaNum c = Lambda : lexer cs
+...</code></pre>
+
+<p>
+lambdaを特別なトークンLambdaとして読み込むようにした。
+</p>
+
+<h2>Parserモジュールへの変更</h2>
+
+<p>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/version_3/Parser.hs"
+	>Parser.hs</a>
+</p>
+
+<pre><code>...
+parseExp (OP : Lambda : OP : ts) = let
+	(ps, ts') = parsePatList ts
+	(es, ts'') = parseList ts' in
+	(lamE ps $ last es, ts'')
+...</code></pre>
+
+<p>
+トークンLambdaを読み込んだら、はじめの括弧内をパターンとして読み込み、
+それに続く式の並びを読み込み、最後に現れたものを結果とするようにした。
+評価途中でIOを行わないHaskellでは最後の式以外は無視することになる。
+</p>
+
+<h2>試してみる</h2>
+
+<pre><code>ghci useLispLike.hs
+*Main&gt; :set -XQuasiQuotes
+*Main&gt; [lisp| (lambda (x y z) (+ x (+ y z))) |] 3 4 5
+12
+*Main&gt; [lisp| (lambda (n) (putStrLn (++ "Hello, " n))) |] "world"
+Hello, world</code></pre>
+
+<p>lambdaが使えるようになった。</p>
+
+<p>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/pattern.html"
+	>「パターンのパース」へもどる</a>
+<a href="/computer/haskell/extensions/quasiquotation/lisp"
+	>「Lispっぽい表記」トップへ</a>
+</p>
