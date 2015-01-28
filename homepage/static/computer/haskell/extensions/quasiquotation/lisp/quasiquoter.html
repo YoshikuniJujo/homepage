@@ -1,6 +1,40 @@
 Lispっぽく表記: QuasiQuoter
 
-<p>(工事中 0%)</p>
-
 <p><a href="/computer/haskell/extensions/quasiquotation/lisp/LispLike.hs"
 	>LispLike.hs</a></p>
+
+<h2>QuasiQuoterの定義</h2>
+
+<p>
+今のところ、使うのは式と宣言の部分のクォートなので、その2ヶ所だけ埋めておく。
+</p>
+
+<pre><code>lisp :: QuasiQuoter
+lisp = QuasiQuoter {
+	quoteExp = fst . parseExp . lexer,
+	quotePat = undefined,
+	quoteType = undefined,
+	quoteDec = parseDec . lexer }</code></pre>
+
+<h2>試してみる</h2>
+
+<p><a href="/computer/haskell/extensions/quasiquotation/lisp/useLispLike.hs"
+	>useLispLike.hs</a></p>
+
+<pre><code>[lisp|
+
+(setq main (putStrLn (++ "Hello, " "world!")))
+
+|]</code></pre>
+
+<pre><code>% ghci useLispLike.hs
+*Main&gt; :set -XQuasiQuotes
+*Main&gt; main
+Hello, world!
+*Main&gt; [lisp| (+ 3 (* 2 4)) |]
+11</code></pre>
+
+<p>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/parser.html"
+	>「パーサ」へもどる</a>
+</p>
