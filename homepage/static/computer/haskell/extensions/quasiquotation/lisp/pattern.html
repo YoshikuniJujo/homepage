@@ -1,0 +1,73 @@
+Lispっぽい表記: パターン
+
+<h2>はじめに</h2>
+
+<p>
+前回までの定義で、とりあえず、Lispっぽくあいさつすることができた。
+しかし、まだ関数定義することはできない。
+関数定義するためには、ラムダを表現する必要があり、
+ラムダを表現するためには引数を解釈する必要がある。
+Haskellでは引数はパターンとして扱われている。
+よって、まっはパターンをパースする必要がある。
+</p>
+
+<h2>何が必要か</h2>
+
+<p>
+まず必要なのは、単純な変数としてのパターンである。
+その後、簡単なのでワイルドカードが使えるようにする。
+で、残りは構成されたパターンである。
+とりあえず、ここまでやる。
+アズパターンや遅延パターンについては簡単ならやる。
+めんどくさければ今後の課題とすることにしよう。
+</p>
+
+<h2>Parser, LispLikeモジュールへの変更</h2>
+
+<p>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/version_2/Parser.hs"
+	>Parser.hs</a>
+</p>
+
+<pre><code>parsePat :: [Token] -&gt; (PatQ, [Token])
+parsePat (Var v : ts) = (varP $ mkName v, ts)
+parsePat (OP : Var v : ts) = let
+	(ps, ts') = parsePatList ts in
+	(conP (mkName v) ps, ts')
+parsePat ts =
+	error $ "parsePattern: parse error: " ++ show ts</code></pre>
+
+<pre><code>parsePatList :: [Token] -&gt; ([PatQ], [Token])
+parsePatList (CP : ts) = ([], ts)
+parsePatList ts = let
+	(p, ts') = parsePat ts
+	(ps, ts'') = parsePatList ts' in
+	(p : ps, ts'')</code></pre>
+
+<p>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/version_2/LispLike.hs"
+	>LispLike.hs</a>
+</p>
+
+<pre><code>lisp = QuasiQuoter {
+	...
+	quotePat = fst . parsePat . lexer,
+	... }</code></pre>
+
+<h2>試してみる</h2>
+
+<pre><code>% ghci useLispLike.hs
+*Main&gt; :set -XQuasiQuotes
+*Main&gt; let [lisp| (: h (: e llo)) |] = "hello"
+*Main&gt; e
+'e'
+*Main&gt; llo
+"llo"
+</code></pre>
+
+<p>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/quasiquoter.html"
+	>「QuasiQuoterの作成」へもどる</a>
+<a href="/computer/haskell/extensions/quasiquotation/lisp"
+	>「Lispっぽい表記」トップへ</a>
+</p>
