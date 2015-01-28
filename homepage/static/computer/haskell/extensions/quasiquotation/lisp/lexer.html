@@ -14,12 +14,12 @@ Lispっぽく表記: 字句解析器
 <h2>トークンの定義</h2>
 
 <pre><code>data Token
-	= Setq | OP | CP
+	= Define | OP | CP
 	| Var String | Nat Int | Str String
 	deriving Show</code></pre>
 
 <p>
-Setqは予約語"setq"に対応するトークン。
+Defineは予約語"define"に対応するトークン。
 OP, CPはそれぞれ開き括弧(open parenthesis)と閉じ括弧(close parenthesis)。
 Varは変数(variable)、Natは自然数(natural number)、Strは文字列(string)。
 </p>
@@ -31,8 +31,8 @@ lexer ('(' : cs) = OP : lexer cs
 lexer (')' : cs) = CP : lexer cs
 lexer ('"' : cs) =
 	let (s, '"' : r) = span (/= '"') cs in Str s : lexer r
-lexer ('s' : 'e' : 't' : 'q' : cs@(c : _))
-	| not $ isAlphaNum c = Setq : lexer cs
+lexer ('d' : 'e' : 'f' : 'i' : 'n' : 'e' : cs@(c : _))
+	| not $ isAlphaNum c = Define : lexer cs
 lexer s@(c : cs)
 	| isSpace c = lexer $ dropWhile isSpace cs
 	| isAlpha c = let (v, r) = span isAlphaNum s in
@@ -61,7 +61,7 @@ Haskellの演算子に使える文字であるかどうかを調べる関数。
 <h2>試してみる</h2>
 
 <pre><code>% ghci Lexer.hs
-Lexer&gt; lexer "(setq) abc3 352 \"hoge\""
+Lexer&gt; lexer "(define) abc3 352 \"hoge\""
 [OP,Setq, CP,Var "abc3",Nat 352,Str "hoge"]</code></pre>
 
 <p>

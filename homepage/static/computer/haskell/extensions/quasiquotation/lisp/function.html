@@ -9,7 +9,7 @@ Lispっぽく表記: 関数定義の追加
 以下のようにすれば良い。
 </p>
 
-<pre><code>(setq add (lambda (x y) (+ x y)))</code></pre>
+<pre><code>(define add (lambda (x y) (+ x y)))</code></pre>
 
 <p>
 しかし、やはり関数定義用の構文が使えたほうが「人間にとって」はわかりやすい。
@@ -20,4 +20,23 @@ Lispっぽく表記: 関数定義の追加
 <p>
 Lispでの関数定義の構文がどんな感じだったのか忘れたので調べてみた。
 以下のような形らしい。
+</p>
+
+<h3>Common Lisp</h3>
+
+<pre><code>(defun 関数名 (引数のリスト) 式)</code></pre>
+
+<h3>Scheme</h3>
+
+<pre><code>(define (関数名 引数のリスト) 式)</code></pre>
+
+<h3>結論</h3>
+
+<p>Schemeの表記のほうが僕好みなので、そちらを採用する。</p>
+
+<p>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/lambda.html"
+	>「lambdaの追加」へもどる</a>
+<a href="/computer/haskell/extensions/quasiquotation/lisp"
+	>「Lispっぽい表記」トップへ</a>
 </p>

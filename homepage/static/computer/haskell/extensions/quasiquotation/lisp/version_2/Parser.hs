@@ -25,7 +25,7 @@ parseList ts = let
 	(e : es, ts'')
 
 parseDec :: [Token] -> DecsQ
-parseDec (OP : Setq : Var v : ts) = let
+parseDec (OP : Define : Var v : ts) = let
 	(e, CP : ts') = parseExp ts in
 	(:)	<$> valD (varP $ mkName v) (normalB e) []
 		<*> parseDec ts'
@@ -37,8 +37,7 @@ parsePat (Var v : ts) = (varP $ mkName v, ts)
 parsePat (OP : Var v : ts) = let
 	(ps, ts') = parsePatList ts in
 	(conP (mkName v) ps, ts')
-parsePat ts =
-	error $ "parsePattern: parse error: " ++ show ts
+parsePat ts = error $ "parsePattern: parse error: " ++ show ts
 
 parsePatList :: [Token] -> ([PatQ], [Token])
 parsePatList (CP : ts) = ([], ts)

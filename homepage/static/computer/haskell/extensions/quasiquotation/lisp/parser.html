@@ -42,11 +42,11 @@ parseList ts = let
 
 <p>
 宣言の並びとしてパースするパーサ。
-(setq var (...))のような表現をvar = ...のような形に解釈する。
+(define var (...))のような表現をvar = ...のような形に解釈する。
 </p>
 
 <pre><code>parseDec :: [Token] -&gt; DecsQ
-parseDec (OP : Setq : Var v : ts) = let
+parseDec (OP : Define : Var v : ts) = let
 	(e, CP : ts') = parseExp ts in
 	(:)	&lt;$&gt; valD (varP $ mkName v) (normalB e) []
 		&lt;*&gt; parseDec ts'
