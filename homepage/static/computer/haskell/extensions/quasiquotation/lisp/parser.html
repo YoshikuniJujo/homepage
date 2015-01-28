@@ -1,11 +1,61 @@
 Lispっぽく表記: パーサ
 
-<p>(工事中 0%)</p>
-
 <p><a href="/computer/haskell/extensions/quasiquotation/lisp/Parser.hs"
 	>Parser.hs</a></p>
+
+<h2>式のパース</h2>
+
+<p>
+まずは、変数、自然数、文字列をパースする。
+開き括弧から始まるトークン列は、まずユニット値をパースし、
+その後は関数適用としてパースされる。
+関数適用は式の並びをパースした結果をリストとして入手したうえで、
+それをappEでつないでいる。
+</p>
+
+<pre><code>parseExp :: [Token] -&gt; (ExpQ, [Token])
+parseExp (Var v : ts) = (varE $ mkName v, ts)
+parseExp (Nat n : ts) = (litE $ integerL n, ts)
+parseExp (Str s : ts) = (litE $ stringL s, ts)
+parseExp (OP : CP : ts) = (conE '(), ts)
+parseExp (OP : ts) = let
+	(es, ts') = parseList ts in
+	(foldl1 appE es, ts')
+parseExp ts = error "parseExp: parse error: " ++ show ts</code></pre>
+
+<h3>式の並びのパース</h3>
+
+<p>
+関数適用で使用するために式の並びをパースしている。
+この段階でappEを適用してしまっても良いが、わかりやすさのため、
+今回はリストとして返す実装にした。
+</p>
+
+<pre><code>parseList :: [Token] -&gt; ([ExpQ], [Token])
+parseList (CP : ts) = ([], ts)
+parseList ts = let
+	(e, ts') = parseExp ts
+	(es, ts'') = parseList ts' in
+	(e : es, ts'')</code></pre>
+
+<h2>宣言のパース</h2>
+
+<p>
+宣言の並びとしてパースするパーサ。
+(setq var (...))のような表現をvar = ...のような形に解釈する。
+</p>
+
+<pre><code>parseDec :: [Token] -&gt; DecsQ
+parseDec (OP : Setq : Var v : ts) = let
+	(e, CP : ts') = parseExp ts in
+	(:)	&lt;$&gt; valD (varP $ mkName v) (normalB e) []
+		&lt;*&gt; parseDec ts'
+parseDec [] = return []
+parseDec ts = error $ show ts</code></pre>
 
 <p>
 <a href="/computer/haskell/extensions/quasiquotation/lisp/lexer.html"
 	>「字句解析器」へもどる</a>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/quasiquoter.html"
+	>「QuasiQuoterの作成」へ</a>
 </p>

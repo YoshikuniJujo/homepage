@@ -15,7 +15,7 @@ parseExp (OP : CP : ts) = (conE '(), ts)
 parseExp (OP : ts) = let
 	(es, ts') = parseList ts in
 	(foldl1 appE es, ts')
-parseExp _ = error "parseExp: parse error"
+parseExp ts = error $ "parseExp: parse error: " ++ show ts
 
 parseList :: [Token] -> ([ExpQ], [Token])
 parseList (CP : ts) = ([], ts)
@@ -27,6 +27,7 @@ parseList ts = let
 parseDec :: [Token] -> DecsQ
 parseDec (OP : Setq : Var v : ts) = let
 	(e, CP : ts') = parseExp ts in
-	(:) <$> valD (varP $ mkName v) (normalB e) [] <*> parseDec ts'
+	(:)	<$> valD (varP $ mkName v) (normalB e) []
+		<*> parseDec ts'
 parseDec [] = return []
 parseDec ts = error $ show ts
