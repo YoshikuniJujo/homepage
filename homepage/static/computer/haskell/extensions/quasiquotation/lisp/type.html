@@ -1,0 +1,60 @@
+Lispっぽく表記: 型のパース
+
+<p>(工事中 20%)</p>
+
+<h2>Haskellなら「型」でしょ</h2>
+
+<p>
+Lispと比較した場合のHaskellの強みのひとつは「型」だ。
+Haskellの型推論は優秀で、こったことをしないかぎり、たいていの型は推論してくれる。
+しかし、機械に推論させるよりも自分で型を指定したほうが、思考を整理できる。
+また、Haskellのよりディープな世界では、型推論が利かない場合がある。
+なので、ここで「型」もLispっぽく書けるようにしておこう。
+</p>
+
+<h2>基本的な型のパース</h2>
+
+<h3>QuasiQuoterのquoteTypeフィールド</h3>
+
+<p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_6/LispLike.hs"
+	>LipsLike.hs</a></p>
+
+<pre><code>lisp :: QuasiQuoter
+lisp = QuasiQuoter {
+	quoteExp = fst . parseExp . lexer,
+	quotePat = fst . parsePat . lexer,
+	quoteType = fst . parseType . lexer,
+	quoteDec = parseDec . lexer }</code></pre>
+
+<p>quoteTypeフィールドを以下で作っていくparseTypeで束縛した。</p>
+
+<h3>単純な型のみのパーサ</h3>
+
+<p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_6/Parser.hs"
+	>Parser.hs</a></p>
+
+<p>まずは単純な型のみのパーサを作成する。</p>
+
+<pre><code>parseType :: [Token] -&gt; (TypeQ, [Token])
+parseType (Con v : ts) = (conT $ mkName v, ts)
+parseType ts = error $ "parseType: parse error: " ++ show ts</code></pre>
+
+<h3>試してみる</h3>
+
+<pre><code>ghci useLispLike.hs
+*Main&gt; :set -XQuasiQuotes
+*Main&gt; 8 :: [lisp| Int |]
+8
+*Main&gt; :t it
+it :: Int
+*Main&gt; 8 :: [lisp| Double |]
+8.0
+*Main&gt; :t it
+it :: Double</code></pre>
+
+<p>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/constructor.html"
+	>「値構築子の追加」へもどる</a>
+<a href="/computer/haskell/extensions/quasiquotation/lisp"
+	>「Lispっぽく表記」トップへ</a>
+</p>
