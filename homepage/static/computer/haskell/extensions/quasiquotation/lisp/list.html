@@ -1,6 +1,76 @@
 Lispっぽく表記: リストのパース
 
-<p>(工事中 0%)</p>
+<h2>角括弧の字句解析</h2>
+
+<p>
+丸括弧、角括弧、波括弧のそれぞれの英語名をまずは調べることにする。
+<a href="https://ja.wikipedia.org/wiki/括弧"
+>ウィキペディア: 括弧</a>を参照。
+</p>
+
+<ul>
+<li>(): parenthesis, paren</li>
+<li>[]: bracket</li>
+<li>{}: brace</li>
+</ul>
+
+<p>Token型にOBとCBを追加することにする。また、Commaも必要となる。</p>
+
+<p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_7/Lexer.hs"
+	>Lexer.hs</a></p>
+
+<h2>式のなかのリストのパース</h2>
+
+<p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_7/Parser.hs"
+	>Parser.hs</a></p>
+
+<pre><code>...
+parseExp (OB : ts) = let
+	(es, ts') = parseHsList ts in
+	(listE es, ts')
+...</code></pre>
+
+<pre><code>parseHsList :: [Token] -&gt; ([ExpQ], [Token])
+parseHsList (CB : ts) = ([], ts)
+parseHsList ts = case parseExp ts of
+	(e, CB : ts') -&gt; ([e], ts')
+	(e, Comma : ts') -&gt; let
+		(es, ts'') = parseHsList ts' in
+		(e : es, ts'')
+	_ -&gt; error $ "parseHsList: parse error: " ++ show ts</code></pre>
+
+<h2>パターンのなかのリストのパース</h2>
+
+<pre><code>...
+parsePat (OB : ts) = let
+	(ps, ts') = parsePatHsList ts in
+	(listP ps, ts')
+...</code></pre>
+
+<pre><code>parsePatHsList :: [Token] -&gt; ([PatQ], [Token])
+parsePatHsList (CB : ts) = ([], ts)
+parsePatHsList ts = case parsePat ts of
+	(p, CB : ts') -&gt; ([p], ts')
+	(p, Comma : ts') -&gt; let
+		(ps, ts'') = parsePatHsList ts' in
+		(p : ps, ts'')
+	_ -&gt; error $ "parsePatHsList: parse error: " ++
+		show ts</code></pre>
+
+<h2>試してみる</h2>
+
+<pre><code>% ghci useLispLike.hs
+*Main&gt; :set -XQuasiQuotes
+*Main&gt; [lisp| ["hello", "world"] |]
+["hello", "world"]
+*Main&gt; [lisp| (length ["hello", "world"]) |]
+2
+*Main&gt; let [lisp| [a, b, c] |] = "tls"
+*Main&gt; a
+'t'
+*Main&gt; c
+'s'
+</code></pre>
 
 <p>
 <a href="/computer/haskell/extensions/quasiquotation/lisp/type.html"
