@@ -1,6 +1,6 @@
 Lispっぽく表記: 型のパース
 
-<p>(工事中 20%)</p>
+<p>(工事中 25%)</p>
 
 <h2>Haskellなら「型」でしょ</h2>
 
@@ -93,6 +93,77 @@ it :: Either Double String
 *Main&gt; let foo = Nothing :: [lisp| (Maybe (IO Int)) |]
 *Main&gt; :t foo
 foo :: Maybe (IO Int)</code></pre>
+
+<h2>何を追加するか</h2>
+
+<p><a href="https://downloads.haskell.org/~ghc/latest/docs/html/libraries/template-haskell-2.9.0.0/Language-Haskell-TH.html#g:18"
+	>Language.Haskell.THモジュールの説明</a></p>
+
+<p>
+この後、何を追加するかを決めるに当たって、
+Type型の値構築子を参考にしていこうと思う。
+Type型の値構築子はGHCの拡張機能に対応して、様々な応用的な構築子を含むので、
+今の時点でどれを採用するのかを取捨選択する必要がある。
+</p>
+
+<ul>
+<li>ForallT: N-ランク多相関連、今は実装しない、いつかはする</li>
+<li>AppT: 型構築子の「適用」、実装済み</li>
+<li>SigT: 型のカインド関連、今は実装しない</li>
+<li>VarT: 型変数、実装する</li>
+<li>ConT: 型構築子、実装済み</li>
+<li>PromotedT: これ知らない、後で調べる</li>
+<li>TupleT: タプル型、実装する</li>
+<li>UnboxedTupleT: 非ボックスタプル型、今は実装しない</li>
+<li>ArrowT: 関数の引数関連、実装する</li>
+<li>ListT: リスト型、実装する</li>
+<li>PromotedTupleT: これ知らない、後で調べる</li>
+<li>PromotedNilT: これ知らない、後で調べる</li>
+<li>PromotedConsT: これ知らない、後で調べる</li>
+<li>StarT: 型のカインド関連か?、後で調べる</li>
+<li>ConstraintT: これ知らない、後で調べる</li>
+<li>LitT: 型レベルプログラミング関連、後で学ぶ</li>
+</ul>
+
+<p>結果としてここでこの後に実装するのは以下の型となる。</p>
+
+<ul>
+<li>ListT: リスト型</li>
+<li>TupleT: タプル型</li>
+<li>ArrowT: 関数の型</li>
+<li>VarT: 型変数</li>
+</ul>
+
+<h2>リスト型</h2>
+
+<h3>[]を特別なトークンとして読み込む</h3>
+
+<p>
+EmptyListトークンを追加し読み出せるようにする。
+'['と']'のあいだに空白文字を入れて良いかどうかは考え中。
+</p>
+
+<p>(作成中)</p>
+
+<h3>空リストとしてパース</h3>
+
+<p>(作成中)</p>
+
+<h3>リスト型としてパース</h3>
+
+<p>(作成中)</p>
+
+<h2>タプル型</h2>
+
+<p>(作成中)</p>
+
+<h2>関数の型</h2>
+
+<p>(作成中)</p>
+
+<h2>型変数</h2>
+
+<p>(作成中)</p>
 
 <p>
 <a href="/computer/haskell/extensions/quasiquotation/lisp/constructor.html"
