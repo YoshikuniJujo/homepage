@@ -1,9 +1,79 @@
-Lispっぽい表記: 値構築子
+Lispっぽい表記: 値構築子の追加
 
-<p>(工事中 0%)</p>
+<h2>問題点</h2>
+
+<p>
+今までの定義では変数と値構築子とを区別して来なかった。
+しかし、Haskellでは大文字で始まる識別子と':'で
+始まる演算子は値構築子として扱う必要がある。
+</p>
+
+<h2>Lexerモジュールへの変更</h2>
 
 <p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_5/Lexer.hs"
 	>Lexer.hs</a></p>
 
+<pre><code>data Token
+	= OP | CP
+	| Define | Lambda
+	| Con String | Var String
+	| Nat Integer | Str String
+	deriving Show</code></pre>
+
+<p>Con Stringを追加した。</p>
+
+<pre><code>...
+	| isUpper c = let (v, r) = span isAlphaNum s in
+		Con v : lexer r
+	| isAlpha c = let (v, r) = span isAlphaNum s in
+		Var v : lexer r
+	| ':' &lt;- c = let (v, r) = span isOperator s in
+		Con v : lexer r
+	| isOperator c = let (v, r) = span isOperator s in
+		Var v : lexer r
+	...</code></pre>
+
+<p>ガードisUpper cとガード':' &lt;- cを追加した。</p>
+
+<h2>Parserモジュールへの変更</h2>
+
 <p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_5/Parser.hs"
 	>Parser.hs</a></p>
+
+<pre><code>...
+parseExp (Con v : ts) = (conE $ mkName v, ts)
+...</code></pre>
+
+<p>Con vの場合のマッチを追加した。</p>
+
+<pre><code>...
+parsePat (OP : Con v : ts) = let
+...</code></pre>
+
+<p>Var vからCon vにマッチの内容を変更した。</p>
+
+<h2>試してみる</h2>
+
+<p>フィボナッチ数列を作成してみよう。</p>
+
+<p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_5/fibs.hs"
+	>fibs.hs</a></p>
+
+<pre><code>[lisp|
+
+(define fibs (: 0 (: 1 (zipWith + fibs (tail fibs)))))
+
+|]</code></pre>
+
+<pre><code>ghci fib.hs
+*Main&gt; fibs !! 10
+55
+*Main&gt; fibs !! 100
+354224848179261915075</code></pre>
+
+<p>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/function.html"
+	>「関数定義の追加」へもどる</a>
+<a href="/computer/haskell/extensions/quasiquotation/lisp"
+	>「Lispっぽい表記」トップへ</a>
+</p>

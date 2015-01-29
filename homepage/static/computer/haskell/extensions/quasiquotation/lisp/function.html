@@ -1,7 +1,5 @@
 Lispっぽく表記: 関数定義の追加
 
-<p>(工事中 0%)</p>
-
 <h2>動機</h2>
 
 <p>
@@ -34,15 +32,41 @@ Lispでの関数定義の構文がどんな感じだったのか忘れたので�
 
 <p>Schemeの表記のほうが僕好みなので、そちらを採用する。</p>
 
+<h2>Parserモジュールへの変更</h2>
+
 <p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_4/Parser.hs"
 	>Parser.hs</a></p>
+
+<pre><code>...
+parseDec (OP : Define : OP : Var v : ts) = let
+	(ps, ts') = parsePatList ts
+	(es, ts'') = parseList ts' in
+	(:)	&lt;$&gt; valD
+			(varP $ mkName v)
+			(normalB . lamE ps $ last es)
+			[]
+		&lt;*&gt; parseDec ts''
+...</code></pre>
+
+<h2>試してみる</h2>
 
 <p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_4/useLispLike.hs"
 	>useLispLike.hs</a></p>
 
+<pre><code>[lisp|
+...
+
+(define (greeting n) (putStrLn (++ "Hello, " n)))
+
+|]</code></pre>
+
+<pre><code>% ghci useLispLike.hs
+*Main&gt; greeting "Yoshikuni"
+Hello, Yoshikuni</code></pre>
+
 <p>
 <a href="/computer/haskell/extensions/quasiquotation/lisp/lambda.html"
 	>「lambdaの追加」へもどる</a>
-<a href="/computer/haskell/extensions/quasiquotation/lisp"
-	>「Lispっぽい表記」トップへ</a>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/constructor.html"
+	>「値構築子の追加」へ</a>
 </p>
