@@ -41,7 +41,7 @@ parseType ts = error $ "parseType: parse error: " ++ show ts</code></pre>
 
 <h3>試してみる</h3>
 
-<pre><code>ghci useLispLike.hs
+<pre><code>% ghci useLispLike.hs
 *Main&gt; :set -XQuasiQuotes
 *Main&gt; 8 :: [lisp| Int |]
 8
@@ -51,6 +51,48 @@ it :: Int
 8.0
 *Main&gt; :t it
 it :: Double</code></pre>
+
+<h2>型構築子の「適用」</h2>
+
+<p>
+型引数が必要な型構築子がある。
+Maybeなどはそれだけでは型にはならない。
+Maybe IntやMaybe Stringのようにする必要がある。
+このような「適用」をパースできるようにする。
+</p>
+
+<p>まずは型の並びをパースできるようにしておく。</p>
+
+<pre><code>parseTypeList :: [Token] -&gt; ([TypeQ], [Token])
+parseTypeList (CP : ts) = ([], ts)
+parseTypeList ts = let
+	(tp, ts') = parseType ts
+	(tps, ts'') = parseTypeList ts' in
+	(tp : tsp, ts'')</code></pre>
+
+<p>型構築子の「適用」は括弧でくくられた並びをappTでつなげば良い。</p>
+
+<pre><code>...
+parseType (OP : ts) = let
+	(tps, ts') = parseTypeList ts in
+	(foldl1 appT tps, ts')
+...</code></pre>
+
+<h3>試してみる</h3>
+
+<pre><code>% ghci useLispLike.hs
+*Main&gt; :set -XQuasiQuotes
+*Main&gt; Nothing :: [lisp| (Maybe Int) |]
+Nothing
+*Main&gt; :t it
+it :: Maybe Int
+*Main&gt; Left 8 :: [lisp| (Either Double String) |]
+Left 8.0
+*Main&gt; :t it
+it :: Either Double String
+*Main&gt; let foo = Nothing :: [lisp| (Maybe (IO Int)) |]
+*Main&gt; :t foo
+foo :: Maybe (IO Int)</code></pre>
 
 <p>
 <a href="/computer/haskell/extensions/quasiquotation/lisp/constructor.html"
