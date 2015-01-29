@@ -1,6 +1,6 @@
 Lispっぽく表記: 型のパース(2)
 
-<p>(工事中 50%)</p>
+<p>(工事中 90%)</p>
 
 <p>
 今はこのような形だが、おそらくタプルのパースを間にはさんで、
@@ -33,13 +33,16 @@ parseType (OB : ts) = let
 
 <h2>試してみる</h2>
 
-<p>(作成中)</p>
-
-<h2>タプル型</h2>
-
-<h2>関数の型</h2>
-
-<h2>型変数</h2>
+<pre><code>% ghci useLispLike.hs
+*Main&gt; :set -XQuasiQuotes
+*Main&gt; [] :: [lisp| ([] Int) |]
+[]
+*Main&gt; :t it
+it :: [Int]
+*Main&gt; [] :: [lisp| [Int] |]
+[]
+*Main&gt; :t it
+it :: [Int]</code></pre>
 
 <p>
 <a href="/computer/haskell/extensions/quasiquotation/lisp/list.html"
