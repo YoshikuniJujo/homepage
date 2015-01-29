@@ -1,8 +1,39 @@
 Lispっぽく表記: 型のパース(2)
 
-<p>(工事中 0%)</p>
+<p>(工事中 50%)</p>
+
+<p>
+今はこのような形だが、おそらくタプルのパースを間にはさんで、
+型のパース(3)とに分けることになるだろう。
+</p>
 
 <h2>リスト型</h2>
+
+<p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_8/Parser.hs"
+	>Parser.hs</a></p>
+
+<p>
+リストのパースのところで角括弧の字句解析は実装した。
+ので、ここですることは単にOB, CBの並びを見つけてlistTに変換するだけだ。
+</p>
+
+<pre><code>...
+parseType (OB : CB : ts) = (listT, ts)
+...</code></pre>
+
+<p>
+[Int]のような書きかたもパースできるようにすることにする。
+</p>
+
+<pre><code>...
+parseType (OB : ts) = let
+	(tp, CB : ts') = parseType ts in
+	(listT `appT` tp, ts')
+...</code></pre>
+
+<h2>試してみる</h2>
+
+<p>(作成中)</p>
 
 <h2>タプル型</h2>
 
