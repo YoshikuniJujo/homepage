@@ -2,6 +2,43 @@ Lispっぽく表記: 代数的データ型の定義
 
 <p>(工事中 0%)</p>
 
+<h2>どのような表記にするか</h2>
+
+<p>Haskellでは以下のような形になる。</p>
+
+<pre><code>data Foo a = Bar | Baz Int | FooBar </code></pre>
+
+<p>Lispっぽい表記では以下のようにすれば良い。</p>
+
+<pre><code>(data (Foo a) Bar (Baz Int) FooBar)</code></pre>
+
+<p>
+'|'は字句解析で特別なものとして読み込むことにするが、
+まず'|'に演算子記号が続かないことと、
+演算子'|'をExpのなかでちゃんと読み込むとととに注意が必要だ。
+</p>
+
+<h3>deriving節</h3>
+
+<p>
+代数的データ型の定義にはderiving節が付く場合もある。
+この場合の表記も考えてみよう。
+以下のようにすれば良いと思う。
+</p>
+
+<pre><code>(deriving (data (Foo a) Bar (Baz Int) FooBar) Show Eq)</code></pre>
+
+<h2>コード</h2>
+
+<p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_15/Lexer.hs"
+	>Lexer.hs</a></p>
+
+<p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_15/Parser.hs"
+	>Parser.hs</a></p>
+
+<p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_15/useLispLike.hs"
+	>useLispLike.hs</a></p>
+
 <p>
 <a href="/computer/haskell/extensions/quasiquotation/lisp/type_annotation.html"
 	>「型注釈」へもどる</a>
