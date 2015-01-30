@@ -1,3 +1,62 @@
 Lispっぽく表記: 型宣言
 
-<p>(工事中 0%)</p>
+<h2>Lexer.hs</h2>
+
+<p>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/version_13/Lexer.hs"
+	>Lexer.hs</a>
+</p>
+
+<pre><code>data Token
+	= ...
+	| Comma | Arrow | Type
+	...</code></pre>
+
+<pre><code>...
+lexer ('t' : 'y' : 'p' : 'e' : cs@(c : _))
+	| not $ isAlphaNum c = Type : lexer cs
+...</code></pre>
+
+<h2>Parser.hs</h2>
+
+<p>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/version_13/Parser.hs"
+	>Parser.hs</a>
+</p>
+
+<pre><code>...
+parseDec (OP : Type : Var v : ts) = case parseType ts of
+	(tp, CP : ts') -&gt;
+		(:) &lt;$&gt; sigD (mkName v) tp &lt;*&gt; parseDec ts'
+	_ -&gt; error $ "parseDec: parse error " ++ show ts
+...</code></pre>
+
+<h2>試してみる</h2>
+
+<p>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/version_13/useLispLike.hs"
+	>useLispLike.hs</a>
+</p>
+
+<pre><code>[lisp|
+
+(type main (IO ()))
+(define main (putStrLn (++ "Hello, " "world!")))
+
+(type greeting (-&gt; String (IO ())))
+(define (greeting n) (putStrLn (++ "Hello, " n)))
+
+|]</code></pre>
+
+<pre><code>% ghci useLispLike.hs
+*Main&gt; main
+Hello, world!
+*Main&gt; greeting "Yoshikuni"
+Hello, Yoshikuni</code></pre>
+
+<p>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/type3.html"
+	>「型のパース(3)」へもどる</a>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/type_annotation.html"
+	>「型注釈」へ</a>
+</p>

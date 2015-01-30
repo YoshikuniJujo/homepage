@@ -1,0 +1,30 @@
+Lispっぽく表記: 型注釈
+
+<h2>Parser.hs</h2>
+
+<p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_14/Parser.hs"
+	>Parser.hs</a></p>
+
+<pre><code>...
+parseExp (OP : Type : ts) = let (e, ts') = parseExp ts in
+	case parseType ts' of
+		(tp, CP : ts'') -&gt;
+			(sigE e $ addForallT &lt;$&gt; tp, ts'')
+		_ -&gt; error $
+			"parseExp: parse error: " ++ show ts
+...</code></pre>
+
+<h2>試してみる</h2>
+
+<pre><code>% ghci useLispLike.hs
+*Main&gt; [lisp| (type 3 Int) |]
+3
+*Main&gt; [lisp| (type 3 Double) |]
+3.0</code></pre>
+
+<p>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/type_dec.html"
+	>「型宣言」へもどる</a>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/data.html"
+	>「代数的データ型」へ</a>
+</p>
