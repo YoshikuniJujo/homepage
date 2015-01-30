@@ -1,8 +1,65 @@
 Lispっぽい表記: 型のパース(3)
 
-<p>(工事中 0%)</p>
+<p>(工事中 25%)</p>
 
 <h2>タプル型</h2>
+
+<p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_11/Parser.hs"
+	>Parser.hs</a></p>
+
+<h3>((,) Int ())のような形</h3>
+
+<pre><code>...
+parseType (OP : CP) = (tupleT 0, ts)
+parseType (OP : Comma : ts) = let
+	(n, ts') = parseTupleType ts in
+	(tupleT n, ts')
+...</code></pre>
+
+<pre><code>parseTupleType :: [Token] -&gt; (Int, [Token])
+parseTupleType (CP : tp) = (2, tp)
+parseTupleType (Comma : tp) = first succ $ parseTupleType tp
+parseTupleType tp =
+	error $ "parseTupleType: parse error: " ++ show tp</code></pre>
+
+<h3>(Int, ())のような形</h3>
+
+<h4>parseTypeListがMaybe値を返すようにする</h4>
+
+<pre><code>parseTypeList :: [Token] -&gt; Maybe ([TypeQ], [Token])
+parseTypeList (Comma : _) = Nothing
+parseTypeList (CP : ts) = Just ([], ts)
+parseTypeList ts = let (tp, ts') = parseType ts in
+	first (tp :) &lt;$&gt; parseTypeList ts'</code></pre>
+
+<h4>parseTupledTypeの作成</h4>
+
+<pre><code>parseTupledType :: [Token] -&gt; ([TypeQ], [Token])
+parseTupledType ts = case parseType ts of
+	(tp, CP : ts') -&gt; ([tp], ts') (tp, Comma : ts') -&gt;
+		first (tp :) $ parseTupledType ts'
+	_ -&gt; error $
+		"parseTupledType: parse error: " ++ show ts</code></pre>
+
+<h4>parseTypeでのparseTupledTypeの使用</h4>
+
+<pre><code>...
+parseType (OP : ts) = maybe
+	(first (foldl appT &lt;$&gt; tupleT . length &lt;*&gt; id) $
+		parseTupledType ts)
+	(first $ foldl1 appT) $ parseTypeList ts
+...</code></pre>
+
+<h3>試してみる</h3>
+
+<pre><code>% ghci useLispLike.hs
+*Main&gt; :set -XQuasiQuotes
+*Main&gt; let some = undefined :: [lisp| ((,,) Int Bool () |]
+*Main&gt; :t some
+some :: (Int, Bool, ())
+*Main&gt; let some = undefined :: [lisp| (Int, Bool, ()) |]
+*Main&gt; :t some
+some :: (Int, Bool, ())</code></pre>
 
 <h2>関数の型</h2>
 
