@@ -1,7 +1,5 @@
 Lispっぽい表記: 型のパース(3)
 
-<p>(工事中 75%)</p>
-
 <h2>タプル型</h2>
 
 <p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_11/Parser.hs"
@@ -97,7 +95,10 @@ parseType (Arrow : ts) = (arrowT, ts)
 
 <h3>試してみる</h3>
 
-<p>(作成中)</p>
+<pre><code>% ghci userLispLike.hs
+*Main&gt; :set -XQuasiQuotes
+*Main&gt; (print :: [lisp| (-&gt; Bool (IO ())) |]) False
+False</code></pre>
 
 <h2>型変数</h2>
 
@@ -154,7 +155,10 @@ parseType (Var v : ts) = (varT $ mkName v, ts)
 
 <h3>試してみる</h3>
 
-<p>(作成中)</p>
+<pre><code>% ghci useLispLike.hs
+*Main&gt; :set -XQuasiQuotes
+*Main&gt; (length :: [lisp| (-&gt; [a] Int) |]) "hello"
+5</code></pre>
 
 <p>
 <a href="/computer/haskell/extensions/quasiquotation/lisp/tuple.html"
