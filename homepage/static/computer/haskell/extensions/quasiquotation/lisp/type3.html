@@ -1,6 +1,6 @@
 Lispっぽい表記: 型のパース(3)
 
-<p>(工事中 25%)</p>
+<p>(工事中 75%)</p>
 
 <h2>タプル型</h2>
 
@@ -63,4 +63,102 @@ some :: (Int, Bool, ())</code></pre>
 
 <h2>関数の型</h2>
 
+<p>
+関数の型はHaskellでは<code>T1 -&gt; T2</code>のように表記される。
+Lispっぽく表記するならば(-&gt; T1 T2)のようになるだろう。
+まずは'-&gt;'を字句解析できるようにする。
+そしてパースの段階でそれをarrowTに置き換えれば良い。
+難しいことはないはずだ。
+</p>
+
+<p>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/version_12/Lexer.hs"
+	>Lexer.hs</a>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/version_12/Parser.hs"
+	>Parser.hs</a>
+</p>
+
+<h3>Lexer.hs</h3>
+
+<pre><code>data Token
+	= ...
+	| Comma | Arrow
+	...</code></pre>
+
+<pre><code>...
+lexer ('-' : '&gt;' : cs) = Arrow : lexer cs
+...</code></pre>
+
+<h3>Parser.hs</h3>
+
+<pre><code>...
+parseType (Arrow : ts) = (arrowT, ts)
+...</code></pre>
+
+<h3>試してみる</h3>
+
+<p>(作成中)</p>
+
 <h2>型変数</h2>
+
+<p>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/version_12/AddForallT.hs"
+	>AddForallT.hs</a>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/version_12/LispLike.hs"
+	>LispLike.hs</a>
+</p>
+
+<p>
+これもVar vをvarT vにすれば良いだけだろう。
+</p>
+
+<p>
+と思ったのだが、ForallTが必要になるようだ。
+型のパース結果のなかに出てくる型変数のうち、
+ForallT内で宣言されていないものを集めて一番外側のForallT内に入れるルーチンが必要だ。
+</p>
+
+<h3>AddForallT.hs</h3>
+
+<pre><code>addForallT :: Type -&gt; Type
+addForallT t = case getTyVarNames t of
+	[] -&gt; t
+	ns -&gt; ForallT (map plainTV ns) [] t</code></pre>
+
+<pre><code>getTyVarNames :: Type -&gt; [Name]
+getTyVarNames (ForallT tvb _ tp) =
+	filter (`notElem` map nameFromTyVar tvb) $
+		getTyVarNames tp
+getTyVarNames (AppT t1 t2) =
+	getTyVarNames t1 `union` getTyVarNames t2
+getTyVarNames (VarT n) = [n]
+getTyVarNames _ = []</code></pre>
+
+<pre><code>nameFromTyVar :: TyVarBndr -&gt; Name
+nameFromTyVar (PlainTV n) = n
+nameFromTyVar (KindedTV n _) = n</code></pre>
+
+<h3>Parser.hs</h3>
+
+<pre><code>...
+parseType (Var v : ts) = (varT $ mkName v, ts)
+...</code></pre>
+
+<h3>LispLike.hs</h3>
+
+<pre><code>lisp = QuasiQuoter {
+	...
+	quoteType = (addForAllT &lt;$&gt;) .
+		fst . parseType . lexer,
+	...</code></pre>
+
+<h3>試してみる</h3>
+
+<p>(作成中)</p>
+
+<p>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/tuple.html"
+	>「タプルのパース」へもどる</a>
+<a href="/computer/haskell/extensions/quasiquotation/lisp"
+	>「Lispっぽく表記」トップへ</a>
+</p>
