@@ -1,3 +1,11 @@
+body {
+	font-size: 16px;
+}
+
+.small {
+	font-size: 12px;
+}
+
 dt.list {
 	padding-left : 0px; padding-right : 0px;
 	float : left; clear : both; font-weight : bold }
@@ -5,5 +13,3 @@ dt.list {
 dd.list { margin-left : 80px }
 
 .right { text-align : right }
-
-.small { font-size: small }

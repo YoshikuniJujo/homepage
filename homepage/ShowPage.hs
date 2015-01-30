@@ -128,6 +128,7 @@ makeHtml fp mt (ttl, bdy) = "<!DOCTYPE html><html lang=\"ja\">" ++ makeHead ttl
 makeHead :: String -> String
 makeHead ttl = "<head><meta charset=\"UTF-8\"><title>" ++ ttl ++ "</title>"
 	++ "<link href=\"/css/basic.css\" rel=\"stylesheet\" type=\"text/css\">"
+	++ "<meta name=\"viewport\" content=\"width=device-width\""
 	++ "</head>"
 
 breadcrumb :: [String] -> String
