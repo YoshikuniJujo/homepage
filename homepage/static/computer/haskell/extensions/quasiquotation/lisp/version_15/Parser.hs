@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskell, TupleSections #-}
 
 module Parser (
 	lexer, parseExp, parseDec, parsePat, parseType
@@ -96,28 +96,26 @@ parseDec (OP : Define : OP : Var v : ts) = let
 			(normalB . lamE ps $ last es)
 			[]
 		<*> parseDec ts''
+parseDec (OP : Data : ts) = let
+	(dd, ts') = parseDataDec ts in
+	(:) <$> dd [] <*> parseDec ts'
 parseDec (OP : Deriving : OP : Data : ts) = let
 	(dd, ts') = parseDataDec ts
 	(cs, ts'') = parseCons ts' in
 	(:) <$> dd cs <*> parseDec ts''
-parseDec (OP : Data : ts) = let
-	(dd, ts') = parseDataDec ts in
-	(:) <$> dd [] <*> parseDec ts'
 parseDec [] = return []
 parseDec ts = error $ "parseDec: " ++ show ts
 
 parseDataDec :: [Token] -> ([Name] -> DecQ, [Token])
-parseDataDec ts = let
-	((n, tvbs), ts') = parseDataHead ts
-	(cs, ts'') = parseConstructors ts' in
-	(dataD (cxt []) n tvbs cs, ts'')
+parseDataDec ts = let ((n, vbs), ts') = parseDataHead ts in
+	first (dataD (cxt []) n vbs) $ parseConstructors ts'
 
 parseDataHead :: [Token] -> ((Name, [TyVarBndr]), [Token])
 parseDataHead (Con v : ts) = ((mkName v, []), ts)
-parseDataHead (OP : Con v : ts) = let
-	(vs, ts') = parseVars ts in
-	((mkName v, map PlainTV vs), ts')
-parseDataHead ts = error $ "parseDataHead: parse error: " ++ show ts
+parseDataHead (OP : Con v : ts) =
+	first ((mkName v ,) . map PlainTV) $ parseVars ts
+parseDataHead ts = error $
+	"parseDataHead: parse error: " ++ show ts
 
 parseVars :: [Token] -> ([Name], [Token])
 parseVars (CP : ts) = ([], ts)
@@ -137,10 +135,10 @@ parseConstructors ts = let (c, ts') = parseConstructor ts in
 
 parseConstructor :: [Token] -> (ConQ, [Token])
 parseConstructor (Con v : ts) = (normalC (mkName v) [], ts)
-parseConstructor (OP : Con v : ts) = let
-	Just (tps, ts') = parseTypeList ts in
-	(normalC (mkName v) $
-		map (strictType notStrict) tps, ts')
+parseConstructor (OP : Con v : ts)
+	| Just (tps, ts') <- parseTypeList ts =
+		(normalC (mkName v) $
+			map (strictType notStrict) tps, ts')
 parseConstructor ts = error $
 	"parseConstructor: parse error: " ++ show ts
 

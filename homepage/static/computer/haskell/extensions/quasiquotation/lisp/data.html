@@ -1,7 +1,5 @@
 Lispっぽく表記: 代数的データ型の定義
 
-<p>(工事中 60%)</p>
-
 <h2>どのような表記にするか</h2>
 
 <p>Haskellでは以下のような形になる。</p>
@@ -51,49 +49,100 @@ lexer ('d' : 'e' : 'r' : 'i' : 'v' : 'i' : 'n' : 'g' :
 
 <pre><code>parseConstructor :: [Token] -&gt; (ConQ, [Token])
 parseConstructor (Con v : ts) = (normalC (mkName v) [], ts)
-parseConstructor (OP : Con v : ts) = let
-	Just (tps, ts') = parseTypeList ts in
-	(normalC (mkName v) $
-		map (strictType notStrict) tps, ts')
+parseConstructor (OP : Con v : ts)
+	| Just (tps, ts') &lt;- parseTypeList ts =
+		(normalC (mkName v) $
+			map (strictType notStrict) tps, ts')
 parseConstructor ts = error $
 	"parseConstructor: parse error: " ++ show ts</code></pre>
 
 <h3>parseConstructors</h3>
 
-<p>(作成中)</p>
+<p>値構築子の並びのパース。</p>
+
+<pre><code>parseConstructors :: [Token] -&gt; ([ConQ], [Token])
+parseConstructors (CP : ts) = ([], ts)
+parseConstructors ts = let (c, ts') = parseConstructor ts in
+	first (c :) $ parseConstructors ts'</code></pre>
 
 <h3>parseVars</h3>
 
-<p>(作成中)</p>
+<p>変数の並びのパース。</p>
+
+<pre><code>parseVars :: [Token] -&gt; ([Name], [Token])
+parseVars (CP : ts) = ([], ts)
+parseVars (Var v : ts) = first (mkName v :) $ parseVars ts
+parseVars ts = error $ "parseVars: parse error: " ++ show ts</code></pre>
 
 <h3>parseDataHead</h3>
 
-<p>(作成中)</p>
+<p>代数的データ型の定義の頭の部分のパース。</p>
+
+<pre><code>parseDataHead :: [Token] -&gt; ((Name, [TyVarBndr]), [Token])
+parseDataHead (Con v : ts) = ((mkName v, []), ts)
+parseDataHead (OP : Con v : ts) =
+	first ((mkName v ,) . map PlainTV) $ parseVars ts
+parseDataHead ts = error $
+	"parseDataHead: parse error: " ++ show ts</code></pre>
 
 <h3>parseDataDec</h3>
 
-<p>(作成中)</p>
+<p>代数的データ型の定義のパース。</p>
+
+<pre><code>parseDataDec :: [Token] -&gt; ([Name] -&gt; DecQ, [Token])
+parseDataDec ts = let ((n, vbs), ts') = parseDataHead ts in
+	first (dataD (cxt []) n vbs) $ parseConstructors ts'</code></pre>
 
 <h3>parseDataDecを使う</h3>
 
-<p>(作成中)</p>
+<p>parseDataDecを使ってparseDecが代数的データ型の定義をパースできるようにする。</p>
+
+<pre><code>parseDec (OP : Data : ts) = let
+	(dd, ts') = parseDataDec ts in
+	(:) &lt;$&gt; dd [] &lt;*&gt; parseDec ts'</code></pre>
 
 <h2>Parser.hs: deriving節の追加</h2>
 
 <h3>parseCons</h3>
 
-<p>(作成中)</p>
+<p>定数の並びをパースする。</p>
+
+<pre><code>parseCons :: [Token] -&gt; ([Name], [Token])
+parseCons (CP : ts) = ([], ts)
+parseCons (Con v : ts) = first (mkName v :) $ parseCons ts
+parseCons ts = error $ "parseCons: parse error: " ++ show ts</code></pre>
 
 <h3>parseDecにderiving節を追加</h3>
 
-<p>(作成中)</p>
+<p>deriving節の付いた代数的データ型の定義をパースできるようにする。</p>
+
+<pre><code>parseDec (OP : Deriving : OP : Data : ts) = let
+	(dd, ts') = parseDataDec ts
+	(cs, ts'') = parseCons ts' in
+	(:) &lt;$&gt; dd cs &lt;*&gt; parseDec ts''</code></pre>
 
 <h2>試してみる</h2>
 
 <p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_15/useLispLike.hs"
 	>useLispLike.hs</a></p>
 
-<p>(作成中)</p>
+<pre><code>[lisp|
+
+(data (Foo a) Bar (Baz a) FooBar)
+
+(deriving (data (Hoge a) Fuga (Piyo a) HogeHoge) Show Eq)
+
+...
+
+|]</code></pre>
+
+<pre><code>% ghci useLispLike.hs
+*Main&gt; :info Foo
+data Foo a = Bar | Baz a | FooBar
+*Main&gt; :info Hoge
+data Hoge a = Fuga | Piyo a | HogeHoge
+instance Eq a =&gt; Eq (Hoge a)
+instance Show a =&gt; Show (Hoge a)</code></pre>
 
 <p>
 <a href="/computer/haskell/extensions/quasiquotation/lisp/type_annotation.html"
