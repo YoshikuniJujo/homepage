@@ -1,7 +1,5 @@
 Lispっぽい表記: タプルのパース
 
-<p>(工事中 60%)</p>
-
 <h2>何をするか?</h2>
 
 <p>
@@ -187,3 +185,29 @@ parsePat (OP : ts) = parsePatOP ts
 <pre><code>...
 parsePat (Con v : ts) = (conP (mkName v) [], ts)
 ...</code></pre>
+
+<h2>試してみる</h2>
+
+<pre><code>% ghci useLispLike.hs
+*Main&gt; :set -XQuasiQuotes
+*Main&gt; [lisp| ((,,) "hoge" 88 ()) |]
+("hoge",88,())
+*Main&gt; [lisp| (123, 456, 789) |]
+(123, 456, 789)
+*Main&gt; [lisp| (fst ("hi", 25)) |]
+"hi"
+</code></pre>
+
+<pre><code>*Main&gt; let [lisp| ((,,) x y z) |] = ('c', True, ())
+*Main&gt; y
+True
+*Main&gt; let [lisp| (Nothing, a, b) |] = (Nothing, "hello", False)
+*Main&gt; a
+"hello"</code></pre>
+
+<p>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/type2.html"
+	>「型のパース(2)」へもどる</a>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/type3.html"
+	>「型のパース(3)」へ</a>
+</p>
