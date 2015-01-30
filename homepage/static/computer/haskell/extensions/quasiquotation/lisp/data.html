@@ -1,6 +1,6 @@
 Lispっぽく表記: 代数的データ型の定義
 
-<p>(工事中 0%)</p>
+<p>(工事中 60%)</p>
 
 <h2>どのような表記にするか</h2>
 
@@ -12,12 +12,6 @@ Lispっぽく表記: 代数的データ型の定義
 
 <pre><code>(data (Foo a) Bar (Baz Int) FooBar)</code></pre>
 
-<p>
-'|'は字句解析で特別なものとして読み込むことにするが、
-まず'|'に演算子記号が続かないことと、
-演算子'|'をExpのなかでちゃんと読み込むとととに注意が必要だ。
-</p>
-
 <h3>deriving節</h3>
 
 <p>
@@ -28,16 +22,78 @@ Lispっぽく表記: 代数的データ型の定義
 
 <pre><code>(deriving (data (Foo a) Bar (Baz Int) FooBar) Show Eq)</code></pre>
 
-<h2>コード</h2>
+<h2>Lexer.hs</h2>
 
 <p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_15/Lexer.hs"
 	>Lexer.hs</a></p>
 
+<pre><code>data Token =
+	...
+	| Comma | Arrow | Type | Data | Deriving
+	...</code></pre>
+
+<pre><code>...
+lexer ('d' : 'a' : 't' : 'a' : cs@(c : _))
+	| not $ isAlphaNum c = Data : lexer cs
+lexer ('d' : 'e' : 'r' : 'i' : 'v' : 'i' : 'n' : 'g' :
+		cs@(c : _))
+	| not $ isAlphaNum c = Deriving : lexer cs
+...</code></pre>
+
+<h2>Parser.hs: 代数的データ型の定義</h2>
+
 <p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_15/Parser.hs"
 	>Parser.hs</a></p>
 
+<h3>parseConstructor</h3>
+
+<p>値構築子のパース。</p>
+
+<pre><code>parseConstructor :: [Token] -&gt; (ConQ, [Token])
+parseConstructor (Con v : ts) = (normalC (mkName v) [], ts)
+parseConstructor (OP : Con v : ts) = let
+	Just (tps, ts') = parseTypeList ts in
+	(normalC (mkName v) $
+		map (strictType notStrict) tps, ts')
+parseConstructor ts = error $
+	"parseConstructor: parse error: " ++ show ts</code></pre>
+
+<h3>parseConstructors</h3>
+
+<p>(作成中)</p>
+
+<h3>parseVars</h3>
+
+<p>(作成中)</p>
+
+<h3>parseDataHead</h3>
+
+<p>(作成中)</p>
+
+<h3>parseDataDec</h3>
+
+<p>(作成中)</p>
+
+<h3>parseDataDecを使う</h3>
+
+<p>(作成中)</p>
+
+<h2>Parser.hs: deriving節の追加</h2>
+
+<h3>parseCons</h3>
+
+<p>(作成中)</p>
+
+<h3>parseDecにderiving節を追加</h3>
+
+<p>(作成中)</p>
+
+<h2>試してみる</h2>
+
 <p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_15/useLispLike.hs"
 	>useLispLike.hs</a></p>
+
+<p>(作成中)</p>
 
 <p>
 <a href="/computer/haskell/extensions/quasiquotation/lisp/type_annotation.html"
