@@ -1,0 +1,24 @@
+Lispっぽく表記: 型変数の文脈
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+型変数には文脈を指定することができる。
+「文脈」とはその型変数がどの型クラスに所属するのかを示すものである。
+たとえば以下のようになる。
+</p>
+
+<pre><code>print :: Show a =&gt; a -&gt; IO ()</code></pre>
+
+<p>記法としては以下のようにする。</p>
+
+<pre><code>(type print (=&gt; ((Show a)) (-&gt; a (IO ())))</code></pre>
+
+<p>
+<a href="/computer/haskell/extensions/quasiquotation/lisp/data.html"
+	>「代数的データ型」へもどる</a>
+<a href="/computer/haskell/extensions/quasiquotation/lisp"
+	>「Lispっぽく表記」トップへ</a>
+</p>
