@@ -16,6 +16,24 @@ Lispっぽく表記: 型変数の文脈
 
 <pre><code>(type print (=&gt; ((Show a)) (-&gt; a (IO ())))</code></pre>
 
+<h2>字句解析</h2>
+
+<p>
+まずは字句解析器で'=&gt;'をトークンとして読み込む必要がある。
+</p>
+
+<p>(作成中)</p>
+
+<h2>構文解析</h2>
+
+<p>
+(=&gt; (文脈のリスト) 型)のような形を<code
+>forallT (plainTV ...) [文脈のリスト] 型</code>のような形にする。
+文脈のリストから型変数を取り出すような処理が必要になるだろう。
+</p>
+
+<p>(作成中)</p>
+
 <p>
 <a href="/computer/haskell/extensions/quasiquotation/lisp/data.html"
 	>「代数的データ型」へもどる</a>
