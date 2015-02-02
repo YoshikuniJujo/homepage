@@ -1,0 +1,123 @@
+GHCi: 対話環境に触れる
+
+<h2>はじめに</h2>
+
+<p>
+これを読む前にHaskell Platformがインストールしておこう。
+Windowsでは<a href="https://www.haskell.org/platform/windows.html">ここ</a>に
+インストーラが用意されている。
+Macでは<a href="https://www.haskell.org/platform/mac.html">ここ</a>にある。
+Linuxではそれぞれのディストリビューションごとにそれぞれのやりかたがあると思うが、
+<a href="https://www.haskell.org/platform/linux.html">ここ</a>に
+情報がまとまっているようだ。
+</p>
+
+<p>
+各自インストールしてもらいたい。
+</p>
+
+<h2>値の表示</h2>
+
+<p>
+対話環境に慣れよう。
+まずはghcがインストールされているかどうかをチェックする。
+コマンドプロンプトを立ち上げて以下を入力する。
+先頭の'%'はコマンドプロンプに対する入力であることを示すためなので
+これは入力しない。
+</p>
+
+<pre><code>% ghc --version
+The Glorious Glasgow Haskell Compilation System, version X.Y.Z</code></pre>
+
+<p>
+上のようにバージョンが表示されればghcはインストールされている。
+それではGHCiを立ち上げて、いくつかの値を入力し表示させてみよう。
+</p>
+
+<pre><code>% ghci
+Prelude&gt;</code></pre>
+
+<p>
+Prelude&gt;はプロンプトである。
+いろいろな値を入力してみよう。
+</p>
+
+<pre><code>Prelude&gt; 4492
+4492
+Prelude&gt; 'c'
+'c'
+Prelude&gt; pi
+3.141592653589793</code></pre>
+
+<p>
+対話環境では入力された式が評価されて、その結果が表示される。
+4492や'c'はリテラルなのでそのまま出力される。
+piは定義済みの変数であり、その値が表示される。
+</p>
+
+<h2>定義ファイルの読み込み</h2>
+
+<p>
+Haskellについて学んでいくうえでしばらくは以下のような形にする。
+</p>
+
+<ol>
+<li>関数を定義したファイルを作成</li>
+<li>GHCiに読み込む</li>
+<li>ファイルを編集する</li>
+<li>変更したファイルを再読み込みする</li>
+</ol>
+
+<p>
+ファイルの読み込みや再読み込みの練習をしてみよう。
+以下のようなファイルを作成する。
+</p>
+
+<pre><code>myFavoriteFruit = "apple"</code></pre>
+
+<p>
+これをfruits.hsというファイルに保存する。
+これを読み込むには以下のようにghciの引数としてファイル名を指定してやれば良い。
+</p>
+
+<pre><code>ghci fuits.hs
+*Main&gt; </code></pre>
+
+<p>
+myFavoriteFruitを入力してみる。
+</p>
+
+<pre><code>*Main&gt; myFavoriteFruit
+"apple"</code></pre>
+
+<p>
+よく考えたらリンゴよりもバナナのほうが好きだったとする。
+対話環境はそのままにしておいて、エディタを開きfruit.hsを変更しよう。
+</p>
+
+<pre><code>myFavoriteFruit = "banana"</code></pre>
+
+<p>
+対話環境のほうで試してみよう。
+</p>
+
+<pre><code>*Main&gt; myFavoriteFruit
+"apple"</code></pre>
+
+<p>「おや?変更が反映されてない!」
+そう、ファイルを変更した後には再読み込みする必要がある。</p>
+
+<pre><code>*Main&gt; :reload
+*Main&gt; myFavoriteFruit
+"banana"</code></pre>
+
+<p>
+これでファイルに書いた定義を読み込んで対話環境で使うことができるようになった。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/whats_function.html"
+	>「関数とは何か」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/make_function.html"
+	>「関数を作る」へ</a>
+</p>
