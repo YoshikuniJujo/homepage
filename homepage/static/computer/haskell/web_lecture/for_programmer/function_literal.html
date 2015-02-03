@@ -1,0 +1,109 @@
+関数リテラル
+
+<h2>リテラルとは</h2>
+
+<p>
+コードのなかで「直接」書き込むことのできる値をリテラルと呼ぶ。
+'c', "hello", 123等はリテラルである。
+変数や関数適用はリテラルではない。
+</p>
+
+<pre><code>% ghci
+Prelude&gt; 'c'
+'c'
+Prelude&gt; "hello"
+"hello"
+Prelude&gt; 123
+123</code></pre>
+
+<h2>関数リテラルとは</h2>
+
+<p>
+今までの関数の定義のしかただと、関数は一度変数を束縛して、
+その変数を使って呼び出すことしかできなかった。
+しかし、関数リテラルを使うと関数に名前をつけずに、
+その場で作り、その場で使うことができる。
+</p>
+
+<h3>変数とリテラル</h3>
+
+<p>
+たとえばx = 3と定義されている場合、xのある場所を3で置き換えることができる。
+では、fun x = x ^ xのように定義されている場合、
+funのある場所を何で置き換えることができるだろうか。
+そのfunのある場所を置き換えられるような表現、言わば関数の実体のようなもの、
+それを関数リテラルと呼ぶ。
+</p>
+
+<h2>関数リテラルの例</h2>
+
+<p>
+上述のfun x = x ^ xを考えてみる。
+</p>
+
+<pre><code>% ghci
+Prelude&gt; let fun x = x ^ x
+Prelude&gt; fun 3
+27</code></pre>
+
+<p>
+このfunの部分を関数リテラルで置き換えてみよう。
+関数リテラルは\[仮引数] -&gt; [表現]のような形で書くことができる。
+</p>
+
+<pre><code>Prelude&gt; (\x -&gt; x ^ x) 3
+27</code></pre>
+
+<h2>関数定義は構文糖だった</h2>
+
+<p>
+実は今まで見てきた関数定義は2つのことを同時に行う構文糖だった。
+以下の表現を見てみよう。
+</p>
+
+<pre><code>fun x = x ^ x</code></pre>
+
+<p>これは以下のように書き直すことができる。</p>
+
+<pre><code>fun = \x -&gt; x ^ x</code></pre>
+
+<p>
+つまり今まで見てきた関数定義は、関数リテラルによって指定した関数で
+関数名としての変数を束縛するという2つのことを行っていた。
+</p>
+
+<h2>xxcryptの例</h2>
+
+<p>xxcryptの定義を再掲する。</p>
+
+<pre><code>xxcrypt n ed mc = mc ^ ed `mod` n</code></pre>
+
+<p>これを関数リテラルで書くと以下のようになる。</p>
+
+<pre><code>xxcrypt = \n -&gt; (\ed -&gt; (\mc -&gt;  mc ^ ed `mod` n))</code></pre>
+
+<p>
+数値を返す関数を返す関数を返す関数ということだ。
+結合性を考慮すると括弧は省略可能だ。
+</p>
+
+<pre><code>xxcrypt = \n -&gt; \ed -&gt; \mc -&gt;  mc ^ ed `mod` n</code></pre>
+
+<h2>複数引数の省略記法</h2>
+
+<p>上記のように引数がつながる場合には以下のような略記が可能だ。</p>
+
+<pre><code>xxcrypt = \n ed mc -&gt; mc ^ ed `mod` n</code></pre>
+
+<h2>まとめ</h2>
+
+<p>関数リテラルの記法は以下のようになる。</p>
+
+<pre><code>\[仮引数1] [仮引数2] ... -&gt; [表現]</code></pre>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/partial_application.html"
+	>「部分適用」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer"
+	>「1から学ぶHaskell」トップへ</a>
+</p>
