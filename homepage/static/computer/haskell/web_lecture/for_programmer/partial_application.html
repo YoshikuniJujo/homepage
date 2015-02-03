@@ -1,0 +1,40 @@
+部分適用
+
+<p>(工事中 0%)</p>
+
+<p><a
+href="/computer/haskell/web_lecture/for_programmer/02_partial_application/rsa.hs"
+	>rsa.hs</a></p>
+
+<h2>鍵を固定した関数</h2>
+
+<p>
+同じ鍵でいろいろなメッセージを暗号化、復号することを考える。
+そのようなときにいちいち鍵を引数として与えるのは面倒だ。
+鍵を固定した関数を作成しよう。
+rsa.hsに以下の関数を追加する。
+</p>
+
+<pre><code>encrypt1 m = encrypt 138689 13 m
+decrypt1 c = decrypt 138689 95497 c</code></pre>
+
+<p>試してみる。</p>
+
+<pre><code>*Main&gt; :reload
+*Main&gt; encrypt1 4492
+47255
+*Main&gt; decrypt1 47255
+4492</code></pre>
+
+<p>(作成中)</p>
+
+<h2>続く</h2>
+
+<p>(作成中)</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/make_function.html"
+	>「関数を作る」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer"
+	>「1から学ぶHaskell」トップへ</a>
+</p>
