@@ -1,10 +1,19 @@
 部分適用
 
-<p>(工事中 0%)</p>
-
 <p><a
 href="/computer/haskell/web_lecture/for_programmer/02_partial_application/rsa.hs"
 	>rsa.hs</a></p>
+
+<h2>実は同じなので</h2>
+
+<p>encrypt関数とdecrypt関数は実は同じものだ。</p>
+
+<pre><code>encrypt n e m = m ^ e `mod` n
+decrypt n d c = c ^ d `mod` n</code></pre>
+
+<p>なのでひとつにまとめてしまうことにする。</p>
+
+<pre><code>xxcrypt n ed mc = mc ^ ed `mod` n</code></pre>
 
 <h2>鍵を固定した関数</h2>
 
@@ -15,8 +24,8 @@ href="/computer/haskell/web_lecture/for_programmer/02_partial_application/rsa.hs
 rsa.hsに以下の関数を追加する。
 </p>
 
-<pre><code>encrypt1 m = encrypt 138689 13 m
-decrypt1 c = decrypt 138689 95497 c</code></pre>
+<pre><code>encrypt1 m = xxcrypt 138689 13 m
+decrypt1 c = xxcrypt 138689 95497 c</code></pre>
 
 <p>試してみる。</p>
 
@@ -26,11 +35,83 @@ decrypt1 c = decrypt 138689 95497 c</code></pre>
 *Main&gt; decrypt1 47255
 4492</code></pre>
 
-<p>(作成中)</p>
+<p>
+encrypt1やdecrypt1の定義を見ると、それぞれencryptやdecryptの
+第1、第2引数だけを指定し、第3引数は指定されていないのがわかる。
+このような場合、以下のように書くことができる。
+</p>
 
-<h2>続く</h2>
+<pre><code>encrypt1' = xxcrypt 138689 13
+decrypt1' = xxcrypt 138689 95497</code></pre>
 
-<p>(作成中)</p>
+<p>
+encrypt1'はencryptの3つの引数のうち第1引数と第2引数に値を与えることで作成した。
+decrypt1'についても同様。
+このように、関数の引数のうちの1部だけ指定することを部分適用と呼ぶ。
+</p>
+
+<p>
+うえでは第1、第2引数を指定したが、もちろん第1引数のみを指定することもできる。
+</p>
+
+<pre><code>xxcrypt1 = xxcrypt 138689</code></pre>
+
+<p>これを使ってencrypt1やdecrypt1を定義することもできる。</p>
+
+<pre><code>encrypt1'' = xxcrypt1 13
+decrypt1'' = xxcrypt1 95497</code></pre>
+
+<h2>展開していくと</h2>
+
+<p>
+encrypt1'' 4492を展開していくと以下のようになる。
+</p>
+
+<pre><code>encrypt1'' 4492
+==&gt; (xxcrypt1 13) 4492
+==&gt; ((xxcrypt 138689) 13) 4492</code></pre>
+
+<p>
+この展開を逆にたどってみよう。
+xxcrypt 138689はxxcrypt1という関数を返す。
+xxcrypt1 13はencrypt1''という関数を返す。
+そしてencrypt1'' 4492が数値を返す。
+</p>
+
+<p>
+xxcryptという3引数関数に1つ引数を与えてやると、
+2引数関数が返り、その関数にまた1つ引数を与えてやると1引数関数が返り、
+そしてその関数にまた1つ引数を与えてやると数値が返る。
+</p>
+
+<h2>3引数関数はなかった</h2>
+
+<p>
+xxcryptを今までは3引数関数として扱ってきた。
+しかし、実はHaskellに2引数関数や3引数関数はない。
+2引数関数や3引数関数のように見えるものは、実は「関数を返す関数」だった。
+関数に3つの引数を与えているかのように見える以下のような記述を見てみよう。
+</p>
+
+<pre><code>xxcrypt 138689 13 4492</code></pre>
+
+これは本当は以下のような意味である。
+
+<pre><code>((xxcrypt 138689) 13) 4492</code></pre>
+
+<p>
+関数適用が左結合なのでこの括弧は省略できる。
+結果として上のような表記になる。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+関数はその一部の引数だけ指定することができ、これを部分適用と呼ぶ。
+「部分適用」は特別に用意された機能ではない。
+むしろ「複数の引数を持つ関数」のほうが幻で、
+「関数を返す関数」の連鎖が起きている。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/make_function.html"

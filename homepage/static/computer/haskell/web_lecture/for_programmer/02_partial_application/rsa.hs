@@ -1,5 +1,7 @@
-encrypt n e m = m ^ e `mod` n
-decrypt n d c = c ^ d `mod` n
+xxcrypt n ed mc = mc ^ ed `mod` n
 
-encrypt1 m = encrypt 138689 13 m
-decrypt1 c = decrypt 138689 95497 c
+encrypt1 m = xxcrypt 138689 13 m
+decrypt1 c = xxcrypt 138689 95497 c
+
+encrypt1' = xxcrypt 138689 13
+decrypt1' = xxcrypt 138689 95497
