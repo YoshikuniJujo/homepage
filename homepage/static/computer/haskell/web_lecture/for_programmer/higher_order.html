@@ -1,0 +1,64 @@
+高階関数
+
+<h2>高階関数とは</h2>
+
+<p>
+関数を引数に取る、または関数を返す関数を高階関数と呼ぶ。
+高階関数を使うことで「くりかえし」等の構造を特別な構文を使わずに、
+単なる関数で表現することができる。
+</p>
+
+<h2>実はすでに</h2>
+
+<p>
+実はすでに高階関数を学んでいた。
+関数を返す関数は複数の引数を取る関数として考えることができる。
+よって、ここでは引数として関数を取る関数について扱うことにする。
+</p>
+
+<h2>引数として関数を取る関数</h2>
+
+<p>例として与えられた値に与えられた関数を2回適用する関数を考える。</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/03_higher_order/higher.hs"
+	>higher.hs</a></p>
+
+<pre><code>twice f x = f (f x)</code></pre>
+
+<p>
+試してみる。
+ちなみにpred, succはそれぞれ1つ前の値、1つ後の値を返す関数である。
+</p>
+
+<pre><code>% ghci higher.hs
+*Main&gt; pred 8
+7
+*Main&gt; twice pred 8
+6
+*Main&gt; succ 8
+9
+*Main&gt; twice succ 8
+10</code></pre>
+
+<h2>まとめ</h2>
+
+<p>高階関数とは</p>
+
+<ul>
+<li>引数が関数である、または</li>
+<li>返り値が関数である</li>
+</ul>
+
+<p>
+ような関数である。
+返り値が関数であるような関数は複数の引数を取る関数として考えることができる。
+引数が関数であるような関数を使うと特別な構文を使うことなく、
+「くりかえし」等、様々な制御の構造を関数として表現することができる。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/function_literal.html"
+	>「関数リテラル」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer"
+	>「1から学ぶHaskell」トップへ</a>
+</p>
