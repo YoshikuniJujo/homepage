@@ -1,10 +1,46 @@
 型宣言
 
-<p>(工事中 0%)</p>
+<h2>記法</h2>
+
+<p>
+Haskellでは関数や値を定義する際に型宣言をつけることができる。
+記法は以下のようになる。
+</p>
+
+<pre><code>[変数名] :: [型]</code></pre>
+
+<h3>略記法</h3>
+
+<p>同じ型の変数をいくつか定義する場合には以下のように書くことができる。</p>
+
+<pre><code>[変数名1], [変数名2], [変数名3] :: [型]</code></pre>
+
+<h3>例</h3>
+
+<pre><code>num1 :: Integer
+str1 :: String
+chr1, chr2, chr3 :: Char
+xxcrypt :: Integer -&gt; Integer -&gt; Integer -&gt; Integer</code></pre>
+
+<h2>型宣言をつける意義</h2>
+
+<p>
+Haskellでは型宣言はオプショナルである。
+型宣言がない場合、コンパイラが型を推論してくれる。
+しかし、以下のような理由から、
+完全に使い捨てのスクリプト等でないならば、型宣言はつけるべきだ。
+</p>
+
+<ul>
+<li>自分が何を作っているのかが明確になる</li>
+<li>バグの多くは型の不一致をともなう</li>
+<li>型宣言はドキュメントとしても優れる</li>
+<li>拡張機能を使う場合、型推論が利かない場合がある</li>
+</ul>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/function_type.html"
 	>「関数の型」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/type_driven.html"
+	>「型駆動開発」トップへ</a>
 </p>
