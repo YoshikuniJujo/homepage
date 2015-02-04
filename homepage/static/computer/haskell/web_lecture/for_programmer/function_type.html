@@ -1,3 +1,69 @@
 関数の型
 
-<p>(工事中 0%)</p>
+<h2>関数も値</h2>
+
+<p>
+Haskellでは関数は「値」である。
+より具体的に言えば関数は「<a
+href="https://ja.wikipedia.org/wiki/第一級オブジェクト"
+>第一級オブジェクト</a>」である。
+だから、関数も「型」を持つ。
+</p>
+
+<h2>関数の型の表現</h2>
+
+<p>
+関数の型は引数の型と返り値の型から成る。
+以下のように表現される。
+</p>
+
+<pre><code>[引数の型] -&gt; [返り値の型]</code></pre>
+
+<p>
+Haskellには1引数関数しかないという話を覚えているだろうか。
+2引数関数に見えるものは本当は「関数を返す関数」である。
+よって以下のようになる。
+</p>
+
+<pre><code>[引数1の型] -&gt; ([引数2の型] -&gt; [返り値の型])</code></pre>
+
+<p>'-&gt;'は右結合なので丸括弧は省略できる。</p>
+
+<pre><code>[引数1の型] -&gt; [引数2の型] -&gt; [返り値の型]</code></pre>
+
+<p>丸括弧を省略すると2引数関数のように見えてくる。</p>
+
+<h2>関数の型の例</h2>
+
+<h3>関数toLower</h3>
+
+<p>
+関数toLowerは引数として文字を取り、小文字の値を返す関数。
+引数、返り値ともにChar型なのでその型は以下のようになる。
+</p>
+
+<pre><code>Char -&gt; Char</code></pre>
+
+<h3>関数xxcrypt</h3>
+
+<p>
+関数xxcryptは整数値を3つ取って、整数値を返す関数である。
+代表的な整数値のひとつにIntegerがある。
+よって以下のようになる。
+</p>
+
+<pre><code>Integer -&gt; (Integer -&gt; (Integer -&gt; Integer))</code></pre>
+
+<p>
+整数を取って関数を返す型となっている。
+'-&gt;'が右結合であることを利用して丸括弧を省略すると3引数関数のように見える。
+</p>
+
+<pre><code>Integer -&gt; Integer -&gt; Integer -&gt; Integer</code></pre>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/whats_type.html"
+	>「型とは何か」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/type_declaration.html"
+	>「型宣言」へ</a>
+</p>
