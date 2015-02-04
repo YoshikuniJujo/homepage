@@ -1,0 +1,69 @@
+型とは何か
+
+<h2>型とは「何ができるか」である</h2>
+
+<p>
+値には型がある。
+型は以下の2つのことを示す。
+</p>
+
+<ul>
+<li>その値にどの関数が適用できるか</li>
+<li>どの関数がその値を返すか</li>
+</ul>
+
+<p>
+その値を使って何ができるかを示すのが「型」である。
+</p>
+
+<h2>Char型は小文字にできる</h2>
+
+<p>
+文字を表すChar型という型がある。
+Char型の値はtoLowerという関数を使って小文字にすることができる。
+toLowerを使うにはData.Charモジュールを読み込む必要がある。
+対話環境でモジュールを読み込むには':m'コマンドを使う。
+また':t'コマンドで値の型を表示することもできる。
+</p>
+
+<pre><code>% ghci
+Prelude&gt; :m Data.Char
+Prelude Data.Char&gt; :t 'L'
+'L' :: Char</code></pre>
+
+<p>文字'L'という値の型はChar型であることがわかる。</p>
+
+<pre><code>Prelude Data.Char&gt; toLower 'L'
+'l'</code></pre>
+
+<p>
+Char型の値はtoLower関数で小文字にすることができる。
+ただし、正確に言うと、toLower関数で小文字と関連づけられているということであり、
+'L'自体が変化しているわけではない。
+</p>
+
+<h2>Bool型は小文字にできない</h2>
+
+<p>
+TrueやFalseという値はBool型の値である。
+これはChar型の値ではないので小文字にすることはできない。
+</p>
+
+<pre><code>Prelude Data.Char&gt; :t False
+False :: Bool
+Prelude Data.Char&gt; toLower False
+
+&lt;interactive&gt;:X:Y:
+    Couldn't match expected type `Char' with actual type `Bool'
+    In the first argument of `toLower', namely `False'
+    In the expression: toLower False
+    In an equation for `it': it = toLower False</code></pre>
+
+<p>「型が一致してないよ」と怒られてしまった。</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/operator.html"
+	>「演算子」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer"
+	>「1から学ぶHaskell」トップへ</a>
+</p>
