@@ -1,7 +1,5 @@
 型駆動開発
 
-<p>(工事中 0%)</p>
-
 <h2>型駆動開発とは</h2>
 
 <p>
@@ -10,6 +8,159 @@ Haskellプログラマの多くはコードを書く前にまずは型を考え�
 そのあたりをキャッチーな単語で表現してみた。
 以下、「型から考える」ことの単純な例を挙げて見ていこう。
 </p>
+
+<h2>題材</h2>
+
+<p>
+身長と体重を入力するとBMIを計算し、
+結果から肥満かどうかを判断してくれる関数を作成していこう。
+</p>
+
+<h2>BMIとは</h2>
+
+<p>
+<a href="https://ja.wikipedia.org/wiki/ボディマス指数">BMI</a>とは
+体重と身長から計算される肥満度を表す指数である。
+計算式は以下のようになる。
+</p>
+
+<pre><code>BMI = [体重(kg)] / [身長(m)] ^ 2</code></pre>
+
+<p>
+日本の基準では、この値が25以上が肥満となる。
+</p>
+
+<h2>仕様</h2>
+
+<p>
+身長と体重を引き数に取り肥満かどうかを表す値を返り値とする関数。
+身長はわかりやすさのためにcm単位とする。
+</p>
+
+<h2>型についての考察</h2>
+
+<p>
+BMIは少数点以下もある程度の意味があるので、
+整数ではなく実数とする必要がある。
+Haskellでの代表的な実数はDouble型の値である。
+よって体重、身長、BMIはDouble型とする。
+肥満かどうかは真か偽かなのでTrueとFalseを値として持つBool型とする。
+</p>
+
+<h2>定義する関数</h2>
+
+<p>
+BMIを求めて、それを25と比較して真偽値を出す。
+よってbmi関数とそれを利用するisObese関数を作成すれば良さそうだ。
+それぞれの型は以下のようになる。
+</p>
+
+<pre><code>bmi :: Double -&gt; Double -&gt; Double
+isObese :: Double -&gt; Double -&gt; Bool</code></pre>
+
+<p>
+bmiは身長(Double)と体重(Double)を取ってBMI(Double)を返す関数であり、
+isObeseは身長と体重を取って肥満かどうか(Bool)を返す関数となる。
+</p>
+
+<h2>型をさきに定義</h2>
+
+<p>
+型駆動開発とかかげたので、まずは型をさきに定義する。
+型の情報をさきにGHCiでチェックしよう。
+ただし、型宣言のみでは読み込みエラーとなるので、
+常にエラーとなる値であるundefined値を使う。
+</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/04_type_driven/bmi_v0.hs"
+	>bmi.hs</a></p>
+
+<pre><code>bmi :: Double -&gt; Double -&gt; Double
+bmi = undefined
+
+isObese :: Double -&gt; Double -&gt; Bool
+isObese = undefined</code></pre>
+
+<p>試してみる。</p>
+
+<pre><code>% ghci bmi.hs
+*Main&gt; :t bmi
+bmi :: Double -&gt; Double -&gt; Double
+*Main&gt; :t isObese
+isObese :: Double -&gt; Double -&gt; Bool</code></pre>
+
+<p>当然呼び出そうとするとエラーとなる。</p>
+
+<pre><code>*Main&gt; bmi 172 66
+*** Exception: Prelude.undefined
+*Main&gt; isObese 172 66
+*** Exception: Prelude.undefined</code></pre>
+
+<h2>トップダウンかボトムアップか</h2>
+
+<p>
+やや話がそれるが、
+トップダウンでコーディングするのか、ボトムアップでするのかという問題がある。
+どちらにも利点があり、状況に応じて使いわけるのが賢明である。
+</p>
+
+<p>
+トップダウンで作ることの利点には全体の構成がわかりやすいこと、
+それぞれの部品が果たす役割が明確であるということがある。
+欠点としては実装しやすさへの考慮が足りなかった場合に、
+部品を作る際に二重化等の無駄が出てしまう場合があるというところだろう。
+</p>
+
+<p>
+ボトムアップで作ることの利点には、
+部品を作る際にできるだけ汎用の部品を作るように意識するようになり、
+流用の利くものが作れることが多いということがある。
+これは仕様の変更に対応しやすくなることを意味する。
+欠点としては全体の一部としての部品であるということへの考慮が足りず、
+全体に組み込む際に手直しが必要になる場合があるといったところだ。
+</p>
+
+<p>
+BMIの例で言えば関数isObeseを先に作ればトップダウンな開発となり、
+関数bmiを先に作ればボトムアップな開発となる。
+isObeseを先に作る場合、「もしbmiが定義されているならばこうすれば良い」という
+仮定が必要になる。
+このような仮定は、再帰関数の説明の際にも出てくるので、
+慣れのために今回はトップダウンの手法を使うことにする。
+</p>
+
+<h2>関数isObeseの定義</h2>
+
+<p>
+「関数bmiがBMI値を返すならば」isObese関数は、その値が25以上かどうかを返せば良い。
+</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/04_type_driven/bmi_v1.hs"
+	>bmi.hs</a></p>
+
+<pre><code>isObese h w = bmi h w &gt;= 25</code></pre>
+
+<h2>関数bmiの定義</h2>
+
+<p>
+関数bmiは身長(h)と体重(w)からBMIを計算する。
+身長はcmからmに変換するので100分の1にしておく。
+</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/04_type_driven/bmi_v2.hs"
+	>bmi.hs</a></p>
+
+<pre><code>bmi h w = w / (h / 100) ^ 2</code></pre>
+
+<h2>試してみる</h2>
+
+<p>ちなみに172cmは日本人男性の平均身長から。</p>
+
+<pre><code>*Main&gt; :reload
+*Main&gt; isObese 172 70
+False
+*Main&gt; isObese 172 80
+True</code></pre>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/type_declaration.html"
