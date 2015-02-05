@@ -1,6 +1,172 @@
 パターンマッチ
 
-<p>(工事中 0%)</p>
+<h2>パターンマッチをここで学ぶ理由</h2>
+
+<p>
+何らかの条件分岐が使えないと、様々な関数の例を挙げていくうえで不便である。
+Haskellの条件分岐の最も基本となるのがパターンマッチであり、
+たとえばif文にしてもHaskellでは本質的にはパターンマッチの一種と考えることができる。
+また、複合的なデータ型から値を取り出すのもパターンマッチの役割のひとつであり、
+Haskellにおけるパターンマッチは、その言語の中核を成す要素のひとつと言える。
+</p>
+
+<h2>仮引数はパターンだった</h2>
+
+<p>xxcryptを見てみよう。</p>
+
+<pre><code>xxcrypt n ed mc = mc ^ ed `mod` n</code></pre>
+
+<p>
+ここで'='の左側にあるn, ed, mcのような変数は仮引数である。
+しかし、実はこれらの変数は「パターン」であり、以下のような働きをする。
+</p>
+
+<ul>
+<li>すべての値にマッチする</li>
+<li>その値で自身を束縛する</li>
+</ul>
+
+<p>
+仮引数の場所にはパターンが入る。
+そして「変数」はパターンとして上のような働きをするものである。
+</p>
+
+<h2>もっとパターンらしい例を</h2>
+
+<p>
+すべての値にマッチするパターンでは、パターンマッチの働きがよくわからないので、
+前回学んだMaybe型の例を見てみよう。
+たとえばJust 8という値があるとする。
+この値を使う人はこう思う。
+「失敗する可能性のある関数が適用されて、その関数は成功し値は8だったのか」と。
+Just 8のままではこの値を数として使うことはできない。
+8の部分を取り出したい。
+以下のようにすればこの「数」の部分を取り出すことができる。
+</p>
+
+<pre><code>fun (Just x) = [xを使った演算]</code></pre>
+
+<p>
+これでJust 8という値を分解して8の部分だけを取り出すことができる。
+この(Just x)はパターンであり以下の働きをする。
+</p>
+
+<ul>
+<li>Just値だけにマッチする(Nothingにはマッチしない)</li>
+<li>Just値を分解し中身の値で変数xを束縛する</li>
+</ul>
+
+<p>
+(Just x)はNothingにマッチしない。
+上の定義だとfun Nothingとした場合にエラーが発生する。
+よって以下のようにNothingの場合の定義もしておいてやる。
+</p>
+
+<pre><code>fun (Just x) = [xを使った演算]
+fun Nothing = [Nothingだった場合に返す値]</code></pre>
+
+<h2>ワイルドカード</h2>
+
+<p>
+上の例では(Just x)にマッチしない値はNothingしかない。
+またNothingでは束縛される変数もない。
+このような場合、何にでもマッチし、何の変数も束縛しないワイルドカードを使うと
+スマートだ。
+</p>
+
+<pre><code>fun (Just x) = ...
+fun _ = ...</code></pre>
+
+<p>
+ワイルドカードには単一の'_'(アンダースコア)を使う。
+変数束縛のない変数パターンと考えても良い。
+</p>
+
+<h2>数も文字も文字列もパターンである</h2>
+
+<p>
+数を含めリテラルもパターンとなる。
+Nothingが自分自身にマッチし何も束縛しなかったのを思い出そう。
+数等のリテラルも同様の働きをする。
+たとえば0の場合にNothingを返すような、逆数を求める関数を書いてみよう。
+</p>
+
+<p><a
+href="/computer/haskell/web_lecture/for_programmer/03_5_pattern_match/safeRecip.hs"
+	>safeRecip.hs</a></p>
+
+<pre><code>safeRecip 0 = Nothing
+safeRecip x = Just (1 / x)</code></pre>
+
+<p>
+safeRecipを適用する場合、まずは引数と0とのマッチングが試される。
+マッチすればNothingを返す。
+マッチしなければ引数は0ではないということなので安全に1 / xができ、
+その答えをJust値で返している。
+試してみよう。
+</p>
+
+<pre><code>% ghci safeRecip.hs
+*Main&gt; safeRecip 8
+Just 0.125
+*Main&gt; safeRecip 0
+Nothing</code></pre>
+
+<p>
+文字列リテラルの例も試してみよう。
+たとえば"Yoshikuni"だけは特別に丁寧に挨拶してくれる関数を作る。
+各自、自分の名前に置き換えてやってみよう。
+(++)はここでは文字列連結演算子と考えておけば良い。
+</p>
+
+<p><a
+href="/computer/haskell/web_lecture/for_programmer/03_5_pattern_match/helloTo.hs"
+	>helloTo.hs</a></p>
+
+<pre><code>helloTo "Yoshikuni" = "Good morning, sir."
+helloTo n = "Hello, " ++ n ++ "!"</code></pre>
+
+<p>試してみよう。</p>
+
+<pre><code>% ghci helloTo.hs
+*Main&gt; helloTo "Yoshikuni"
+"Good morning, sir."
+*Main&gt; helloTo "Ichiro"
+"Hello, Ichiro!"</code></pre>
+
+<p>
+最後に文字の例を。
+引数の文字が数字だったらその数を返し、そうでなかったら-1を返す関数。
+</p>
+
+<p><a
+href="/computer/haskell/web_lecture/for_programmer/03_5_pattern_match/digit.hs"
+	>digit.hs</a></p>
+
+<pre><code>digit '0' = 0
+digit '1' = 1
+digit '2' = 2
+digit '3' = 3
+digit '4' = 4
+digit '5' = 5
+digit '6' = 6
+digit '7' = 7
+digit '8' = 8
+digit '9' = 9
+digit _ = -1</code></pre>
+
+<h2>まとめ</h2>
+
+<ul>
+<li>パターンは値がマッチするかしないかをチェックする</li>
+<li>ワイルドカードは必ずマッチするパターンである</li>
+<li>変数は必ずマッチするパターンである
+	<ul>
+	<li>さらにマッチした値で自身を束縛する</li>
+	</ul></li>
+<li>パターンマッチにより構成的な値から中身の値を取り出せる</li>
+<li>関数定義を複数並べると上から順にマッチを試してくれる</li>
+</ul>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/maybe.html"
