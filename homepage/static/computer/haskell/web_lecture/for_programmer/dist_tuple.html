@@ -1,3 +1,77 @@
 タプル: 原点からの距離の例
 
-<p>(工事中 0%)</p>
+<h2>xとyを別々に</h2>
+
+<p>
+ある点から原点までの距離を求める関数を考える。
+原点からの距離はxの二乗とyの二乗を足したものの平方根なので、以下のようになる。
+</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/06_dist_tuple/distXY.hs"
+	>distXY.hs</a></p>
+
+<pre><code>dist0 :: Double -&gt; Double -&gt; Double
+dist0 = sqrt $ x ^ 2 + y ^ 2</code></pre>
+
+<p>試してみる。</p>
+
+<pre><code>% ghci distXY.hs
+*Main&gt; dist0 7 9
+11.40175425099138
+*Main&gt; dist0 3 4
+5.0</code></pre>
+
+<p>
+点pの座標を保存しておいて使うには、以下のようになるだろう。
+</p>
+
+<pre><code>px, py :: Double
+px = 9.0
+py = 5.0</code></pre>
+
+<pre><code>*Main&gt; dist0 px py
+10.295630140987</code></pre>
+
+<h2>タプルにまとめる</h2>
+
+<p>
+pxとpyという2つの変数で表現したが、実際は「点」というひとつのものである。
+このような場合に、複数の値をひとつの値としてまとめるのに、
+タプルという構造を使うことができる。
+上記の点pをタプルを用いて表すと以下のようになる。
+</p>
+
+<pre><code>p :: (Double, Double)
+p = (9.0, 5.0)</code></pre>
+
+<p>
+より一般的に、x1 :: T1, x2 :: T2, x3 :: T3, ...を含むタプルtの定義は
+以下のようになる。
+</p>
+
+<pre><code>t :: (T1, T2, T3, ...)
+t = (x1, x2, x3, ...)</code></pre>
+
+<h2>タプルに対するパターンマッチ</h2>
+
+<p>
+タプルからそれぞれの要素を取り出すにはパターンマッチが使える。
+たとえば(x, y)のようなパターンに対して(9, 5)をマッチさせれば、
+xは9に束縛されyは5に束縛される。
+このパターンを使ってタプルを引数とする関数を作成することができる。
+</p>
+
+<pre><code>dist0' :: (Double, Double) -&gt; Double
+dist0' (x, y) = sqrt $ x ^ 2 + y ^ 2</code></pre>
+
+<p>試してみよう。</p>
+
+<pre><code>*Main&gt; dist0' p
+10.295630140987</code></pre>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/polymorphic.html"
+	>「多相関数」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/polymorphic_more.html"
+	>「さらに多相関数」へ</a>
+</p>
