@@ -1,6 +1,6 @@
 多相関数
 
-<p>(工事中 5%)</p>
+<p>(工事中 7%)</p>
 
 <h2>多相関数とは</h2>
 
@@ -117,7 +117,84 @@ id :: a -&gt; a</code></pre>
 
 <h2>関数const</h2>
 
-<p>(作成中)</p>
+<h3>動作</h3>
+
+<p>
+どのような引数でも常に同じ値を返す関数を考えてみよう。
+たとえば何に対しても常に0を返す関数は以下のようになる。
+</p>
+
+<pre><code>const0 _ = 0</code></pre>
+
+<p>
+あるいは何に対しても常に文字'A'を返す関数は以下のようになる。
+</p>
+
+<pre><code>constA _ = 'A'</code></pre>
+
+<p>
+これらの関数は「何に対しても常に値xを返す関数」としてまとめられるので、
+以下のような関数を用意することでまとめることができる。
+</p>
+
+<pre><code>const x _ = x</code></pre>
+
+<p>
+このconstを使うことで上記2つの関数はそれぞれ以下のように書くことができる。
+</p>
+
+<pre><code>const0 = const 0
+constA = const 'A'</code></pre>
+
+<p>
+constはすでに定義済みの関数なので以下のように試すことができる。
+</p>
+
+<pre><code>% ghci
+Prelude&gt; const 0 4492
+0
+Prelude&gt; const 'A' "Hello, world!"
+'A'
+Prelude&gt; const 'A' 999
+'A'</code></pre>
+
+<h3>使い道</h3>
+
+<p>
+関数idの例では、割る数が0の場合、割られる数をそのまま返すという仕様にした。
+今度は割る数が0の場合には0を返すような仕様にしてみよう。
+素直に書くと以下のようになる。
+</p>
+
+<pre><code>devide' :: Double -&gt; Double -&gt; Double
+devide' 0 _ = 0
+devide' a b = b / a</code></pre>
+
+<p>
+これも関数idの例と同じように割られる数となる仮引数を省略することができる。
+「devide' 0は引数に関係なく0を返す関数」とし0でないaについては
+「devide' aは引数をaで割る関数」とすれば良い。
+</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/05_polymorphic/const.hs"
+	>const.hs</a></p>
+
+<pre><code>devide' :: Double -&gt; Double -&gt; Double
+devide' 0 = const 0
+devide' a = (/ a)</code></pre>
+
+<h3>型</h3>
+
+<p>
+関数constは、xを引数に取り「引数に関わらず常にxを返す関数」を返す関数である。
+constを2引数関数としてとらえた場合、
+第2引数を無視し第1引数の値を返す関数と考えることができる。
+つまり、constの第1引数と返り値は同じ型である必要があるが、
+第2引数は何でも良いということになる。
+つまり以下のような型になるだろう。
+</p>
+
+<pre><code>a -&gt; b -&gt; a</code></pre>
 
 <h2>演算子($)</h2>
 
