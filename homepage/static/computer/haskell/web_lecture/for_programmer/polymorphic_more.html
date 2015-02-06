@@ -1,6 +1,97 @@
 さらに多相関数
 
-<p>(工事中 0%)</p>
+<p>(工事中 20%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+タプルに関する多相高階関数であるcurry, uncurryを学ぶが、
+その前にその他の多相高階関数に慣れておくことで、理解しやすくなる。
+追加の多相高階関数を見ていこう。
+</p>
+
+<h2>関数flip</h2>
+
+<h3>動作</h3>
+
+<p>
+関数の第1引数と第2引数を交換したい場面というのは時々ある。
+たとえば第2引数のみに部分適用したいような場合があるだろう。
+よって、そのような関数flipが定義されている。
+試してみよう。
+</p>
+
+<pre><code>% ghci
+Prelude&gt; mod 8 3
+2
+Prelude&gt; flip mod 3 8
+2
+Prelude&gt; let mod3 = flip mod 3
+Prelude&gt; mod3 8
+2</code></pre>
+
+<h3>定義</h3>
+
+<p>関数flip定義は以下のようになる。</p>
+
+<pre><code>flip :: (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+flip f x y = f y x</code></pre>
+
+<p>
+第1引数に2引数関数を取り、第2, 第3引数にそれぞれの値を取り、
+それらの値を逆にして関数fを適用している。
+</p>
+
+<h3>演算子の部分適用</h3>
+
+<p>
+前に演算子の部分適用を学んだ。
+演算子の部分適用においては(`mod` 3)のような形で第2引数に部分適用することができる。
+これは内部的には以下のようにflipを使っていると考えて良い。
+</p>
+
+<pre><code>flip mod 3</code></pre>
+
+<p>(/ 3)であれば以下のようになる。</p>
+
+<pre><code>flip (/) 3</code></pre>
+
+<h2>関数on</h2>
+
+<h3>動作</h3>
+
+<p>
+2つの値に同じ関数を適用したうえで、
+それらを2引数関数に渡したいということもよくある。
+具体例を挙げれば、2つの数を3で割った余りが等しいかどうかを比較するような場合だ。
+そのような場合関数onを使えば以下のように書くことができる。
+</p>
+
+<pre><code>on (==) (`mod` 3) 8 11</code></pre>
+
+<p>
+これは8を3で割った余りと11を3で割った余りとが等しいかどうかを比較している。
+対話環境で試してみよう。
+</p>
+
+<pre><code>Prelude&gt; :m Data.Function
+Prelude Data.Function&gt; on (==) (`mod` 3) 8 11
+True</code></pre>
+
+<h3>定義</h3>
+
+<p>この関数の定義は以下のようになるだろう。</p>
+
+<pre><code>on :: (b -&gt; b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; a -&gt; c
+on op f x y = op (f x) (f y)</code></pre>
+
+<p>以下のように書いても良い。</p>
+
+<pre><code>on op f x y = f x `op` f y</code></pre>
+
+<h2>型変換を関数側に</h2>
+
+<p>(作成中)</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/dist_tuple.html"
