@@ -2,6 +2,57 @@
 
 <p>(工事中 0%)</p>
 
+<h2>自己紹介</h2>
+
+<p>
+名前と年齢をまとめたタプルを引数にして、自己紹介の文字列を返す関数を考えよう。
+関数showはIntegerを表現する文字列にする関数と思っておけば良い。
+</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/08_curry/introduction.hs"
+	>introduction.hs</a></p>
+
+<pre><code>introduction :: (String, Integer) -&gt; String
+introduction (n, a) =
+	"My name is " ++ n ++
+	". I'm " ++ show a ++ " years old."</code></pre>
+
+<pre><code>% ghci introduction.hs
+*Main&gt; introduction ("Yoshikuni Jujo", 34)
+"My name is Yoshikuni Jujo. I'm 34 years old."<!--
+*Main&gt; introduction ("Jun Natsukawa", 34)
+"My name is Jun Natsukawa. I'm 34 years old."--></code></pre>
+
+<h2>年齢は変わる</h2>
+
+<p>
+名前は変わらないが年齢は変わる。
+年齢が変わらなくてもサバ読むこともある。
+</p>
+
+<pre><code>*Main&gt; introduction ("Yoshikuni Jujo", 10)
+"My name is Yoshikuni Jujo. I'm 10 years old."</code></pre>
+
+<p>
+これで「どうして解散するんですか?」というページを作れば、
+みんな見てくれるはずだ。
+でもバレたらちゃんと本当のことを言わなければならない。
+</p>
+
+<pre><code>*Main&gt; introduction ("Yoshikuni Jujo", 34)
+"My name is Yoshikuni Jujo. I'm 34 years old."</code></pre>
+
+<p>
+サバ読むときやバレたときのことを考えると、
+"Yoshikuni Jujo"専用の自己紹介関数を作っておきたくなるだろう。
+名前だけに部分適用したい。
+しかし、名前と年齢はタプルにまとまっているので部分適用できない。
+</p>
+
+<h2>そこでカリー化ですよ</h2>
+
+<p>(作成中)</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/polymorphic_more.html"
 	>「もっと多相関数」へもどる</a>
