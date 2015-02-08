@@ -1,3 +1,25 @@
 一時的文書達
 
 <p>覚え書き、未分類の文書達</p>
+
+<h2>telnetでSMTP</h2>
+
+<pre><code>telnet smtp.foo.com 587
+EHLO localhost
+...
+AUTH PLAIN ["ユーザ名\0ユーザ名\0パスワード"をBase64エンコードで]
+...
+MAIL FROM: bar@foo.com
+...
+RCPT TO: another@baz.co.jp
+...
+DATA
+...
+From: bar@foo.com
+Subject: test
+Hello world.
+.
+...
+QUIT
+...
+</code></pre>
