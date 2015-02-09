@@ -1,7 +1,5 @@
 カリー化
 
-<p>(工事中 0%)</p>
-
 <h2>自己紹介</h2>
 
 <p>
@@ -51,11 +49,101 @@ introduction (n, a) =
 
 <h2>そこでカリー化ですよ</h2>
 
-<p>(作成中)</p>
+<h3>カリー化とは</h3>
+
+<p>
+本来、「カリー化」とは「複数の引数を取る関数」を、
+「関数を返す関数」に変換することで引数の部分適用を可能にするということ。
+しかし、Haskellにおいては「複数の引数を取る関数のようなもの」は
+もともと「関数を返す関数」である。
+つまりHaskellにおいて「複数の引数を取る関数」ははじめからカリー化されている。
+</p>
+
+<p>
+ここで、他の言語における「複数の引数を取る関数」は
+Haskellにおける「タプルを引数に取る関数」に相当すると考えることができる。
+とすると、Haskellでのカリー化は「タプルを引数に取る関数」を
+「複数の引数を取る関数のようなもの」に変換することとなるだろう。
+</p>
+
+<h3>カリー化を試す</h3>
+
+<p>カリー化を対話環境で試してみよう。</p>
+
+<pre><code>*Main&gt; :t introduction
+(String, Integer) -&gt; String
+*Main&gt; :t curry introduction
+String -&gt; Integer -&gt; String
+*Main&gt; curry introduction "Yoshikuni Jujo" 34
+"My name is Yoshikuni Jujo. I'm 34 years old."</code></pre>
+
+<p>
+タプルとする必要があった引数をばらばらに与えることができる。
+これでYoshikuni Jujo専用の自己紹介関数を作成することが簡単にできる。
+introduction.hsに以下を追加しよう。
+</p>
+
+<pre><code>introductionYj :: Integer -&gt; String
+introductionYj = curry introduction "Yoshikuni Jujo"</code></pre>
+
+<p>試してみよう。</p>
+
+<pre><code>*Main&gt; introductionYj 34
+"My name is Yoshikuni Jujo. I'm 34 yeras old."
+*Main&gt; introductionYj 10
+"My name is Yoshikuni Jujo. I'm 10 years old."</code></pre>
+
+<h2>関数curryの定義</h2>
+
+<p>
+関数curryは引数としてタプルを期待する関数の引数をばらばらにする。
+この関数の定義はどうなっているのだろうか。
+</p>
+
+<h3>型</h3>
+
+<p>
+まずは型について見ていこう。
+上の例では<code>(String, Integer) -&gt; String</code>を
+<code>String -&gt; Intege -&gt; String</code>に変換しているので、
+型は以下のようになる。
+</p>
+
+<pre><code>((String, Integer) -&gt; String) -&gt; (String -&gt; Integer -&gt; String)</code></pre>
+
+<p>
+これをより一般的な形にすると、以下のようになる。
+</p>
+
+<pre><code>((a, b) -&gt; c) -&gt; (a -&gt; b -&gt; c)</code></pre>
+
+<p>
+(a, b)型のタプルを取って返り値cを返す関数を、
+a型の値とb型の値を取って返り値cを返す関数に変換している。
+'-&gt;'は右結合なので右側の丸括弧は省略できる。
+</p>
+
+<pre><code>((a, b) -&gt; c) -&gt; a -&gt; b -&gt; c</code></pre>
+
+<p>
+この型は、タプルを取る関数とそのタプルの第1要素と第2要素を取り、
+第1引数の関数の返り値の型の値を返す関数と考えられる。
+</p>
+
+<h3>定義</h3>
+
+<p>型宣言も含めた定義は以下のようになる。</p>
+
+<pre><code>curry :: ((a, b) -&gt; c) -&gt; a -&gt; b -&gt; c
+curry f x y = f (x, y)</code></pre>
+
+<p>
+curyの第2, 第3引数として取った値x, yをタプルにしたうえで関数fに与えている。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/polymorphic_more.html"
 	>「もっと多相関数」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/uncurry.html"
+	>「非カリー化」へ</a>
 </p>
