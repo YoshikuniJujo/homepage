@@ -48,6 +48,12 @@
 <pre><code>sum3N :: Integer -&gt; Integer
 sum3N n = sum $ filter ((== 0) . (`mod` 3)) [0 .. 3 * n]</code></pre>
 
+<p>試してみる。</p>
+
+<pre><code>% ghci sum3N.hs
+*Main&gt; sum3N 10
+165</code></pre>
+
 <h2>まとめ</h2>
 
 <p>
