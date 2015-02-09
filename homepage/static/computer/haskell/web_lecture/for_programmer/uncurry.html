@@ -1,6 +1,60 @@
 非カリー化
 
-<p>(工事中 0%)</p>
+<h2>非カリー化とは</h2>
+
+<p>
+タプルとして引数を受けとる関数を、
+ばらばらの引数を受けとる関数に変換することをカリー化と呼び、
+関数curryが用意されていた。
+逆に、ばらばらの引数を受けとる関数を、
+タプルとして引数を受けとる関数に変換することを非カリー化と呼び、
+関数uncurryが用意されている。
+</p>
+
+<h2>整数の組の足し算</h2>
+
+<p>
+2つで1組の値に対して、ばらばらの引数を取る関数を適用したいことがある。
+たとえば整数の組に対して、その2つの値を足した値が欲しいような場合があるだろう。
+そのようなとき、uncurryを使うとスマートである。
+</p>
+
+<pre><code>% ghci
+Prelude&gt; uncurry (+) (3, 8)
+11</code></pre>
+
+<h2>関数uncurry</h2>
+
+<h3>型</h3>
+
+<p>
+整数の組の足し算の例では、
+<code>Integer -&gt; Integer -&gt; Integer</code>を
+<code>(Integer, Integer) -&gt; Integer</code>に変換するので、
+型は以下のようになる。
+</p>
+
+<pre><code>(Integer -&gt; Integer -&gt; Integer) -&gt; ((Integer, Integer) -&gt; Integer)</code></pre>
+
+<p>より一般的には以下のようになる。</p>
+
+<pre><code>(a -&gt; b -&gt; c) -&gt; ((a, b) -&gt; c)</code></pre>
+
+<p>右側の丸括弧は省略できるので以下のようになる。</p>
+
+<pre><code>(a -&gt; b -&gt; c) -&gt; (a, b) -&gt; c</code></pre>
+
+<h3>定義</h3>
+
+<p>uncurryの定義は以下のようになる。</p>
+
+<pre><code>uncurry :: (a -&gt; b -&gt; c) -&gt; (a, b) -&gt; c
+uncurry f (x, y) = f x y</code></pre>
+
+<p>
+関数uncurryの第2引数であるタプル(x, y)の第1、第2要素をばらばらにして、
+関数uncurryの第1引数である関数fに与えている。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/curry.html"
