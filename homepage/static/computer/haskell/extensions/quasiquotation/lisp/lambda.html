@@ -9,13 +9,18 @@ Lispっぽく表記: lambda
 
 <pre><code>data Token
 	= OP | CP
-	| Setq | Lambda
-	| Var String | Nat Integer | Str String
+	| Setq
+	| Lambda
+	| Var String
+	| Nat Integer
+	| Str String
 	deriving Show</code></pre>
 
 <pre><code>...
-lexer ('l' : 'a' : 'm' : 'b' : 'd' : 'a' : cs@(c : _))
-	| not $ isAlphaNum c = Lambda : lexer cs
+lexer ('l' : 'a' : 'm' : 'b' : 'd' : 'a' :
+		cs@(c : _))
+	| not $ isAlphaNum c =
+		Lambda : lexer cs
 ...</code></pre>
 
 <p>
@@ -44,12 +49,12 @@ parseExp (OP : Lambda : OP : ts) = let
 
 <h2>試してみる</h2>
 
-<pre><code>ghci useLispLike.hs
-*Main&gt; :set -XQuasiQuotes
-*Main&gt; [lisp| (lambda (x y z) (+ x (+ y z))) |] 3 4 5
-12
-*Main&gt; [lisp| (lambda (n) (putStrLn (++ "Hello, " n))) |] "world"
-Hello, world</code></pre>
+<code>ghci useLispLike.hs<br/>
+*Main&gt; :set -XQuasiQuotes<br/>
+*Main&gt; [lisp| (lambda (x y z) (+ x (+ y z))) |] 3 4 5<br/>
+12<br/>
+*Main&gt; [lisp| (lambda (n) (putStrLn (++ "Hello, " n))) |] "world"<br/>
+Hello, world</code>
 
 <p>lambdaが使えるようになった。</p>
 
