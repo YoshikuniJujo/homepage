@@ -101,6 +101,33 @@ mkStdGen 8によって'9 1'というStdGen型の値が得られた。
 [3.2045989427785653, 3.24663064721416, 3.9771447330621963]
 </code>
 
+<h2>関数split</h2>
+
+<p>
+座標を指定するためにはx座標, y座標の2つのランダムな値の系列が必要になる。
+そのためには「ランダムの種」を2つに分ける必要がある。
+「ランダムの種」を2つに分けるには関数splitが使える。
+</p>
+
+<code>Prelude System.Random&gt; split $ mkStdGen 8<br/>
+(10 40692, 360126 2147483398)</code>
+
+<h2>正方形内のランダムな点</h2>
+
+<p>
+原点を中心とする1辺が2の正方形内にあるランダムな点の列を生成してみよう。
+</p>
+
+<code>Prelude System.Random&gt; :m + Control.Arrow
+Prelude System.Random Control.Arrow&gt; take 3 . uncurry zip .
+(randomRs (-1, 1) *** randomRs (-1, 1)) . split $ mkStdGen 8 ::
+[(Double, Double)]<br/>
+[(-3.18859986651685e-2, -0.4475857685951523),
+(-0.4281869025678364, 0.969606436457163),
+(-0.7979778666086881, -0.6623840670853804)]</code>
+
+<p>(作成中)</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/about_montecarlo.html"
 	>「モンテカルロ法の説明」へもどる</a>
