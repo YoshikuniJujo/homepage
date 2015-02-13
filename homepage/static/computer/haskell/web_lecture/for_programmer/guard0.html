@@ -1,6 +1,71 @@
 ガード
 
-<p>(工事中 0%)</p>
+<h2>はじめに</h2>
+
+<p>
+関数を定義する場合、単にパターンマッチするだけでなく、
+条件によって処理を分岐させたいことはよくある。
+たとえば0の場合だけを特別扱いにする場合にはパターンマッチでできるが、
+0未満の場合と0以上の場合とで処理を分けるのは直接的なパターンマッチではできない。
+</p>
+
+<h2>0未満を考慮した平方根</h2>
+
+「0未満のときにはNothingを返すsqrt'」を定義してみよう。
+
+<h3>今まで学んできた範囲内で</h3>
+
+<p>
+今まで学んできた内容のみを使って定義するには以下のようにする。
+</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/03_7_guard0/sqrt0.hs"
+	>sqrt0.hs</a></p>
+
+<pre><code>sqrt' x = sqrtBool (x &lt; 0) x</code></pre>
+
+<pre><code>sqrtBool True _ = Nothing
+sqrtBool _ x = Just $ sqrt x</code></pre>
+
+<h3>ガードを使う</h3>
+
+<p>
+Bool値に対するパターンマッチは頻出なので略記法がある。
+以下のように書ける。
+</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/03_7_guard0/sqrt1.hs"
+	>sqrt1.hs</a></p>
+
+<pre><code>sqrt' x
+	| x &lt; 0 = Nothing
+	| otherwise = Just $ sqrt x</code></pre>
+
+<p>一般的には以下のようになる。</p>
+
+<pre><code>[関数名]
+	| [Bool値を返す式1] = [結果となる式1]
+	| [Bool値を返す式2] = [結果となる式2]
+		...</code></pre>
+
+<p>
+Bool値を返す式の部分をガードと呼ぶ。
+ガードの部分がTrueになるまで上から順に見ていき、
+Trueになったら対応する「結果となる式」が全体の結果となる。
+また、sqrt'の例にあるotherwiseはTrueに束縛された変数である。
+これはpiと同じように事前に束縛された変数である。
+読みやすさのために定義されている。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+True, Falseに対するパターンマッチはしばしば使われるので、略記法が用意されている。
+そのうちのひとつが関数につけることができるガードであり、以下のような表記で、
+複数つけることができる。
+</p>
+
+<pre><code>	| [Bool値を返す式] = [結果となる式]</code></pre>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/pattern_match.html"
