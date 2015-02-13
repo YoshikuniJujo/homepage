@@ -92,8 +92,8 @@ nが2より小さい場合、この関数は無限に実行されてしまう。
 
 <pre><code>factor n
 	| n &lt; 2 = 1
-	| otherwise = head $
-		filter ((== 0) . (n `mod`)) [2 ..]</code></pre>
+	| otherwise = head $ filter
+		((== 0) . (n `mod`)) [2 ..]</code></pre>
 
 <p>試してみよう。</p>
 
@@ -102,6 +102,30 @@ nが2より小さい場合、この関数は無限に実行されてしまう。
 13<br/>
 *Main&gt; factor 100233223200127<br/>
 9997777</code>
+
+<h2>平方数のリスト</h2>
+
+<p>
+今度は平方数のリストを見てみよう。
+平方数のリストは以下のように作ることができる。
+</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/12_inf_list/squares.hs"
+	>squares.hs</a></p>
+
+<pre><code>squares :: [Integer]
+squares = map (^ 2) [0 ..]</code></pre>
+
+<p>試してみる。</p>
+
+<code>ghci squares.hs<br/>
+*Main&gt; take 13 squares
+[0,1,4,9,16,25,36,49,64,81,100,121,144]</code>
+
+<p>
+takeは指定した数だけリストから値を取り出す関数。
+無限リストを表示するときにはtakeを使わないと無限実行となってしまう。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/list_as_data.html"

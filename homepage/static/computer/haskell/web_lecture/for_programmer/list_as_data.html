@@ -77,6 +77,19 @@ Haskellでのデフォルトの文字列は単なる文字のリストである�
 Prelude&gt; ['h', 'e', 'l', 'l', 'o']
 "hello"</code></pre>
 
+<h2>リストの型</h2>
+
+<p>
+きちんと理解するには代数的データ型と多相型について学ぶ必要がある。
+今のところはリストの型は要素の型を'['と']'で囲んだものと覚えておけば良い。
+</p>
+
+<pre><code>is :: [Integer]
+is = [23, 15, 4, 9]</code></pre>
+
+<pre><code>bs :: [Bool]
+bs = [True, False, False, True]</code></pre>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/list_efficiency.html"
 	>「空間効率」へもどる</a>
