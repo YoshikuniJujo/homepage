@@ -1,6 +1,6 @@
 疑似乱数列の生成
 
-<p>(工事中 0%)</p>
+<p>(工事中 40%)</p>
 
 <h2>動機</h2>
 
@@ -58,6 +58,48 @@ StdGen型の値を与えるとDouble型の値のリストを返す。
 </p>
 
 <h2>StdGen型</h2>
+
+<p>
+StdGen型は「乱数の種」である。
+この値を変えることで乱数は変化する。
+逆にこの値が同じならば常に同じ値が返る。
+ここではこの値を関数mkStdGenを使ってIntから生成することにする。
+</p>
+
+<pre><code>mkStdGen :: Int -&gt; StdGen</code></pre>
+
+<h2>試してみる</h2>
+
+<code>% ghci<br/>
+Prelude&gt; :m System.Random<br/>
+Prelude System.Random&gt; mkStdGen 8<br/>
+9 1<br/>
+Prelude System.Random&gt; :t it<br/>
+it :: StdGen</code>
+
+<p>
+mkStdGen 8によって'9 1'というStdGen型の値が得られた。
+この値を使って疑似乱数列を作成してみよう。
+表示する際にはtakeを使っていくつかだけを取り出すことにする。
+</p>
+
+<code>Prelude System.Random&gt; take 3 . randoms $ mkStdGen 8 :: [Double]<br/>
+[0.6022994713892826, 0.62331532360708, 0.9885723665310981]</code>
+
+<h2>関数randomRs</h2>
+
+<p>
+関数randomsでは生成される乱数列の範囲を指定することができない。
+指定した範囲内の値で乱数列を生成するには関数randomRsを使う。
+</p>
+
+<code>randomRs :: (Double, Double) -&gt; StdGen -&gt; [Double]</code>
+
+<p>第1引数となるタプルで乱数の範囲を指定する。</p>
+
+<code>Prelude System.Random&gt; take 3 . randomRs (2, 4) $ mkStdGen 8 :: [Double]<br/>
+[3.2045989427785653, 3.24663064721416, 3.9771447330621963]
+</code>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/about_montecarlo.html"
