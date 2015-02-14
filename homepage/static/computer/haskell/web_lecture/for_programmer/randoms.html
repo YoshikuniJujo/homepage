@@ -118,13 +118,55 @@ mkStdGen 8によって'9 1'というStdGen型の値が得られた。
 原点を中心とする1辺が2の正方形内にあるランダムな点の列を生成してみよう。
 </p>
 
-<code>Prelude System.Random&gt; :m + Control.Arrow
+<code>Prelude System.Random&gt; :m + Control.Arrow<br/>
 Prelude System.Random Control.Arrow&gt; take 3 . uncurry zip .
 (randomRs (-1, 1) *** randomRs (-1, 1)) . split $ mkStdGen 8 ::
 [(Double, Double)]<br/>
 [(-3.18859986651685e-2, -0.4475857685951523),
 (-0.4281869025678364, 0.969606436457163),
 (-0.7979778666086881, -0.6623840670853804)]</code>
+
+<h3>演算子(***)</h3>
+
+<p>
+演算子(***)は2要素タプルの1要素目と2要素目の両方に関数を適用する関数である。
+たとえば(* 2) *** (+ 3)は1要素目を2倍し2要素目に3を足す関数となる。
+</p>
+
+<code>Prelude System.Random Control.Arrow&gt; (* 2) *** (+ 3) $ (4, 2)<br/>
+(8,5)</code>
+
+<h3>説明</h3>
+
+<p>
+すこしずつ組み立てていくことで説明とする。
+</p>
+
+<code>split $ mkStdGen 8</code>
+
+<p>これは2つの乱数の種をタプルにして返す。</p>
+
+<code>(randomRs (-1, 1) *** randomRs (-1, 1)) . split $ mkStdGen 8</code>
+
+<p>
+タプルの第1要素、第2要素の両方にrandomRs (-1, 1)を適用している。
+つまり別々の系列の乱数列のタプルが返る。
+型は([Double], [Double])である。
+</p>
+
+<code>uncurry zip . (randomRs (-1, 1) *** randomRs (-1, 1)) . split $ mkStdGen 8</code>
+
+<p>
+zipは2つのリストを取ってそれをタプルのリストにして返す。
+型は[a] -&gt; [b] -&gt; [(a, b)]である。
+uncurryによって引数である2つのリストをタプルにまとめている。
+uncurry zipの型は([a], [b]) -&gt; [(a, b)]となる。
+</p>
+
+<p>
+これでタプルの第1要素であるx座標のリストと第2要素であるy座標のリストが、
+座標上の点のリストとなる。
+</p>
 
 <p>(作成中)</p>
 
