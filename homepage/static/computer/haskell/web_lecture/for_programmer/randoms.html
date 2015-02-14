@@ -1,7 +1,5 @@
 疑似乱数列の生成
 
-<p>(工事中 40%)</p>
-
 <h2>動機</h2>
 
 <p>
@@ -126,6 +124,14 @@ Prelude System.Random Control.Arrow&gt; take 3 . uncurry zip .
 (-0.4281869025678364, 0.969606436457163),
 (-0.7979778666086881, -0.6623840670853804)]</code>
 
+<h3>関数split</h3>
+
+<p>上の表現を1つずつ組み立てていく。</p>
+
+<code>split $ mkStdGen 8</code>
+
+<p>これは2つの乱数の種をタプルにして返す。</p>
+
 <h3>演算子(***)</h3>
 
 <p>
@@ -136,15 +142,7 @@ Prelude System.Random Control.Arrow&gt; take 3 . uncurry zip .
 <code>Prelude System.Random Control.Arrow&gt; (* 2) *** (+ 3) $ (4, 2)<br/>
 (8,5)</code>
 
-<h3>説明</h3>
-
-<p>
-すこしずつ組み立てていくことで説明とする。
-</p>
-
-<code>split $ mkStdGen 8</code>
-
-<p>これは2つの乱数の種をタプルにして返す。</p>
+<p>これを使って以下のようにする。</p>
 
 <code>(randomRs (-1, 1) *** randomRs (-1, 1)) . split $ mkStdGen 8</code>
 
@@ -154,11 +152,16 @@ Prelude System.Random Control.Arrow&gt; take 3 . uncurry zip .
 型は([Double], [Double])である。
 </p>
 
-<code>uncurry zip . (randomRs (-1, 1) *** randomRs (-1, 1)) . split $ mkStdGen 8</code>
+<h3>関数zip</h3>
 
 <p>
 zipは2つのリストを取ってそれをタプルのリストにして返す。
 型は[a] -&gt; [b] -&gt; [(a, b)]である。
+</p>
+
+<code>uncurry zip . (randomRs (-1, 1) *** randomRs (-1, 1)) . split $ mkStdGen 8</code>
+
+<p>
 uncurryによって引数である2つのリストをタプルにまとめている。
 uncurry zipの型は([a], [b]) -&gt; [(a, b)]となる。
 </p>
@@ -168,11 +171,24 @@ uncurry zipの型は([a], [b]) -&gt; [(a, b)]となる。
 座標上の点のリストとなる。
 </p>
 
-<p>(作成中)</p>
+<h2>まとめ</h2>
+
+<p>
+原点を中心とする1辺2の正方形内にあるランダムな点の列は以下のように
+生成することができる。
+</p>
+
+<pre><code>uncurry zip . (randomRs (-1, 1) *** randomRs (-1, 1))
+	. split $ mkStdGen 8</code></pre>
+
+<p>
+乱数の種を作るために作った整数値8は適当な値なので実際に使うときには
+パラメータ化することにする。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/about_montecarlo.html"
 	>「モンテカルロ法の説明」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/montecarlo_coding.html"
+	>「モンテカルロ法のコーディング」へ</a>
 </p>
