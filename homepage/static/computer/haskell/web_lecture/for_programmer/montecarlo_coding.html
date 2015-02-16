@@ -1,6 +1,96 @@
 モンテカルロ法のコーディング
 
-<p>(工事中 0%)</p>
+<p><a
+href="/computer/haskell/web_lecture/for_programmer/13_montecarlo/montecarlo.hs"
+	>montecarlo.hs</a></p>
+
+<h2>正方形内のランダムな点</h2>
+
+<p>正方形内のランダムな点を生成する式を再掲する。</p>
+
+<code>uncurry zip . (randomRs (-1, 1) *** randomRs (-1, 1))
+	. split $ mkStdGen 8</code>
+
+<p>
+乱数の種を求めるための整数を指定することで
+様々な系列のランダムな点の列を返すような関数とする。
+</p>
+
+<code>points :: Int -&gt; [(Double, Double)]<br/>
+points = uncurry zip . (randomRs (-1, 1) *** randomRs (-1, 1))
+	. split . mkStdGen</code>
+
+<h2>円内の点であることのチェック</h2>
+
+<p>
+円内の点であるということは原点からの距離が1以下であるということであるので、
+以下の関数でチェックすることができる。
+</p>
+
+<code>inCircle :: (Double, Double) -&gt; Bool<br/>
+inCircle (x, y) = x ^ 2 + y ^ 2 &lt;= 1</code>
+
+<h2>円内の点のみを取り出す</h2>
+
+<p>
+もともとの点の数を指定して、そのなかから円内の点のみを取り出す関数を作成する。
+</p>
+
+<code>inCirclePoints :: Int -&gt; Int -&gt; [(Double, Double)]<br/>
+inCirclePoints g n = filter inCircle . take n $ points g</code>
+
+<h2>円周率の推測値を出す</h2>
+
+<p>
+ランダムな点の系列を指定し、点の数を指定し、円周率の推測を計算する関数を作成する。
+</p>
+
+<code>guessPi :: Int -&gt; Int -&gt; Double<br/>
+guessPi g n = 4 * fromIntegral (length $ inCirclePoints g n) / fromIntegral n</code>
+
+<p>
+円内の点の数を全体の点の数で割ったものに4倍している。
+つまり以下の式を計算しているということ。
+</p>
+
+<code>[正方形の面積] * [円内の点の数] / [正方形内の点の数]</code>
+
+<h2>試してみる</h2>
+
+<code>% ghci montecarlo.hs<br/>
+*Main&gt; guessPi 8 100<br/>
+2.96<br/>
+*Main&gt; guessPi 8 1000<br/>
+3.096<br/>
+*Main&gt; guessPi 8 10000<br/>
+3.134<br/>
+*Main&gt; guessPi 8 100000<br/>
+3.1434<br/>
+*Main&gt; guessPi 8 1000000<br/>
+3.143328<br/>
+*Main&gt; guessPi 9 1000000<br/>
+3.142572</code>
+
+<h2>グラフ</h2>
+
+<p>
+横軸に点の数、縦軸に円周率の推測値を取ったグラフを以下に示す。
+収束が遅いので横軸は対数としてある。
+gの値によって異なる系列のランダムな点の列となっている。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/images/monteGraphLog.svg"
+><img
+alt="円周率へ収束していくグラフ"
+width="330"
+src="/computer/haskell/web_lecture/for_programmer/images/monteGraphLog.svg"/>
+</a>
+</p>
+
+<p>
+πに収束しているように見える。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/randoms.html"

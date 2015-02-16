@@ -178,8 +178,8 @@ uncurry zipの型は([a], [b]) -&gt; [(a, b)]となる。
 生成することができる。
 </p>
 
-<pre><code>uncurry zip . (randomRs (-1, 1) *** randomRs (-1, 1))
-	. split $ mkStdGen 8</code></pre>
+<code>uncurry zip . (randomRs (-1, 1) *** randomRs (-1, 1))
+	. split $ mkStdGen 8</code>
 
 <p>
 乱数の種を作るために作った整数値8は適当な値なので実際に使うときには
