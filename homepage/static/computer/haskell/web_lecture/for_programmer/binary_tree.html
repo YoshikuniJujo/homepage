@@ -2,6 +2,116 @@
 
 <p>(工事中 0%)</p>
 
+<p><a
+href="/computer/haskell/web_lecture/for_programmer/15_binary_tree/binaryTree.hs"
+>binaryTree.hs</a></p>
+
+<h2>はじめに</h2>
+
+<p>
+制御の流れが1本道であるような再帰、つまり「くりかえし」は、
+生の再帰を使わなくてもリストとそれを扱う関数で書けてしまう。
+よって、生の再帰の力を証明するためには制御の流れが樹構造になるような、
+再帰関数が必要になる。
+</p>
+
+<h2>仕様</h2>
+
+<p>
+二分樹を下にたどっていくことで、
+ある要素から別の要素にたどりつけるかどうかを判定する関数を作成する。
+樹の各要素は2つの枝を出すか、またはひとつも枝を出さないかのどちらかとする。
+</p>
+
+<img
+alt="樹のサンプルの画像"
+src="/computer/haskell/web_lecture/for_programmer/images/binaryTree.svg"/>
+
+<p>
+図に書いた例ではたとえばbからfには行くことができる。
+しかし、cからfには行くことができない。
+樹を上向きにたどることはできないという条件により、
+cからaにもどることができないためだ。
+</p>
+
+<h2>樹の表現</h2>
+
+<p>
+樹の要素は一文字で表現する。
+そして、樹は各要素から出る枝の集合とする。
+また同じ要素から出る枝はまとめて書くことにする。
+つまり上の例でaからbとcに枝が出ていることを('a', ('b', 'c'))のように表現する。
+上の樹を表現するデータは以下のようになる。
+</p>
+
+<code>[('a', ('b', 'c')), ('b', ('d', 'e')), ('e', ('f', 'g'))]</code>
+
+<p>
+このようなデータの型は<code>[(Char, (Char, Char))]</code>となる。
+これに別名をつけておこう。
+別名のつけかたは以下のようになる。
+</p>
+
+<code>type [型の別名] = [型]</code>
+
+<p>
+樹を表現する型の別名をTree型とすると以下のようになる。
+</p>
+
+<code>type Tree = [(Char, (Char, Char))]</code>
+
+<p>サンプルの樹も定義しておこう。</p>
+
+<code>sampleTree :: Tree<br/>
+sampleTree = [('a', ('b', 'c')), ('b', ('d', 'e')), ('e', ('f', 'g'))]</code>
+
+<h2>次を見つける</h2>
+
+<p>
+樹を下にたどっていくためには、ある要素から出る枝の先にある要素を求める必要がある。
+たとえば'b'に対しては'd'と'e'が返れば良い。
+Tree型の値を辞書として考えれば、
+これは辞書から鍵に対応する値を取り出すことと同じことである。
+リストを辞書と考えたときに値を引き出す関数lookupが用意されている。
+lookupをサンプルの樹で試してみよう。
+</p>
+
+<code>% ghci binaryTree.hs<br/>
+*Main&gt; lookup 'b' sampleTree<br/>
+Just ('d', 'e')<br/>
+*Main&gt; lookup 'e' sampleTree<br/>
+Just ('f', 'g')<br/>
+*Main&gt; lookup 'd' sampleTree<br/>
+Nothing</code>
+
+<p>
+bからはdとeに枝がのび、eからはfとgに枝がのびている。
+またdからは枝がないということがNothingで表現されている。
+これである要素から次に行ける要素を求めることができる。
+</p>
+
+<h2>case文</h2>
+
+<p>ここらへんでcase文について学んでおこう。</p>
+
+<p>(作成中)</p>
+
+<h2>求める関数</h2>
+
+<p>
+求める関数は、
+樹を指定しある要素からもうひとつの要素へと行けるかどうかを求める関数なので、
+以下のような関数になるだろう。
+</p>
+
+<code>reachable [樹] [始点] [終点] =&gt; [真偽値]</code>
+
+<p>Haskellの型宣言では以下のようになるだろう。</p>
+
+<code>reachable :: Tree -&gt; Char -&gt; Char -&gt; Bool</code>
+
+<p>(作成中)</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/leibniz_formula.html"
 	>「ライプニッツの公式」へもどる</a>
