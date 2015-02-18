@@ -3,35 +3,36 @@ GHCi: 対話環境に触れる
 <h2>はじめに</h2>
 
 <p>
-これを読む前にHaskell Platformをインストールしておこう。
-Windowsでは<a href="https://www.haskell.org/platform/windows.html">ここ</a>に
-インストーラが用意されている。
-Macでは<a href="https://www.haskell.org/platform/mac.html">ここ</a>にある。
-Linuxではそれぞれのディストリビューションごとにそれぞれのやりかたがあると思うが、
+Haskell Platformをインストールする。
+Windowsでは<a href="https://www.haskell.org/platform/windows.html">ここ</a>、
+Macでは<a href="https://www.haskell.org/platform/mac.html">ここ</a>に
+インストーラがある。
+Linuxではディストリビューションごとにそれぞれのやりかたがある。
 <a href="https://www.haskell.org/platform/linux.html">ここ</a>に
-情報がまとまっているようだ。
+情報がまとまっている。
+以下、Haskell Platformがインストールされているものとして話を進める。
 </p>
 
-<p>
-各自インストールしてもらいたい。
-</p>
-
-<h2>値の表示</h2>
+<h2>ghcのチェック</h2>
 
 <p>
-対話環境に慣れよう。
-まずはghcがインストールされているかどうかをチェックする。
-コマンドプロンプトを立ち上げて以下を入力する。
-先頭の'%'はコマンドプロンプトに対する入力であることを示すためなので
+ghcがインストールされているかどうかのチェック。
+コマンドプロンプトを立ち上げて以下を入力。
+先頭の'%'はコマンドプロンプトに対する入力であることを示すため。
 これは入力しない。
 </p>
 
-<pre><code>% ghc --version
-The Glorious Glasgow Haskell Compilation System, version X.Y.Z</code></pre>
+<code>% ghc --version<br/>
+The Glorious Glasgow Haskell Compilation System, version X.Y.Z</code>
 
 <p>
-上のようにバージョンが表示されればghcはインストールされている。
-それではGHCiを立ち上げて、いくつかの値を入力し表示させてみよう。
+ghcの名前とバージョンが表示されればghcはインストールされている。
+</p>
+
+<h2>終わらせかた</h2>
+
+<p>
+さっそく対話環境を立ち上げてみよう。
 </p>
 
 <pre><code>% ghci
@@ -39,15 +40,20 @@ Prelude&gt;</code></pre>
 
 <p>
 Prelude&gt;はプロンプトである。
-まずは、重要なことがある。
-それは終わらせかた、だ。
+終わらせかたは意外と重要だ。
+対話環境から抜けられなくて困惑するはめにならないように、
+まずは終了のしかたを学ぼう。
 以下のようにプロンプトに':q'に続けてリターンキーを入力しよう。
+':q'は':quit'の略である。
+几帳面な方は':quit'と省略せずに入力しても良い。
 </p>
 
 <pre><code>Prelude&gt; :q</code></pre>
 
+<h2>値の表示</h2>
+
 <p>
-再度ghciを立ち上げて、いろいろな値を入力してみよう。
+再度、ghciを立ち上げていろいろな値を入力してみよう。
 </p>
 
 <pre><code>% ghci
@@ -59,69 +65,88 @@ Prelude&gt; pi
 3.141592653589793</code></pre>
 
 <p>
-対話環境では入力された式が評価されて、その結果が表示される。
-4492や'c'はリテラルなのでそのまま出力される。
-piは定義済みの変数であり、その値が表示される。
+対話環境は入力した式を評価し結果を表示する。
+4492や'c'はリテラルでありそのまま出力される。
+piは定義済みの変数だ。円周率の値が表示される。
 </p>
 
 <h2>定義ファイルの読み込み</h2>
 
-<p>
-Haskellについて学んでいくうえでしばらくは以下のような形にする。
-</p>
+<h3>学習の流れ</h3>
+
+<p>入出力について学ぶまでは以下のような形で学習を進める。</p>
 
 <ol>
 <li>関数を定義したファイルを作成</li>
 <li>GHCiに読み込む</li>
-<li>ファイルを編集する</li>
-<li>変更したファイルを再読み込みする</li>
+<li>関数を評価し結果を表示</li>
+<li>ファイルを編集</li>
+<li>変更したファイルの再読み込み</li>
+<li>関数を評価し結果を表示</li>
+<li>4から6をくりかえす</li>
 </ol>
+
+<h3>リンゴが好き</h3>
 
 <p>
 ファイルの読み込みや再読み込みの練習をしてみよう。
 以下のようなファイルを作成する。
 </p>
 
+<p><a href="/computer/haskell/web_lecture/for_programmer/00_touch_ghci/fruits_1.hs"
+	>fruits.hs</a></p>
+
 <pre><code>myFavoriteFruit = "apple"</code></pre>
 
 <p>
-これをfruits.hsというファイルに保存する。
-これを読み込むには以下のようにghciの引数としてファイル名を指定してやれば良い。
+fruits.hsというファイルに保存する。
+以下のようにghciの引数としてファイル名を指定することで、これを読み込む。
 </p>
 
 <pre><code>ghci fuits.hs
 *Main&gt; </code></pre>
 
+<p>myFavoriteFruitと入力してリターンキーを入力。</p>
+
+<pre><code>*Main&gt; myFavoriteFruit
+"apple"</code></pre>
+
+<h3>バナナが好き</h3>
+
 <p>
-myFavoriteFruitを入力してみる。
+実はリンゴよりもバナナのほうが好きだった。
+対話環境はそのまま走らせておき、エディタを開きfruit.hsを変更する。
 </p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/00_touch_ghci/fruits_2.hs"
+	>fruits.hs</a></p>
+
+<code>myFavoriteFruit = "banana"</code>
+
+<p>対話環境で試してみよう。</p>
 
 <pre><code>*Main&gt; myFavoriteFruit
 "apple"</code></pre>
 
 <p>
-よく考えたらリンゴよりもバナナのほうが好きだったとする。
-対話環境はそのままにしておいて、エディタを開きfruit.hsを変更しよう。
+「おや?変更が反映されてない!」。
+ファイルを変更した後には再読み込みの必要がある。
+再読み込みには':r'または':reload'とする。
 </p>
-
-<pre><code>myFavoriteFruit = "banana"</code></pre>
-
-<p>
-対話環境のほうで試してみよう。
-</p>
-
-<pre><code>*Main&gt; myFavoriteFruit
-"apple"</code></pre>
-
-<p>「おや?変更が反映されてない!」
-そう、ファイルを変更した後には再読み込みする必要がある。</p>
 
 <pre><code>*Main&gt; :reload
 *Main&gt; myFavoriteFruit
 "banana"</code></pre>
 
+<h2>まとめ</h2>
+
 <p>
-これでファイルに書いた定義を読み込んで対話環境で使うことができるようになった。
+Haskell Platformをインストールすれば、コンパイラ、インタプリタ、対話環境だけでなく、
+パッケージ管理ソフトやドキュメントの自動生成ソフト、その他のライブラリがそろう。
+入出力について学ぶまでは対話環境を使って学習を進める。
+対話環境はghciコマンドで開始し':q'で終了させる。
+定義ファイルを読み込むにはそのファイル名を引数にしてghciを走らせれば良い。
+ファイルを編集したあとには:reloadで再読み込みする必要がある。
 </p>
 
 <p>
