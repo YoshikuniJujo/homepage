@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!-- MADE BY SVG.HS -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink" width="280.0"
+     height="140.0"
+  ><rect x="0.0" y="0.0" width="280.0" height="140.0"
+         stroke-width="0.0" fill="rgb(255,255,255)"
+         stroke="rgb(255,255,255)"
+  /><polyline points="19.999999999999996,5.000000000000025 20.0,25.000000000000025 220.0,25.0 220.0,5.0 20.0,5.0 "
+              fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.0"
+  /><polyline points="19.999999999999986,50.000000000000036 69.99999999999999,50.00000000000003 70.0,90.00000000000003 220.0,90.00000000000001 220.0,70.00000000000001 170.0,70.00000000000001 170.0,50.000000000000014 270.0,50.0 270.0,30.0 20.0,30.0 "
+              fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.0"
+  /><polyline points="20.0,115.00000000000003 70.0,115.00000000000003 70.0,135.00000000000003 270.0,135.0 270.0,115.0 170.0,115.0 170.0,95.0 20.0,95.0 "
+              fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.0"/></svg>
