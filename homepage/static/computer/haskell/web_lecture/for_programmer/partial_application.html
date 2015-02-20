@@ -4,14 +4,14 @@
 href="/computer/haskell/web_lecture/for_programmer/02_partial_application/rsa.hs"
 	>rsa.hs</a></p>
 
-<h2>実は同じなので</h2>
+<h2>関数xxcrypt</h2>
 
 <p>encrypt関数とdecrypt関数は実は同じものだ。</p>
 
 <pre><code>encrypt n e m = m ^ e `mod` n
 decrypt n d c = c ^ d `mod` n</code></pre>
 
-<p>なのでひとつにまとめてしまうことにする。</p>
+<p>ひとつにまとめてしまおう。</p>
 
 <pre><code>xxcrypt n ed mc = mc ^ ed `mod` n</code></pre>
 
@@ -19,9 +19,8 @@ decrypt n d c = c ^ d `mod` n</code></pre>
 
 <p>
 同じ鍵でいろいろなメッセージを暗号化、復号することを考える。
-そのようなときにいちいち鍵を引数として与えるのは面倒だ。
-鍵を固定した関数を作成しよう。
-rsa.hsに以下の関数を追加する。
+いちいち鍵を引数として与えるのは面倒だ。
+鍵を固定した関数を作成する。
 </p>
 
 <pre><code>encrypt1 m = xxcrypt 138689 13 m
@@ -36,22 +35,19 @@ decrypt1 c = xxcrypt 138689 95497 c</code></pre>
 4492</code></pre>
 
 <p>
-encrypt1やdecrypt1の定義を見ると、それぞれencryptやdecryptの
-第1、第2引数だけを指定し、第3引数は指定されていないのがわかる。
-このような場合、以下のように書くことができる。
+encrypt1やdecrypt1の定義では、それぞれencryptやdecryptの
+第1、第2引数だけを指定し、第3引数は指定されていない。
+このような場合、以下のように書ける。
 </p>
 
 <pre><code>encrypt1' = xxcrypt 138689 13
 decrypt1' = xxcrypt 138689 95497</code></pre>
 
 <p>
-encrypt1'はencryptの3つの引数のうち第1引数と第2引数に値を与えることで作成した。
-decrypt1'についても同様。
-このように、関数の引数のうちの1部だけ指定することを部分適用と呼ぶ。
-</p>
-
-<p>
-うえでは第1、第2引数を指定したが、もちろん第1引数のみを指定することもできる。
+encrypt1'、decrypt1'はそれぞれencrypt、decryptの3つの引数のうち
+第1引数と第2引数のみに値を与えることで作成した。
+関数の引数のうち一部だけ指定することを部分適用と呼ぶ。
+もちろん第1引数のみを指定することもできる。
 </p>
 
 <pre><code>xxcrypt1 = xxcrypt 138689</code></pre>
@@ -61,10 +57,10 @@ decrypt1'についても同様。
 <pre><code>encrypt1'' = xxcrypt1 13
 decrypt1'' = xxcrypt1 95497</code></pre>
 
-<h2>展開していくと</h2>
+<h2>展開</h2>
 
 <p>
-encrypt1'' 4492を展開していくと以下のようになる。
+encrypt1'' 4492を展開してみる。
 </p>
 
 <pre><code>encrypt1'' 4492
@@ -77,6 +73,12 @@ xxcrypt 138689はxxcrypt1という関数を返す。
 xxcrypt1 13はencrypt1''という関数を返す。
 そしてencrypt1'' 4492が数値を返す。
 </p>
+
+<img
+width="330"
+alt="[3引数関数の図]"
+src="/computer/haskell/web_lecture/for_programmer/images/three_arg_fun.svg"
+/>
 
 <p>
 xxcryptという3引数関数に1つ引数を与えてやると、
@@ -107,10 +109,10 @@ xxcryptを今までは3引数関数として扱ってきた。
 <h2>まとめ</h2>
 
 <p>
-関数はその一部の引数だけ指定することができ、これを部分適用と呼ぶ。
+関数はその一部の引数だけ指定することができる。
+これを部分適用と呼ぶ。
 「部分適用」は特別に用意された機能ではない。
-むしろ「複数の引数を持つ関数」のほうが幻で、
-「関数を返す関数」の連鎖が起きている。
+むしろ「複数の引数を持つ関数」のほうが幻で「関数を返す関数」の連鎖が起きている。
 </p>
 
 <p>
