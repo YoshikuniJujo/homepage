@@ -19,10 +19,10 @@ Prelude&gt; 123
 <h2>関数リテラルとは</h2>
 
 <p>
-今までの関数の定義のしかただと、関数は一度変数を束縛して、
+今までの関数の定義のしかただと、関数は変数を束縛して、
 その変数を使って呼び出すことしかできなかった。
-しかし、関数リテラルを使うと関数に名前をつけずに、
-その場で作り、その場で使うことができる。
+しかし、関数リテラルを使うと、関数に名前をつけずに
+その場で作りその場で使うことができる。
 </p>
 
 <h3>変数とリテラル</h3>
@@ -31,15 +31,14 @@ Prelude&gt; 123
 たとえばx = 3と定義されている場合、xのある場所を3で置き換えることができる。
 では、fun x = x ^ xのように定義されている場合、
 funのある場所を何で置き換えることができるだろうか。
-そのfunのある場所を置き換えられるような表現、言わば関数の実体のようなもの、
-それを関数リテラルと呼ぶ。
+そのfunのある場所を置き換えられるような表現、
+関数の実体とも言えるようなもの、
+それが関数リテラルである。
 </p>
 
 <h2>関数リテラルの例</h2>
 
-<p>
-上述のfun x = x ^ xを考えてみる。
-</p>
+<p>fun x = x ^ xの例を見ていこう。</p>
 
 <pre><code>% ghci
 Prelude&gt; let fun x = x ^ x
@@ -47,8 +46,8 @@ Prelude&gt; fun 3
 27</code></pre>
 
 <p>
-このfunの部分を関数リテラルで置き換えてみよう。
-関数リテラルは\[仮引数] -&gt; [表現]のような形で書くことができる。
+このfunの部分を関数リテラルで置き換える。
+関数リテラルは\[仮引数] -&gt; [表現]という形で書く。
 </p>
 
 <pre><code>Prelude&gt; (\x -&gt; x ^ x) 3
@@ -61,45 +60,51 @@ Prelude&gt; fun 3
 以下の表現を見てみよう。
 </p>
 
-<pre><code>fun x = x ^ x</code></pre>
+<code>fun x = x ^ x</code>
 
 <p>これは以下のように書き直すことができる。</p>
 
-<pre><code>fun = \x -&gt; x ^ x</code></pre>
+<code>fun = \x -&gt; x ^ x</code>
 
 <p>
-つまり今まで見てきた関数定義は、関数リテラルによって指定した関数で
-関数名としての変数を束縛するという2つのことを行っていた。
+関数定義は、関数リテラルによって関数を作成し、
+その関数で変数を束縛するという2つのことを一度に行っている。
 </p>
 
 <h2>xxcryptの例</h2>
 
 <p>xxcryptの定義を再掲する。</p>
 
-<pre><code>xxcrypt n ed mc = mc ^ ed `mod` n</code></pre>
+<code>xxcrypt n ed mc = mc ^ ed `mod` n</code>
 
 <p>これを関数リテラルで書くと以下のようになる。</p>
 
-<pre><code>xxcrypt = \n -&gt; (\ed -&gt; (\mc -&gt;  mc ^ ed `mod` n))</code></pre>
+<code>xxcrypt = \n -&gt; (\ed -&gt; (\mc -&gt;  mc ^ ed `mod` n))</code>
+
+<img
+width="330"
+alt="[3引数関数の図]"
+src="/computer/haskell/web_lecture/for_programmer/images/three_arg_fun.svg"
+/>
 
 <p>
 数値を返す関数を返す関数を返す関数ということだ。
-結合性を考慮すると括弧は省略可能だ。
+結合性を考慮すると括弧は省略できる。
 </p>
 
-<pre><code>xxcrypt = \n -&gt; \ed -&gt; \mc -&gt;  mc ^ ed `mod` n</code></pre>
+<code>xxcrypt = \n -&gt; \ed -&gt; \mc -&gt;  mc ^ ed `mod` n</code>
 
 <h2>複数引数の省略記法</h2>
 
-<p>上記のように引数がつながる場合には以下のような略記が可能だ。</p>
+<p>上記のように引数がつながる場合には以下のような略記法がある。</p>
 
-<pre><code>xxcrypt = \n ed mc -&gt; mc ^ ed `mod` n</code></pre>
+<code>xxcrypt = \n ed mc -&gt; mc ^ ed `mod` n</code>
 
 <h2>まとめ</h2>
 
-<p>関数リテラルの記法は以下のようになる。</p>
+<p>関数リテラルの記法を以下に示す。</p>
 
-<pre><code>\[仮引数1] [仮引数2] ... -&gt; [表現]</code></pre>
+<code>\[仮引数1] [仮引数2] ... -&gt; [表現]</code>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/partial_application.html"
