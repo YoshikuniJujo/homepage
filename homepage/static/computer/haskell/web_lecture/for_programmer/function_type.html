@@ -7,23 +7,33 @@ Haskellでは関数は「値」である。
 より具体的に言えば関数は「<a
 href="https://ja.wikipedia.org/wiki/第一級オブジェクト"
 >第一級オブジェクト</a>」である。
-だから、関数も「型」を持つ。
+関数も「型」を持つ。
 </p>
 
 <h2>関数の型の表現</h2>
 
 <p>
-関数の型は引数の型と返り値の型から成る。
-以下のように表現される。
+関数の型は引数の型と返り値の型で指定する。
+'-&gt;'で引数の型と返り値の型をつなぐ。
 </p>
+
+<img
+alt="[単純な関数の図]"
+src="/computer/haskell/web_lecture/for_programmer/images/simple_function.svg"
+/>
 
 <pre><code>[引数の型] -&gt; [返り値の型]</code></pre>
 
 <p>
-Haskellには1引数関数しかないという話を覚えているだろうか。
-2引数関数に見えるものは本当は「関数を返す関数」である。
-よって以下のようになる。
+Haskellには1引数関数しかない。
+2引数関数に見えるものは「関数を返す関数」だ。
+型としてそれを示すことができる。
 </p>
+
+<img
+alt="[2引数関数の図]"
+src="/computer/haskell/web_lecture/for_programmer/images/two_arg_fun.svg"
+/>
 
 <pre><code>[引数1の型] -&gt; ([引数2の型] -&gt; [返り値の型])</code></pre>
 
@@ -31,14 +41,14 @@ Haskellには1引数関数しかないという話を覚えているだろうか
 
 <pre><code>[引数1の型] -&gt; [引数2の型] -&gt; [返り値の型]</code></pre>
 
-<p>丸括弧を省略すると2引数関数のように見えてくる。</p>
+<p>丸括弧を省略すると2引数関数のように見える。</p>
 
 <h2>関数の型の例</h2>
 
 <h3>関数toLower</h3>
 
 <p>
-関数toLowerは引数として文字を取り、小文字の値を返す関数。
+関数toLowerは引数として文字を取り小文字の値を返す関数。
 引数、返り値ともにChar型なのでその型は以下のようになる。
 </p>
 
@@ -47,9 +57,9 @@ Haskellには1引数関数しかないという話を覚えているだろうか
 <h3>関数xxcrypt</h3>
 
 <p>
-関数xxcryptは整数値を3つ取って、整数値を返す関数である。
-代表的な整数値のひとつにIntegerがある。
-よって以下のようになる。
+関数xxcryptは整数値を3つ取って整数値を返す関数だ。
+整数型としてIntegerがある。
+よって関数xxcryptの型は以下のようになる。
 </p>
 
 <pre><code>Integer -&gt; (Integer -&gt; (Integer -&gt; Integer))</code></pre>
