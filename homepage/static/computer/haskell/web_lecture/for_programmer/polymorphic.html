@@ -21,6 +21,7 @@ Prelude&gt; id 'c'
 'c'</code></pre>
 
 <img
+height="130"
 alt="[関数idの図]"
 src="/computer/haskell/web_lecture/for_programmer/images/function_id.svg"
 />
@@ -131,6 +132,7 @@ id :: a -&gt; a</code></pre>
 <p><code>const x _ = x</code></p>
 
 <img
+height="130"
 alt="[関数constの図]"
 src="/computer/haskell/web_lecture/for_programmer/images/function_const.svg"
 />
@@ -202,6 +204,7 @@ Prelude&gt; recip 8</br>
 0.125</br></p>
 
 <img
+height="130"
 alt="[単純な関数の図]"
 src="/computer/haskell/web_lecture/for_programmer/images/simple_function.svg"
 />
@@ -211,6 +214,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/simple_function.svg"
 0.125</br></p>
 
 <img
+height="130"
 alt="[演算子applyの図]"
 src="/computer/haskell/web_lecture/for_programmer/images/operator_apply.svg"
 />
@@ -219,6 +223,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/operator_apply.svg"
 0.125</code></p>
 
 <img
+height="130"
 alt="[関数applyの図]"
 src="/computer/haskell/web_lecture/for_programmer/images/function_apply.svg"
 />
@@ -292,15 +297,30 @@ Prelude&gt; ((* 2) . (+ 3)) 8<br/>
 
 <p>演算子(.)の定義は以下のようになる。</p>
 
-<p><code>(f . g) x = f (g x)</code></p>
-
-<p>以下のように書いても良い。</p>
-
 <p><code>(.) f g x = f (g x)</code></p>
+
+<img
+height="130"
+alt="[関数dotの図]"
+src="/computer/haskell/web_lecture/for_programmer/images/function_dot.svg"
+/>
 
 <p>
 第3引数xに第2引数である関数gを適用した結果に第1引数であるfを適用する。
+演算子であることを強調したければ以下のように書く。
 </p>
+
+<p><code>(f . g) x = f (g x)</code></p>
+
+<p>あるいは</p>
+
+<p><code>f . g = \x -&gt; f (g x)</code></p>
+
+<img
+height="130"
+alt="[演算子dotの図]"
+src="/computer/haskell/web_lecture/for_programmer/images/operator_dot.svg"
+/>
 
 <h3>使い道</h3>
 
@@ -320,20 +340,9 @@ Prelude&gt; ((* 2) . (+ 3)) 8<br/>
 
 <p><code>f . g</code></p>
 
-<img
-alt="[演算子dotの図]"
-src="/computer/haskell/web_lecture/for_programmer/images/operator_dot.svg"
-/>
-
 <p>わかりやすさのために関数的な書きかたにする。</p>
 
 <p><code>(.) f g</code></p>
-
-<img
-width="300"
-alt="[関数dotの図]"
-src="/computer/haskell/web_lecture/for_programmer/images/function_dot.svg"
-/>
 
 <p>
 g、fの順に適用するのでgの返り値とfの引数は同じ型だ。
@@ -341,13 +350,13 @@ gの型をa -&gt; bとしfの型をb -&gt; cとする。
 結果としてできるf . gはgの引数を引数としfの返り値を返り値とする。
 </p>
 
-<code>f :: b -&gt; c<br/>
+<p><code>f :: b -&gt; c<br/>
 g :: a -&gt; b<br/>
-f . g :: a -&gt; c</code>
+f . g :: a -&gt; c</code></p>
 
 <p>演算子(.)はf, gを引数としf . gを返り値とする。</p>
 
-<code>(.) :: (b -&gt; c) -&gt; (a -&gt; b) -&gt; (a -&gt; c)</code>
+<p><code>(.) :: (b -&gt; c) -&gt; (a -&gt; b) -&gt; (a -&gt; c)</code></p>
 
 <h2>まとめ</h2>
 
