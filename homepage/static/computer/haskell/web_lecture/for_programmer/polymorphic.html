@@ -2,16 +2,15 @@
 
 <h2>多相関数とは</h2>
 
-<p>複数の型の値に適用可能な関数があり、これを多相関数と呼ぶ。</p>
+<p>
+複数の型の値を引数や返り値とすることができる関数を多相関数と呼ぶ。
+</p>
 
 <h2>関数id</h2>
 
 <h3>動作</h3>
 
-<p>
-最も単純な多相関数に関数idがある。
-まずは動作を見てみよう。
-</p>
+<p>関数idの動作を見てみよう。</p>
 
 <pre><code>% ghci
 Prelude&gt; id 8
@@ -21,31 +20,27 @@ Prelude&gt; id "hello"
 Prelude&gt; id 'c'
 'c'</code></pre>
 
+<img
+alt="[関数idの図]"
+src="/computer/haskell/web_lecture/for_programmer/images/function_id.svg"
+/>
+
 <p>
-関数idは引数と同じ値を返す関数である。
-つまり、id 8と書くのと8と書くのとは同じことである。
+関数idは引数と同じ値を返す関数だ。
+id 8は8と同じである。
 「同じ値を返す」という動作はどのような型でも可能だ。
-つまり関数idはすべての型の値を引数と(し返り値と)することができる。
+関数idはすべての型の値を引数とし同じ型の値を返り値とする。
 関数定義は以下のようになる。</p>
 
-<pre><code>id x = x</code></pre>
+<code>id x = x</code>
 
 <h3>使い道</h3>
 
 <p>
-関数idなんて何のためにあるの。
-なんでこんな関数が標準ライブラリにあるのだろうか。
-と、思うかもしれない。
-しかし、この関数が意外と使えるのだ。
-学習が進むといろいろな例が挙げられるのだが、
-今のところは人工的な例でがまんしていただきたい。
-</p>
-
-<p>
-第1引数で第2引数を割った値を返す関数を作りたい。
-ただし、第1引数が0だった場合には第2引数をそのまま返すようにする。
-こんな関数を作ってみよう。
-素直に作ると以下のようになる。
+どう使うのか。
+今の段階で理解できる例で説明する。
+第1引数で第2引数を割った値を返す関数を作る。
+第1引数が0のときは第2引数をそのまま返す。
 </p>
 
 <pre><code>devide :: Double -&gt; Double -&gt; Double
@@ -53,13 +48,12 @@ devide 0 b = b
 devide a b = b / a</code></pre>
 
 <p>
-この定義はもっと簡潔にできる。
-まず、2行目は演算子の部分適用を使って、<code
->devide a = (/ a)</code>のように書ける。
-つまり「devide aは何かをaで割ったものである」ということだ。
-それでは1行目はどうなるだろうか。
-ここに関数idが使える。<code>devide 0 = id</code>となる。
-これは「devide 0は引数をそのまま返す関数である」ということになる。
+簡潔にしよう。
+2行目は演算子の部分適用で<code>devide a = (/ a)</code>と書ける。
+「devide aは引数をaで割る関数」だ。
+1行目はどうなるだろうか。
+関数idが使える。<code>devide 0 = id</code>とする。
+「devide 0は引数をそのまま返す関数」だ。
 </p>
 
 <p><a
@@ -84,8 +78,8 @@ devide a = (/ a)</code></pre>
 <h3>型</h3>
 
 <p>
-関数idの型はどうなっているのだろうか。
-たとえばid 8では関数idの型は以下のようになる。
+関数idの型は何だろう。
+たとえばInteger型の値8に対して適用されたとき、関数idの型は以下のようになる。
 </p>
 
 <pre><code>Integer -&gt; Integer</code></pre>
@@ -95,17 +89,18 @@ devide a = (/ a)</code></pre>
 <pre><code>String -&gt; String</code></pre>
 
 <p>
-つまり[型X] -&gt; [型X]のような形になっていることがわかる。
-引数と返り値の型が同じであれば、どのような型でも良い。
-これを表現するには「型変数」が使える。
-型変数は小文字で始まる識別子であり、しばしば小文字1文字で表される。
+[型X] -&gt; [型X]のような形になっている。
+引数と返り値の型が同じであればどの型でも良い。
+これを表現するのに「型変数」を使う。
+型変数は小文字で始まる識別子だ。
+しばしば小文字1文字で表される。
 idの型は以下のようになる。
 </p>
 
-<pre><code>a -&gt; a</code></pre>
+<code>a -&gt; a</code>
 
 <p>
-何でも良いので型aの値を取って、同じ型である型aの値を返すということだ。
+何でも良いので型aの値を取って同じ型aの値を返す。
 対話環境で関数idの型を確認してみよう。
 </p>
 
@@ -118,60 +113,58 @@ id :: a -&gt; a</code></pre>
 <h3>動作</h3>
 
 <p>
-どのような引数でも常に同じ値を返す関数を考えてみよう。
-たとえば何に対しても常に0を返す関数は以下のようになる。
+引数にかかわらず常に同じ値を返す関数を作る。
+たとえば引数に何を与えても0を返す関数だ。
 </p>
 
-<pre><code>const0 _ = 0</code></pre>
+<code>const0 _ = 0</code>
+
+<p>あるいは何を与えても文字'A'を返す関数でも良い。</p>
+
+<code>constA _ = 'A'</code>
 
 <p>
-あるいは何に対しても常に文字'A'を返す関数は以下のようになる。
+これらの関数は「何を与えても値xを返す関数」としてまとめられる。
+以下の関数で生成することができる。
 </p>
 
-<pre><code>constA _ = 'A'</code></pre>
+<p><code>const x _ = x</code></p>
 
-<p>
-これらの関数は「何に対しても常に値xを返す関数」としてまとめられるので、
-以下のような関数を用意することでまとめることができる。
-</p>
+<img
+alt="[関数constの図]"
+src="/computer/haskell/web_lecture/for_programmer/images/function_const.svg"
+/>
 
-<pre><code>const x _ = x</code></pre>
+<p>constを使って上記2つの関数はそれぞれ以下のように書ける。</p>
 
-<p>
-このconstを使うことで上記2つの関数はそれぞれ以下のように書くことができる。
-</p>
+<p><code>const0 = const 0<br/>
+constA = const 'A'</code></p>
 
-<pre><code>const0 = const 0
-constA = const 'A'</code></pre>
+<p>constは定義済みの関数である。 対話環境で見てみよう。</p>
 
-<p>
-constはすでに定義済みの関数なので以下のように試すことができる。
-</p>
-
-<pre><code>% ghci
-Prelude&gt; const 0 4492
-0
-Prelude&gt; const 'A' "Hello, world!"
-'A'
-Prelude&gt; const 'A' 999
-'A'</code></pre>
+<code>% ghci<br/>
+Prelude&gt; const 0 4492<br/>
+0<br/>
+Prelude&gt; const 'A' "Hello, world!"<br/>
+'A'<br/>
+Prelude&gt; const 'A' 999<br/>
+'A'</code>
 
 <h3>使い道</h3>
 
 <p>
-関数idの例では、割る数が0の場合、割られる数をそのまま返すという仕様にした。
-今度は割る数が0の場合には0を返すような仕様にしてみよう。
-素直に書くと以下のようになる。
+関数idの使い道を示した例では割る数が0のときは割られる数をそのまま返した。
+今度は割る数が0の場合には0を返すことにする。
 </p>
 
-<pre><code>devide' :: Double -&gt; Double -&gt; Double
-devide' 0 _ = 0
-devide' a b = b / a</code></pre>
+<code>devide' :: Double -&gt; Double -&gt; Double<br/>
+devide' 0 _ = 0<br/>
+devide' a b = b / a</code>
 
 <p>
-これも関数idの例と同じように割られる数となる仮引数を省略することができる。
-「devide' 0は引数に関係なく0を返す関数」とし0でないaについては
-「devide' aは引数をaで割る関数」とすれば良い。
+これも割られる数である第2引数を省略できる。
+「devide' 0は何を与えても0を返す関数」であり、
+「devide' aは引数をaで割る関数」だ。
 </p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/05_polymorphic/const.hs"
@@ -184,89 +177,95 @@ devide' a = (/ a)</code></pre>
 <h3>型</h3>
 
 <p>
-関数constは、xを引数に取り「引数に関わらず常にxを返す関数」を返す関数である。
-constを2引数関数としてとらえた場合、
-第2引数を無視し第1引数の値を返す関数と考えることができる。
-つまり、constの第1引数と返り値は同じ型である必要があるが、
-第2引数は何でも良いということになる。
-つまり以下のような型になるだろう。
+関数constはxを引数に取り「何を与えてもxを返す関数」を返す関数だ。
+constを2引数関数として考えてみよう。
+第2引数を無視し第1引数の値を返す関数となる。
+constの第1引数と返り値は同じ型である必要がある。
+第2引数は何でも良い。
 </p>
 
-<pre><code>a -&gt; b -&gt; a</code></pre>
+<code>a -&gt; b -&gt; a</code>
 
 <h2>演算子($)</h2>
 
 <h3>動作</h3>
 
 <p>
-演算子($)は関数を値に適用する演算子である。
+演算子($)は関数を値に適用する演算子だ。
 f $ xとするとxにfを適用するという意味になる。
-これはf xと同じことだ。
+f xと同じだ。
 対話環境で試してみよう。
 </p>
 
-<pre><code>% ghci
-Prelude&gt; recip 8
-0.125
-Prelude&gt; recip $ 8
-0.125
-Prelude&gt; ($) recip 8
-0.125</code></pre>
+<p><code>% ghci</br>
+Prelude&gt; recip 8</br>
+0.125</br></p>
+
+<img
+alt="[単純な関数の図]"
+src="/computer/haskell/web_lecture/for_programmer/images/simple_function.svg"
+/>
+
+
+<p><code>Prelude&gt; recip $ 8</br>
+0.125</br></p>
+
+<img
+alt="[演算子applyの図]"
+src="/computer/haskell/web_lecture/for_programmer/images/operator_apply.svg"
+/>
+
+<p><code>Prelude&gt; ($) recip 8</br>
+0.125</code></p>
+
+<img
+alt="[関数applyの図]"
+src="/computer/haskell/web_lecture/for_programmer/images/function_apply.svg"
+/>
 
 <h3>使い道</h3>
 
 <p>
-f $ xがf xと同じなら、f xと書けば良い。
-演算子($)の存在理由は一体どこに?
-</p>
-
-</p>
-いくつかの答えがあるがその答えのうちのひとつは「丸括弧の省略」にある。
-たとえばrecip (1 + 3)のような表現があった場合にrecip $ 1 + 3のように書ける。
-表現が複雑になってくると、
-このような書き換えによってコードが読みやすくなる。
-また、($)は結合力が最弱であり、しかも右結合なので、
-f $ ...のように書かれている場合、
-...の内容が全体としてfの引数になることが保証される。
-これは可読性を向上させる有効な手段となる。
+f $ xがf xと同じならf xと書けば良い。
+演算子($)は何のためにあるのだろうか。
+いくつかの答えがある。ひとつは「丸括弧の省略」だ。
+recip (1 + 3)のような表現をrecip $ 1 + 3に書き換えられる。
+複雑な表現ではこの書き換えでコードが読みやすくなる。
+($)は結合力が最弱で右結合だ。
+f $ ...と書くと...の部分が全体としてfの引数になることが保証される。
 </p>
 
 <h3>型</h3>
 
+<p>($)の型はどうなるだろう。以下の例について見てみよう。</p>
+
+<code>($) recip 8</code>
+
 <p>
-($)の型について考えてみよう。
-まずは以下の型について見てみる。
+recipはDouble -&gt; Double、8はDoubleと考えよう。
+($)はDouble -&gt; DoubleとDoubleを引数として取りDoubleを返す。
 </p>
 
-<pre><code>($) recip 8</code></pre>
+<code>(Double -&gt; Double) -&gt; Double -&gt; Double</code>
 
 <p>
-recipはDouble -&gt; Doubleとし、8をDoubleと考えると、
-($)はDouble -&gt; DoubleとDoubleを引数として取りDoubleを返すので、
-型は以下のようになる。
-</p>
-
-<pre><code>(Double -&gt; Double) -&gt; Double -&gt; Double</code></pre>
-
-<p>
-別の例を考えようoddは「奇数である」ことを確認する関数であり、
-整数を取って真偽値を返す。
+oddは「奇数である」ことを確認する関数だ。整数を取って真偽値を返す。
 以下の例を見てみよう。
 </p>
 
 <pre><code>($) odd 11</code></pre>
 
 <p>
-oddをInteger -&gt; Boolとし、11をIntegerとすると、
+oddをInteger -&gt; Boolとし11をIntegerとする。
 この場合の($)の型は以下のようになる。
 </p>
 
 <pre><code>(Integer -&gt; Bool) -&gt; Integer -&gt; Bool</code></pre>
 
 <p>
-($)の第1引数である関数の引数と($)の第2引数の型は同じでなければならない。
-また($)の第1引数である関数の返り値と($)の返り値も同じでなければならない。
-よって($)の型は以下のようになるだろう。
+($)の第1引数である関数の引数と($)の第2引数の型は同じだ。
+($)の第1引数である関数の返り値と($)の返り値も同じだ。
+よって($)の型は以下のようになる。
 </p>
 
 <pre><code>($) :: (a -&gt; b) -&gt; a -&gt; b</code></pre>
@@ -276,84 +275,86 @@ oddをInteger -&gt; Boolとし、11をIntegerとすると、
 <h3>動作</h3>
 
 <p>
-演算子(.)は関数を合成する演算子である。
-f . gとすると引数にgを適用した結果にfを適用する関数となる。
-たとえば3足して2をかける関数は以下のように書ける。
+演算子(.)は関数を合成する。
+f . gは引数にgを適用した結果にfを適用する関数だ。
+3足して2をかける関数は以下のように書ける。
 </p>
 
-<pre><code>(* 2) . (+ 3)</code></pre>
+<code>(* 2) . (+ 3)</code>
 
 <p>試してみよう。</p>
 
-<pre><code>% ghci
-Prelude&gt; ((* 2) . (+ 3)) 8
-22</code></pre>
+<code>% ghci<br/>
+Prelude&gt; ((* 2) . (+ 3)) 8<br/>
+22</code>
 
 <h3>定義</h3>
 
 <p>演算子(.)の定義は以下のようになる。</p>
 
-<pre><code>(f . g) x = f (g x)</code></pre>
+<p><code>(f . g) x = f (g x)</code></p>
 
-<p>以下のように書いても同じことだ。</p>
+<p>以下のように書いても良い。</p>
 
-<pre><code>(.) f g x = f (g x)</code></pre>
+<p><code>(.) f g x = f (g x)</code></p>
 
 <p>
-第3引数xに第2引数である関数gを適用し、その結果である(g x)に第1引数である
-fを適用している。
+第3引数xに第2引数である関数gを適用した結果に第1引数であるfを適用する。
 </p>
 
 <h3>使い道</h3>
 
-<p>RSA暗号の例で作ったxxcryptは以下のような定義だった。</p>
+<p>RSA暗号の例のxxcryptは以下のような定義だ。</p>
 
-<pre><code>xxcrypt n ed mc = mc ^ ed `mod` n</code></pre>
+<code>xxcrypt n ed mc = mc ^ ed `mod` n</code>
 
-<p>これを部分適用と関数合成を使うと以下のように書き換えることができる。</p>
+<p>部分適用と関数合成で以下のように書き換えられる。</p>
 
-<pre><code>xxcrypt n ed = (`mod` n) . (^ ed)</code></pre>
+<code>xxcrypt n ed = (`mod` n) . (^ ed)</code>
 
-<p>「ed乗してnの剰余を取る」と読むことができる。</p>
+<p>「ed乗してnの剰余を取る」。</p>
 
 <h3>型</h3>
 
-<p>
-(.)の型について見ていこう。
-以下のような式を考える。
-</p>
+<p>(.)の型はどうなるだろう。以下のような式を作る。</p>
 
-<pre><code>f . g</code></pre>
+<p><code>f . g</code></p>
 
-<p>同じことだがわかりやすさのために関数的な書きかたにしてみる。</p>
+<img
+alt="[演算子dotの図]"
+src="/computer/haskell/web_lecture/for_programmer/images/operator_dot.svg"
+/>
 
-<pre><code>(.) f g</code></pre>
+<p>わかりやすさのために関数的な書きかたにする。</p>
 
-<p>
-gの返り値をfの引数として渡すのでそれらは同じである必要がある。
-それを満たすように、gの型をa -&gt; bとし、fの型をb -&gt; cとする。
-結果としてできるf . gの引数はgの引数を引数としfの返り値を返り値とする。
-よって以下のようになる。
-</p>
+<p><code>(.) f g</code></p>
 
-<pre><code>f :: b -&gt; c
-g :: a -&gt; b
-f . g :: a -&gt; c</code></pre>
+<img
+width="300"
+alt="[関数dotの図]"
+src="/computer/haskell/web_lecture/for_programmer/images/function_dot.svg"
+/>
 
 <p>
-演算子(.)は引数としてf, gを取って返り値としてf . gを返す関数である。
-よって(.)の型は以下のようになる。
+g、fの順に適用するのでgの返り値とfの引数は同じ型だ。
+gの型をa -&gt; bとしfの型をb -&gt; cとする。
+結果としてできるf . gはgの引数を引数としfの返り値を返り値とする。
 </p>
 
-<pre><code>(.) :: (b -&gt; c) -&gt; (a -&gt; b) -&gt; (a -&gt; c)</code></pre>
+<code>f :: b -&gt; c<br/>
+g :: a -&gt; b<br/>
+f . g :: a -&gt; c</code>
+
+<p>演算子(.)はf, gを引数としf . gを返り値とする。</p>
+
+<code>(.) :: (b -&gt; c) -&gt; (a -&gt; b) -&gt; (a -&gt; c)</code>
 
 <h2>まとめ</h2>
 
 <p>
-いくつかの多相関数を見てきた。
-多相関数の多くは、ある意味では制御構造と呼べる。
-とくに関数を引数に取る関数によって、普通に関数を定義するだけで、
-独自の制御構造を作成することができる。
+いくつかの多相関数を見た。
+多相関数は制御構造と考えられる。
+独自の制御構造を単なる関数として作成することができる。
 </p>
 
 <p>
