@@ -14,14 +14,14 @@
 <h2>整数の組の足し算</h2>
 
 <p>
-2つで1組の値に対して、ばらばらの引数を取る関数を適用したいことがある。
-たとえば整数の組に対して、その2つの値を足した値が欲しいような場合があるだろう。
-そのようなとき、uncurryを使うとスマートである。
+2つで1組の値に対してばらばらの引数を取る関数を適用したい。
+「整数の組の値を足した値を計算する」など。
+uncurryを使う。
 </p>
 
-<pre><code>% ghci
-Prelude&gt; uncurry (+) (3, 8)
-11</code></pre>
+<p><code>% ghci<br/>
+Prelude&gt; uncurry (+) (3, 8)<br/>
+11</code></p>
 
 <h2>関数uncurry</h2>
 
@@ -30,30 +30,34 @@ Prelude&gt; uncurry (+) (3, 8)
 <p>
 整数の組の足し算の例では、
 <code>Integer -&gt; Integer -&gt; Integer</code>を
-<code>(Integer, Integer) -&gt; Integer</code>に変換するので、
+<code>(Integer, Integer) -&gt; Integer</code>に変換する。
 型は以下のようになる。
 </p>
 
 <pre><code>(Integer -&gt; Integer -&gt; Integer) -&gt; ((Integer, Integer) -&gt; Integer)</code></pre>
 
-<p>より一般的には以下のようになる。</p>
+<p>一般的にすると</p>
 
 <pre><code>(a -&gt; b -&gt; c) -&gt; ((a, b) -&gt; c)</code></pre>
 
-<p>右側の丸括弧は省略できるので以下のようになる。</p>
+<p>右側の丸括弧は省略できる。</p>
 
 <pre><code>(a -&gt; b -&gt; c) -&gt; (a, b) -&gt; c</code></pre>
 
 <h3>定義</h3>
 
-<p>uncurryの定義は以下のようになる。</p>
+<p>関数uncurryの定義を見る。</p>
 
-<pre><code>uncurry :: (a -&gt; b -&gt; c) -&gt; (a, b) -&gt; c
-uncurry f (x, y) = f x y</code></pre>
+<p><code>uncurry :: (a -&gt; b -&gt; c) -&gt; (a, b) -&gt; c<br/>
+uncurry f (x, y) = f x y</code></p>
+
+<img
+alt="[関数uncurryの図]"
+src="/computer/haskell/web_lecture/for_programmer/images/uncurry.svg"
+/>
 
 <p>
-関数uncurryの第2引数であるタプル(x, y)の第1、第2要素をばらばらにして、
-関数uncurryの第1引数である関数fに与えている。
+第2引数のタプル(x, y)の第1、第2要素をばらばらにして第1引数の関数fに与えている。
 </p>
 
 <p>
