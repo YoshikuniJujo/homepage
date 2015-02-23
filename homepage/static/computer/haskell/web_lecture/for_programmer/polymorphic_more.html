@@ -11,10 +11,9 @@
 <h3>動作</h3>
 
 <p>
-関数の第1引数と第2引数を交換したい場面というのは時々ある。
-たとえば第2引数のみに部分適用したいような場合があるだろう。
-よって、そのような関数flipが定義されている。
-試してみよう。
+関数の第1引数と第2引数を入れ換えたいときがある。
+第2引数に部分適用するときなどだ。
+関数flipが定義されている。
 </p>
 
 <pre><code>% ghci
@@ -28,45 +27,39 @@ Prelude&gt; mod3 8
 
 <h3>定義</h3>
 
-<p>関数flipの定義は以下のようになる。</p>
+<p>関数flipの定義を見る。</p>
 
 <pre><code>flip :: (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
 flip f x y = f y x</code></pre>
 
 <p>
-第1引数に2引数関数を取り、第2, 第3引数にそれぞれの値を取り、
-それらの値を逆にして関数fを適用している。
+第1引数に2引数関数fを取る。
+第2、第3引数の値を逆にして関数fを適用する。
 </p>
 
 <h3>演算子の部分適用</h3>
 
-<p>
-前に演算子の部分適用を学んだ。
-演算子の部分適用においては(`mod` 3)のような形で第2引数に部分適用することができる。
-これは内部的には以下のようにflipを使っていると考えて良い。
-</p>
+<p>演算子は(`mod` 3)のように第2引数に部分適用できる。flipでも書ける。</p>
 
-<pre><code>flip mod 3</code></pre>
+<p><code>flip mod 3</code></p>
 
-<p>(/ 3)であれば以下のようになる。</p>
+<p>(/ 3)は以下のようになる。</p>
 
-<pre><code>flip (/) 3</code></pre>
+<p><code>flip (/) 3</code></p>
 
 <h2>関数on</h2>
 
 <h3>動作</h3>
 
 <p>
-2つの値に同じ関数を適用したうえで、
-それらを2引数関数に渡したいということもよくある。
-具体例を挙げれば、2つの数を3で割った余りが等しいかどうかを比較するような場合だ。
-そのような場合関数onを使えば以下のように書くことができる。
+2つの値に同じ関数を適用してから2引数関数に渡す。
+「2つの数のそれぞれを3で割った余りの比較」などだ。
 </p>
 
-<pre><code>on (==) (`mod` 3) 8 11</code></pre>
+<p><code>on (==) (`mod` 3) 8 11</code></p>
 
 <p>
-これは8を3で割った余りと11を3で割った余りとが等しいかどうかを比較している。
+8を3で割った余りと11を3で割った余りとの比較だ。
 対話環境で試してみよう。
 </p>
 
@@ -76,12 +69,12 @@ True</code></pre>
 
 <h3>定義</h3>
 
-<p>この関数の定義は以下のようになるだろう。</p>
+<p>定義は以下のようになる。</p>
 
 <pre><code>on :: (b -&gt; b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; a -&gt; c
 on op f x y = op (f x) (f y)</code></pre>
 
-<p>以下のように書いても良い。</p>
+<p>以下のようにも書ける。</p>
 
 <pre><code>on op f x y = f x `op` f y</code></pre>
 
@@ -89,7 +82,7 @@ on op f x y = op (f x) (f y)</code></pre>
 
 <h3>値の変換</h3>
 
-<p>実数を半分にする以下のような関数を考えよう。</p>
+<p>実数を半分にする関数を考える。</p>
 
 <p><a
 href="/computer/haskell/web_lecture/for_programmer/07_polymorphic_more/convert.hs"
@@ -98,25 +91,25 @@ href="/computer/haskell/web_lecture/for_programmer/07_polymorphic_more/convert.h
 <pre><code>half :: Double -&gt; Double
 half = (/ 2)</code></pre>
 
-<p>また整数値7を定義しておく。</p>
+<p>また整数値7を定義する。</p>
 
 <pre><code>seven :: Integer
 seven = 7</code></pre>
 
-<p>sevenにhalfを適用しようとすると当然型エラーが生じる。</p>
+<p>sevenにhalfを適用すると型エラーが生じる。</p>
 
-<pre><code>% ghci convert.hs
-*Main&gt; half seven
-
-&lt;interactive&gt;:X:Y:
-    Couldn't match expected type `Double' with actual type `Integer'
-    In the first argument of `half', namely `seven'
-    In the expression: half seven
-    In an equation for `it' : it = half seven</code></pre>
+<p><code>% ghci convert.hs<br/>
+*Main&gt; half seven<br/>
+<br/>
+&lt;interactive&gt;:X:Y:<br/>
+    Couldn't match expected type `Double' with actual type `Integer'<br/>
+    In the first argument of `half', namely `seven'<br/>
+    In the expression: half seven<br/>
+    In an equation for `it' : it = half seven</code></p>
 
 <p>
-halfの第1引数であるsevenで、
-期待していたDoubleと実際のIntegerのあいだで型の不一致が起きたよ、と言っている。
+「halfの第1引数であるsevenで
+期待していたDoubleと実際のIntegerのあいだで型の不一致が起きた」とのこと。
 型をちゃんと合わせなければならない。
 整数から実数に型を変換するにはfromIntegral関数が使える。
 </p>
@@ -126,28 +119,24 @@ halfの第1引数であるsevenで、
 
 <p>
 これでIntegerからDoubleへの型変換ができた。
-ただし、「型変換」と考えているのは人間だけであり、
-Haskell側からすればfromIntegralは整数と実数を関連づけるだけの単なる関数である。
+人間には「型変換」に見えるがfromIntegralは整数を取り実数を返す関数である。
 </p>
 
 <h3>関数を変換する関数</h3>
 
 <p>
-上では値のほうの型を変換したが、その代わりに関数のほうを変換してやれば、
-いちいち値の型変換をする必要がなくなる。
-関数の型をDouble -&gt; DoubleからInt -&gt; Doubleに変換する関数を作る。
-その変換関数の型は以下のようになる。
+値ではなく関数のほうを変換してやれば値の型変換の必要はない。
+関数の型をDouble -&gt; DoubleからInt -&gt; Doubleに変換する。
+変換関数の型は以下のようになる。
 </p>
 
-<pre><code>(Double -&gt; Double) -&gt; (Integer -&gt; Double)</code></pre>
+<p><code>(Double -&gt; Double) -&gt; (Integer -&gt; Double)</code></p>
 
-<p>'-&gt;'は右結合なので右側の括弧は省略可能だ。</p>
+<p>'-&gt;'は右結合なので右側の丸括弧は省略できる。</p>
 
-<pre><code>(Double -&gt; Double) -&gt; Integer -&gt; Double</code></pre>
+<p><code>(Double -&gt; Double) -&gt; Integer -&gt; Double</code></p>
 
-<p>
-第2引数のIntegerをDoubleに変換して第1引数である関数に与える関数を作成すれば良い。
-</p>
+<p>第2引数のIntegerをDoubleに変換して第1引数である関数に与える関数となる。</p>
 
 <pre><code>convert :: (Double -&gt; Double) -&gt; Integer -&gt; Double
 convert f n = f $ fromIntegral n</code></pre>
@@ -161,44 +150,60 @@ convert f n = f $ fromIntegral n</code></pre>
 <h3>変換関数の本質</h3>
 
 <p>
-f $ fromIntegral nはnにfromIntegralを適用し、その結果にfを適用している。
-よって(f . fromIntegral) nとすることができる。
+f $ fromIntegral nはnにfromIntegralを適用した結果にfを適用する。
+よって(f . fromIntegral) nとなる。
 </p>
 
-<pre><code>convert f n = (f . fromIntegral) n</code></pre>
+<p><code>convert f n = (f . fromIntegral) n</code></p>
 
 <p>
-convert fをnに適用したものが(f . fromIntegral)をnに適用したものである。
-つまりconvert fはf . fromIntegralであるということだ。
+convert fをnに適用したものが(f . fromIntegral)をnに適用したものだ。
+つまりconvert fはf . fromIntegralと同じだ。
 </p>
 
-<pre><code>convert f = f . fromIntegral</code></pre>
+<p><code>convert f = f . fromIntegral</code></p>
 
-<p>これは演算子の部分適用を使って以下のように書くことができる。</p>
+<p>演算子の部分適用で仮引数fも省略できる。</p>
 
 <pre><code>convert = (. fromIntegral)</code></pre>
 
 <p>
-つまりconvert halfはhalf . fromIntegralということになる。
-halfの引数をDoubleからIntegerに変換するためには、
-値をIntegerからDoubleに変換する関数と関数合成すれば良いことがわかる。
+convert halfはhalf . fromIntegralだ。
+関数halfの引数をDoubleからIntegerに変換するのにIntegerからDoubleへの変換関数を使う。
 </p>
 
-<pre><code>half :: Double -&gt; Double
-half . fromIntegral :: Integer -&gt; Double</code></pre>
+<p><code>half :: Double -&gt; Double<br/>
+half . fromIntegral :: Integer -&gt; Double</code></p>
 
 <h3>変換アダプタ</h3>
 
 <p>
-値を変換するのか関数を変換するのかということは、
-変換アダプタをどちらにつけるかの違いと考えることもできる。
-以下のようにするとそれが良くわかる。
+「値を変換するか関数を変換するか」は「変換アダプタをどちらにつけるか」である。
 </p>
+
+<img
+alt="[変換器の図1]"
+src="/computer/haskell/web_lecture/for_programmer/images/conversion_adapter1.svg"
+/>
+
+<img
+alt="[変換器の図2]"
+src="/computer/haskell/web_lecture/for_programmer/images/conversion_adapter2.svg"
+/>
 
 <pre><code>*Main&gt; half (fromIntegral seven)
 3.5
 *Main&gt; (half . fromIntegral) seven
 3.5</code></pre>
+
+<h2>まとめ</h2>
+
+<p>
+高階多相関数について学んだ。
+値を変換するかわりに関数を変換するという考えかたに注目。
+次に学ぶcurryやuncurryは「値をタプルにしたりばらばらにする」かわりに
+「関数の引数をばらばらにしたりタプルにする」。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/dist_tuple.html"
