@@ -12,22 +12,18 @@ Lispっぽい表記: タプルのパース
 <p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_9/Parser.hs"
 	>Parser.hs</a></p>
 
-<pre><code>...
-parseExp (OP : Comma : ts) = let
-	(tpl, ts') = parseTupleCon ts in
-	(conE . mkName $ "(," ++ tpl, ts')
-...</code></pre>
+<p><code>...<br/>
+parseExp (OP : Comma : ts) = let<br/>
+	<span style="padding-left:2em">(tpl, ts') = parseTupleCon ts in</span><br/>
+	<span style="padding-left:2em">(conE . mkName $ "(," ++ tpl, ts')</span><br/>
+...</code></p>
 
-<pre><code>parseTupleCon ::
-	[Token] -&gt; (String, [Token])
-parseTupleCon (CP : ts) = (")", ts)
-parseTupleCon (Comma : ts) = let
-	(tpl, ts') = parseTupleCon ts in
-	(',' : tpl, ts')
-parseTupleCon ts = error $
-	"parseTupleCon: parse error: " ++
-	show ts
-</code></pre>
+<p><code>parseTupleCon :: [Token] -&gt; (String, [Token])<br/>
+parseTupleCon (CP : ts) = (")", ts)<br/>
+parseTupleCon (Comma : ts) = let<br/>
+	<span style="padding-left:2em">(tpl, ts') = parseTupleCon ts in</span><br/>
+	<span style="padding-left:2em">(',' : tpl, ts')</span><br/>
+parseTupleCon ts = error $ "parseTupleCon: parse error: " ++ show ts</code></p>
 
 <h2>(1, 2, 3)のようなタプルの読み込み</h2>
 
@@ -39,16 +35,12 @@ parseTupleCon ts = error $
 
 <h3>関数parseTupleExpを作成</h3>
 
-<pre><code>parseTupleExp ::
-	[Token] -&gt; ([ExpQ], [Token])
-parseTupleExp ts = case parseExp ts of
-	(e, CP : ts') -&gt; ([e], ts')
-	(e, Comma : ts') -&gt; let
-		(es, ts'') =
-			parseTupleExp ts' in
-		(e : es, ts'')
-	_ -&gt; error $ "parseTupleExp: " ++
-		"parse error: " ++ show ts</code></pre>
+<p><code>parseTupleExp :: [Token] -&gt; ([ExpQ], [Token])<br/>
+parseTupleExp ts = case parseExp ts of<br/>
+	<span style="padding-left:2em">(e, CP : ts') -&gt; ([e], ts')</span><br/>
+	<span style="padding-left:2em">(e, Comma : ts') -&gt; let</span><br/>
+		<span style="padding-left:4em">(es, ts'') = parseTupleExp ts' in (e : es, ts'')</span><br/>
+	<span style="padding-left:2em">_ -&gt; error $ "parseTupleExp: " ++ "parse error: " ++ show ts</span></code></p>
 
 <h3>parseListへの変更</h3>
 
@@ -56,66 +48,60 @@ parseTupleExp ts = case parseExp ts of
 parseList関数がMaybe値を返すことによりバックトラック動作を実装する。
 </p>
 
-<pre><code>parseList ::
-	[Token] -&gt; Maybe ([ExpQ], [Token])
-parseList (Comma : _) = Nothing
-parseList (CP : ts) = Just ([], ts)
-parseList ts = let (e, ts') = parseExp ts in
-	case parseList ts' of
-		Just (es, ts'') -&gt;
-			Just (e : es, ts'')
-		_ -&gt; Nothing</code></pre>
+<p><code>parseList :: [Token] -&gt; Maybe ([ExpQ], [Token])<br/>
+parseList (Comma : _) = Nothing<br/>
+parseList (CP : ts) = Just ([], ts)<br/>
+parseList ts = let (e, ts') = parseExp ts in<br/>
+	<span style="padding-left:2em">case parseList ts' of</span><br/>
+		<span style="padding-left:4em">Just (es, ts'') -&gt; Just (e : es, ts'')</span><br/>
+		<span style="padding-left:4em">_ -&gt; Nothing</span></code></p>
 
 <p>parseListを使っている部分を修正する。</p>
 
-<pre><code>...
-parseExp (OP : Lambda : OP : ts) = let
-	(ps, ts') = parsePatList ts
-	Just (es, ts'') = parseList ts' in
-	(lamE ps $ last es, ts'')
-...</code></pre>
+<p><code>...<br/>
+parseExp (OP : Lambda : OP : ts) = let<br/>
+	<span style="padding-left:2em">(ps, ts') = parsePatList ts</span><br/>
+	<span style="padding-left:2em">Just (es, ts'') = parseList ts' in</span><br/>
+	<span style="padding-left:2em">(lamE ps $ last es, ts'')</span><br/>
+...</code></p>
 
-<pre><code>...
-parseDec (OP : Define : OP : Var v : ts) =
-	let	(ps, ts') = parsePatList ts
-		Just (es, ts'') =
-			parseList ts' in
-	(:)	&lt;$&gt; valD
-			(varP $ mkName v)
-			(normalB . lamE ps $
-				last es)
-			[]
-		&lt;*&gt; parseDec ts''
-...</code></pre>
+<p><code>...<br/>
+parseDec (OP : Define : OP : Var v : ts) = let<br/>
+	<span style="padding-left:2em">(ps, ts') = parsePatList ts</span><br/>
+	<span style="padding-left:2em">Just (es, ts'') = parseList ts' in</span><br/>
+	<span style="padding-left:2em">(:)	&lt;$&gt; valD</span><br/>
+		<span style="padding-left:6em">(varP $ mkName v)</span><br/>
+		<span style="padding-left:6em">(normalB . lamE ps $ last es)</span><br/>
+		<span style="padding-left:6em">[]</span><br/>
+		<span style="padding-left:4em">&lt;*&gt; parseDec ts''</span><br/>
+...</code></p>
 
 <h3>関数parseListOrTupleの作成</h3>
 
-<pre><code>parseListOrTuple :: [Token] -&gt;
-	(Either [ExpQ] [ExpQ], [Token])
-parseListOrTuple ts = maybe
-	(first Right $ parseTupleExp ts)
-	(first Left) $ parseList ts</code></pre>
+<p><code>parseListOrTuple ::<br/>
+	<span style="padding-left:2em">[Token] -&gt; (Either [ExpQ] [ExpQ], [Token])</span><br/>
+parseListOrTuple ts = maybe<br/>
+	<span style="padding-left:2em">(first Right $ parseTupleExp ts)</span><br/>
+	<span style="padding-left:2em">(first Left) $ parseList ts</span></code></p>
 
 <h3>関数parseExpでparseListOrTupleを使う</h3>
 
-<pre><code>...
-parseExp (OP : ts) = let
-	(es, ts') = parseListOrTuple ts in
-	(either (foldl1 appE) tupE es, ts')
-...</code></pre>
+<p><code>...<br/>
+parseExp (OP : ts) = let (es, ts') = parseListOrTuple ts in<br/>
+	<span style="padding-left:2em">(either (foldl1 appE) tupE es, ts')</span><br/>
+...</code></p>
 
 <h2>(,), (,,,)のような構築子をパターンで使う</h2>
 
 <p><a href="/computer/haskell/extensions/quasiquotation/lisp/version_10/Parser.hs"
 	>Parser.hs</a></p>
 
-<pre><code>...
-parsePat (OP : OP : Comma : ts) = let
-	(tpl, ts') = parseTupleCon ts
-	(ps, ts'') = parsePatList ts' in
-	(conP (mkName $ "(," ++ tpl) ps,
-		ts'')
-...</code></pre>
+<p><code>...<br/>
+parsePat (OP : OP : Comma : ts) = let<br/>
+	<span style="padding-left:2em">(tpl, ts') = parseTupleCon ts</span><br/>
+	<span style="padding-left:2em">(ps, ts'') = parsePatList ts' in</span><br/>
+	<span style="padding-left:2em">(conP (mkName $ "(," ++ tpl) ps, ts'')</span><br/>
+...</code></p>
 
 <h2>(a, b, c)のような形をパターンで使う</h2>
 
@@ -128,97 +114,83 @@ parsePatOPのなかではまず(Con v : ...)を試してNothingだった場合�
 
 <h3>parsePatListがMaybe値を返すようにする</h3>
 
-<pre><code>parsePatList ::
-	[Token] -&gt; Maybe ([PatQ], [Token])
-parsePatList (Comma : _) = Nothing
-parsePatList (CP : ts) = Just ([], ts)
-parsePatList ts = let
-	(p, ts') = parsePat ts in
-	first (p :) &lt;$&gt; parsePatList ts'</code></pre>
+<p><code>parsePatList :: [Token] -&gt; Maybe ([PatQ], [Token])<br/>
+parsePatList (Comma : _) = Nothing<br/>
+parsePatList (CP : ts) = Just ([], ts)<br/>
+parsePatList ts = let<br/>
+	<span style="padding-left:2em">(p, ts') = parsePat ts in</span><br/>
+	<span style="padding-left:2em">first (p :) &lt;$&gt; parsePatList ts'</span></code></p>
 
 <h3>parsePatListの影響を受ける部分を修正</h3>
 
-<pre><code>...
-parseExp (OP : Lambda : OP : ts) = let
-	Just (ps, ts') = parsePatList ts
-	Just (es, ts'') = parseList ts' in
-	(lamE ps $ last es, ts'')
-...</code></pre>
+<p><code>...<br/>
+parseExp (OP : Lambda : OP : ts) = let<br/>
+	<span style="padding-left:2em">Just (ps, ts') = parsePatList ts</span><br/>
+	<span style="padding-left:2em">Just (es, ts'') = parseList ts' in</span><br/>
+	<span style="padding-left:2em">(lamE ps $ last es, ts'')</span><br/>
+...</code></p>
 
-<pre><code>...
-parseDec (OP : Define : OP : Var v : ts) =
-	let	Just (ps, ts') =
-			parsePatList ts
-		Just (es, ts'') =
-			parseList ts' in
-	(:)	&lt;$&gt; valD
-			(varP $ mkName v)
-			(normalB . lamE ps $
-				last es)
-			[]
-		&lt;*&gt; parseDec ts''
-...</code></pre>
+<p><code>...<br/>
+parseDec (OP : Define : OP : Var v : ts) = let<br/>
+	<span style="padding-left:2em">Just (ps, ts') = parsePatList ts</span><br/>
+	<span style="padding-left:2em">Just (es, ts'') = parseList ts' in</span><br/>
+	<span style="padding-left:2em">(:)	&lt;$&gt; valD</span><br/>
+			<span style="padding-left:6em">(varP $ mkName v)</span><br/>
+			<span style="padding-left:6em">(normalB . lamE ps $ last es)</span><br/>
+			<span style="padding-left:6em">[]</span><br/>
+		<span style="padding-left:4em">&lt;*&gt; parseDec ts''</span><br/>
+...</code></p>
 
-<pre><code>...
-parsePat (OP : OP : Comma : ts) = let
-	(tpl, ts') = parseTupleCon ts
-	Just (ps, ts'') =
-		parsePatList ts' in
-	(conP (mkName $ "(," ++ tpl) ps,
-		ts'')
-...</code></pre>
+<p><code>...<br/>
+parsePat (OP : OP : Comma : ts) = let<br/>
+	<span style="padding-left:2em">(tpl, ts') = parseTupleCon ts</span><br/>
+	<span style="padding-left:2em">Just (ps, ts'') = parsePatList ts' in</span><br/>
+	<span style="padding-left:2em">(conP (mkName $ "(," ++ tpl) ps, ts'')</span><br/>
+...</code></p>
 
 <h3>parsePatConを作成</h3>
 
-<pre><code>parsePatCon ::
-	[Token] -&gt; Maybe (PatQ, [Token])
-parsePatCon (Con v : ts) = first
-	(conP $ mkName v) &lt;$&gt;
-	parsePatList ts
-parsePatCon _ = Nothing</pre></code>
+<p><code>parsePatCon :: [Token] -&gt; Maybe (PatQ, [Token])<br/>
+parsePatCon (Con v : ts) =<br/>
+	<span style="padding-left:2em">first (conP $ mkName v) &lt;$&gt; parsePatList ts</span><br/>
+parsePatCon _ = Nothing</p></code>
 
 <h3>parseTuplePatを作成</h3>
 
-<pre><code>parseTuplePat ::
-	[Token] -&gt; ([PatQ], [Token])
-parseTuplePat ts = case parsePat ts of
-	(p, CP : ts') -&gt; ([p], ts')
-	(p, Comma : ts') -&gt; first (p :) $
-		parseTuplePat ts'
-	_ -&gt; error $ "parseTuplePat: " ++
-		"parse error: " ++ show ts</pre></code>
+<p><code>parseTuplePat :: [Token] -&gt; ([PatQ], [Token])<br/>
+parseTuplePat ts = case parsePat ts of<br/>
+	<span style="padding-left:2em">(p, CP : ts') -&gt; ([p], ts')</span><br/>
+	<span style="padding-left:2em">(p, Comma : ts') -&gt; first (p :) $ parseTuplePat ts'</span><br/>
+	<span style="padding-left:2em">_ -&gt; error $ "parseTuplePat: " ++ "parse error: " ++ show ts</span></code></p>
 
 <h3>parsePatOPを作成</h3>
 
-<pre><code>parsePatOP :: [Token] -&gt; (PatQ, [Token])
-parsePatOP ts = fromMaybe
-	(first tupP $ parseTuplePat ts) $
-	parsePatCon ts</code></pre>
+<p><code>parsePatOP :: [Token] -&gt; (PatQ, [Token])<br/>
+parsePatOP ts = fromMaybe<br/>
+	<span style="padding-left:2em">(first tupP $ parseTuplePat ts) $ parsePatCon ts</span></code></p>
 
 <h3>parsePatでparsePatOPを使用</h3>
 
-<pre><code>...
-parsePat (OP : ts) = parsePatOP ts
-...</pre></code>
+<p><code>...<br/>
+parsePat (OP : ts) = parsePatOP ts<br/>
+...</code></p>
 
 <h3>parsePatが引数無しの値構築子を解析</h3>
 
-<pre><code>...
-parsePat (Con v : ts) =
-	(conP (mkName v) [], ts)
-...</code></pre>
+<p><code>...<br/>
+parsePat (Con v : ts) = (conP (mkName v) [], ts)<br/>
+...</code></p>
 
 <h2>試してみる</h2>
 
-<pre><code>% ghci useLispLike.hs
-*Main&gt; :set -XQuasiQuotes
-*Main&gt; [lisp| ((,,) "hoge" 88 ()) |]
-("hoge",88,())
-*Main&gt; [lisp| (123, 456, 789) |]
-(123, 456, 789)
-*Main&gt; [lisp| (fst ("hi", 25)) |]
-"hi"
-</code></pre>
+<p><code>% ghci useLispLike.hs<br/>
+*Main&gt; :set -XQuasiQuotes<br/>
+*Main&gt; [lisp| ((,,) "hoge" 88 ()) |]<br/>
+("hoge",88,())<br/>
+*Main&gt; [lisp| (123, 456, 789) |]<br/>
+(123, 456, 789)<br/>
+*Main&gt; [lisp| (fst ("hi", 25)) |]<br/>
+"hi"</code></p>
 
 <code>*Main&gt; let [lisp| ((,,) x y z) |] = ('c', True, ())<br/>
 *Main&gt; y<br/>

@@ -13,3 +13,5 @@ dt.list {
 dd.list { margin-left : 80px }
 
 .right { text-align : right }
+
+li { margin-top: 0.4em; margin-bottom: 0.5em; }

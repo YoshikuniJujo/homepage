@@ -16,12 +16,10 @@ Lispっぽく表記: lambda
 	| Str String
 	deriving Show</code></pre>
 
-<pre><code>...
-lexer ('l' : 'a' : 'm' : 'b' : 'd' : 'a' :
-		cs@(c : _))
-	| not $ isAlphaNum c =
-		Lambda : lexer cs
-...</code></pre>
+<p><code>...<br/>
+lexer ('l' : 'a' : 'm' : 'b' : 'd' : 'a' : cs@(c : _))<br/>
+	<span style="padding-left:2em">| not $ isAlphaNum c = Lambda : lexer cs</span><br/>
+...</code></p>
 
 <p>
 lambdaを特別なトークンLambdaとして読み込むようにした。
@@ -34,12 +32,12 @@ lambdaを特別なトークンLambdaとして読み込むようにした。
 	>Parser.hs</a>
 </p>
 
-<pre><code>...
-parseExp (OP : Lambda : OP : ts) = let
-	(ps, ts') = parsePatList ts
-	(es, ts'') = parseList ts' in
-	(lamE ps $ last es, ts'')
-...</code></pre>
+<p><code>...<br/>
+parseExp (OP : Lambda : OP : ts) = let<br/>
+	<span style="padding-left:2em">(ps, ts') = parsePatList ts</span><br/>
+	<span style="padding-left:2em">(es, ts'') = parseList ts' in</span><br/>
+	<span style="padding-left:2em">(lamE ps $ last es, ts'')</span><br/>
+...</code></p>
 
 <p>
 トークンLambdaを読み込んだら、はじめの括弧内をパターンとして読み込み、
