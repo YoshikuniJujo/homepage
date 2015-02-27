@@ -1,7 +1,5 @@
 二分樹を下にたどる
 
-<p>(工事中 30%)</p>
-
 <p><a
 href="/computer/haskell/web_lecture/for_programmer/15_binary_tree/binaryTree.hs"
 >binaryTree.hs</a></p>
@@ -90,7 +88,7 @@ bからはdとeに枝がのび、eからはfとgに枝がのびている。
 これである要素から次に行ける要素を求めることができる。
 </p>
 
-<h2>求める関数</h2>
+<h2>求める関数の型</h2>
 
 <p>
 求める関数は、
@@ -104,7 +102,62 @@ bからはdとeに枝がのび、eからはfとgに枝がのびている。
 
 <code>reachable :: Tree -&gt; Char -&gt; Char -&gt; Bool</code>
 
-<p>(作成中)</p>
+<h2>基底部</h2>
+
+<p>
+基底部とは再帰しない部分だ。
+再帰的に定義する必要のない部分である。
+今回の例での基底部は以下の2つになる。
+</p>
+
+<ul>
+<li>始点と終点が同じとき
+	<ul><li>このとき経路は存在する</li></ul></li>
+<li>上記以外で始点からの枝がないとき
+	<ul><li>このとき経路は存在しない</li></ul></li>
+</ul>
+
+<p>
+それぞれの基底部を書いてみよう。
+まずは始点と終点が同じときをガードを使って書いてみよう。
+</p>
+
+<p><code>reachable _ s e | s == e = True</code></p>
+
+<p>
+次に始点からの枝が存在しない場合を書く。
+</p>
+
+<p><code>reachable t s e = case lookup s t of<br/>
+	<span style="padding-left: 2em">Nothing -&gt; False</span></code></p>
+
+<h2>再帰部</h2>
+
+<p>
+次に再帰部である。
+これは以下のように考えれば良い。
+「点Xからの直接の枝が点Y, Zにのびているとき、
+点Yまたは点Zから点Wまでの経路があれば、点Xから点Wまでの経路は存在する。」
+上のcase文に続けて以下を書けば良い。
+</p>
+
+<p><code><span style="padding-left: 2em">
+	Just (l, r) -&gt; reachable t l e || reachable t r e</span></code></p>
+
+<h2>試してみる</h2>
+
+<p><code>% ghci binaryTree.hs<br/>
+*Main&gt; reachable sampleTree 'b' 'g'<br/>
+True<br/>
+*Main&gt; reachable sampleTree 'c' 'f'<br/>
+False</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+処理の流れが樹構造となる再帰関数の例を見た。
+このような場合に生の再帰が威力を発揮する。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/case.html"
