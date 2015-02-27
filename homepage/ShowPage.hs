@@ -133,7 +133,7 @@ makeHead ttl = "<head><meta charset=\"UTF-8\"><title>" ++ ttl ++ "</title>"
 
 breadcrumb :: [String] -> String
 breadcrumb ["/"] = "<small>top page</small>"
-breadcrumb ("/" : ps) = "<small><a href=\"/\">top page</a> &gt; "
+breadcrumb ("/" : ps) = "<small style=\"line-height: 250%\"><a href=\"/\">top page</a> &gt; "
 	++ concatMap link (init pairs) ++ last (map fst pairs) ++ "</small>"
 	where
 	link (n, p) = "<a href=\"" ++ p ++ "\">" ++ n ++ "</a> &gt; "
