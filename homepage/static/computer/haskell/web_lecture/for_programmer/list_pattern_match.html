@@ -180,7 +180,37 @@ myHead _ = error "Bonehead!"</code></p>
 
 <h2>関数null</h2>
 
-<p>(作成中)</p>
+<p>関数nullはリストが空かどうかをチェックする関数だ。</p>
+
+<p><code>*Main&gt; null [1, 2, 3]<br/>
+False<br/>
+*Main&gt; null []<br/>
+True<br/>
+*Main&gt; null "hello"<br/>
+False<br/>
+*Main&gt; null ""<br/>
+True</code></p>
+
+<p>
+この関数もリストに対するパターンマッチで作成することができる。
+わかりやすさのために冗長な書きかたをすると以下のようになる。
+</p>
+
+<p><code>myNull :: [a] -&gt; Bool<br/>
+myNull [] = True<br/>
+myNull (_ : _) = False</code></p>
+
+<p>
+これは「空リストなら真、リストに要素をひとつ足したリストなら偽」ということだ。
+もっと簡潔に書くと以下のようになる。
+</p>
+
+<p><code>myNull [] = True<br/>
+myNull _ = False</code></p>
+
+<p>
+「空リストなら真、そうでないなら偽」ということだ。
+</p>
 
 <h2>まとめ</h2>
 
