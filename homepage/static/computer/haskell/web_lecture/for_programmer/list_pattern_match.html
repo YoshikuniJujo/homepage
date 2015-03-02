@@ -29,9 +29,18 @@ Prelude&gt; 'H' : "ello"<br/>
 [8, 3, 5, 7]</code></p>
 
 <p>
-このリストは内部的に8 : 3 : 5 : 7: []という形で保存されていると考えて良い。
+このリストは実は内部的に8 : 3 : 5 : 7: []という形で保存されていると考えて良い。
 [8, 3, 5, 7]という表記はコンパイラが読みやすい形に直してくれただけで、
 リストは本質的にx : y : z : ... : []という形のデータ構造だ。
+</p>
+
+<h3>構文糖</h3>
+
+<p>
+[x, y, ... ,z]のような形での入力は構文糖であり、
+x : y : ... : z : []という形に解釈される。
+また演算子':'は右結合であり、丸括弧を省略せずに書けば、
+x : (y : (... : (z : []) ...))ということになる。
 </p>
 
 <h3>再帰的</h3>
@@ -53,15 +62,121 @@ Maybe a型の値がJust aまたはNothingだったのと同じように
 
 <h2>リストへのパターンマッチ</h2>
 
-<p>(作成中)</p>
+<p>リストは次の2つのどちらかである。</p>
+
+<p><code>要素 : リスト<br/>
+空リスト</code></p>
+
+<p>なので次の2つのパターンでパターンマッチすることができる。</p>
+
+<p><code>x : xs<br/>
+[]</code></p>
+
+<p>
+これらでマッチを試た場合、空リストでないならばひとつ目にマッチし、
+リストの先頭の要素がxを束縛し、リストの残りの部り部分がxsを束縛する。
+空リストだった場合にはふたつ目にマッチする。
+このようにして、リストから「先頭の要素」と「残りの要素から成るリスト」を
+取り出すことができる。
+</p>
 
 <h2>関数head</h2>
 
-<p>(作成中)</p>
+<p>リストの先頭を取り出す関数は用意されている。</p>
+
+<p><code>Prelude&gt; head [3, 4, 5]<br/>
+3<br/>
+Prelude&gt; head "Hello"<br/>
+'H'</code></p>
+
+<p>
+同じ動作をする関数を作成してみよう。
+パターンマッチして束縛した値を返せば良い。
+</p>
+
+<p><code>myHead :: [a] -&gt; a<br/>
+myHead (x : _) = x</code></p>
 
 <h2>関数tail</h2>
 
-<p>(作成中)</p>
+<p>
+リストの残りの部分を取り出す関数も用意されている。
+</p>
+
+<p><code>Prelude&gt; tail [3, 4, 5]<br/>
+[4,5]<br/>
+Prelude&gt; tail "Hello"<br/>
+"ello"</code></p>
+
+<p>こちらも同様に自分で定義してみる。</p>
+
+<p><code>myTail :: [a] -&gt; [a]<br/>
+myTail (_ : xs) = xs</code></p>
+
+<h2>試してみる</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/16_list_pattern_match/myHeadTail.hs"
+	>myHeadTail.hs</a></p>
+
+<p><code>% ghci myHeadTail.hs<br/>
+*Main&gt; myHead [3, 4, 5]<br/>
+3<br/>
+*Main&gt; myTail [3, 4, 5]<br/>
+[4,5]<br/>
+*Main&gt; myHead []<br/>
+*** Exception: myHeadTail.hs:2:1-18: Non-exhaustive patterns in function myHead<br/>
+<br/>
+*Main&gt; myTail []<br/>
+*** Exception: myHeadTail.hs:5:1-20: Non-exhaustive patterns in function myTail<br/>
+<br/></code></p>
+
+<p>
+空でないリストに対して予想通りの動作をする。
+空リストに対しては「パターンが存在していないよ」というエラーが発生する。
+</p>
+
+<h2>部分関数</h2>
+
+<p>
+関数とはある集合から別の集合に値を対応づけるものだ。
+たとえば逆数を求める関数は2を0.5に、4を0.25に対応づける。
+もととなる集合を実数とする。
+このとき逆数関数は実数0に対して対応する値を持たない。
+対応する値を持たない値がもとの集合にあるような関数を
+「全域関数ではない部分関数」と言う。
+</p>
+
+<p>
+headやtailは空リストに対して定義できないので全域関数ではない。
+このような関数は慎重に使わないと予期せぬエラーのもととなる。
+</p>
+
+<h2>エラー値</h2>
+
+<p>
+パターンマッチを書かない場合上記のようにNon-exhaustive patternsという
+エラーメッセージが表示される。
+コード中により明示的にエラー値を示すことができる。
+定義済みのエラー値としてundefined値と関数errorとがある。
+</p>
+
+<p><code>*Main&gt; undefined<br/>
+*** Exception: Prelude.undefined<br/>
+*Main&gt; error "Beep! Beep!"<br/>
+*** Exception: Beep! Beep!</code></p>
+
+<p>
+undefinedはコーディング途中にスタブとして使うのに便利だ。
+関数errorを使うと自分の好きなエラーメッセージを表示させることができる。
+関数errorはできるだけ「起こり得ない場合」に使いたい。
+</p>
+
+<p>
+myHeadのエラーメッセージをユーザーフレンドリーにしてみよう。
+</p>
+
+<p><code>myHead (x : _) = x<br/>
+myHead _ = error "Bonehead!"</code></p>
 
 <h2>関数null</h2>
 
