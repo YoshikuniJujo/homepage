@@ -13,39 +13,39 @@
 
 <h2>必要なファイルの用意</h2>
 
-<pre><code>% mkdir /home/tatsuya/phd03_white/oreore
-% cd /home/tatsuya/phd03_white/oreore
-% cp /etc/ssl/misc/CA.sh ./
-% cp /etc/ssl/openssl.cnf ./
-% vim CA.sh
-% diff /etc/ssl/misc/CA.sh CA.sh
-29a30,32
-&gt; SSLEAY_CONFIG="-config /home/tatsuya/phd03_white/oreore/openssl.cnf"
-&gt; CATOP="/home/tatsuya/phd03_white/oreore/"
-&gt;
-% vim openssl.cnf
-% diff /etc/ssl/openssl.cnf openssl.cnf
-42c42
-&lt; dir		= ./demoCA		# Where everything is kept
----
-&gt; dir		= /home/tatsuya/phd03_white/oreore/	# Where everything is kept
-106c106
-&lt; default_bits		= 1024
----
-&gt; default_bits		= 2048
-129c129
-&lt; countryName_default	= AU
----
-&lt; countryName_default	= JP
-134c134
-&lt; stateOrProvinceName_default	= Some-State
----
-&gt; stateOrProvinceName_default	= Gunma
-139c139
-&lt; 0.organizationName_default		= Internet Widgits Pty Ltd
----
+<p><code>% mkdir /home/tatsuya/phd03_white/oreore<br/>
+% cd /home/tatsuya/phd03_white/oreore<br/>
+% cp /etc/ssl/misc/CA.sh ./<br/>
+% cp /etc/ssl/openssl.cnf ./<br/>
+% vim CA.sh<br/>
+% diff /etc/ssl/misc/CA.sh CA.sh<br/>
+29a30,32<br/>
+&gt; SSLEAY_CONFIG="-config /home/tatsuya/phd03_white/oreore/openssl.cnf"<br/>
+&gt; CATOP="/home/tatsuya/phd03_white/oreore/"<br/>
+&gt;<br/>
+% vim openssl.cnf<br/>
+% diff /etc/ssl/openssl.cnf openssl.cnf<br/>
+42c42<br/>
+&lt; dir		= ./demoCA		# Where everything is kept<br/>
+---<br/>
+&gt; dir		= /home/tatsuya/phd03_white/oreore/	# Where everything is kept<br/>
+106c106<br/>
+&lt; default_bits		= 1024<br/>
+---<br/>
+&gt; default_bits		= 2048<br/>
+129c129<br/>
+&lt; countryName_default	= AU<br/>
+---<br/>
+&lt; countryName_default	= JP<br/>
+134c134<br/>
+&lt; stateOrProvinceName_default	= Some-State<br/>
+---<br/>
+&gt; stateOrProvinceName_default	= Gunma<br/>
+139c139<br/>
+&lt; 0.organizationName_default		= Internet Widgits Pty Ltd<br/>
+---<br/>
 &gt; 0.organizationName_default		= Yoshikuni
-</code></pre>
+</code></p>
 
 <p><a href="/computer/web/security/certificate/myca/CA.sh.diff.txt"
 	>CA.sh.diff</a></p>
@@ -64,8 +64,8 @@ cacert.pemが証明書、private/cakey.pemが秘密鍵となる。
 
 <h2>CSRの作成</h2>
 
-<pre><code>% ./CA.sh -newreq
-(必要事項を入力、CNのところはlocalhostとしておく)</code></pre>
+<p><code>% ./CA.sh -newreq<br/>
+(必要事項を入力、CNのところはlocalhostとしておく)</code></p>
 
 <h2>証明書に署名する</h2>
 
@@ -78,10 +78,10 @@ cacert.pemが証明書、private/cakey.pemが秘密鍵となる。
 newkey.pem newreq.pem newcert.pem
 </p>
 
-<pre><code>% mkdir reqs
-% mv newreq.pem reqs/first_csr.pem
-% mv newkey.pem private/first_key.pem
-% mv newcert.pem certs/first_cert.pem</code></pre>
+<p><code>% mkdir reqs<br/>
+% mv newreq.pem reqs/first_csr.pem<br/>
+% mv newkey.pem private/first_key.pem<br/>
+% mv newcert.pem certs/first_cert.pem</code></p>
 
 <p>
 private/first_key.pemが秘密鍵、certs/first_cert.pemが証明書となる。
@@ -117,13 +117,13 @@ href="https://support.mozilla.org/ja/kb/profile-manager-create-and-remove-firefo
 
 <h3>プロファイルを指定してFirefoxを起動する</h3>
 
-<pre><code>% firefox --help
-...
-Firefox options
-...
-  -P &lt;profile&gt;		Start with &lt;profile&gt;
-...
-% firefox -P test_cert</code></pre>
+<p><code>% firefox --help<br/>
+...<br/>
+Firefox options<br/>
+...<br/>
+  -P &lt;profile&gt;		Start with &lt;profile&gt;<br/>
+...<br/>
+% firefox -P test_cert</code></p>
 
 <p>これで、まっさらな状態のプロファイルでFirefoxが立ち上がるはずだ。</p>
 
@@ -145,15 +145,22 @@ Firefox options
 <p>
 ここでは自分で作ったHaskellパッケージの<a
 href="https://hackage.haskell.org/package/peyotls"
->peyotls</a>を使用する。
+>peyotlsパッケージ</a>を使用する。
+</p>
+
+<p>
 このパッケージの<a href="https://hackage.haskell.org/package/peyotls-0.1.6.5/src/examples/simpleServer.hs"
 >simpleServer.hs</a>(<a
 href="/computer/web/security/certificate/myca/simpleServer.hs"
->ソースコード</a>)を使うことにしよう。
-<pre><code>% mkdir local_test
-% cp private/first_key.pem local_test/localhost.sample_key
-% cp certs/first_cert.pem local_test/localhost.sample_crt
-% openssl rsa -in local_test/localhost.sample_key -out local_test/localhost.sample_key
-% runhaskell simpleServer.hs local_test</code></pre>
+>ソースコードはここ</a>)を使うことにしよう。
+</p>
+
+<p><code>% mkdir local_test<br/>
+% cp private/first_key.pem local_test/localhost.sample_key<br/>
+% cp certs/first_cert.pem local_test/localhost.sample_crt<br/>
+% openssl rsa -in local_test/localhost.sample_key -out local_test/localhost.sample_key<br/>
+% runhaskell simpleServer.hs local_test</code></p>
+
+<p>
 Firefoxからhttps://localhostに接続する。
 </p>
