@@ -13,15 +13,17 @@
 
 <h2>必要なファイルの用意</h2>
 
-<p><code>% mkdir /home/tatsuya/phd03_white/oreore<br/>
-% cd /home/tatsuya/phd03_white/oreore<br/>
+<p><small>(余計なスペースがあるので注意)</small></p>
+
+<small><code>% mkdir /home/tatsuya/ phd03_white/oreore<br/>
+% cd /home/tatsuya/ phd03_white/oreore<br/>
 % cp /etc/ssl/misc/CA.sh ./<br/>
 % cp /etc/ssl/openssl.cnf ./<br/>
 % vim CA.sh<br/>
 % diff /etc/ssl/misc/CA.sh CA.sh<br/>
 29a30,32<br/>
-&gt; SSLEAY_CONFIG="-config /home/tatsuya/phd03_white/oreore/openssl.cnf"<br/>
-&gt; CATOP="/home/tatsuya/phd03_white/oreore/"<br/>
+&gt; SSLEAY_CONFIG="-config /home/tatsuya/ phd03_white/oreore/openssl.cnf"<br/>
+&gt; CATOP="/home/tatsuya/ phd03_white/oreore/"<br/>
 &gt;<br/>
 % vim openssl.cnf<br/>
 % diff /etc/ssl/openssl.cnf openssl.cnf<br/>
@@ -45,7 +47,7 @@
 &lt; 0.organizationName_default		= Internet Widgits Pty Ltd<br/>
 ---<br/>
 &gt; 0.organizationName_default		= Yoshikuni
-</code></p>
+</code></small>
 
 <p><a href="/computer/web/security/certificate/myca/CA.sh.diff.txt"
 	>CA.sh.diff</a></p>
