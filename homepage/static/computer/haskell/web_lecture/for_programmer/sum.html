@@ -1,7 +1,5 @@
 リストの要素の総和
 
-<p>(工事中 90%)</p>
-
 <h2>はじめに</h2>
 
 <p>
@@ -100,11 +98,29 @@ mySum (x : xs) = x + mySum xs</code></p>
 
 <h2>まとめ</h2>
 
-<p>(作成中)</p>
+<p>
+リストの総和を求める再帰関数を作成した。
+「空リストの総和は0である」と
+「リストの総和は先頭の数と残りのリストの総和の和である」とを定義すれば良い。
+リストを引数に取る再帰関数の多くはこのような形で定義することができる。
+再帰関数の定義には以下のコツがある。
+</p>
+
+<ul>
+<li>基底ケースが何かを考える</li>
+<li>定義されている関数がすでに存在しているものと考える</li>
+<li>その関数をその関数自体でどのように表現できるかを考える</li>
+<li>引数が基底に近づいていくようにする</li>
+</ul>
+
+<p>
+リストの場合だいたいにおいて基底は空リストとなる。
+また先頭の要素を削除したリストを引数とすれば「基底に近づく」。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/list_pattern_match.html"
 	>「リストのパターンマッチ」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/product.html"
+	>「リストの要素の総積」へ</a>
 </p>
