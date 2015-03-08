@@ -2,6 +2,79 @@
 
 <p>(工事中 0%)</p>
 
+<h2>はじめに</h2>
+
+<p>
+今度はリストに含まれる値すべてをかけ算する関数を作成してみよう。
+総和を求めるのと考えかたはまったく同じである。
+ここをしっかり理解しておくことが重要と考えるので、
+ほぼ同じことをもう一度くりかえすことにする。
+</p>
+
+<h2>関数product</h2>
+
+<p>
+リストの要素すべてをかけ算する関数は用意されている。
+試してみよう。
+</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; product [3, 18, 9]<br/>
+486</code></p>
+
+<h2>関数myProduct</h2>
+
+<p>
+Integer型の値のリストに対してproductと同じ動作をする関数を作ろう。
+</p>
+
+<h3>型</h3>
+
+<p>
+Integer型の値のリストを引数として取りInteger型の値を返すので型は以下のようになる。
+</p>
+
+<p><code>myProduct :: [Integer] -&gt; Integer</code></p>
+
+<h3>再帰部</h3>
+
+<p>
+リストに1つ値を追加したときに結果の値がどう変化するのかを考えよう。
+リストxsがあったとする。
+myProduct xsとmyProduct (x : xs)の関係はどうなるだろうか。
+後者は前者のx倍となっているはずだ。
+よって以下の定義を書くことができる。
+</p>
+
+<p><code>myProduct (x : xs) = x * myProduct xs</code></p>
+
+<h3>基底部</h3>
+
+<p>
+基底となる引数を空リストとする。
+空リストの総積は空リストの総和ほど自明ではない。
+myProduct [3, 18, 9]はmyProduct [18, 9]の3倍であり、
+myProduct [18, 9]はmyProduct [9]の18倍である。
+同様にmyProduct [9]がmyProduct []の9倍となれば良い。
+この関係が成り立つようなmyProduct []の値は1となる。
+よって空リストの総積は1としておけば良いことになる。
+</p>
+
+<p><code>myProduct [] = 1</code></p>
+
+<h3>出来上がり</h3>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/18_product/product.hs"
+	>product.hs</a></p>
+
+<p><code>myProduct :: [Integer] -&gt; Integer<br/>
+myProduct [] = 1<br/>
+myProduct (x : xs) = x * myProduct xs</code></p>
+
+<h2>まとめ</h2>
+
+<p>(作成中)</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/sum.html"
 	>「リストの要素の総和」へもどる</a>
