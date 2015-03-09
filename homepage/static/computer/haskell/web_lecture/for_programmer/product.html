@@ -1,7 +1,5 @@
 リストの要素の総積
 
-<p>(工事中 0%)</p>
-
 <h2>はじめに</h2>
 
 <p>
@@ -71,9 +69,35 @@ myProduct [18, 9]はmyProduct [9]の18倍である。
 myProduct [] = 1<br/>
 myProduct (x : xs) = x * myProduct xs</code></p>
 
+<h2>関数mySumとの比較</h2>
+
+<p>関数mySumの定義は以下のようになっていた。</p>
+
+<p><code>mySum :: [Integer] -&gt; Integer<br/>
+mySum [] = 0<br/>
+mySum (x : xs) = x + mySum xs</code></p>
+
+<p>
+mySumとmyProductを比較してみよう。
+空リストのときの値がmySumでは0であるのに対してmyProductでは1である。
+また、再帰部では先頭の要素と再帰的な関数適用とをつなぐ演算子が、
+mySumでは(+)であるのに対してmyProductでは(*)となっている。
+それ以外の部分には違いはない。
+全体としての枠組みはmySumとmyProductでは同じだ。
+Haskellではメタ的な関数によってこのような枠組みを抽象化することができる。
+この話題には後のほうでまた触れることになる。
+</p>
+
 <h2>まとめ</h2>
 
-<p>(作成中)</p>
+<p>
+リストを引数に取る再帰関数の作りかたの基本は以下のようになる。
+</p>
+
+<ul>
+<li>空リストの場合の値を定義</li>
+<li>先頭の要素と「残りの要素のリストに関数を適用したもの」を作って値を定義</li>
+</ul>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/sum.html"
