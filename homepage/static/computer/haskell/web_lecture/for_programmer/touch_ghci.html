@@ -40,12 +40,11 @@ Prelude&gt;</code></pre>
 
 <p>
 Prelude&gt;はプロンプトである。
-終わらせかたは意外と重要だ。
-対話環境から抜けられなくて困惑するはめにならないように、
-まずは終了のしかたを学ぼう。
-以下のようにプロンプトに':q'に続けてリターンキーを入力しよう。
-':q'は':quit'の略である。
-几帳面な方は':quit'と省略せずに入力しても良い。
+何事もまずは終わらせかたを知っておくべきだ。
+そうでないと対話環境から抜けられなくて困惑するはめになる。
+プロンプトに':q'を入力し続けてリターンキーを押す。
+':q'は':quit'の略。
+省略せずに':quit'と入力しても良い。
 </p>
 
 <pre><code>Prelude&gt; :q</code></pre>
@@ -89,8 +88,8 @@ piは定義済みの変数だ。円周率の値が表示される。
 <h3>リンゴが好き</h3>
 
 <p>
-ファイルの読み込みや再読み込みの練習をしてみよう。
-以下のようなファイルを作成する。
+ファイルの読み込み、再読み込みの練習。
+fruits.hsを作成する。
 </p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/00_touch_ghci/fruits_1.hs"
@@ -98,24 +97,22 @@ piは定義済みの変数だ。円周率の値が表示される。
 
 <pre><code>myFavoriteFruit = "apple"</code></pre>
 
-<p>
-fruits.hsというファイルに保存する。
-以下のようにghciの引数としてファイル名を指定することで、これを読み込む。
-</p>
+<p>引数としてファイル名を指定してghciを立ち上げる。</p>
 
-<pre><code>ghci fuits.hs
-*Main&gt; </code></pre>
+<p><code>ghci fuits.hs<br/>
+*Main&gt; </code></p>
 
-<p>myFavoriteFruitと入力してリターンキーを入力。</p>
+<p>myFavoriteFruitと入力しリターンキーを押す。</p>
 
-<pre><code>*Main&gt; myFavoriteFruit
-"apple"</code></pre>
+<p><code>*Main&gt; myFavoriteFruit<br/>
+"apple"</code></p>
 
 <h3>バナナが好き</h3>
 
 <p>
-実はリンゴよりもバナナのほうが好きだった。
-対話環境はそのまま走らせておき、エディタを開きfruit.hsを変更する。
+リンゴよりもバナナのほうが好きかもしれない。
+対話環境はそのまま走らせておく。
+エディタでfruit.hsを編集。
 </p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/00_touch_ghci/fruits_2.hs"
@@ -123,15 +120,15 @@ fruits.hsというファイルに保存する。
 
 <code>myFavoriteFruit = "banana"</code>
 
-<p>対話環境で試してみよう。</p>
+<p>試してみよう。</p>
 
 <pre><code>*Main&gt; myFavoriteFruit
 "apple"</code></pre>
 
 <p>
 「おや?変更が反映されてない!」。
-ファイルを変更した後には再読み込みの必要がある。
-再読み込みには':r'または':reload'とする。
+ファイルを変更した後には再読み込みだ。
+':r'または':reload'と入力。
 </p>
 
 <pre><code>*Main&gt; :reload
@@ -142,12 +139,29 @@ fruits.hsというファイルに保存する。
 
 <p>
 Haskell Platformをインストールすれば、コンパイラ、インタプリタ、対話環境だけでなく、
-パッケージ管理ソフトやドキュメントの自動生成ソフト、その他のライブラリがそろう。
-入出力について学ぶまでは対話環境を使って学習を進める。
-対話環境はghciコマンドで開始し':q'で終了させる。
-定義ファイルを読み込むにはそのファイル名を引数にしてghciを走らせれば良い。
-ファイルを編集したあとには:reloadで再読み込みする必要がある。
+パッケージ管理ソフトやドキュメントの自動生成ソフト、標準的なライブラリがそろう。
+入出力について学ぶまでは対話環境で学習を進める。
+対話環境はghciコマンドで開始、':q'で終了。
+定義ファイルを読み込むにはそのファイル名を引数にしてghciを立ち上げる。
+ファイルを編集したら:reloadで再読み込みする。
 </p>
+
+<h2>課題</h2>
+
+<ol>
+<li>ghciを立ち上げて自分の生まれた日を入力してみよう</li>
+<li>続いて自分の名前のイニシャルを入力する
+	<ul>
+	<li>文字は''で囲んで入力する</li>
+	</ul></li>
+<li>myFavoriteColor変数を定義したファイルを作成する
+	<ul>
+	<li>まずは2番目に好きな色を指定してみよう</li>
+	<li>対話環境に読み込み表示する</li>
+	<li>1番好きな色に変更する</li>
+	<li>再読み込みして再度表示してみよう</li>
+	</ul></li>
+</ol>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/whats_function.html"
