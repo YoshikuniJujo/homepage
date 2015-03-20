@@ -4,8 +4,8 @@
 
 <p>
 関数を引数に取る、または関数を返す関数を高階関数と呼ぶ。
-高階関数を使うことで「くりかえし」等の構造を特別な構文を使わずに、
-単なる関数で表現することができる。
+高階関数を使うと「くりかえし」等の構造を特別な構文を使わずに、
+単なる関数で表現できる。
 </p>
 
 <h2>関数を返す関数</h2>
@@ -17,7 +17,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/return_fun_machine.svg"
 
 <p>
 すでに高階関数を学んでいた。
-複数の引数を取る関数のように見える関数は実は関数を返す関数である。
+複数の引数を取る関数のように見える関数は実は関数を返す関数だ。
 </p>
 
 <h2>引数として関数を取る関数</h2>
@@ -27,15 +27,14 @@ alt="[引数として関数を取る関数の図]"
 src="/computer/haskell/web_lecture/for_programmer/images/fun_arg_machine.svg"
 />
 
-<p>例として、与えられた値に与えられた関数を2回適用する関数を考える。</p>
+<p>第1引数の関数を第2引数の値に2回適用する関数を考える。</p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/03_higher_order/higher.hs"
 	>higher.hs</a></p>
 
-<pre><code>twice f x = f (f x)</code></pre>
+<p><code>twice f x = f (f x)</code></p>
 
 <p>
-試してみる。
 pred, succはそれぞれ1つ前の値、1つ後の値を返す関数である。
 </p>
 
@@ -64,6 +63,15 @@ pred, succはそれぞれ1つ前の値、1つ後の値を返す関数である�
 引数が関数であるような関数を使うことで特別な構文を使うことなく、
 「くりかえし」等の様々な制御構造を単なる関数として表現することができる。
 </p>
+
+<h2>課題</h2>
+
+<ol>
+<li>第1引数の関数を第2引数の値に3回適用する関数を作成せよ
+	<ul>
+	<li>succやpredを使って試してみる</li>
+	</ul></li>
+</ol>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/function_literal.html"
