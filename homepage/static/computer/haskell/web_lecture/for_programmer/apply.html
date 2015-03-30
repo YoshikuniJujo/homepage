@@ -1,0 +1,103 @@
+関数適用
+
+<h2>演算子($)</h2>
+
+<h3>動作</h3>
+
+<p>
+演算子($)は関数を値に適用する演算子だ。
+f $ xとするとxにfを適用するという意味になる。
+f xと同じだ。
+対話環境で試してみよう。
+</p>
+
+<p><code>% ghci</br>
+Prelude&gt; recip 8</br>
+0.125</br></p>
+
+<img
+height="130"
+alt="[単純な関数の図]"
+src="/computer/haskell/web_lecture/for_programmer/images/simple_function.svg"
+/>
+
+
+<p><code>Prelude&gt; recip $ 8</br>
+0.125</br></p>
+
+<img
+height="130"
+alt="[演算子applyの図]"
+src="/computer/haskell/web_lecture/for_programmer/images/operator_apply.svg"
+/>
+
+<p><code>Prelude&gt; ($) recip 8</br>
+0.125</code></p>
+
+<img
+height="130"
+alt="[関数applyの図]"
+src="/computer/haskell/web_lecture/for_programmer/images/function_apply.svg"
+/>
+
+<h3>使い道</h3>
+
+<p>
+f $ xがf xと同じならf xと書けば良い。
+演算子($)は何のためにあるのだろうか。
+いくつかの答えがある。ひとつは「丸括弧の省略」だ。
+recip (1 + 3)のような表現をrecip $ 1 + 3に書き換えられる。
+複雑な表現ではこの書き換えでコードが読みやすくなる。
+($)は結合力が最弱で右結合だ。
+f $ ...と書くと...の部分が全体としてfの引数になることが保証される。
+</p>
+
+<h3>型</h3>
+
+<p>($)の型はどうなるだろう。以下の例について見てみよう。</p>
+
+<code>($) recip 8</code>
+
+<p>
+recipはDouble -&gt; Double、8はDoubleと考えよう。
+($)はDouble -&gt; DoubleとDoubleを引数として取りDoubleを返す。
+</p>
+
+<code>(Double -&gt; Double) -&gt; Double -&gt; Double</code>
+
+<p>
+oddは「奇数である」ことを確認する関数だ。整数を取って真偽値を返す。
+以下の例を見てみよう。
+</p>
+
+<pre><code>($) odd 11</code></pre>
+
+<p>
+oddをInteger -&gt; Boolとし11をIntegerとする。
+この場合の($)の型は以下のようになる。
+</p>
+
+<pre><code>(Integer -&gt; Bool) -&gt; Integer -&gt; Bool</code></pre>
+
+<p>
+($)の第1引数である関数の引数と($)の第2引数の型は同じだ。
+($)の第1引数である関数の返り値と($)の返り値も同じだ。
+よって($)の型は以下のようになる。
+</p>
+
+<pre><code>($) :: (a -&gt; b) -&gt; a -&gt; b</code></pre>
+
+<h2>まとめ</h2>
+
+<p>
+いくつかの多相関数を見た。
+多相関数は制御構造と考えられる。
+独自の制御構造を単なる関数として作成することができる。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/polymorphic.html"
+	>「多相関数」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/dot.html"
+	>「関数合成」へ</a>
+</p>
