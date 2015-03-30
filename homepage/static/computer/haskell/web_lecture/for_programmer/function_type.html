@@ -54,6 +54,13 @@ src="/computer/haskell/web_lecture/for_programmer/images/two_arg_fun.svg"
 
 <pre><code>Char -&gt; Char</code></pre>
 
+<p>対話環境で見てみよう。</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; :m Data.Char<br/>
+Prelude Data.Char&gt; :t toLower<br/>
+toLower :: Char -&gt; Char</code></p>
+
 <h3>関数xxcrypt</h3>
 
 <p>
@@ -70,6 +77,15 @@ src="/computer/haskell/web_lecture/for_programmer/images/two_arg_fun.svg"
 </p>
 
 <pre><code>Integer -&gt; Integer -&gt; Integer -&gt; Integer</code></pre>
+
+<h2>課題</h2>
+
+<ol>
+<li>以下の関数の型を対話環境で確認せよ(:m Data.Charが必要)
+	<ul>
+	<li>toUpper, isDigit</li>
+	</ul></li>
+</ol>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/whats_type.html"
