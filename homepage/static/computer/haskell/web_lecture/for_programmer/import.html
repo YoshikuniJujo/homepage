@@ -1,6 +1,156 @@
 モジュールの読み込み
 
-<p>(工事中 0%)</p>
+<h2>はじめに</h2>
+
+<p>
+ここらへんでそろそろモジュールの読み込みについて学んでおこう。
+Haskellの標準ライブラリには様々な有用な関数がある。
+それらを使いこなせるようになることも学習のひとつの目的だ。
+この先の学習や課題にもそれらのモジュールを使用していく。
+</p>
+
+<h2>Preludeモジュール</h2>
+
+<p>
+対話環境を立ち上げてみよう。
+</p>
+
+<p><code>% ghci<br/>
+Prelude&gt;</code></p>
+
+<p>
+プロンプトに'Prelude'とある。
+これは一体何だろうか。
+Haskellでは何も指定しなくてもPreludeというモジュールが暗黙のうちに読み込まれる。
+プロンプトに'Prelude'とあるのは、
+Preludeというモジュールが読み込まれていて、
+それが公開している関数等が使用可能であるということを示している。
+<p>
+
+<p>
+もしもPreludeを読み込みたくなければ以下のようにする。
+</p>
+
+<p><code>% ghci -XNoImplicitPrelude<br/>
+&gt;</code></p>
+
+<p>
+プロンプトの'Prelude'の文字が消えた。
+こうすると基本的な関数が未定義となる。
+</p>
+
+<p><code>&gt; 3<br/>
+3<br/>
+&gt; 3 + 8<br/>
+&lt;interactive&gt;:X:Y: Not in scope `+'</code></p>
+
+<p>
+演算子(+)はPreludeモジュールから公開されているので
+Preludeモジュールを読み込まないと使うことができない。
+</p>
+
+<h2>Mainモジュール</h2>
+
+<p>
+空のファイルを作成しそれに'empty.hs'という名前をつけておく。
+これを読み込んでみよう。
+</p>
+
+<p>% ghci empty.hs<br/>
+*Main&gt;</p>
+
+<p>
+今度はプロンプトに'*Main'とある。
+ファイルに書かれたHaskellのコードはMainモジュールとして扱われる。
+'Main'の部分はわかった。
+それではその前の'*'は何だろうか。
+この'*'は言ってみればそのモジュールの「なかに」いるということである。
+プロンプトが'*Main'となっている場合、
+Mainモジュール内の公開されていない関数等も使うことができる。
+</p>
+
+<h2>対話環境でのモジュールの読み込み</h2>
+
+<p>
+対話環境でのモジュールの読み込みは':m'または':module'とすれば良い。
+</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; :m Data.Char<br/>
+Prelude Data.Char&gt; toLower 'L'<br/>
+'l'</code></p>
+
+<p>
+Data.Charモジュールから公開されているtoLower関数を使ってみた。
+次にData.MaybeモジュールのfromMaybe関数を使ってみよう。
+</p>
+
+<p><code>Prelude Data.Char&gt; :m Data.Maybe<br/>
+Prelude Data.Maybe&gt; fromMaybe 0 (Just 8)<br/>
+8<br/>
+Prelude Data.Maybe&gt; fromMaybe 0 Nothing<br/>
+0<br/>
+Prelude Data.Maybe&gt; toLower 'L'<br/>
+<br/>
+&lt;interactive&gt;:X:Y: Not in scope `toLower'
+</code></p>
+
+<p>
+Data.Maybeモジュールを読み込んだらData.Charモジュールが消えてしまった。
+「追加で」モジュールを読み込みたいときは':m +'または':module +'を使う。
+</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; :m Data.Char<br/>
+Prelude Data.Char&gt; :m + Data.Maybe<br/>
+Prelude Data.Char Data.Maybe&gt; toLower 'L'<br/>
+'l'<br/>
+Prelude Data.Char Data.Maybe&gt; fromMaybe 0 (Just 8)<br/>
+8</code></p>
+
+<p>これで関数toLowerも関数fromMaybeも使うことができる。</p>
+
+<h2>ソースファイルでの読み込み</h2>
+
+<p>
+ソースファイルでモジュールを読み込むにはimport文を使用する。
+最も簡単な形は以下のようになる。
+</p>
+
+<p><code>import Data.Char</code></p>
+
+<p>
+これでData.Charモジュールの公開している値をすべて使うことができる。
+個人的に使うコードであればこれで良い。
+しかし、公開して多くの人に使ってもらおうと思ったらもうすこし丁寧に書く必要がある。
+この形での読み込みのでは、コード中の値がどのモジュール由来なのかわからない。
+コードを読みやすくするためには以下の2つのどちらかの形式を使えば良い。
+</p>
+
+<h3>読み込みリスト指定</h3>
+
+<p>読み込む値を指定してやることができる。</p>
+
+<p><code>import Data.Char (toLower, toUpper)</code></p>
+
+<h3>修飾名指定</h3>
+
+<p>修飾名を指定してやることができる。</p>
+
+<p><code>import qualified Data.Char as Ch</code></p>
+
+<p>
+この場合、Data.Charモジュールが公開している値を使うには修飾名を使う必要がある。
+修飾名はCh.toLowerやCh.toUpperのようになる。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+モジュールの読み込みの基本を学んだ。
+実験的なコードや練習以外では読み込みリストを指定するか、
+または修飾名を指定するように心がけよう。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/type_driven.html"
