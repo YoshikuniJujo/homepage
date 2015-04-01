@@ -1,0 +1,100 @@
+値を無視する関数
+
+<h2>関数const</h2>
+
+<h3>動作</h3>
+
+<p>
+引数にかかわらず常に同じ値を返す関数を作る。
+たとえば引数に何を与えても0を返す関数だ。
+</p>
+
+<code>const0 _ = 0</code>
+
+<p>あるいは何を与えても文字'A'を返す関数でも良い。</p>
+
+<code>constA _ = 'A'</code>
+
+<p>
+これらの関数は「何を与えても値xを返す関数」としてまとめられる。
+以下の関数で生成することができる。
+</p>
+
+<p><code>const x _ = x</code></p>
+
+<img
+height="130"
+alt="[関数constの図]"
+src="/computer/haskell/web_lecture/for_programmer/images/function_const.svg"
+/>
+
+<p>constを使って上記2つの関数はそれぞれ以下のように書ける。</p>
+
+<p><code>const0 = const 0<br/>
+constA = const 'A'</code></p>
+
+<p>constは定義済みの関数である。 対話環境で見てみよう。</p>
+
+<code>% ghci<br/>
+Prelude&gt; const 0 4492<br/>
+0<br/>
+Prelude&gt; const 'A' "Hello, world!"<br/>
+'A'<br/>
+Prelude&gt; const 'A' 999<br/>
+'A'</code>
+
+<h3>使い道</h3>
+
+<p>
+関数idの使い道を示した例では割る数が0のときは割られる数をそのまま返した。
+今度は割る数が0の場合には0を返すことにする。
+</p>
+
+<code>devide' :: Double -&gt; Double -&gt; Double<br/>
+devide' 0 _ = 0<br/>
+devide' a b = b / a</code>
+
+<p>
+これも割られる数である第2引数を省略できる。
+「devide' 0は何を与えても0を返す関数」であり、
+「devide' aは引数をaで割る関数」だ。
+</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/05_polymorphic/const.hs"
+	>const.hs</a></p>
+
+<pre><code>devide' :: Double -&gt; Double -&gt; Double
+devide' 0 = const 0
+devide' a = (/ a)</code></pre>
+
+<h3>型</h3>
+
+<p>
+関数constはxを引数に取り「何を与えてもxを返す関数」を返す関数だ。
+constを2引数関数として考えてみよう。
+第2引数を無視し第1引数の値を返す関数となる。
+constの第1引数と返り値は同じ型である必要がある。
+第2引数は何でも良い。
+</p>
+
+<code>a -&gt; b -&gt; a</code>
+
+<h2>まとめ</h2>
+
+<p>単純な多相関数を見た。</p>
+
+<h2>課題</h2>
+
+<ol>
+<li>関数constは第1引数を無視する関数とも考えられる。
+第2引数を無視する関数const'定義せよ</li>
+<li>上記の関数に型宣言をつけよ</li>
+<li>[挑戦問題] 関数const'をconstとidを使って作成せよ</li>
+</ol>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/id.html"
+	>「そのままにする関数」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/apply.html"
+	>「関数適用」へ</a>
+</p>
