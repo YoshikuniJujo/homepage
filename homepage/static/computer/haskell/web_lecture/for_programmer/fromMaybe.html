@@ -1,7 +1,5 @@
 Maybe型からの値の取り出し
 
-<p>(工事中 0%)</p>
-
 <h2>はじめに</h2>
 
 <p>
@@ -11,11 +9,109 @@ Maybe型からの値の取り出し
 
 <h2>関数fromMaybe</h2>
 
-<p>(作成中)</p>
+<p>
+Maybe型から値を取り出す関数fromMaybeがある。
+デフォルトの値を決めておきMaybe型の値がNothingだった場合にはそれを返す。
+</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; :m Data.Maybe<br/>
+Prelude Data.Maybe&gt; fromMaybe 0 (Just 8)<br/>
+8<br/>
+Prelude Data.Maybe&gt; fromMaybe 0 Nothing<br/>
+0<br/>
+Prelude Data.Maybe&gt; fromMaybe ' ' (Just 'c')<br/>
+'c'</code></p>
+
+<h3>定義</h3>
+
+<p>fromMaybeの定義は以下のようになる。</p>
+
+<p><code>fromMaybe _ (Just x) = x<br/>
+fromMaybe d _ = d</code></p>
+
+<p>
+Maybe型の値がJust値だった場合は中身の値を返し、
+そうでなかった場合は第1引数で指定したデフォルト値を返す。
+</p>
+
+<h3>型</h3>
+
+<p>
+fromMaybeの型は以下のようになる。
+</p>
+
+<p><code>fromMaybe :: a -&gt; Maybe a -&gt; a</code></p>
+
+<p>
+Maybe型の中身の型とデフォルト値の型、そして返り値はすべて同じである必要がある。
+よってそれらを同じ型変数aとする。
+</p>
 
 <h2>関数maybe</h2>
 
-<p>(作成中)</p>
+<p>
+関数fromMaybeはデフォルト値を決めて値を取り出す関数だ。
+それに対して関数maybeはデフォルト値を決めて値に関数を適用する関数である。
+</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; :m Data.Char<br/>
+Prelude Data.Char&gt; maybe False isLower (Just 'c')<br/>
+True<br/>
+Prelude Data.Char&gt; maybe False isLower Nothing<br/>
+False<br/>
+Prelude Data.Char&gt; maybe 0 ord (Just 'c')<br/>
+99<br/>
+Prelude Data.Char&gt; maybe 0 ord Nothing<br/>
+0</code></p>
+
+<h3>定義</h3>
+
+<p>定義は以下のようになる。</p>
+
+<p><code>maybe _ f (Just x) = f x<br/>
+maybe d _ _ = d</code></p>
+
+<p>
+Maybe型の値がJust値の場合には中身の値に引数で与えられた関数を適用し、
+そうでなければデフォルト値を返す。
+</p>
+
+<h3>型</h3>
+
+<p>型は以下のようになる。</p>
+
+<p><code>maybe :: b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b</code></p>
+
+<p>
+Maybe型の中身の値aをbに変換する関数を第2引数に取る。
+デフォルト値は変換後の値と同じ型である必要だあるので型はbとなり、
+返り値も同様にb型の値となる。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+Maybe型から値を取り出す関数を見た。
+関数fromMaybeと関数maybeは
+ともにデフォルト値を指定することでNothing値に対応している。
+違いは前者は直接値を取り出し後者は関数適用後の値を取り出すという点だ。
+</p>
+
+<p>
+前者は中身の値をいじらないことで多相性を維持しているのに対し、
+後者は値の操作を引数として取った関数に任せることで多相性を維持している。
+このように、多相関数の多くは引数として取った関数で値の変換を行う場合が多い。
+よって多相関数はその多くが高階関数となる。
+</p>
+
+<h2>課題</h2>
+
+<ol>
+<li>[挑戦問題] 2つのMaybe型の値がともにJust値だったら、それらに2引数関数を適用する関数maybe2を定義せよ</li>
+<li>[挑戦問題] 関数maybe2の型を決めよ</li>
+</ol>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/polymorphic.html"
