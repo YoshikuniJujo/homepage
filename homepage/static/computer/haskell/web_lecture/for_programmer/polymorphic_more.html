@@ -8,37 +8,6 @@
 多相関数をさらにいくつか学ぼう。
 </p>
 
-<h2>関数on</h2>
-
-<h3>動作</h3>
-
-<p>
-2つの値に同じ関数を適用してから2引数関数に渡す。
-「2つの数のそれぞれを3で割った余りの比較」などだ。
-</p>
-
-<p><code>on (==) (`mod` 3) 8 11</code></p>
-
-<p>
-8を3で割った余りと11を3で割った余りとの比較だ。
-対話環境で試してみよう。
-</p>
-
-<pre><code>Prelude&gt; :m Data.Function
-Prelude Data.Function&gt; on (==) (`mod` 3) 8 11
-True</code></pre>
-
-<h3>定義</h3>
-
-<p>定義は以下のようになる。</p>
-
-<pre><code>on :: (b -&gt; b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; a -&gt; c
-on op f x y = op (f x) (f y)</code></pre>
-
-<p>以下のようにも書ける。</p>
-
-<pre><code>on op f x y = f x `op` f y</code></pre>
-
 <h2>型変換</h2>
 
 <h3>値の変換</h3>
@@ -167,8 +136,8 @@ src="/computer/haskell/web_lecture/for_programmer/images/conversion_adapter2.svg
 </p>
 
 <p>
-<a href="/computer/haskell/web_lecture/for_programmer/flip.html"
-	>「引数を入れ替える」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/on.html"
+	>「2つの引数に同じ関数を適用」へもどる</a>
 <a href="/computer/haskell/web_lecture/for_programmer/dist_tuple.html"
 	>「タプル: 原点からの距離」へ</a>
 </p>
