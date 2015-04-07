@@ -1,0 +1,70 @@
+引数を入れ替える
+
+<p>(工事中 60%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+引数を入れ替える多相関数を学ぼう。
+</p>
+
+<h2>関数flip</h2>
+
+<h3>動作</h3>
+
+<p>
+関数の第1引数と第2引数を入れ換えたいときがある。
+第2引数に部分適用するときなどだ。
+関数flipが定義されている。
+</p>
+
+<pre><code>% ghci
+Prelude&gt; mod 8 3
+2
+Prelude&gt; flip mod 3 8
+2
+Prelude&gt; let mod3 = flip mod 3
+Prelude&gt; mod3 8
+2</code></pre>
+
+<h3>定義</h3>
+
+<p>関数flipの定義を見る。</p>
+
+<pre><code>flip :: (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+flip f x y = f y x</code></pre>
+
+<p>
+第1引数に2引数関数fを取る。
+第2、第3引数の値を逆にして関数fを適用する。
+</p>
+
+<h3>演算子の部分適用</h3>
+
+<p>演算子は(`mod` 3)のように第2引数に部分適用できる。flipでも書ける。</p>
+
+<p><code>flip mod 3</code></p>
+
+<p>(/ 3)は以下のようになる。</p>
+
+<p><code>flip (/) 3</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+関数flipは2引数関数の2つの引数を入れ替える。
+この関数は演算子の部分適用の際に暗黙に使われていると考えられる。
+</p>
+
+<h2>課題</h2>
+
+<ol>
+<li>3引数関数の第1引数と第3引数のを入れ替える関数flip13を定義せよ</li>
+</ol>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/dot.html"
+	>「関数合成」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/polymorphic_more.html"
+	>「さらに多相関数」へ</a>
+</p>
