@@ -50,7 +50,8 @@ introduction (n, a) =
 <p>
 「カリー化」によって「複数の引数を取る関数」は「関数を返す関数」に変換され
 部分適用できるようになる。
-Haskellでは「複数の引数を取る関数(のようなもの)」は「関数を返す関数」。
+Haskellでは「複数の引数を取る関数(のようなもの)」は
+そもそも「関数を返す関数」である。
 「複数の引数を取る関数(のようなもの)」ははじめからカリー化されている。
 他の言語での「複数の引数を取る関数」は
 Haskellの「タプルを引数に取る関数」に相当する。
@@ -116,6 +117,7 @@ introductionYj = curry introduction "Yoshikuni Jujo"</code></p>
 <p><code>((a, b) -&gt; c) -&gt; a -&gt; b -&gt; c</code></p>
 
 <p>
+このように右側の丸括弧を省略することで以下のように読める。
 「タプルを取る関数」とそのタプルの第1要素と第2要素を引数として取り
 「第1引数の関数の返り値の型」の値を返す。
 </p>
@@ -132,7 +134,24 @@ alt="[関数curryの図]"
 src="/computer/haskell/web_lecture/for_programmer/images/curry.svg"
 />
 
-<p>curyの第2引数xと第3引数yをタプルにまとめて関数fに与える。</p>
+<p>
+関数curryの第2引数xと第3引数yをタプルにまとめて関数fに与えている。
+つまり、ばらばらの引数をタプルにまとめるという仕事をしている。
+</p>
+
+<h2>課題</h2>
+
+<p>
+(
+ここにcurryを使う例とcurryと似た関数の例のそれぞれを作成することで、
+使いかたと作りかたの両面で理解を深める課題を置くこと。
+)
+</p>
+
+<ol>
+<li></li>
+<li></li>
+</ol>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/dist_tuple.html"
