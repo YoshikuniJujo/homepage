@@ -1,17 +1,14 @@
 型変換
 
-<p>(工事中 40%)</p>
-
 <h2>はじめに</h2>
 
 <p>
-型変換を関数側で行うという例。
-これは多相関数ではない。
+型変換を関数側で行うという例を挙げる。
+「タプルを扱う関数」と「2引数関数」との相互変換について学ぶ前の準備として、
+引数側を変換する代わりに関数のほうを変換するという例を学ぶ。
 </p>
 
-<h2>型変換</h2>
-
-<h3>値の変換</h3>
+<h2>値の変換</h2>
 
 <p>実数を半分にする関数を考える。</p>
 
@@ -50,10 +47,10 @@ seven = 7</code></pre>
 
 <p>
 これでIntegerからDoubleへの型変換ができた。
-人間には「型変換」に見えるがfromIntegralは整数を取り実数を返す関数である。
+「型変換」に見えるが、本当は、fromIntegralは整数を取り実数を返す単なる関数である。
 </p>
 
-<h3>関数を変換する関数</h3>
+<h2>関数を変換する関数</h2>
 
 <p>
 値ではなく関数のほうを変換してやれば値の型変換の必要はない。
@@ -78,7 +75,7 @@ convert f n = f $ fromIntegral n</code></pre>
 *Main&gt; convert half seven
 3.5</code></pre>
 
-<h3>変換関数の本質</h3>
+<h2>変換関数の本質</h2>
 
 <p>
 f $ fromIntegral nはnにfromIntegralを適用した結果にfを適用する。
@@ -106,7 +103,7 @@ convert halfはhalf . fromIntegralだ。
 <p><code>half :: Double -&gt; Double<br/>
 half . fromIntegral :: Integer -&gt; Double</code></p>
 
-<h3>変換アダプタ</h3>
+<h2>変換アダプタ</h2>
 
 <p>
 「値を変換するか関数を変換するか」は「変換アダプタをどちらにつけるか」である。
@@ -139,7 +136,11 @@ src="/computer/haskell/web_lecture/for_programmer/images/conversion_adapter2.svg
 <h2>課題</h2>
 
 <ol>
-<li></li>
+<li>文字'c'を文字コードに変換してそれが偶数であるかどうかをチェックせよ
+	<ul>
+	<li>文字コードへの変換にはordを偶数であることの確認にはevenを使う</li>
+	</ul></li>
+<li>上記の変換を関数側に行うようにせよ</li>
 </ol>
 
 <p>
