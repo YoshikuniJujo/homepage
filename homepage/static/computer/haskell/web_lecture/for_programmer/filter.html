@@ -3,8 +3,10 @@
 <h2>3の倍数のみ</h2>
 
 <p>
-0から3nまでの整数の3の倍数のみの総和を求める。手続き的には
+0から3nまでの整数の3の倍数のみの総和を求める。
 </p>
+
+<h3>手続き的に</h3>
 
 <ol>
 <li>変数i, sを用意</li>
@@ -15,7 +17,7 @@
 <li>変数sの値を返す</li>
 </ol>
 
-<p>リストを使うと</p>
+<h3>リストで</h3>
 
 <ol>
 <li>0から3nまでの整数のリストを作成</li>
@@ -59,6 +61,15 @@ sum3N n = sum $ filter ((== 0) . (`mod` 3)) [0 .. 3 * n]</code></pre>
 しぼりこむ段階をろ過と呼ぶ。関数filterが用意されている。
 関数filterの第1引数はBool値を返す関数だ。
 </p>
+
+<h2>課題</h2>
+
+<ol>
+<li>1から2 * n + 1までのすべての奇数の積を求める関数productOddsを作成せよ
+	<ul>
+	<li>奇数であることを確認する関数oddが使える</li>
+	</ul></li>
+</ol>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/enum_accum.html"
