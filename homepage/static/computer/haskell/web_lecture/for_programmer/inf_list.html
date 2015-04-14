@@ -91,7 +91,7 @@
 
 <h2>平方数のリスト</h2>
 
-<p>平方数のリストを見てみよう。平方数のリストは以下のように作れる。</p>
+<p>すべての平方数のリストは以下のように作れる。</p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/12_inf_list/squares.hs"
 	>squares.hs</a></p>
@@ -102,13 +102,19 @@ squares = map (^ 2) [0 ..]</code></pre>
 <p>試してみる。</p>
 
 <code>ghci squares.hs<br/>
-*Main&gt; take 13 squares
+*Main&gt; take 13 squares<br/>
 [0,1,4,9,16,25,36,49,64,81,100,121,144]</code>
 
 <p>
 takeは指定した数だけリストから値を取り出す関数。
 無限リストを表示するときにはtakeを使わないと無限実行となる。
 </p>
+
+<h2>課題</h2>
+
+<ol>
+<li></li>
+</ol>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/list_as_data.html"

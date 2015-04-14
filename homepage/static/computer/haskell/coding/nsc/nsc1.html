@@ -29,11 +29,11 @@ AES暗号による暗号化と復号を行う関数を含む
 
 <p>以下の3つの関数を使う。</p>
 
-<pre><code>initAES :: Byteable b =&gt; b -&gt; AES
-encryptCBC ::
-	Byteable iv =&gt; AES -&gt; iv -&gt; ByteString -&gt; ByteString
-decryptCBC ::
-	Byteable iv =&gt; AES -&gt; iv -&gt; ByteString -&gt; ByteString</code></pre>
+<p><code>initAES :: Byteable b =&gt; b -&gt; AES<br/>
+encryptCBC ::<br/>
+	Byteable iv =&gt; AES -&gt; iv -&gt; ByteString -&gt; ByteString<br/>
+decryptCBC ::<br/>
+	Byteable iv =&gt; AES -&gt; iv -&gt; ByteString -&gt; ByteString</code></p>
 
 <p>
 Byteable bは「ByteStringにすることができる型b」。
@@ -72,42 +72,42 @@ AESやIVはencryptCBCと同じものを使用する。
 
 <h3>テスト用のファイルを作成する</h3>
 
-<pre><code>% cat <a href="/computer/haskell/coding/nsc/nsc1.hs">nsc1.hs</a>
-{-# LANGUAGE OverloadedStrings #-}
-
-import Crypto.Cipher.AES
-import Crypto.Cipher.Types
-
-import qualified Data.ByteString as BS
-
-keySample :: AES
-keySample = initAES ("passwordpassword" :: BS.ByteString)
-
-ivSample :: BS.ByteString
-ivSample = "this is iv ivivi"</code></pre>
+<p><code>% cat <a href="/computer/haskell/coding/nsc/nsc1.hs">nsc1.hs</a><br/>
+{-# LANGUAGE OverloadedStrings #-}<br/>
+<br/>
+import Crypto.Cipher.AES<br/>
+import Crypto.Cipher.Types<br/>
+<br/>
+import qualified Data.ByteString as BS<br/>
+<br/>
+keySample :: AES<br/>
+keySample = initAES ("passwordpassword" :: BS.ByteString)<br/>
+<br/>
+ivSample :: BS.ByteString<br/>
+ivSample = "this is iv ivivi"</code></p>
 
 <h3>GHCiで試してみる</h3>
 
-<pre><code>% ghci nsc1.hs
-*Main&gt; blockSize keySample
-16
-*Main&gt; BS.length ivSample
-16
-*Main&gt; :set -XOverloadedStrings
-*Main&gt; encryptCBC keySample ivSample "Hello, world!"
-*** Exception: Encryption error:
-input length must be a multiple of block size (16).
-Its length is: 13</code></pre>
+<p><code>% ghci nsc1.hs<br/>
+*Main&gt; blockSize keySample<br/>
+16<br/>
+*Main&gt; BS.length ivSample<br/>
+16<br/>
+*Main&gt; :set -XOverloadedStrings<br/>
+*Main&gt; encryptCBC keySample ivSample "Hello, world!"<br/>
+*** Exception: Encryption error:<br/>
+input length must be a multiple of block size (16).<br/>
+Its length is: 13</code></p>
 
 <p>
 暗号化する平文はブロックサイズ(16)の整数倍でないといけない。
 パディングの処理はこちらでやるということ。
 </p>
 
-<pre><code>*Main&gt; encryptCBC keySample ivSample "Hello, world!ppp"
-"\206\&amp;2/^\142\141\&amp;2\172\227:\\\164d_\DC4\131"
-*Main&gt; decryptCBC keySample ivSample it
-"Hello, world!ppp"</code></pre>
+<p><code>*Main&gt; encryptCBC keySample ivSample "Hello, world!ppp"<br/>
+"\206\&amp;2/^\142\141\&amp;2\172\227: \\\164d_\DC4\131"<br/>
+*Main&gt; decryptCBC keySample ivSample it<br/>
+"Hello, world!ppp"</code></p>
 
 <p>これで暗号化と復号化ができる。</p>
 
@@ -148,12 +148,12 @@ ByteStringにpackする。
 指定された数だけのランダムな要素を含むリストを用意するための補助関数を作る。
 </p>
 
-<pre><code>times :: Int -&gt; (s -&gt; (x, s)) -&gt; s -&gt; ([x], s)
-times n _ s | n &lt;= 0 = ([], s)
-times n f s = let
-	(x, s') = f s
-	(xs, s'') = times (n - 1) f s ' in
-	(x : xs, s'')</code></pre>
+<p><code>times :: Int -&gt; (s -&gt; (x, s)) -&gt; s -&gt; ([x], s)<br/>
+times n _ s | n &lt;= 0 = ([], s)<br/>
+times n f s = let<br/>
+	<span style="padding-left:2em">(x, s') = f s</span><br/>
+	<span style="padding-left:2em">(xs, s'') = times (n - 1) f s ' in</span><br/>
+	<span style="padding-left:2em">(x : xs, s'')</span></code></p>
 
 <small id="times_with_state">* Stateモナドを使用したバージョンは<a
 href="/computer/haskell/coding/nsc/times_with_state.html"
@@ -161,19 +161,19 @@ href="/computer/haskell/coding/nsc/times_with_state.html"
 
 <p>これを利用すれば求める関数は簡単に作れる。</p>
 
-<pre><code>randomIv :: RandomGen g =&gt; AES -&gt; g -&gt; (BS.ByteString, g)
-randomIv a = (BS.pack `first`) . times (blockSize a) random</code></pre>
+<p><code>randomIv :: RandomGen g =&gt; AES -&gt; g -&gt; (BS.ByteString, g)<br/>
+randomIv a = (BS.pack `first`) . times (blockSize a) random</code></p>
 
 <p>試してみよう。</p>
 
-<pre><code>% ghci <a href="/computer/haskell/coding/nsc/nsc2.hs">nsc2.hs</a>
-*Main&gt; randomIv keySample $ mkStdGen 42
-("\207O\133\250\236\&amp;7~`US\DC2\179%\DC3\DC4\ACK\184a",
-1178748947 1554910725)
-*Main&gt; getStdRandom $ randomIv keySample
-"\229*\242iG*%@\192\DLE\DC3\237\130\219\"\DC2"
-*Main&gt; BS.length it
-16</code></pre>
+<p><code>% ghci <a href="/computer/haskell/coding/nsc/nsc2.hs">nsc2.hs</a><br/>
+*Main&gt; randomIv keySample $ mkStdGen 42<br/>
+("\207O\133 \250\236\&amp;7~`US \DC2\179%\DC3 \DC4\ACK\184a",<br/>
+1178748947 1554910725)<br/>
+*Main&gt; getStdRandom $ randomIv keySample<br/>
+"\229*\242iG*%@ \192\DLE\DC3 \237\130\219 \"\DC2"<br/>
+*Main&gt; BS.length it<br/>
+16</code></p>
 
 <h2 id="sha-256">SHA-256ライブラリ</h2>
 
@@ -191,22 +191,21 @@ randomIv a = (BS.pack `first`) . times (blockSize a) random</code></pre>
 href="https://hackage.haskell.org/package/cryptohash/docs/Crypto-Hash-SHA256.html#g:2"
 >ドキュメント</a>を参照。以下の関数が使えそうだ。</p>
 
-<pre><code>hash :: ByteString -&gt; ByteString</code></pre>
+<p><code>hash :: ByteString -&gt; ByteString</code></p>
 
 <h3>試してみる</h3>
 
-<pre><code>% ghci
-Prelude&gt; :m Crypto.Hash.SHA256
-Prelude Crypto.Hash.SHA256&gt;
-Prelude Crypto.Hash.SHA256&gt; :m + Data.ByteString
-Prelude (略) Data.ByteString&gt; :t hash
-hash :: ByteString -&gt; ByteString
-Prelude (略) Data.ByteString&gt; :set -XOverloadedStrings
-Prelude (略) Data.ByteString&gt; hash "hello"
-",\242M\186_...\147\139\152$"
-Prelude (略) Data.ByteString&gt; Data.ByteString.length it
-32
-</code></pre>
+<p><code>% ghci<br/>
+Prelude&gt; :m Crypto.Hash.SHA256<br/>
+Prelude Crypto.Hash.SHA256&gt;<br/>
+Prelude Crypto.Hash.SHA256&gt; :m + Data.ByteString<br/>
+Prelude (略) Data.ByteString&gt; :t hash<br/>
+hash :: ByteString -&gt; ByteString<br/>
+Prelude (略) Data.ByteString&gt; :set -XOverloadedStrings<br/>
+Prelude (略) Data.ByteString&gt; hash "hello"<br/>
+",\242M\186_...\147\139\152$"<br/>
+Prelude (略) Data.ByteString&gt; Data.ByteString.length it<br/>
+32</code></p>
 
 <h3>わかったこと</h3>
 
@@ -242,49 +241,48 @@ href="/computer/web/rfc/rfc5246/6_2_3_2_padding.html">ここ</a>にまとめた�
 
 <p>まずは最終的な長さを指定してパディングを行う関数を作成する。</p>
 
-<pre><code>padToLen :: BS.ByteString -&gt; Int -&gt; BS.ByteString
-padToLen s n = s `BS.append` BS.replicate
-	(n - BS.length s)
-	(fromIntegral $ n - BS.length s - 1)</code></pre>
+<p><code>padToLen :: BS.ByteString -&gt; Int -&gt; BS.ByteString<br/>
+padToLen s n = s `BS.append` BS.replicate<br/>
+	<span style="padding-left:2em">(n - BS.length s)</span><br/>
+	<span style="padding-left:2em">(fromIntegral $ n - BS.length s - 1)</span></code></pre>
 
 <h4>ブロックサイズから最終的な長さを計算する</h4>
 
 <p>次にブロックサイズと文字列から最終的な長さを計算する関数を作成する。</p>
 
-<pre><code>blkSzToLen :: Int -&gt; BS.ByteString -&gt; Int
-blkSzToLen b s = (BS.length s `div` b + 1) * b</code></pre>
+<p><code>blkSzToLen :: Int -&gt; BS.ByteString -&gt; Int<br/>
+blkSzToLen b s = (BS.length s `div` b + 1) * b</code></p>
 
 <h4>ブロックサイズを指定してパディングする</h4>
 
 <p>これらの関数を合わせれば良い。</p>
 
-<pre><code>padding :: Int -&gt; BS.ByteString -&gt; BS.ByteString
-padding b = ($) &lt;$&gt; padToLen &lt;*&gt; blkSzToLen b</code></pre>
+<p><code>padding :: Int -&gt; BS.ByteString -&gt; BS.ByteString<br/>
+padding b = ($) &lt;$&gt; padToLen &lt;*&gt; blkSzToLen b</code></p>
 
 <h4>パディングを初り捨てる関数</h4>
 
-<pre><code>unpadding :: BS.ByteString -> BS.ByteString
-unpadding p = BS.take
-	(BS.length p - fromIntegral (BS.last p) - 1) p</code></pre>
+<p><code>unpadding :: BS.ByteString -> BS.ByteString<br/>
+unpadding p = BS.take<br/>
+	<span style="padding-left:2em">(BS.length p - fromIntegral (BS.last p) - 1) p</span></code></p>
 
 <h3>試してみる</h3>
 
-<pre><code>% ghci <a href="/computer/haskell/coding/nsc/padding.hs">padding.hs</a>
-*Main&gt; padding 16 "Hello, world!"
-"Hello, world!\STX\STX\STX"
-*Main&gt; let p1 = it
-*Main&gt; BS.length p1
-16
-*Main&gt; unpadding p1
-"Hello, world!"
-*Main&gt; padding 16 "Hello, world! My name is Yoshikuni Jujo."
-"Hello, world! My name is Yoshikuni Jujo.\a\a\a\a\a\a\a\a"
-*Main&gt; let p2 = it
-*Main&gt; BS.length p2
-48
-*Main&gt; unpadding p2
-"Hello, world! My name is Yoshikuni Jujo."
-</code></pre>
+<p><code>% ghci <a href="/computer/haskell/coding/nsc/padding.hs">padding.hs</a><br/>
+*Main&gt; padding 16 "Hello, world!"<br/>
+"Hello, world!\STX\STX\STX"<br/>
+*Main&gt; let p1 = it<br/>
+*Main&gt; BS.length p1<br/>
+16<br/>
+*Main&gt; unpadding p1<br/>
+"Hello, world!"<br/>
+*Main&gt; padding 16 "Hello, world! My name is Yoshikuni Jujo."<br/>
+"Hello, world! My name is Yoshikuni Jujo.\a\a\a\a\a\a\a\a"<br/>
+*Main&gt; let p2 = it<br/>
+*Main&gt; BS.length p2<br/>
+48<br/>
+*Main&gt; unpadding p2<br/>
+"Hello, world! My name is Yoshikuni Jujo."</code></p>
 
 <h2 id="base64">Base64ライブラリを試す</h2>
 
