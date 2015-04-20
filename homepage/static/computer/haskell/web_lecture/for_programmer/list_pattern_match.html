@@ -81,6 +81,16 @@ Maybe a型の値がJust aまたはNothingだったのと同じように
 空リストは[]にマッチする。
 </p>
 
+<h3>構文糖</h3>
+
+<p>
+パターンマッチにもリストの構築と同様の構文糖が使える。
+以下のような表現でのパターンマッチができる。
+</p>
+
+<p><code>[x]<br/>
+[x, y, z]</code></p>
+
 <h2>関数head</h2>
 
 <p>リストの先頭を取り出す関数は用意されている。</p>
@@ -246,6 +256,15 @@ fun _ = [空リストの場合の式]</code></p>
 
 <p><code>fun [] = [空リストの場合の式]<br/>
 fun (x : xs) = [xやxsを使った式]</code></p>
+
+<h2>課題</h2>
+
+<ol>
+<li>与えられたリストの要素が複数であることを確認する関数pluralを定義せよ
+	<ul>
+	<li>英語の「複数形」の基準に従い空リストはTrueとする</li>
+	</ul></li>
+</ol>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/binary_tree.html"
