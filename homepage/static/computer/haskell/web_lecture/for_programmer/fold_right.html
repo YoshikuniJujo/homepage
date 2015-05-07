@@ -80,6 +80,60 @@ myProductでも同様に[]を1に、(:)を(*)に置き換えている。
 
 <h2>右たたみこみを抽象化する</h2>
 
+<p>
+[]を何に置き換えるか、(:)を何に置き換えるかという2点をパラメータとすると、
+右たたみこみそのものを抽象化した関数を作成することができる。
+つまり、右たたみこみ関数を作成する関数が作れる。
+このような関数はすでに関数foldrとして標準ライブラリで定義されている。
+</p>
+
+<h2>関数foldrの使いかた</h2>
+
+<p>
+まずは使いかたから見てみよう。
+mySumをfoldrを使って表してみる。
+foldrは第1引数に(:)を置き換える演算子を取り、第2引数に[]を置き換える値を取る。
+mySumではそれぞれ(+)と0なので以下のように定義することができる。
+</p>
+
+<p>mySum = foldr (+) 0</p>
+
+<p>
+myProductの例も見てみよう。
+同様にそれぞれ(*)と1に置き換えれば良い。
+</p>
+
+<p>myProduct = foldr (*) 1</p>
+
+<h2>関数foldrの定義</h2>
+
+<p>
+foldrの定義を見ていく。
+同様の関数myFoldrを作ってみよう。
+mySumとmyProductの定義を参考にする。
+</p>
+
+<p><code>mySum [] = 0<br/>
+mySum (x : xs) = x + mySum xs</code></p>
+
+<p><code>myProduct [] = 1<br/>
+myProduct (x : xs) = x * mySum xs</code></p>
+
+<p>
+mySumにおける0や(+)、myProductにおける1や(*)を、
+myFoldrの第1引数と第2引数に置き換えれば良い。
+</p>
+
+<p><code>myFoldr _ v [] = v<br/>
+myFoldr op v (x : xs) = x `op` myFoldr op v xs</code></p>
+
+<p>
+myFoldrの定義のvを0にopを(+)に、myFoldr op vをmySumに置き換えるとmySumの定義になる。
+同様にvを1にopを(*)に、myFoldr op vをmyProductに置き換えるとmyProductの定義になる。
+</p>
+
+<h2>関数foldrの型</h2>
+
 <p>(作成中)</p>
 
 <p>
