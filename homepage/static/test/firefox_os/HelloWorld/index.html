@@ -1,0 +1,17 @@
+Hello Firefox OS
+
+<script>
+var manifestUrl = 'https://skami.iocikun.jp/test/firefox_os/HelloWorld/package.manifest'
+var req = navigator.mozApps.installPackage(manifestUrl);
+alert("here")
+req.onsuccess = function() {
+	alert(req.result.origin);
+}
+alert("there")
+req.onerror = function() {
+	alert(req.error.name);
+}
+alert("try install")
+</script>
+
+<p>Hello Firefox OS</p>

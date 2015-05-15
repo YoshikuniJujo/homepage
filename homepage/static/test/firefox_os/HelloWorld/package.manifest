@@ -1,0 +1,5 @@
+{
+	"name":"Hello Firefox OS",
+	"description":"Firefox OS book's 1st app",
+	"package_path":"https://skami.iocikun.jp/test/firefox_os/HelloWorld/hello.zip"
+}
