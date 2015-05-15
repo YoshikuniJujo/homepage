@@ -1,5 +1,52 @@
 Hello Firefox OS
 
-<p>(工事中 0%)</p>
+<p>(工事中 2%)</p>
+
+<h2>目的</h2>
 
 <p>Hello Firefox OSと表示するだけのアプリを作成する。</p>
+
+<h2>流れ</h2>
+
+<ol>
+<li>index.htmlの作成</li>
+<li>manifest.webappの作成</li>
+<li>zipによって上記2ファイルをまとめる</li>
+<li>package.manifestファイルの作成</li>
+<li>インストール機能を持つページを作成する</li>
+</ol>
+
+<h2>index.html</h2>
+
+<p>
+普通にHTMLを書けば良い。
+今回は"Hello Firefox OS"と表示するだけなので以下のようになるだろう。
+</p>
+
+<p><code>% cat index.html<br/>
+&lt;!DOCTYPE html&gt;<br/>
+&lt;html&gt;<br/><br/>
+&lt;head&gt;<br/>
+&lt;meta charset="utf-8" /&gt;<br/>
+&lt;title&gt;Hello Firefox OS&lt;/title&gt;<br/>
+&lt;/head&gt;<br/><br/>
+&lt;body&gt;<br/>
+&lt;p&gt;Hello Firefox OS&lt;/p&gt;<br/>
+&lt;/body&gt;<br/><br/>
+&lt;/html&gt;</code></p>
+
+<h2>manifest.webapp</h2>
+
+<p>
+manifest.webappはJSON形式でいくつかの項目を指定する。
+必須の項目はname, description, launch_pathである。
+</p>
+
+<p><code>% cat manifest.webapp<br/>
+{<br/>
+"name": "Hello Firefox OS"<br/>
+"description": "My first app"<br/>
+"launch_path": "/index.html"<br/>
+}</code></p>
+
+<p>(作成中)</p>

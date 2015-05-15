@@ -1,0 +1,75 @@
+基本
+
+<p>(工事中 20%)</p>
+
+<h2>Firefox OSの構成</h2>
+
+<p>
+以下の3つの層から成る。
+</p>
+
+<ul>
+<li>Gaia</li>
+<li>Gecko</li>
+<li>Gonk</li>
+</ul>
+
+<p>下から説明する。</p>
+
+<h3>Gonk</h3>
+
+<p>
+カーネル層。
+Android用に修正されたLinuxを使用。
+Android 4.0からJava仮想マシンのDalvicやWebkit等を削除している。
+デバイスドライバもAndroidのものを使っている。
+</p>
+
+<h3>Gecko</h3>
+
+<p>
+HTML、CSS、Javascript等を理解しWeb APIを用意する層。
+Webアプリはこの上で走る。
+Firefoxブラウザで使用されているのと同じWebエンジン。
+システムアプリも含め、すべてのアプリがWebアプリと同様の技術で作られる。
+</p>
+
+<h3>Gaia</h3>
+
+<p>
+ホームアプリや電話、メール等の基本的なアプリから成る。
+基本的なユーザインターフェースの層。
+HTML、CSS、JavascriptなどWebアプリと同じ技術で作られる。
+</p>
+
+<h2>Firefox OSにおけるアプリとは</h2>
+
+<p>
+他のスマートフォン向けのOSと同様にWebアプリとネイティブアプリとがあるが、
+その二者の違いは小さい。
+他のOSではネイティブアプリはiPhoneならObjective-Cを、
+AndroidならJavaを使用している。
+Firefox OSではWebアプリと同じ技術を使用している。
+また、Androidではアプリの開発に特殊な環境を必要とするが、
+Firefox OSではWebアプリを開発するのと同様に標準的な環境で開発が行える。
+</p>
+
+<h3>Webアプリ</h3>
+
+<p>
+普通にHTML、CSS、Javascript等によってサイトを構成すれば良い。
+マニフェストファイルを作成しインストール可能なアプリとすることができる。
+ただし1ドメインにつき1つのアプリケーションしか公開できない。
+</p>
+
+<h3>パッケージ化されたアプリ</h3>
+
+<p>
+マニフェストファイルを含むファイル群をzip圧縮する。
+インストール用のマニフェストを用意し、Javascriptでインストール機能を用意する。
+</p>
+
+<p>
+<a href="/computer/firefox_os/appli">「アプリ」トップへ</a>
+<a href="/computer/firefox_os/appli/hello.html">Hello Firefox OSへ</a>
+</p>
