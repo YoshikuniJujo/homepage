@@ -14,6 +14,7 @@ Hello Firefox OS
 <li>zipによって上記2ファイルをまとめる</li>
 <li>package.manifestファイルの作成</li>
 <li>インストール機能を持つページを作成する</li>
+<li>適切な場所にzipファイル、マニフェストファイル、インストールページをアップロードする</li>
 </ol>
 
 <h2>index.html</h2>
@@ -27,7 +28,7 @@ Hello Firefox OS
 &lt;!DOCTYPE html&gt;<br/>
 &lt;html&gt;<br/><br/>
 &lt;head&gt;<br/>
-&lt;meta charset="utf-8" /&gt;<br/>
+&lt;meta charset="utf-8"&gt;<br/>
 &lt;title&gt;Hello Firefox OS&lt;/title&gt;<br/>
 &lt;/head&gt;<br/><br/>
 &lt;body&gt;<br/>
@@ -48,5 +49,74 @@ manifest.webappはJSON形式でいくつかの項目を指定する。
 "description": "My first app"<br/>
 "launch_path": "/index.html"<br/>
 }</code></p>
+
+<h2>hello.zip</h2>
+
+<p>
+上記の2ファイルをzip形式のファイルにまとめる。
+</p>
+
+<p><code>% zip hello.zip index.html manifest.webapp</code></p>
+
+<h2>package.manifest</h2>
+
+<p>
+インストール用のマニフェストファイルを作成する。
+manifest.webappにpackage_pathとversionの2項目を追加する。
+</p>
+
+<p><code>% cat package.manifest<br/>
+{<br/>
+"name": "Hello Firefox OS"<br/>
+"description": "My first app"<br/>
+"launch_path": "/index.html"<br/>
+"package_path": "https://skami.iocikun.jp/computer/firefox_os/appli/packages/hello/hello.zip"<br/>
+"version": "0.1.0.0"<br/>
+}</code></p>
+
+<h2>インストール機能を持つページの作成</h2>
+
+<p>
+JavaScriptでインストール機能を実装する。
+package.manifestのURLを引数にして
+navigator.mozApps.installPackage関数を呼び出せば良い。
+</p>
+
+<p><code>% cat install.html<br/>
+&lt;!DOCTYPE html&gt;<br/>
+&lt;html&gt;<br/><br/>
+&lt;head&gt;<br/>
+&lt;meta charset="utf-8"&gt;<br/>
+&lt;title&gt;Hello Firefox OS installer&lt;/title&gt;<br/>
+&lt;/head&gt;<br/><br/>
+&lt;body&gt;<br/>
+&lt;p&gt;Hello Firefox OS installer&lt;/p&gt;<br/><br/>
+&lt;script&gt;<br/>
+var manifestUrl = 'https://skami.iocikun.jp/computer/firefox_os/appli/packages/hello/opackage.manifest';<br/>
+var req = navigator.mozApps.installPackage(manifestUrl);<br/>
+req.onsuccess = function() {
+	alert(req.result.origin);
+};<br/>
+req.onerror = function () {
+	alert(req.error.name);
+};<br/>
+&lt;/script&gt;<br/><br/>
+&lt;/body&gt;<br/><br/>
+&lt;/html&gt;<br/>
+</code></p>
+
+<h2>アップロード</h2>
+
+<p>
+install.htmlをアップロードする。
+そこで指定されているURLにpackage.manifestをアップロード。
+さらにそのマニフェストファイルに指定されているURLにhello.zipをアップロードする。
+</p>
+
+<h2>できあがり</h2>
+
+<p>うまくいっていれば以下からインストールできるはずだ。</p>
+
+<p><a href="/computer/firefox_os/appli/packages/hello/install.html">インストール</a></p>
 
 <p>(作成中)</p>

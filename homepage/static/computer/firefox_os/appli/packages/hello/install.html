@@ -1,0 +1,10 @@
+Hello Firefox OS installer
+
+<p>Hello Firefox OS installer</p>
+
+<script>
+var manifestUrl = 'https://skami.iocikun.jp/computer/firefox_os/appli/packages/hello/package.manifest'
+var req = navigator.mozApps.installPackage(manifestUrl);
+req.onsuccess = function() { alert(req.result.origin) };
+req.onerror = function() { alert(req.error.name) };
+</script>

@@ -1,0 +1,7 @@
+{
+"name": "Hello Firefox OS",
+"description": "My first app",
+"launch_path": "/index.html",
+"package_path": "https://skami.iocikun.jp/computer/firefox_os/appli/packages/hello/hello.zip",
+"version": "0.1.0.1"
+}
