@@ -1,0 +1,10 @@
+Hello Storage
+
+<p>test storage</p>
+
+<script>
+var counter = localStorage.getItem("counter");
+if (counter == null) counter = 0;
+localStorage.setItem("counter", parseInt(counter) + 1);
+alert(localStorage.getItem("counter"));
+</script>
