@@ -1,0 +1,51 @@
+Gentoo LinuxのEee PC 900へのインストール: Portage樹のインストール
+
+<p>(工事中 90%)</p>
+
+<h2>portageのスナップショットのインストール</h2>
+
+<p>emerge-webrsyncを使ってportageのスナップショットをインストールする。</p>
+
+<p><code># emerge-webrsync</code></p>
+
+<h2>portage樹の更新</h2>
+
+<p>
+emerge-webrsyncはたいていは24時間以内のスナップショットをインストールするので、
+特に更新の必要はない。
+ここではインストールが上手くいっていることの確認として行うこととする。
+</p>
+
+<p><code># emerge --sync</code></p>
+
+<h3>ニュース</h3>
+
+<p>
+portage樹を更新したときにニュースがとどく場合がある。
+これはeselect news list, eselect news readによって読むことができる。
+またeslect news purgeでニュースを削除できる。
+</p>
+
+<h2>プロファイルを選択する</h2>
+
+<p>
+様々な設定がプロファイルにまとめられている。
+まずはデフォルトの状態でのプロファイルを確認してみよう。
+</p>
+
+<p><code>eselect profile list</code></p>
+
+<p>
+現在のプロファイルはdefault/linux/x86/13.0であることがわかる。
+また3番目にdefault/linux/x86/13.0/desktopがある。
+今回はデスクトップの用途なので一応3番目のプロファイルにしておくことにする。
+</p>
+
+<p><code>eselect profile set 3</code></p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/chroot.html"
+	>「新しいシステムに入る」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900"
+	>「Eee PC 900へのインストール」トップへ</a>
+</p>

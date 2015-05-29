@@ -1,0 +1,137 @@
+Gentoo LinuxのEee PC 900へのインストール: ディスクの準備
+
+<p>(工事中 90%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+全体的に非力なマシンである。
+ディスクの容量も少なくメモリも少ない。
+よってよく考えてディスクを切らないと途中でいろいろと不足してくる。
+</p>
+
+<h2>Eee PCのディスク容量、メモリ容量</h2>
+
+<p>
+Eee PC 900ではSSDを利用している。
+</p>
+
+<ul>
+<li>ディスク容量: 8GB + 8GB</li>
+<li>メモリ: 512MB</li>
+</ul>
+
+<h2>ハードディスクの割り当ての計画</h2>
+
+<p>
+とくに大きくなると思われるのが、
+パッケージ化されたソフトウェアのインストール先である/usr/binだ。
+よって/binのために/dev/sdbをまるまる当てることにする。
+また、パッケージによってはコンパイル時にメモリを大量に使うものもあるので、
+swapのたせに/dev/sda2(2GB)を当てることにする。
+それ以外は/bootを分けずにすべて/パーティションとして/dev/sda1(6GB)を割り当てよう。
+以下の表に示す。
+</p>
+
+<ul>
+<li>/dev/sda1 6GB /</li>
+<li>/dev/sda2 2GB swap</li>
+<li>/dev/sdb1 8GB /usr</li>
+</ul>
+
+<p>以上の構成を試し問題が生じたらインストールをやり直すことにする。</p>
+
+<h2>MBRかGPTか</h2>
+
+<p>
+MBRでも問題ないが、今回はより新しい技術であるGPTを選択することにする。
+</p>
+
+<h2>GPTラベルをつける</h2>
+
+<p><code># parted /dev/sda<br/>
+(parted) mklabel gpt<br/>
+(parted) quit<br/>
+# parted /dev/sdb<br/>
+(parted) mklabel gpt<br/>
+(parted) quit</code></p>
+
+<h2>既存のパーティションを削除する</h2>
+
+<p>
+今回は既存のパーティションがGPTではなかったので、この作業は必要ない。
+もし必要なら以下のようにする。
+</p>
+
+<p><code># parted /dev/sda<br/>
+(parted) print<br/>
+(parted) rm 1<br/>
+(parted) rm 2<br/>
+...</code></p>
+
+<p><code># parted /dev/sdb<br/>
+(parted) print<br/>
+(parted) rm 1<br/>
+(parted) rm 2<br/>
+...</code></p>
+
+<h2>パーティションの作成</h2>
+
+<p>まずは/dev/sdaから始める。</p>
+
+<p><code># parted /dev/sda</code></p>
+
+<p>
+/dev/sda1を6GBで作成しようとしたが、
+実際のサイズは8GBより小さいので5500MBとした。
+</p>
+
+<p><code>(parted) unit mib<br/>
+(parted) mkpart primary 1 5500<br/>
+(parted) name 1 root<br/>
+(parted) set 1 bios_grub on<br/>
+(parted) print</code></p>
+
+<p>/dev/sda2は残り全部。SWAPファイルシステムとする。</p>
+
+<p><code>(parted) mkpart primary 5500 -1<br/>
+(parted) name 2 swap<br/>
+(parted) print</code></p>
+
+<p>次に/dev/sdbはまるまる1つをそのままパーティションにする。</p>
+
+<p><code>parted /dev/sdb<br/>
+(parted) unit mib<br/>
+(parted) mkpart primary 1 -1<br/>
+(parted) name 1 usr<br/>
+(parted) print</code></p>
+
+<h2>ファイルシステムの作成</h2>
+
+<p>
+いろいろなファイルシステムがあり、それぞれ特徴があるようだが、
+ここではext4を採用することにする。
+</p>
+
+<p><code># mkfs.ext4 /dev/sda1</code></p>
+
+<p><code># mkfs.ext4 /dev/sdb1</code></p>
+
+<h2>swapパーティションの作成と有効化</h2>
+
+<p><code># mkswap /dev/sda2<br/>
+# swapon /dev/sda2<br/>
+# free -h</code></p>
+
+<h2>マウントする</h2>
+
+<p><code># mount /dev/sda1 /mnt/gentoo<br/>
+# mkdir /mnt/gentoo/usr<br/>
+# mount /dev/sdb1 /mnt/gentoo/usr</code></p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/boot_from_cd.html"
+	>「インストールCDからのブート」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900/stage3.html"
+	>「Stage3」へ</a>
+</p>

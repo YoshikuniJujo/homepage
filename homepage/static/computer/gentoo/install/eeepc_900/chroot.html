@@ -1,0 +1,82 @@
+Gentoo LinuxのEee PC 900へのインストール: chroot: 新しいシステムに入る
+
+<p>(工事中 90%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+chrootを使って/mnt/gentoo/ディレクトリを/とする環境に入り
+インストールを続ける。
+そのために、いくつかの準備が必要となる。
+</p>
+
+<h2>ミラーサイトの設定</h2>
+
+<p>
+<a href="https://wiki.gentoo.org/wiki/Handbook:X86/Installation/Base#Optional:_Selecting_mirrors"
+>HandbookのSlecting mirrors</a>によるとmirrorselectは
+使わなくなっていく方向とのこと。
+よって、ミラーサイトの設定は飛ばすことにする。
+</p>
+
+<h2>DNS情報のコピー</h2>
+
+<p>
+DNS情報をコピーする必要がある。
+/etc/resolv.confを/mnt/gentoo/etc/にコピーすれば良い。
+cpに-Lオプションを与えることで、
+/etc/resolv.confがシンボリックリンクであったとしても、
+実体のほうをコピーすることができる。
+</p>
+
+<p><code>cp -L /etc/resolv.conf /mnt/gentoo/etc/</code></p>
+
+<h2>必要なファイルシステムのマウント</h2>
+
+<h3>/proc/</h3>
+
+<p>
+/proc/にマウントされるのは疑似的なファイルシステムであり、
+Linuxカーネルからの情報を参照するのに使われる。
+</p>
+
+<h3>/sys/</h3>
+
+<p>
+/proc/と似たようなもの。
+/proc/を置き換えることが意図されていた。
+/proc/よりも構造化されている。
+</p>
+
+<h3>/dev/</h3>
+
+<p>
+udev等のデバイスマネージャーによって扱われるファイルシステム。
+すべてのデバイスファイルが含まれる。
+</p>
+
+<h3>実際のマウント</h3>
+
+<p><code>mount -t proc proc /mnt/gentoo/proc<br/>
+mount --rbind /sys /mnt/gentoo/sys<br/>
+mount --make-rslave /mnt/gentoo/sys<br/>
+mount --rbind /dev /mnt/gentoo/dev<br/>
+mount --make-rslave /mnt/gentoo/dev</code></p>
+
+<h2>新しい環境へと移行する</h2>
+
+<p>
+CDからブートされた環境から、
+ディスク上のファイルシステムをルートとする環境への移行を行う。
+</p>
+
+<p><code># chroot /mnt/gentoo /bin/bash<br/>
+# source /etc/profile<br/>
+# export PS1="(chroot) $PS1"</code></p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/stage3.html"
+	>「Stage 3:基本となるファイルの設置」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900/portage_tree.html"
+	>「Portage樹のインストール」へ</a>
+</p>

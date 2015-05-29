@@ -1,0 +1,142 @@
+Gentoo LinuのEee PC 900へのインストール: Stage3
+
+<p>(工事中 90%)</p>
+
+<h2>日付と時刻の修正</h2>
+
+<p>日付や時刻が正しい値でないとインストールの過程で問題が生じることがある。</p>
+
+<p><code># date<br/>
+Fri May 29 12:58:39 UTC 2015</code></p>
+
+<p>ntp-clientデーモンを使って時刻を合わせる。</p>
+
+<p><code># /etc/init.d/ntp-client start<br/>
+ * Setting clock via the NTP client 'ntpdate' ...<br/>
+# date<br/>
+Fri May 29 12:45:20 UTC 2015</code></p>
+
+<p>不要だがついでにハードウェアクロックも合わせておく。</p>
+
+<p><code># hwclock<br/>
+Fri May 29 13:02:51 2015 -0.376930 seconds<br/>
+# hwclock --systohc<br/>
+# hwclock<br/>
+Fri May 29 12:50:41 -0.502429 seconds</code></p>
+
+<h2>マウントしたディレクトリへ移動</h2>
+
+<p><code># cd /mnt/gentoo</code></p>
+
+<h2>Stage 3のtarボールをダウンロードする</h2>
+
+<p><a href="https://www.gentoo.org/downloads/mirrors/#JP"
+>Gentooのミラー(日本)</a>からJAISTを選び</p>
+
+<p><code>links https://www.gentoo.org/downloads/mirrors/#JP</code></p>
+
+<p>以下のファイルを取得する。</p>
+
+<p>releases/x86/autobuilds/current-stage3-i686/stage3-i686-20150526.tar.bz2</p>
+
+<p>releases/x86/autobuilds/current-stage3-i686/stage3-i686-20150526.tar.bz2.DIGESTS.asc</p>
+
+<h3>ハッシュファイルの検証</h3>
+
+<p><code>% gpg --recv-keys 0xBB572E0E2D182910<br/>
+% gpg --verify stage3-i686-20150526tar.bz2.DIGESTS.asc<br/>
+...<br/>
+Primary key fingerprint: 13EB BDBE DE7A 1277 5DFD  B1BA BB57 2E0E 2D18 2910</code></p>
+
+<p><code># gpg --verify stage3-i686-20150526.tar.bz2.DIGESTS.asc</code></p>
+
+<h2>Stage 3ファイルの解凍と設置</h2>
+
+<p><code># pwd<br/>
+/mnt/gentoo<br/>
+# tar xvjpf stage3-i686-20150526.tar.bz2 --xattrs</code></p>
+
+<h2>コンパイルオプションの説明</h2>
+
+<p>ここでコンパイル時にmakeやgccに渡されるオプションを設定する。</p>
+
+<h3>CFLAGSとCXXFLAGS</h3>
+
+<h4>-march=または-mtune=</h4>
+
+<p>
+mtuneは指定されたCPU向けに最適化するフラグ。
+marchは指定されたCPU「だけ」で動作するコードを作成するフラグ。
+いろいろなCPUの名前を指定できるが、
+コンパイルするマシンと実行するマシンが同じならば、
+nativeを設定しておけば良い。
+</p>
+
+<h4>-Oフラグ</h4>
+
+<p>
+どのくらい最適化するかを指定するフラグ。
+s, 0, 1, 2, 3のどれかの値を取る。
+-O3では問題が生じることがわかっている。
+-O2がお勧め。
+</p>
+
+<h4>-pipe</h4>
+
+<p>
+一時ファイルを作る代わりにパイプを使用する。
+より多くのメモリーを使用する。
+コンパイル中にメモリーが足りなくなるようなら、このフラグを削除すると良い。
+</p>
+
+<h4>-fomit-frame-pointer</h4>
+
+<p>
+C/C++では関数を呼び出す際に引数を指し示すためのフレームポインタが設定される。
+このフレームポインタが不要な場合にこれを設定しないようにするフラグ。
+この最適化を行うとデバッガを使ったバイナリファイルのデバッグは不可能となる。
+</p>
+
+<h4>CFLAGS</h4>
+
+<p>結果として以下のような値となるだろう。</p>
+
+<p><code>CFLAGS="-march=native -O2 -pipe"</code></p>
+
+<h4>CXXFLAGS</h4>
+
+<p>CXXFLAGSはCFLAGSと同じでかまわないので</p>
+
+<p><code>CXXFLAGS="${CFLAGS}"</code></p>
+
+<h3>MAKEOPTS</h3>
+
+<p>
+MAKEOPTSでは-jオプションに数を続けることで並行して走るコンパイルプロセスの数を
+指定できる。
+目安としてはCPUの数に1を足したものと言われている。
+</p>
+
+<p><code>MAKEOPTS="-j2"</code></p>
+
+<h2>コンパイルオプションの設定</h2>
+
+<p>上記で説明した値を実際に設定ファイルに書き込もう。</p>
+
+<p><code>nano -w /mnt/gentoo/etc/portage/make.conf</code></p>
+
+<p>
+nanoというエディタを使って以下の値を書き込む。
+</p>
+
+<p><code>CFLAGS="-march=native -O2 -pipe"<br/>
+CXXFLAGS="${CFLAGS}"<br/>
+<br/>
+MAKEOPTS="-j2"</code></p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/prepare_disk.html"
+	>「ディスクの用意」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900/chroot.html"
+	>「新しいシステムに入る」へ</a>
+</p>

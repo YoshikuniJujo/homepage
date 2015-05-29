@@ -1,0 +1,120 @@
+Gentoo LinuxをEee PC 900へインストールする: インストールCDの作成
+
+<p>(工事中 0%)</p>
+
+<h2>ここですること</h2>
+
+<p>
+インストールCDを作成する。
+インストール作業はこのCDからブートした環境上で行っていくことになる。
+</p>
+
+<h2>参考にするページ</h2>
+
+<p>
+Gentoo LinuxのオフィシャルなページのHandbookを参考にする。
+CPUの種類によって分かれているので適切なページを選ぶ必要がある。
+たいていはx86かAMD64(x86_64)のどちらかを選べば良い。
+Eee PC 900はWikipediaによるとCeleron-M ULV 353相当とのこと。
+これの機能を見てみるとMMX, SSE, SSE2とあり、Intel 64がないので、
+x86のほうを参照すれば良いことがわかる。
+</p>
+
+<p>
+<a href="https://wiki.gentoo.org/wiki/Handbook:X86"
+	>Handbook:X86</a>
+(<a href="https://wiki.gentoo.org/wiki/Handbook:X86/ja">日本語版</a>)
+</p>
+
+<p>
+このHandbookのなかのCDを焼くところから始めよう。
+</p>
+
+<p>
+<a href="https://wiki.gentoo.org/wiki/Handbook:X86/Installation/Media"
+	>Handbook:X86/Installation/Media</a>
+(<a href="https://wiki.gentoo.org/wiki/Handbook:X86/Installation/Media/ja"
+	>日本語版</a>)
+</p>
+
+<h2>ISOイメージの取得</h2>
+
+<p>まずはミラーサイトを選ぼう。</p>
+
+<p><a href="https://www.gentoo.org/downloads/mirrors/#JP">日本のミラー</a></p>
+
+<p>ミラーサイトから以下のように「MinimalインストールCD」のISOイメージを探す。</p>
+
+<p>releases/x86/autobuilds/current-iso/install-x86-minimal-XXXXXXXX.iso</p>
+
+<p>ファイルが破損していないかを確かめるために以下のファイルもダウンロードする。</p>
+
+<p>releases/x86/autobuilds/current-iso/install-x86-minimal-XXXXXXXX.iso.DIGESTS.asc</p>
+
+<h3>実際には</h3>
+
+<p>実際にはJAISTの場合以下のようになっていた。</p>
+
+<p>releases/x86/autobuilds/current-install-x86-minimal/install-x86-minimal-20150526.iso</p>
+<p>releases/x86/autobuilds/current-install-x86-minimal/install-x86-minimal-20150526.iso.DIGESTS.asc</p>
+
+<h2>デジタル署名の検証</h2>
+
+<p><code>% gpg --recv-keys 0xBB572E0E2D182910<br/>
+% gpg --verify install-x86-minimal-20150526.iso.DIGESTS.asc<br/>
+...<br/>
+Primary key fingerprint: 13EB BDBE DE7A 1277 5DFD  B1BA BB57 2E0E 2D18 2910</code></p>
+
+<p>
+フィンガープリントが表示されるので<a
+href="https://www.gentoo.org/downloads/signatures/"
+>Gentooの署名のページ</a>でチェックする。
+</p>
+
+<h2>ファイルの完全性の確認</h2>
+
+<p>
+SHA512チェックサムを確認する。
+以下の2つのコマンドの結果を比較する。
+</p>
+
+<p><code>% grep -A 1 -i sha512
+install-x86-minimal-20150526.iso.DIGESTS.asc<br/>
+# SHA512HASH<br/>
+b2df48...63cf39 install-x86-minimal-20150526.iso<br/>
+--<br/>
+# SHA512HASH<br/>
+9c35a8...fb00ed install-x86-minimal-20150526.iso.CONTENTS<br/>
+</code></p>
+
+<p><code>% sha512sum install-x86-minimal-20150526.iso<br/>
+b2df48...63cf39 install-x86-minimal-20150526.iso</code></p>
+
+<h2>CD-Rへの書き込み</h2>
+
+<p>用意したCD-Rを挿入したうえで以下のようにする。</p>
+
+<p><code>% cdrecord install-minimal-20150526.iso</code></p>
+
+<p>
+インストールCDが焼けたことを確認してみよう。
+/mnt/freeは適当なマウントポイントに読み変えること。
+</p>
+
+<p><code>% sudo mount /dev/cdrom /mnt/free<br/>
+% ls /mnt/free<br/>
+README.txt gentoo.efimg gentoo.efimg.mountPoint image.squashfs isolinux livecd<br/>
+% sudo eject</code></p>
+
+<p>
+CDにラベルをつけよう。
+マジックペンでinstall-x86-minimal-20150526.isoと書いておく。
+念のためSHA512HASH: b2df48...63cf39も書いておくことにする。
+</p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/prepare.html"
+	>「用意するもの」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900/boot_from_cd.html"
+	>「インストールCDからのブート」へ</a>
+</p>

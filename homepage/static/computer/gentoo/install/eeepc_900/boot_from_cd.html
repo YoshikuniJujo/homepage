@@ -1,0 +1,52 @@
+Gentoo LinuxのEee PC 900へのインストール: インストールCDからのブート
+
+<p>(工事中 90%)</p>
+
+<h2>Eee PC本体の用意</h2>
+
+<ol>
+<li>電源を接続する</li>
+<li>有線LANを接続する</li>
+<li>キーボードを接続する</li>
+<li>USB CD(DVD)-ROMドライバを接続する
+	<ol>
+	<li>インストールCDを挿入する</li>
+	</ol></li>
+</ol>
+
+<h2>ブート</h2>
+
+<ol>
+<li>電源を入れる</li>
+<li>「boot: 」という表示が出たらキーボードから適当なキーを入力する
+	<ul>
+	<li>キーを押さないで15秒たつとディスクからブートしてしまう</li>
+	</ul></li>
+<li>ルートでログインしたコンソールが表示される
+	<ul>
+	<li>livecd ~ # </li>
+	</ul></li>
+</ol>
+
+<h2>ネットワーク接続の確認</h2>
+
+<p>
+DHCPが適切に動いている環境であればこの時点でネットに接続できているはずだ。
+pingで確認してみよう。
+</p>
+
+<p><code># ping gentoo.org -c 3<br/>
+PING gentoo.org ...<br/>
+64 byte from www.gentoo.org ...<br/>
+64 byte from www.gentoo.org ...<br/>
+64 byte from www.gentoo.org ...<br/>
+<br/>
+--- gentoo.org ping statistics ---<br/>
+3 packets transmitted, 3 recieved, ...</code></p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/make_install_cd.html"
+	>「インストールCDの作成」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900/prepare_disk.html"
+	>「ディスクの準備」へ</a>
+</p>
