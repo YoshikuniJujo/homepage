@@ -1,0 +1,10 @@
+{
+"name": "brainkanji",
+"description": "kanji brainf*ck",
+"launch_path": "/brainkanji.html",
+"developer": {
+	"name": "Yoshikuni Jujo",
+	"url": "https://skami.iocikun.jp" },
+"package_path": "https://skami.iocikun.jp/test/brainkanji/brainkanji.zip",
+"version": "0.2.0.0"
+}

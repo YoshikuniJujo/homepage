@@ -1,0 +1,10 @@
+brainkanji installer
+
+<p>brainkanji installer</p>
+
+<script>
+var manifestUrl = 'https://skami.iocikun.jp/test/brainkanji/package.manifest';
+var req = navigator.mozApps.installPackage(manifestUrl);
+req.onsuccess = function() { alert(req.result.origin); }
+req.onerror = function() { alert(req.error.name); }
+</script>
