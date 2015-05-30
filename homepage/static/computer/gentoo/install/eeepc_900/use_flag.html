@@ -1,0 +1,269 @@
+Gentoo LinuxのEee PC 900へのインストール: USEフラグの設定
+
+<p>(工事中 0%)</p>
+
+<h2>USEフラグとは</h2>
+
+<p>
+USEフラグこそが他のディストリビューションとは一線を画すGentooオリジナルな機能
+とも言える。
+USEフラグを指定することでコンパイル段階で、
+それぞれのソフトウェアがどの機能を含み、どの機能を含まないかを決めることができる。
+また、GentooはUSEフラグも加味したうえでパッケージの依存関係を計算してくれる。
+</p>
+
+<p>
+パッケージレベルでも、パッケージ内のコードレベルでも、
+自分の求めるシステムにとって必要なものだけを残し、不要なものを削ることができる。
+システムを自分の色に染めるための強力な道具である。
+</p>
+
+<h2>USEフラグのピックアップ</h2>
+
+<p>個人的に必要かまたは興味のあるUSEを分類しながら抽出する。</p>
+
+<h3>ネットワーク関連</h3>
+
+<h4>今回有効にするもの</h4>
+
+<ul>
+<li>clamav: Clam AntiVirusのサポート</li>
+<li>cracklib: cracklib強力パスワードチェックのサポート</li>
+<li>crypt: 暗号化のサポート(mcryptやgpgを使う)</li>
+<li>curl: client側におけるURL変換ライブラリのサポート</li>
+<li>ftp: FTPのサポートの追加</li>
+<li>ipv6: IP version 6のサポート</li>
+<li>mime: MIMEのサポート</li>
+<li>nsplugin: Netscapeプラグインアーキテクチャによるブラウザへのプラグイン</li>
+<li>rss: RSSフィードのサポート</li>
+<li>sasl: Simple Authentication and Security Layerのサポート</li>
+<li>ssl: SSLのサポート</li>
+<li>wifi: ワイアレスネットワークを有効化</li>
+<li>xmpp: XMPPのサポート</li>
+</ul>
+
+<h4>今回デフォルトの設定にするもの</h4>
+
+<ul>
+<li>apache2: apache2のサポート</li>
+<li>jabber: jabber IMプロトコルのサポート</li>
+<li>jingle: jabberの音声通話を有効にする</li>
+<li>msn: MSNメッセンジャーのサポート</li>
+</ul>
+
+<h4>検討中のもの</h4>
+
+<ul>
+<li>cgi: CGIスクリプトのサポート</li>
+<li>fastcgi: FastCGIインターフェースのサポート</li>
+<li>imap: IMAPのサポート</li>
+<li>kerberos: kerberosのサポート</li>
+<li>maildir: maildirスタイル(~/.maildir)のメール箱のサポート</li>
+<li>mbox: mboxスタイル(/var/spool/mail)のメール箱のサポート</li>
+<li>milter: sendmailのメールフィルターをサポート</li>
+<li>mozilla: Mozillaブラウザのサポート</li>
+<li>qmail-spp: qmail SMTPプラグインのサポート</li>
+<li>sockets: tcp/ipソケットのサポート</li>
+<li>tcpd: TCPラッパーのサポート</li>
+</ul>
+
+<h3>GUI関連</h3>
+
+<h4>今回有効化するもの</h4>
+
+<ul>
+<li>X: X11のサポート</li>
+<li>cairo: cairoグラフィックのサポート</li>
+<li>fontconfig: media-libs/fontconfigによるフォントの設定やカスタマイズのサポート</li>
+<li>glut: GLUTライブラリを使ってOpenGLプラグインを作成する</li>
+<li>gpm: sys-libs/gpm(コンソール上でのマウスドライバー)のサポート</li>
+<li>gtk: gtk+のサポート</li>
+<li>opengl: OpenGLのサポート</li>
+<li>startup-notification: アプリケーション開始のフィードバック機構を有効化</li>
+<li>wxwidgets: wxWidgets/wxGTK GUIツールキットのサポート</li>
+<li>xcb: X C-language Bindingのサポート。Xlibを置き換える</li>
+<li>xft: XFTフォントレンダラーのサポート</li>
+<li>xinerama: xinerama X11拡張のサポート</li>
+<li>xscreensaver: XScreenSaver拡張のサポート</li>
+</ul>
+
+<h4>今回デフォルトの設定にするもの</h4>
+
+<ul>
+<li>fbcon: カーネルによるコンソールにおけるframebufferのサポート</li>
+</ul>
+
+<h4>検討中のもの</h4>
+
+<ul>
+</ul>
+
+<h3>CPUの拡張命令</h3>
+
+<p>これについてはcat /proc/cpuinfoを参照して決める。</p>
+
+<p><code># cat /proc/cpuinfo<br/>
+...<br/>
+flags: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov clflush
+dts acpi mmx fxsr sse sse2 ss tm pbe nx bts<br/>
+...
+</code></p>
+
+<h4>今回有効化するもの</h4>
+
+<ul>
+<li>mmx: MMX命令セットのサポート</li>
+<li>sse: SSE命令セットのサポート</li>
+<li>sse2: SSE2命令セットのサポート</li>
+</ul>
+
+<h4>今回デフォルトの設定にするもの</h4>
+
+<ul>
+<li>3dnow: 3DNow!命令セットのサポート</li>
+<li>3dnowext: 拡張3DNow!命令セットのサポート</li>
+<li>mmxext: 拡張MMX命令セットのサポート</li>
+<li>sse3: SSE3命令セットのサポート</li>
+<li>ssse3: SSSE3命令セットのサポート</li>
+<li>sse4_1: SSE4.1命令セットのサポート</li>
+</ul>
+
+<h3>その他のハードウェア関連</h3>
+
+<h4>今回有効化するもの</h4>
+
+<ul>
+<li>acpi: ACPIのサポート</li>
+<li>alsa: ALSAのサポート</li>
+<li>cdr: CDへの書き込みのサポート</li>
+<li>cups: CUPSのサポート</li>
+<li>dbus: dbusのサポート</li>
+<li>dvd: DVDのサポート</li>
+<li>dvdr: DVDの書き込みのサポート</li>
+<li>foomaticdb: プリンタドライバのデータベースfoomaticのサポート</li>
+<li>lm_sensors: lm_sensorsというLinuxのハードウェアセンサーのサポート</li>
+<li>oss: OSSのサポート</li>
+<li>pulseaudio: PulseAudioのサポート</li>
+<li>scanner: スキャナのサポート</li>
+<li>udev: udevを有効化</li>
+<li>udisks: ストレージ管理の有効化</li>
+<li>upower: パワーマネージメントのサポート</li>
+<li>usb: USBのサポート</li>
+<li>v4l: video4linuxのサポート</li>
+</ul>
+
+<h4>今回デフォルトの設定にするもの</h4>
+
+<ul>
+<li>css: 暗号化されたDVDを読む</li>
+<li>smp: マルチプロセッサやマルチコアシステムのサポート</li>
+<li>timidity: MIDIシーケンサのTimidity++のサポート</li>
+<li>vnc: VNCのサポート</li>
+</ul>
+
+<h4>検討中のもの</h4>
+
+<ul>
+</ul>
+
+<h3>プログラミング言語関連</h3>
+
+<ul>
+<li>cscope: vimなどでcscopeを使用する</li>
+<li>cxx: C++のビルドのサポート</li>
+<li>gcj: gcjによるビルドを有効にする</li>
+<li>guile: guileのサポート</li>
+<li>hscolour: haskellのソースコードを色分けする</li>
+<li>java: Javaのサポート</li>
+<li>java6: パッケージのビルドにJava 1.6を使う</li>
+<li>javascript: javascriptのサポート</li>
+<li>jit: just-in-time compilationを有効にする</li>
+<li>lua: Lua言語を有効にする</li>
+<li>pcre: Perl互換の正規表現のサポート</li>
+<li>perl: 追加のPerlのサポート</li>
+<li>python: Pythonのサポート</li>
+<li>ruby: Rubyのサポート</li>
+<li>vim-syntax: vim構文スクリプトを追加する</li>
+</ul>
+
+<h3>ファイルフォーマット関連</h3>
+
+<ul>
+<li>bzip2: bzlibのサポート</li>
+<li>exif: JPEGのEXIFの読み込みのサポート</li>
+<li>gzip: gzipによる圧縮のサポート</li>
+<li>imagemagick: Imagemagickによる画像の変換を有効にする</li>
+<li>imlib: imlibのサポートを追加</li>
+<li>jpeg: JPEG画像のサポート</li>
+<li>jpeg2k: JPEG 2000のサポート</li>
+<li>latex: LaTeXのサポート</li>
+<li>mng: libmngのサポート(MNG画像)</li>
+<li>mp3: mp3ファイルの読み込みのサポート</li>
+<li>mpeg: libmpeg3のサポート</li>
+<li>pdf: PDFのサポート</li>
+<li>png: libpngのサポート(PNG画像)</li>
+<li>postscript: PostScriptのサポート</li>
+<li>svg: SVGのサポート</li>
+<li>svga: SVGAlib(グラフィックライブラリ)のサポート</li>
+<li>tiff: TIFF画像形式のサポート</li>
+<li>xml: XMLファイルのサポート</li>
+<li>xpm: XPM画像形式のサポート</li>
+<li>zlib: zlib圧縮・解凍のサポート</li>
+</ul>
+
+<h3>国際化関連</h3>
+
+<ul>
+<li>cjk: 多バイト文字(中国語、日本語、韓国語)のサポート</li>
+<li>iconv: iconvによる文字コードの変換を有効にする</li>
+<li>m17n-lib: m17n-libのサポート</li>
+<li>migemo: 日本語のためにmigemoのサポートを有効にする</li>
+<li>nls: Native Language Support</li>
+<li>unicode: Unicodeのサポート</li>
+</ul>
+
+<h3>その他</h3>
+
+<ul>
+<li>debug: debug用のコードを含める</li>
+<li>doc: 追加のドキュメントをインストールする(グローバルには指定しない)</li>
+<li>emacs: GNU Emacsのサポート</li>
+<li>examples: コード例等のインストール</li>
+<li>gimp: GIMPのプラグインを作成する</li>
+<li>git: gitを有効にする</li>
+<li>hardened: ツールチェインのセキュリティを固くする</li>
+<li>ldap: LDAPのサポート</li>
+<li>libedit: readlineの代わりにlibeditを使う</li>
+<li>libffi: Foreign Function Interfaceライブラリのサポート</li>
+<li>memlimit: メモリ使用の限界を追加</li>
+<li>minimal: 小さくビルドする</li>
+<li>mmap: mmap (memory map)のサポート</li>
+<li>modules: カーネルモジュールの作成</li>
+<li>mplayer: mplayerのサポート</li>
+<li>ncurses: ncursesのサポート</li>
+<li>pam: PAMのサポート - DANGEROUS to arbitrarily flip</li>
+<li>posix: POSIX互換の機能のサポート</li>
+<li>postgres: postgresqlデータベースのサポート</li>
+<li>profile: ソフトウェアのパフォーマンスの分析をサポート</li>
+<li>readline: libreadlineのサポート</li>
+<li>savedconfig: 設定を保存する</li>
+<li>skey: S/Key(単回使用パスワード)認証のサポート</li>
+<li>sound: 音のサポート</li>
+<li>source: zip圧縮したソースコードをインストールする</li>
+<li>sqlite: sqliteのサポート</li>
+<li>sqlite3: sqlite3のサポート</li>
+<li>subversion: subversionを有効化</li>
+<li>suid: setuid rootプログラムを有効化 - セキュリティリスクの可能性もある</li>
+<li>symlink: カーネルを更新したときに/usr/src/linuxリンクファイルも更新する</li>
+<li>syslog: syslogのサポート</li>
+<li>systemd: systemdのサポート</li>
+<li>threads: スレッドのサポート。たいていはpthreads</li>
+<li>zsh-complition: zsh補完の有効化</li>
+</ul>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/portage_tree.html"
+	>「Portage樹のインストール」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900"
+	>「Eee PC 900へのインストール」トップへ</a>
+</p>
