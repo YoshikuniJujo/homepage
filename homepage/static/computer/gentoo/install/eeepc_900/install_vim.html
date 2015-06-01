@@ -1,0 +1,47 @@
+Gentoo LinuxのEee PC 900へのインストール: vimのインストール
+
+<p>(工事中 90%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+いろいろな設定作業においてnanoを使うのがめんどくさいのでここでvimをインストール
+してしまおう。
+</p>
+
+<h2>vimのインストール</h2>
+
+<p>まずはvimとともに何がインストールされるかをチェックする。</p>
+
+<p><code># emerge -pv vim</code></p>
+
+<p>
+37個のパッケージがインストールされるようだ。
+今はvimだけあれば良いのでUSEから変数をいくつか無効にして試みる。
+</p>
+
+<p><code># USE="-X" emerge -pv vim</code></p>
+
+<p>
+こうすると20個に減る。
+</p>
+
+<p><code># USE="-X -ruby" emerge -pv vim</code></p>
+
+<p>
+さらに9個に減る。
+だいたい良さそうなのでこの設定でインストールすることにする。
+</p>
+
+<p><code># USE="-X -ruby" emerge -av vim</code></p>
+
+<p>
+お茶でも飲みながら待つ。
+</p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/use_flag.html"
+	>「USEフラグ」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900"
+	>「Eee PC 900へのインストール」トップへ</a>
+</p>

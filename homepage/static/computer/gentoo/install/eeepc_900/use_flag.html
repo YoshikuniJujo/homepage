@@ -1,6 +1,6 @@
 Gentoo LinuxのEee PC 900へのインストール: USEフラグの設定
 
-<p>(工事中 0%)</p>
+<p>(工事中 90%)</p>
 
 <h2>USEフラグとは</h2>
 
@@ -168,14 +168,11 @@ dts acpi mmx fxsr sse sse2 ss tm pbe nx bts<br/>
 
 <h3>プログラミング言語関連</h3>
 
+<h4>今回有効にするもの</h4>
+
 <ul>
 <li>cscope: vimなどでcscopeを使用する</li>
-<li>cxx: C++のビルドのサポート</li>
-<li>gcj: gcjによるビルドを有効にする</li>
-<li>guile: guileのサポート</li>
 <li>hscolour: haskellのソースコードを色分けする</li>
-<li>java: Javaのサポート</li>
-<li>java6: パッケージのビルドにJava 1.6を使う</li>
 <li>javascript: javascriptのサポート</li>
 <li>jit: just-in-time compilationを有効にする</li>
 <li>lua: Lua言語を有効にする</li>
@@ -186,7 +183,24 @@ dts acpi mmx fxsr sse sse2 ss tm pbe nx bts<br/>
 <li>vim-syntax: vim構文スクリプトを追加する</li>
 </ul>
 
+<h4>今回デフォルトの設定にするもの</h4>
+
+<ul>
+<li>cxx: C++のビルドのサポート</li>
+<li>gcj: gcjによるビルドを有効にする</li>
+<li>java: Javaのサポート</li>
+<li>java6: パッケージのビルドにJava 1.6を使う</li>
+</ul>
+
+<h4>検討中のもの</h4>
+
+<ul>
+<li>guile: guileのサポート</li>
+</ul>
+
 <h3>ファイルフォーマット関連</h3>
+
+<h4>今回有効にするもの</h4>
 
 <ul>
 <li>bzip2: bzlibのサポート</li>
@@ -204,66 +218,122 @@ dts acpi mmx fxsr sse sse2 ss tm pbe nx bts<br/>
 <li>png: libpngのサポート(PNG画像)</li>
 <li>postscript: PostScriptのサポート</li>
 <li>svg: SVGのサポート</li>
-<li>svga: SVGAlib(グラフィックライブラリ)のサポート</li>
 <li>tiff: TIFF画像形式のサポート</li>
 <li>xml: XMLファイルのサポート</li>
 <li>xpm: XPM画像形式のサポート</li>
 <li>zlib: zlib圧縮・解凍のサポート</li>
 </ul>
 
+<h4>今回デフォルトの設定にするもの</h4>
+
+<ul>
+</ul>
+
+<h4>検討中のもの</h4>
+
+<ul>
+<li>svga: SVGAlib(グラフィックライブラリ)のサポート</li>
+</ul>
+
 <h3>国際化関連</h3>
+
+<h4>今回有効にするもの</h4>
 
 <ul>
 <li>cjk: 多バイト文字(中国語、日本語、韓国語)のサポート</li>
 <li>iconv: iconvによる文字コードの変換を有効にする</li>
 <li>m17n-lib: m17n-libのサポート</li>
-<li>migemo: 日本語のためにmigemoのサポートを有効にする</li>
 <li>nls: Native Language Support</li>
 <li>unicode: Unicodeのサポート</li>
 </ul>
 
+<h4>今回デフォルトの設定にするもの</h4>
+
+<ul>
+<li>migemo: 日本語のためにmigemoのサポートを有効にする</li>
+</ul>
+
+<h4>検討中のもの</h4>
+
+<ul>
+</ul>
+
 <h3>その他</h3>
+
+<h4>今回有効にするもの</h4>
+
+<ul>
+<li>git: gitを有効にする</li>
+<li>modules: カーネルモジュールの作成</li>
+<li>ncurses: ncursesのサポート</li>
+<li>postgres: postgresqlデータベースのサポート</li>
+<li>profile: ソフトウェアのパフォーマンスの分析をサポート</li>
+<li>skey: S/Key(単回使用パスワード)認証のサポート</li>
+<li>sound: 音のサポート</li>
+<li>sqlite: sqliteのサポート</li>
+<li>sqlite3: sqlite3のサポート</li>
+<li>zsh-complition: zsh補完の有効化</li>
+</ul>
+
+<h4>今回デフォルトの設定にするもの</h4>
 
 <ul>
 <li>debug: debug用のコードを含める</li>
 <li>doc: 追加のドキュメントをインストールする(グローバルには指定しない)</li>
 <li>emacs: GNU Emacsのサポート</li>
-<li>examples: コード例等のインストール</li>
-<li>gimp: GIMPのプラグインを作成する</li>
-<li>git: gitを有効にする</li>
-<li>hardened: ツールチェインのセキュリティを固くする</li>
-<li>ldap: LDAPのサポート</li>
 <li>libedit: readlineの代わりにlibeditを使う</li>
-<li>libffi: Foreign Function Interfaceライブラリのサポート</li>
-<li>memlimit: メモリ使用の限界を追加</li>
 <li>minimal: 小さくビルドする</li>
-<li>mmap: mmap (memory map)のサポート</li>
-<li>modules: カーネルモジュールの作成</li>
-<li>mplayer: mplayerのサポート</li>
-<li>ncurses: ncursesのサポート</li>
-<li>pam: PAMのサポート - DANGEROUS to arbitrarily flip</li>
-<li>posix: POSIX互換の機能のサポート</li>
-<li>postgres: postgresqlデータベースのサポート</li>
-<li>profile: ソフトウェアのパフォーマンスの分析をサポート</li>
 <li>readline: libreadlineのサポート</li>
-<li>savedconfig: 設定を保存する</li>
-<li>skey: S/Key(単回使用パスワード)認証のサポート</li>
-<li>sound: 音のサポート</li>
 <li>source: zip圧縮したソースコードをインストールする</li>
-<li>sqlite: sqliteのサポート</li>
-<li>sqlite3: sqlite3のサポート</li>
 <li>subversion: subversionを有効化</li>
 <li>suid: setuid rootプログラムを有効化 - セキュリティリスクの可能性もある</li>
 <li>symlink: カーネルを更新したときに/usr/src/linuxリンクファイルも更新する</li>
-<li>syslog: syslogのサポート</li>
 <li>systemd: systemdのサポート</li>
-<li>threads: スレッドのサポート。たいていはpthreads</li>
-<li>zsh-complition: zsh補完の有効化</li>
 </ul>
+
+<h4>検討中のもの</h4>
+
+<ul>
+<li>examples: コード例等のインストール</li>
+<li>gimp: GIMPのプラグインを作成する</li>
+<li>hardened: ツールチェインのセキュリティを固くする</li>
+<li>ldap: LDAPのサポート</li>
+<li>libffi: Foreign Function Interfaceライブラリのサポート</li>
+<li>memlimit: メモリ使用の限界を追加</li>
+<li>mmap: mmap (memory map)のサポート</li>
+<li>mplayer: mplayerのサポート</li>
+<li>pam: PAMのサポート - DANGEROUS to arbitrarily flip</li>
+<li>posix: POSIX互換の機能のサポート</li>
+<li>savedconfig: 設定を保存する</li>
+<li>syslog: syslogのサポート</li>
+<li>threads: スレッドのサポート。たいていはpthreads</li>
+</ul>
+
+<h2>USE変数の設定</h2>
+
+<p>上の「今回有効にするもの」をUSE変数に設定する。</p>
+
+<p><code>nano -w /etc/portage/make.conf</code></p>
+
+<p>USE="..."を以下のように修正する。</p>
+
+<p><code>USE="bindist \<br/>
+clamav cracklib crypt curl ftp ipv6 mime nsplugin rss \<br/>
+sasl ssl wifi xmpp X cairo fontconfig glut gpm gtk opengl \<br/>
+startup-notification wxwidgets xcb xft xinerama \<br/>
+xscreensaver mmx sse sse2 acpi alsa cdr cups dbus dvd dvdr \<br/>
+foomaticdb lm_sensors oss pulseaudio scanner udev udisks \<br/>
+upower usb v4l cscope hscolour javascript jit lua pcre \<br/>
+perl python ruby vim-syntax bzip2 exif gzip imagemagick \<br/>
+imlib jpeg jpeg2k latex mng mp3 mpeg pdf png postscript \<br/>
+svg tiff xml xpm zlib cjk iconv m17n-lib nls unicode git \<br/>
+modules ncurses postgres profile skey sound sqlite sqlite3 \<br/>
+zsh-complition
+"</code></p>
 
 <p>
 <a href="/computer/gentoo/install/eeepc_900/portage_tree.html"
 	>「Portage樹のインストール」へもどる</a>
-<a href="/computer/gentoo/install/eeepc_900"
-	>「Eee PC 900へのインストール」トップへ</a>
+<a href="/computer/gentoo/install/eeepc_900/install_vim.html"
+	>「vimのインストール」へ</a>
 </p>

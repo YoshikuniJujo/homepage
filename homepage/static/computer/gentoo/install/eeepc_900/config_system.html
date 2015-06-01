@@ -1,0 +1,156 @@
+システムの設定
+
+<p>(工事中 0%)</p>
+
+<h2>fstabの作成</h2>
+
+<p>
+ブート時にマウントするパーティションを指定する等のために
+/etc/fstabファイルを作成する必要がある。
+</p>
+
+<h3>今回のパーティション構成</h3>
+
+<ul>
+<li>/ /dev/sda1</li>
+<li>/usr/ /dev/sdb1</li>
+<li>swap /dev/sda2</li>
+</ul>
+
+<h3>fstabファイルの6つのフィールド</h3>
+
+<ol>
+<li>パーティションのデバイスファイルへのパス</li>
+<li>マウントポイント</li>
+<li>ファイルシステムの種類</li>
+<li>マウントオプション</li>
+<li>ダンプが必要かどうか。普通は0にしておけば良い</li>
+<li>fsckがチェックする順番を決める
+	<ul>
+	<li>/は1とする</li>
+	<li>他はチェックが必要なパーティションは2とし</li>
+	<li>チェックが不要なパーティションは0とする</li>
+	</li></ul>
+</ol>
+
+<h3>fstabファイルの作成</h3>
+
+<p>もともと用意されている/etc/fstabを編集する。</p>
+
+<p><code># vi /etc/fstab</code></p>
+
+<p>以下のような内容にする。</p>
+
+<p><code>/dev/sda1 / ext4 noatime 0 1<br/>
+/dev/sdb1 /usr ext4 noatime 0 2<br/>
+/dev/sda2 none swap sw 0 0<br/>
+/dev/cdrom /mnt/cdrom auto noauto,ro 0 0
+</code></p>
+
+<h2>ネットワークの設定</h2>
+
+<h3>ホスト名とドメイン情報</h3>
+
+<p>
+PCの名前を決める。この名前は後から変えることができる。
+今回のPCには黒猫のシールがはってあるのでblack_catとしておく。
+</p>
+
+<p><code>vi /etc/conf.d/hostname<br/>
+hostname="black_cat"</code></p>
+
+<p>
+今回はドメイン名を指定する必要はない。
+ログイン時にhoge.(none)と表示されないように、以下のようにしておく。
+</p>
+
+<p><code>vi /etc/issue<br/>
+('.\O'を削除)</code></p>
+
+<h3>ネットワークへの接続の設定</h3>
+
+<p>
+最終的には有線LANの他にテザリングでも接続できるようにする。
+余力があれば無線LANの設定もしたい。
+しかし、現段階では有線LANのみを扱う。
+</p>
+
+<p>
+netifrcをインストールする。
+(このパッケージは比較的新しいようで僕は初めて見る)
+</p>
+
+<p><code># emerge --ask --noreplace net-misc/netifrc</code></p>
+
+<p>
+今回はすでにインストールされていたようだ。
+DHCPクライアントは後でインストールする。
+</p>
+
+<p>
+有線LANに関してはDHCPを使用することにする。
+まずは有線LANのインターフェース名を調べよう。
+</p>
+
+<p><code># ifconfig | less</code></p>
+
+<p>
+ここで表示されるインターフェースのうちenp3s0が有線LANのインターフェースのようだ。
+</p>
+
+<p><code># vi /etc/conf.d/net<br/>
+config_enp3s0="dhcp"</code></p>
+
+<p>/etc/init.d/net.enp3s0を作成する。</p>
+
+<p><code># cd /etc/init.d<br/>
+# ln -s net.lo net.enp3s0</code></p>
+
+<p>ブート時に自動でネットワークをつなげるためには以下のようにする。</p>
+
+<p><code># rc-update add net.enp3s0 default</code></p>
+
+<p>しかし、今回はブート後に明示的に
+/etc/init.d/net.enp3s0 startのようにすることにする。</p>
+
+<h3>カーネルに有線LANのドライバを追加</h3>
+
+<p>
+Eee PC 900のLANカードを認識させるためのドライバーを組み込むために、
+カーネルに追加の設定が必要となる。
+</p>
+
+<p><code># lspci | grep -i ethernet<br/>
+01:00.0 Ethernet controller: Qualcomm Atheros AR242x / AR542x Wireless Network Adapter (PCI-Express) (rev 01)<br/>
+03:00.0 Ethernet controller: Qualcomm Atheros Attansic L2 Fast Ethernet (rev a0)</code></p>
+
+<p>
+有線LANはQualcomm Atheros Attansic L2 Fast Ethernetという製品であるようだ。
+このカードのドライバを追加することにする。
+</p>
+
+<p><code># cd /usr/src/linux<br/>
+# make menuconfig<br/>
+Device Driver ---&gt;<br/>
+	[*] Network device support ---&gt;<br/>
+		[*] Ethernet driver support ---&gt;<br/>
+			[*] Atheros devices<br/>
+				&lt;*&gt; Atheros L2 Fast Ethernet support</code></p>
+
+<p>カーネルの再コンパイルとインストール</p>
+
+<p><code># make &amp;&amp; make modules_install<br/>
+# make install</code></p>
+
+<p>念のためinitramfsも作り直しておく。</p>
+
+<p><code># genkernel --install initramfs<br/>
+# ls /boot/initramfs*</code></p>
+
+<h3>hostsファイルの作成</h3>
+
+<p>(作成中)</p>
+
+<h2>rootパスワードの設定</h2>
+
+<h2>システムの構成の設定</h2>

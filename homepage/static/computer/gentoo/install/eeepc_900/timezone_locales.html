@@ -1,0 +1,45 @@
+Gentoo LinuxのEee PC 900へのインストール: タイムゾーンとロケールの設定
+
+<p>(工事中 5%)</p>
+
+<h2>タイムゾーンの設定</h2>
+
+<p>
+タイムゾーンを設定する。
+まずは何があるかを調べる。
+</p>
+
+<p><code># ls /usr/share/zoneinfo</code></p>
+
+<p>上記の結果のなかからタイムゾーンを選び/etc/timezoneファイルに記述する。</p>
+
+<p><code># echo "Japan" &gt; /etc/timezone</code></p>
+
+<p>timezone-dateパッケージを再設定する。</p>
+
+<p><code># emerge --config sys-libs/timezone-data</code></p>
+
+<h2>ロケールの設定</h2>
+
+<p><code># vi /etc/locale.gen</code></p>
+
+<p>アメリカ英語と日本語の値だけをデコメントする。</p>
+
+<p><code># locale-gen<br/>
+# locale -a</code></p>
+
+<p>システム全体で使うロケールを選択する。</p>
+
+<p><code># eselect locale list<br/>
+# eselect locale set 9</code></p>
+
+<p><code># cat /etc/env.d/02locale</code></p>
+
+<p><code># env-update &amp;&amp; source /etc/profile</code></p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/install_vim.html"
+	>「vimのインストール」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900/kernel.html"
+	>「カーネルの設定」へ</a>
+</p>

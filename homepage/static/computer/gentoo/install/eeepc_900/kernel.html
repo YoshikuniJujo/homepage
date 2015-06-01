@@ -1,0 +1,120 @@
+Gentoo LinuxのEee PC 900へのインストール
+
+<p>(工事中 90%)</p>
+
+<h2>ソースコードのインストール</h2>
+
+<p><code># emerge -av sys-kernel/gentoo-sources<br/>
+# ls -l /usr/src/linux</code></p>
+
+<h2>pciutilsのインストール</h2>
+
+<p>
+カーネルの設定をするにはハードウェアについてよく調べる必要がある。
+pciutilsパッケージを使うことで様々な周辺機器について調べることができる。
+</p>
+
+<p><code># emerge -av sys-apps/pciutils</code></p>
+
+<h2>カーネルの設定を行う</h2>
+
+<p><code># cd /usr/src/linux<br/>
+# make menuconfig</code></p>
+
+<h3>カーネルの設定の取得</h3>
+
+<p>動いているカーネルの設定が取得できると便利だ。</p>
+
+<p><code>General setup ---&gt;<br/>
+	&lt;*&gt; Kernel .config support<br/>
+	[*] Enable access to .config through /proc/config.gz</code></p>
+
+<p>こうしておくと、
+/proc/config.gzで動いているカーネルの設定を取得することができる。</p>
+
+<h3>devtmpfsの有効化</h3>
+
+<p>
+ブート時に重要なデバイスファイルが使えるようにdevtmpfsファイルシステムを
+有効にする必要がある。
+</p>
+
+<p><code>Device Drivers ---&gt;<br/>
+	Generic Driver Options ---&gt;<br/>
+		[*] Maintain a devtmpfs filesystem to mount at /dev</code></p>
+
+<h3>/procファイルシステムとバーチャルメモリのサポート</h3>
+
+<p><code>File systems ---&gt;<br/>
+	Pseudo Filesystems ---&gt;<br/>
+		[*] /proc file system support<br/>
+		[*] Virtual memory file system support</code></p>
+
+<h3>使用するファイルシステムのサポート</h3>
+
+<p>
+今回構成ではExt4のみを使用している。
+よってそれ以外のファイルシステムのサポートは必要ない。
+</p>
+
+<p><code>File systems ---&gt;<br/>
+	...<br/>
+	&lt;*&gt; The Extended 4 (ext4) filesystem<br/>
+	...</code></p>
+
+<h3>CPUファミリーの選択</h3>
+
+<p>64bit CPUではないので、とりあえずIntel P4 ...を選んでおいた。</p>
+
+<p><code>Processor type and features ---&gt;<br/>
+	Processor family (Intel P4 / older netburst based Xeon)</code></p>
+
+<p>また64-bit kernelというオプションを無効にする必要がある。</p>
+
+<p><code>[ ] 64-bit kernel</code></p>
+
+<h2>さらに追加が必要だが</h2>
+
+<p>
+とりあえず最低限の設定だけしておいた。
+後でまた追加の設定は必要になるが、
+とりあえずはブートしてCUIで使えるところまで持っていき、
+必要に応じてカーネルの設定を追加していくことにする。
+</p>
+
+<h2>コンパイル、インストール</h2>
+
+<p><code># make &amp;&amp; make modules_install (&lt;- 今ここ)<br/>
+# make install</code></p>
+
+<h2>initramfsの作成</h2>
+
+<p>
+/usr/や/var/が別のパーティションにある場合、initramfsを作成する必要がある。
+sys-kernel/genkernelパッケージが必要になる。
+</p>
+
+<p><code># emerge -av sys-kernel/genkernel</code></p>
+
+<p>
+genkernelを使ってinitramfsのインストールを行う。
+</p>
+
+<p><code># genkernel --install initramfs</code></p>
+
+<p>
+これはある程度時間がかかるようだ。5分ほど待つ。
+</p>
+
+<p>
+ファイルが生成されたことを確認する。
+</p>
+
+<p><code># ls /boot/initramfs*</code></p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/timezone_locales.html"
+	>「タイムゾーンとロケール」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900"
+	>「Eee PC 900へのインストール」トップへ</a>
+</p>

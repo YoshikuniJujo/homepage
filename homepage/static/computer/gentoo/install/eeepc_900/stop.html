@@ -1,0 +1,119 @@
+Gentoo LinuxのEee PC 900へのインストール: 中断と再開
+
+<p>(工事中 90%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+インストールを中断せざるを得ないことがある。
+前回の段階以降であればこのページで説明する方法で、
+インストールを中断・再開することができる。
+</p>
+
+<h2>インストールの中断</h2>
+
+<p>exitしてshutdownする。</p>
+
+<p><code># exit<br/>
+# shutdown -h now</code></p>
+
+<p>Eee PC 900の本体をおかたづけする。</p>
+
+<h2>インストールの再開</h2>
+
+<h3>Eee PC 900本体の準備</h3>
+
+<ul>
+<li>必要な機器の用意
+	<ul>
+	<li>Eee PC本体</li>
+	<li>電源</li>
+	<li>HHKBキーボード</li>
+	<li>USB CD(DVD)-ROMドライブ</li>
+	<li>各種ケーブル</li>
+	</ul></li>
+<li>Eee PC 900を電源につなぐ</li>
+<li>キーボードを接続する</li>
+<li>CD(DVD)-ROMドライブを接続する</li>
+<li>LANケーブルを接続する</li>
+<li>電源を入れる
+	<ul>
+	<li>「boot: 」と出たらキー入力する</li>
+	</ul></li>
+</ul>
+
+<h3>ネットワークの確認</h3>
+
+<p>ネットワークに接続されていることを確認する。</p>
+
+<p><code># ping gentoo.org -c 3<br/>
+PING gentoo.org (89.16.167.134) 56(84) bytes of data.<br/>
+64 bytes from www.gentoo.org (89.16.167.134): icmp_seq=1 ttl=42 time=275 ms<br/>
+64 bytes from www.gentoo.org (89.16.167.134): icmp_seq=2 ttl=42 time=275 ms<br/>
+64 bytes from www.gentoo.org (89.16.167.134): icmp_seq=3 ttl=42 time=280 ms<br/>
+<br/>
+--- gentoo.org ping statistics ---<br/>
+3 packets transmitted. 3 received, 0% packet loss. time 2002ms<br/>
+rtt min/avg/max/mdev = 275.072/276.910/280.478/2.523 ms
+</code></p>
+
+<h3>日付・時刻の修正</h3>
+
+<p>日付・時刻を確認し修正する。</p>
+
+<p><code># date<br/>
+Sat May 30 02:20:51 UTC 2015<br/>
+# /usr/init.d/ntp-client start<br/>
+ * Setting clock via the NTP client 'ntpdate' ...<br/>
+# date<br/>
+Sat May 30 02:21:17 UTC 2015
+</code></p>
+
+<h3>SWAPパーティションをONにする</h3>
+
+<p><code># swwaon /dev/sda2<br/>
+# free -h<br/>
+...<br/>
+Swap: 2.1G 0B 2.1G</code></p>
+
+<h3>基本的なファイルシステムのマウント</h3>
+
+<p>
+今回は/dev/sda1を/mnt/gentoo/に/dev/sdb1を/mnt/gentoo/usrにマウントすれば良い。
+</p>
+
+<p><code># mount /dev/sda1 /mnt/gentoo/<br/>
+# mount /dev/sdb1 /mnt/gentoo/usr/</code></p>
+
+<h3>resolv.confのコピー</h3>
+
+<p>DNSサーバの位置が新しい環境でも見つけられるようにする。</p>
+
+<p><code># cp -L /etc/resolv.conf /mnt/gentoo/etc/</code></p>
+
+<h3>必要なファイルシステムのマウント</h3>
+
+<p>/proc/, /sys/, /dev/をそれぞれマウントする。</p>
+
+<p><code># mount -t proc proc /mnt/gentoo/proc<br/>
+# mount --rbind /sys /mnt/gentoo/sys<br/>
+# mount --make-rslave /mnt/gentoo/sys<br/>
+# mount --rbind /dev /mnt/gentoo/dev<br/>
+# mount --make-rslave /mnt/gentoo/dev</code></p>
+
+<h3>chroot</h3>
+
+<p><code># chroot /mnt/gentoo /bin/bash<br/>
+# source /etc/profile<br/>
+# export PS1="(chroot) $PS1"</code></p>
+
+<h3>おめでとう</h3>
+
+<p>これでインストール作業を再開することができる。</p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/chroot.html"
+	>「新しいシステムに入る」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900/portage_tree.html"
+	>「Portage樹のインストール」へ</a>
+</p>
