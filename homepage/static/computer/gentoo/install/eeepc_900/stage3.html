@@ -43,12 +43,13 @@ Fri May 29 12:50:41 -0.502429 seconds</code></p>
 
 <h3>ハッシュファイルの検証</h3>
 
-<p><code>% gpg --recv-keys 0xBB572E0E2D182910<br/>
-% gpg --verify stage3-i686-20150526tar.bz2.DIGESTS.asc<br/>
+<p><code># gpg --recv-keys 0xBB572E0E2D182910<br/>
+# gpg --verify stage3-i686-20150526.tar.bz2.DIGESTS.asc<br/>
 ...<br/>
 Primary key fingerprint: 13EB BDBE DE7A 1277 5DFD  B1BA BB57 2E0E 2D18 2910</code></p>
 
-<p><code># gpg --verify stage3-i686-20150526.tar.bz2.DIGESTS.asc</code></p>
+<p><code># sha512sum stage3-i686-20150526.tar.bz2<br/>
+# grep -A 1 SHA512 stage3-i686-20150526.tar.bz2.DIGESTS.asc</code></p>
 
 <h2>Stage 3ファイルの解凍と設置</h2>
 
@@ -123,13 +124,13 @@ MAKEOPTSでは-jオプションに数を続けることで並行して走るコ�
 
 <p>上記で説明した値を実際に設定ファイルに書き込もう。</p>
 
-<p><code>nano -w /mnt/gentoo/etc/portage/make.conf</code></p>
+<p><code>vi /mnt/gentoo/etc/portage/make.conf</code></p>
 
 <p>
-nanoというエディタを使って以下の値を書き込む。
+viを使って以下の値を書き込む。
 </p>
 
-<p><code>CFLAGS="-march=native -O2 -pipe"<br/>
+<p><code>CFLAGS="-O2 -march=native -pipe"<br/>
 CXXFLAGS="${CFLAGS}"<br/>
 <br/>
 MAKEOPTS="-j2"</code></p>

@@ -1,0 +1,53 @@
+システムツールのインストール
+
+<p>(工事中 90%)</p>
+
+<h2>システムロガー</h2>
+
+<p>
+Gentooではすくなくとも3つからロガーを選択することになる。
+sysklogd, syslog-ng, metalogである。
+あまりよくわからないが、metalogが良さそうな気がする。
+</p>
+
+<p><code># emerge --ask app-admin/metalog<br/>
+# rc-update add metalog default</code></p>
+
+<h2>クロンデーモン</h2>
+
+<p>
+同様にクロンデーモンにもいくつかの選択肢がある。
+これもなんとなくfcronを選択。
+</p>
+
+<p><code># emerge --ask sys-process/fcron<br/>
+# rc-update add fcron default<br/>
+# crontab /etc/crontab</code></p>
+
+<h2>ファイルインデックス</h2>
+
+<p>mlocateをとりあえずインストールしておく。</p>
+
+<p><code># emerge --ask sys-apps/mlocate</code></p>
+
+<h2>ファイルシステムツール</h2>
+
+<p>
+ファイルシステムにはext4のみを使っている。
+e2fsprogsはすでにインストールされているのでここで新たにインストールする必要はない。
+</p>
+
+<h2>DHCPクライアント</h2>
+
+<p>
+ネットワークの設定にはDHCPを使用するのでDHCPクライアントが必要となる。
+</p>
+
+<p><code># emerge --ask net-misc/dhcpcd</code></p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/config_system.html"
+	>「システムの設定」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900/boot_loader.html"
+	>「ブートローダの設定」へ</a>
+</p>

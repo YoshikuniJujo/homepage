@@ -41,6 +41,19 @@ swapのたせに/dev/sda2(2GB)を当てることにする。
 
 <p>以上の構成を試し問題が生じたらインストールをやり直すことにする。</p>
 
+<p>
+問題が生じた。
+GRUB2用に2MBほどのパーティションを確保する必要があるようだ。
+以下のような構成とする。
+</p>
+
+<ul>
+<li>/dev/sda1 2MB GRUB2</li>
+<li>/dev/sda2 6GB /</li>
+<li>/dev/sda3 2GB swap</li>
+<li>/dev/sdb1 8GB /usr</li>
+</ul>
+
 <h2>MBRかGPTか</h2>
 
 <p>
@@ -82,20 +95,29 @@ MBRでも問題ないが、今回はより新しい技術であるGPTを選択�
 <p><code># parted /dev/sda</code></p>
 
 <p>
-/dev/sda1を6GBで作成しようとしたが、
-実際のサイズは8GBより小さいので5500MBとした。
+まずはGRUB2用の2MBのパーティションを作成する。
 </p>
 
 <p><code>(parted) unit mib<br/>
-(parted) mkpart primary 1 5500<br/>
-(parted) name 1 root<br/>
+(parted) mkpart primary 1 3<br/>
+(parted) name 1 grub<br/>
 (parted) set 1 bios_grub on<br/>
+(parted) print</code></p>
+
+<p>
+/dev/sda2を6GBで作成しようとしたが、
+実際のサイズは8GBより小さいので5500MBとした。
+</p>
+
+<p><code>(parted) mkpart primary 3 5500<br/>
+(parted) name 2 rootfs<br/>
+(parted) set 2 boot on<br/>
 (parted) print</code></p>
 
 <p>/dev/sda2は残り全部。SWAPファイルシステムとする。</p>
 
 <p><code>(parted) mkpart primary 5500 -1<br/>
-(parted) name 2 swap<br/>
+(parted) name 3 swap<br/>
 (parted) print</code></p>
 
 <p>次に/dev/sdbはまるまる1つをそのままパーティションにする。</p>
@@ -113,19 +135,19 @@ MBRでも問題ないが、今回はより新しい技術であるGPTを選択�
 ここではext4を採用することにする。
 </p>
 
-<p><code># mkfs.ext4 /dev/sda1</code></p>
+<p><code># mkfs.ext4 /dev/sda2</code></p>
 
 <p><code># mkfs.ext4 /dev/sdb1</code></p>
 
 <h2>swapパーティションの作成と有効化</h2>
 
-<p><code># mkswap /dev/sda2<br/>
-# swapon /dev/sda2<br/>
+<p><code># mkswap /dev/sda3<br/>
+# swapon /dev/sda3<br/>
 # free -h</code></p>
 
 <h2>マウントする</h2>
 
-<p><code># mount /dev/sda1 /mnt/gentoo<br/>
+<p><code># mount /dev/sda2 /mnt/gentoo<br/>
 # mkdir /mnt/gentoo/usr<br/>
 # mount /dev/sdb1 /mnt/gentoo/usr</code></p>
 

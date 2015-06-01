@@ -1,0 +1,47 @@
+Gentoo LinuxのEee PC 900へのインストール: ブートローダの設定
+
+<h2>ブートローダについて</h2>
+
+<p>
+BIOSを使っている場合にはGRUB2またはLILOを使い、
+UEFIを使っている場合にはefibootmgrを使う。
+今回はGRUB2を使うことにする。
+</p>
+
+<h2>GRUB2</h2>
+
+<p>まずはgrubパッケージをインストールする。</p>
+
+<p><code># emerge --ask sys-boot/grub</code></p>
+
+<p><code># grub2-install /dev/sda</code></p>
+
+<p><code># grub2-mkconfig -o /boot/grub/grub.cfg</code></p>
+
+<h2>再起動</h2>
+
+<p>
+さて、緊張の瞬間。
+10回に1回くらいはうまくいかないものだ。
+覚悟を決めて再起動する。
+</p>
+
+<p><code># exit<br/>
+# cd<br/>
+# umount -l /mnt/gentoo/dev{/shm,/pts,}<br/>
+# umount /mnt/gentoo{/boot,/sys,/proc,}<br/>
+# reboot</code></p>
+
+<p>
+CDは出しておこう。
+</p>
+
+<h2>大失敗</h2>
+
+<p>
+原因はだいたいわかった。
+はじめのパーティションを切るところで
+grub用のパーティションを作成する必要があったらしい。
+パーティションの切りかたのミスなので、
+ほど最初からやりなおすことになる。
+</p>

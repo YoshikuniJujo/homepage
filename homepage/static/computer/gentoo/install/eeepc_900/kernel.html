@@ -39,22 +39,33 @@ pciutilsパッケージを使うことで様々な周辺機器について調べ
 有効にする必要がある。
 </p>
 
+<p>
+ただし、今回使用したカーネルでははじめから有効になっているため以下は
+あえてする必要がない。
+</p>
+
 <p><code>Device Drivers ---&gt;<br/>
 	Generic Driver Options ---&gt;<br/>
 		[*] Maintain a devtmpfs filesystem to mount at /dev</code></p>
 
 <h3>/procファイルシステムとバーチャルメモリのサポート</h3>
 
+<p>これもデフォルトで有効になっている。</p>
+
 <p><code>File systems ---&gt;<br/>
 	Pseudo Filesystems ---&gt;<br/>
-		[*] /proc file system support<br/>
-		[*] Virtual memory file system support</code></p>
+		-*- /proc file system support<br/>
+		-*- Tmpfs virtual memory file system support</code></p>
 
 <h3>使用するファイルシステムのサポート</h3>
 
 <p>
 今回構成ではExt4のみを使用している。
 よってそれ以外のファイルシステムのサポートは必要ない。
+</p>
+
+<p>
+これもデフォルトで有効。
 </p>
 
 <p><code>File systems ---&gt;<br/>
@@ -73,7 +84,31 @@ pciutilsパッケージを使うことで様々な周辺機器について調べ
 
 <p><code>[ ] 64-bit kernel</code></p>
 
-<h2>さらに追加が必要だが</h2>
+<h3>有線LANのドライバを追加する</h3>
+
+<p>
+Eee PC 900のLANカードを認識させるためのドライバーを組み込むために、
+カーネルに追加の設定が必要となる。
+</p>
+
+<p><code># lspci | grep -i ethernet<br/>
+01:00.0 Ethernet controller: Qualcomm Atheros AR242x / AR542x Wireless Network Adapter (PCI-Express) (rev 01)<br/>
+03:00.0 Ethernet controller: Qualcomm Atheros Attansic L2 Fast Ethernet (rev a0)</code></p>
+
+<p>
+有線LANはQualcomm Atheros Attansic L2 Fast Ethernetという製品であるようだ。
+このカードのドライバを追加することにする。
+</p>
+
+<p><code># cd /usr/src/linux<br/>
+# make menuconfig<br/>
+Device Driver ---&gt;<br/>
+	[*] Network device support ---&gt;<br/>
+		[*] Ethernet driver support ---&gt;<br/>
+			[*] Atheros devices<br/>
+				&lt;*&gt; Atheros L2 Fast Ethernet support</code></p>
+
+<h3>さらに追加が必要だが</h3>
 
 <p>
 とりあえず最低限の設定だけしておいた。
@@ -84,8 +119,15 @@ pciutilsパッケージを使うことで様々な周辺機器について調べ
 
 <h2>コンパイル、インストール</h2>
 
-<p><code># make &amp;&amp; make modules_install (&lt;- 今ここ)<br/>
-# make install</code></p>
+<p><code># make &amp;&amp; make modules_install</code></p>
+
+<p>
+かなり時間がかかるので何か別のことをしよう。
+1時間以上はかかると考えられる。
+</p>
+
+<p><code># make install<br/>
+# ls /boot</code></p>
 
 <h2>initramfsの作成</h2>
 
@@ -115,6 +157,6 @@ genkernelを使ってinitramfsのインストールを行う。
 <p>
 <a href="/computer/gentoo/install/eeepc_900/timezone_locales.html"
 	>「タイムゾーンとロケール」へもどる</a>
-<a href="/computer/gentoo/install/eeepc_900"
-	>「Eee PC 900へのインストール」トップへ</a>
+<a href="/computer/gentoo/install/eeepc_900/config_system.html"
+	>「システムの設定」へ</a>
 </p>
