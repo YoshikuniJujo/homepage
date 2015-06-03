@@ -1,0 +1,41 @@
+Gentoo LinuxのEee PCへのインストール: GHCのインストール
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+ウィンドウマネージャとしてxmonadを使用する。
+xmonadはHaskellで書かれていて、コンパイルのためにGHCが必要になる。
+</p>
+
+<h2>GHCのインストール</h2>
+
+<p>
+GHCのインストールには非常に時間がかかる。
+すくなくとも以前はとても時間がかかった。
+覚悟してemergeする。
+まずはUSEフラグの確認から。
+</p>
+
+<p><code>% emerge -pv ghc</code></p>
+
+<p>
+よくわからないがllvmを有効にしておくことにする。
+</p>
+
+<p><code>% sudoedit /etc/portage/make.conf<br/>
+...<br/>
+USE="bindist \<br/>
+...<br/>
+zsh-complition clang llvm"<br/>
+...<br/>
+</code></p>
+
+<p><code>% sudo emerge -av ghc</code></p>
+
+<p>
+以前は10時間ほどかかったこともあったが、最近はかなり速くなっている。
+それでもそれなりの時間はかかると思われるので、
+お茶でも飲んで待つことにする。
+</p>

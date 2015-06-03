@@ -1,0 +1,159 @@
+Gentoo LinuxのEee PC 900へのインストール: 一般ユーザの追加
+
+<p>(工事中 90%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+普段の作業は一般ユーザで行うほうが良い。
+特権ユーザでのログインは最小限にすることが、
+フールプルーフという意味でもセキュリティという意味でも望ましい。
+一般ユーザのアカウントを作成する。
+</p>
+
+<p>
+特権が必要な場合にはsuで一時的にrootになっても良いが、
+むしろ「そのコマンドだけ」特権ユーザで行うためにsudoを使ったほうが良いだろう。
+</p>
+
+<h2>一般ユーザの追加</h2>
+
+<p>
+ここでは「一般ユーザ」を追加するが、普段の作業とPCの管理作業とを行う
+ためのアカウントとするので下のsudoでの作業と合わせると、
+ほぼ特権ユーザであるとも考えられる。
+</p>
+
+<h3>グループ</h3>
+
+<p>
+まずは新しいユーザをどのグループに所属させるかを考える。
+</p>
+
+<ul>
+<li>users: よくわからないがこのグループにも入れておいたほうが良い気がする</li>
+<li>portage: emerge -p hoge/hoge等ができる</li>
+<li>wheel: suを使うことができる</li>
+</ul>
+
+<h3>実際にユーザを追加する</h3>
+
+<p><code># useradd -m -G users,portage,wheel -s /bin/bash yoshio<br/>
+# passwd yoshio<br/>
+Password: (Enter the password for yoshio)<br/>
+Re-enter password: (Re-enter the password to verify)</code></p>
+
+<h3>新しいユーザでログインし直す</h3>
+
+<p><code># exit<br/>
+black_cat login: yoshio<br/>
+Password: <br/>
+yoshio@black_cat ~ $ pwd<br/>
+/home/yoshio</code></p>
+
+<p>
+インストール作業を続けるためにここではsuで特権ユーザになっておく。
+</p>
+
+<p><code>yoshio@black_cat ~ $ su<br/>
+パスワード: <br/>
+black_cat yoshio #</code></p>
+
+<p>
+sudoをインストールしてしまえばあとはsuを使う必要はなくなる。
+</p>
+
+<h2>sudoのインストールと設定</h2>
+
+<h3>インストール</h3>
+
+<p>とりあえずインストールする。</p>
+
+<p><code># emerge -av sudo</code></p>
+
+<p>
+pamとskeyとを同時に指定できないというエラーが生じた。
+どちらかを選ぶ必要がある。
+よくわからないが今回はpamのほうを使うことにする。
+</p>
+
+<p><code># vi /etc/portage/package.use<br/>
+app-admin/sudo	-skey</code></p>
+
+<p><code># emerge -av sudo<br/>
+...<br/>
+ * Error: circular dependencies:<br/>
+...</code></p>
+
+<p>
+今度は依存関係の循環参照が生じてしまったようだ。
+このような場合はまずはどれかのUSEを無効にして一度インストールすることだ。
+postgresqlとsaslが相互に依存してしまっているので、
+はじめだけはpostgresを無効にしてインストールする。
+</p>
+
+<p><code># USE="-postgres" emerge -av sudo</code></p>
+
+<p>
+お茶でも飲んで待つことにする。
+だいたい30分くらいかかる。
+</p>
+
+<h3>時間の計測について</h3>
+
+<p>
+timeコマンドを使うか、あるいはdate &gt;&gt; time.tmp ; ...; date &gt;&gt; time.tmp
+とすればどのくらい時間がかかるか記録できる。
+今回の用途では体感が大事なのでdateコマンドを使った方法のほうが良いかもしれない。
+一度試してみる。
+</p>
+
+<p><code># date &gt;&gt; time.tmp; sleep 120; date &gt;&gt; time.tmp</code></p>
+
+<h3>エディタの選択</h3>
+
+<p>
+システムのデフォルトのエディタを選択できる。
+$EDITORの値を調べてみよう。
+</p>
+
+<p><code># echo $EDITOR<br/>
+/bin/nano</code></p>
+
+<p>
+これはeselect editorで変えることができる。
+</p>
+
+<p><code># eselect editor list<br/>
+# eselect editor set 3<br/>
+# . /etc/profile<br/>
+# echo $EDITOR<br/>
+/usr/bin/vi</code></p>
+
+<h3>sudoの設定</h3>
+
+<p><code># visudo<br/>
+(以下をデコメントする)<br/>
+%wheel ALL=(ALL) ALL</code></p>
+
+<p>
+これはwheelグループのユーザはすべてのコマンドを特権ユーザとして実行できることを
+示す。
+suと違ってrootのパスワードは必要ないことに注意する。
+</p>
+
+<h3>試してみる</h3>
+
+<p><code># exit<br/>
+$ sudo echo "hello"<br/>
+password: (ログインしている一般ユーザのパスワード)<br/>
+hello</code></p>
+
+<p>これでsuをしなくてもsudoでemergeを行うことができる。</p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/boot_loader.html"
+	>「ブートローダの設定」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900/cui.html"
+	>「CUI環境の設定」へ</a>
+</p>

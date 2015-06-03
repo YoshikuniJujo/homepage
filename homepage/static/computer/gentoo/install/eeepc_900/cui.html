@@ -1,0 +1,166 @@
+Gentoo LinuxのEee PC 900へのインストール: CUI環境を整える
+
+<p>(工事中 90%)</p>
+
+<h2>GUIを入れる前に</h2>
+
+<p>
+GUIを入れる前にCUIでの操作性を改善することにする。
+具体的にはシェルをzshにしてvi風のインターフェースにし、
+tmuxをインストールする。
+</p>
+
+<h2>zsh</h2>
+
+<h3>インストール</h3>
+
+<p><code>% sudo emerge -av zsh</code></p>
+
+<p>
+これもそれなりに時間がかかると思われる。5分ほどかかった。
+</p>
+
+<p>
+vipwで使用しているユーザのシェルをbashからzshに変える。
+</p>
+
+<p><code>% sudo vipw<br/>
+...<br/>
+yoshio:x:XXXX:XXXX::/home/yoshio:/bin/zsh<br/>
+...</code></p>
+
+<p>ログインし直す。</p>
+
+<p><code>% exit<br/>
+black_cat login: yoshio<br/>
+Password: </code></p>
+
+<p>
+するとzshの設定画面が出る。
+1を押して設定を開始しよう。
+</p>
+
+<p>
+まずはコマンドの記憶数を増やそう。
+たとえば1日100コマンド x 365日 x 25年として、1000,000くらいで十分だろう。
+記憶容量としては1行100文字としてだいたい100,000,000byteつまり100Mbyteとなる。
+ルートパーティションの容量が6GBなので問題ないだろう。
+</p>
+
+<p>
+1を押して画面の指示通りに指定する。
+</p>
+
+<p>
+補完システムはデフォルトの設定でonにする。
+</p>
+
+<p>
+指づかいはviを選択。
+</p>
+
+<p>
+設定画面を終了するとプロンプトにもどる。
+</p>
+
+<h3>その他の設定</h3>
+
+<p>
+コマンド履歴は複数のターミナルで共有したい。
+</p>
+
+<p><code>% vi .zshrc<br/>
+...<br/>
+setopt share_history</code></p>
+
+<p>
+プロンプトに時間を表示し、右プロンプトにディレクトリを表示する。
+</p>
+
+<p><code>% vi .zshrc<br/>
+...<br/>
+PROMPT="[%D{%H:%M}] %# "<br/>
+RPROMPT="[%40&lt;...&lt;%~]"<br/>
+PROMPT2="%_&gt; "
+</code></p>
+
+<p>
+左プロンプトを緑にする。
+以下の'^['の部分はESCを表す文字。
+vimではCtrl-Vを押したあとESCキーを押す。
+</p>
+
+<p><code>% vi .zshrc<br/>
+...<br/>
+PROMPT="%{^[[;32:1m%}[%D{%H:%M}] %#%{^[[m%} "<br/>
+...</code></p>
+
+<p>
+色をつけたい部分を%{^[[;色番号:1m%}と%{^[[m%}で囲む。
+色番号は以下のようになる。
+</p>
+
+<ul>
+<li>黒: 30</li>
+<li>赤: 31</li>
+<li>緑: 32</li>
+<li>黄: 33</li>
+<li>青: 34</li>
+<li>マゼンタ: 35</li>
+<li>シアン: 36</li>
+<li>白: 37</li>
+</ul>
+
+<h2>tmux</h2>
+
+<h3>何ができるの</h3>
+
+<p>
+複数の画面の切り換えや画面の分割、画面の切り離しや復帰等ができる。
+非常に便利。
+</p>
+
+<h3>インストール</h3>
+
+<p><code>% sudo emerge tmux</code></p>
+
+<p>
+これもそれなりに時間がかかる。5分くらい。
+お茶でも飲んで待て。
+</p>
+
+<p><code>% tmux</code></p>
+
+<p>
+とりあえずCtrl-b "で画面を2分割しておくと便利だ。
+画面間の移動はCtrl-b oでできる。
+また、以下のような追加のキーバインドをしておくと使いやすい。
+</p>
+
+<p><code>% vi ~/.tmux.conf<br/>
+set-window-option -g mode-keys vi<br/>
+<br/>
+bind-key j resize-pane -D<br/>
+bind-key k resize-pane -U<br/>
+bind-key J resize-pane -D 8<br/>
+bind-key K resize-pane -U 8<br/>
+bind-key O select-pane -U</code></p>
+
+<p>exitでtmuxを抜けて入り直そう。</p>
+
+<h2>次は何をするか</h2>
+
+<p>
+CUIのみでの作業であればこのままでも使える。
+しかし、せっかくならGUIも入れたい。
+ということで、<a
+href="/computer/gentoo/install/eeepc_900/gui_prelude.html"
+>GUIの設定</a>へ進む。
+</p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/useradd.html"
+	>「一般ユーザの追加」へ</a>
+<a href="/computer/gentoo/install/eeepc_900"
+	>「Eee PC 900へのインストール」トップへ</a>
+</p>

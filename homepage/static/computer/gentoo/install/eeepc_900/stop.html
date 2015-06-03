@@ -63,7 +63,7 @@ rtt min/avg/max/mdev = 275.072/276.910/280.478/2.523 ms
 
 <p><code># date<br/>
 Sat May 30 02:20:51 UTC 2015<br/>
-# /usr/init.d/ntp-client start<br/>
+# /etc/init.d/ntp-client start<br/>
  * Setting clock via the NTP client 'ntpdate' ...<br/>
 # date<br/>
 Sat May 30 02:21:17 UTC 2015
@@ -71,7 +71,7 @@ Sat May 30 02:21:17 UTC 2015
 
 <h3>SWAPパーティションをONにする</h3>
 
-<p><code># swwaon /dev/sda2<br/>
+<p><code># swwaon /dev/sda3<br/>
 # free -h<br/>
 ...<br/>
 Swap: 2.1G 0B 2.1G</code></p>
@@ -79,10 +79,10 @@ Swap: 2.1G 0B 2.1G</code></p>
 <h3>基本的なファイルシステムのマウント</h3>
 
 <p>
-今回は/dev/sda1を/mnt/gentoo/に/dev/sdb1を/mnt/gentoo/usrにマウントすれば良い。
+今回は/dev/sda2を/mnt/gentoo/に/dev/sdb1を/mnt/gentoo/usrにマウントすれば良い。
 </p>
 
-<p><code># mount /dev/sda1 /mnt/gentoo/<br/>
+<p><code># mount /dev/sda2 /mnt/gentoo/<br/>
 # mount /dev/sdb1 /mnt/gentoo/usr/</code></p>
 
 <h3>resolv.confのコピー</h3>

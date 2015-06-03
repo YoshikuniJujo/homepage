@@ -1,0 +1,168 @@
+Gentoo LinuxのEee PC 900へのインストール: Xorgのインストール
+
+<p>(工事中 90%)</p>
+
+<h2>カーネルの設定</h2>
+
+<h3>evdev</h3>
+
+<p>
+Xorgはインプット用のドライバとしてevdevを使用する。
+以前はマウスやキーボード等に様々なドライバが使われていた。
+evdevに統一されてずいぶん楽になった。
+</p>
+
+<p>
+evdevが有効になっていることを確認する。
+</p>
+
+<p><code>% cd /usr/src/linux<br/>
+% sudo make menuconfig<br/>
+Device Drivers ---&gt;<br/>
+	Input device support ---&gt;<br/>
+		&lt;*&gt; Event interface</code></p>
+
+<p>
+tmuxを使ってペインを分割している場合、ターミナルの大きさが19行に満たない。
+この場合Ctrl-b jで上のペインを大きくしてそこでmenuconfigを行えば良い。
+今回はすでにevdevは有効だった。
+</p>
+
+<p>
+あるいは以下のようにも確認できる。
+こっちのほうがスマートだ。
+</p>
+
+<p><code>% zcat /proc/config.gz | grep -i evdev<br/>
+CONFIG_INPUT_EVDEV=y</code></p>
+
+<h3>Kernel modesetting(KMS)</h3>
+
+<p>
+KMSが使われるようになってXのインストールは格段に簡単で安心できるようになった。
+CUIの時点ですでにGUI用のモニタの設定ができているので、
+Xを入れる前にドライバが問題なく働いていることがわかる。
+</p>
+
+<p><code>% sudo make menuconfig<br/>
+Device Drivers ---&gt;<br/>
+	Graphics support ---&gt;<br/>
+		Support for frame buffer devices ---&gt;<br/>
+			(すべてのドライバを無効にする)<br/>
+		Console display driver support ---&gt;<br/>
+			&lt;*&gt; Framebuffer Console Support</code></p>
+
+<p>これもそのままの設定で問題ない。</p>
+
+<p>ビデオカードの種類を調べる。</p>
+
+<p><code>% /usr/sbin/lspci | grep -i graphics<br/>
+00:02.0 VGA compatible controller: Intel Corporation Mobile 915GM/GMS/901GML Express Graphics Controller (rev 04)<br/>
+00:02.1 Display controller: Intel Corporation Monile 915GM/GMS/910GML Express Graphics Controller (rev 04)</code></p>
+
+<p>Intelのカードであることがわかる。</p>
+
+<p>カーネルの設定を確認する。</p>
+
+<p><code>sudo make menuconfig<br/>
+Device Drivers ---&gt;<br/>
+	Graphics support ---&gt;<br/>
+		/dev/agpgart (AGP Support) ---&gt;<br/>
+			&lt;*&gt; Intel 440LX/BX/GX, I8xx and E7x05 chi...<br/>
+		Direct Rendering Manager (XFree86 4.1.0 and higher ...) ---&gt;<br/>
+			&lt;*&gt; Intel 8xx/9xx/G3x/G4x/HD Graphics<br/>
+			[*]	Enable modesetting on intel by default</code></p>
+
+<p>そのままの設定で問題ない。</p>
+
+<h2>make.confの設定</h2>
+
+<p>
+make.confに2つの環境変数を設定する。
+ついでにここでシステムのデフォルトの言語を日本語に設定してしまおう。
+VIDEO_CARDS, INPUT_DEVICES, LINGUASを設定する。
+</p>
+
+<p><code>% sudoedit /etc/portage/make.conf<br/>
+INPUT_DEVICES="evdev"<br/>
+VIDEO_CARDS="intel"<br/>
+LINGUAS="ja"</code></p>
+
+<h2>Xorgのインストール</h2>
+
+<p>まずは環境変数が正しく設定されていることを確認する。</p>
+
+<p><code>emerge --ask --verbose --pretend x11-base/xorg-drivers</code></p>
+
+<p>
+表示が流れて消えていってしまった場合、tmuxを使っているのならば、
+Ctrl-b [としCtrl-uで上を見ていけば良い。
+下にもどるにはCtrl-dを使う。
+より細かく移動したければCtrl-y, Ctrl-eを使う。
+コマンド入力にもどるにはESCを押す。
+</p>
+
+<p>
+見ていくと、CPU_FLAGS_X86にsse2を入れておくと良さそうなことに気づく。
+</p>
+
+<p><code>% sudoedit /etc/portage/make.conf<br/>
+...<br/>
+CPU_FLAGS_X86="sse2"</code></p>
+
+<p>またついでにUSEにclangを入れておこう。</p>
+
+<p><code>% sudoedit /etc/portage/make.conf<br/>
+...<br/>
+USE="...<br/>
+...<br/>
+zsh-complition clang"<br/>
+...</code></p>
+
+<p>Xorgをインストールする。</p>
+
+<p><code>sudo emerge --ask --verbose x11-base/xorg-server</code></p>
+
+<p>
+USE等の変数をざっとチェックする。
+72個のパッケージがインストールされるので相当時間がかかるはずだ。
+</p>
+
+<p>
+現在llvmのインストール中。
+これに非常に時間がかかる様子。
+次回はllvmを別にインストールしてからXorgをインストールしたほうが良いかもしれない。
+</p>
+
+<p>
+最終的に8時間半かかった。
+</p>
+
+<p><code>% startx</code></p>
+
+<p>
+xtermがないためにエラーとなったようだ。
+xtermをインストールする。
+</p>
+
+<p><code>% sudo emerge -av xterm</code></p>
+
+<p>20分ほどかかる。</p>
+
+<p><code>% startx</code></p>
+
+<p>
+twmというウィンドウマネージャが立ち上がる。
+1番大きいターミナルでexitコマンドを入力する。
+</p>
+
+<h2>成功</h2>
+
+<p>これでXorgのインストールに成功した。</p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/gui_prelude.html"
+	>「GUI: はじめに」へ</a>
+<a href="/computer/gentoo/install/eeepc_900"
+	>「Eee PC 900へのインストール」トップへ</a>
+</p>
