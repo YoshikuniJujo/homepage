@@ -1,0 +1,175 @@
+Xmonadのインストール
+
+<p>(工事中 90%)</p>
+
+<h2>Xmonadをインストールする</h2>
+
+<p>
+何はともあれXmonadのインストールだ。
+</p>
+
+<p><code>% sudo emerge -av xmonad</code></p>
+
+<p>
+18パッケージあるのでそれなりに時間がかかるだろう。
+40分ほどかかった。
+</p>
+
+<h2>.xinitrcの作成</h2>
+
+<p>
+とりあえずはCUIからstartxでxmonadを立ち上げるようにする。
+xdmを使うかどうかはあとで決めることにする。
+</p>
+
+<p><code>% vi ~/.xinitrc<br/>
+exec xmonad</code></p>
+
+<h2>startx</h2>
+
+<p>startxしてみよう。</p>
+
+<p><code>% startx</code></p>
+
+<p>
+真黒な画面になるはずだ。
+それでいい、問題ない。
+Ctrl+Alt+Returnを押してみよう。
+ターミナルが立ち上がるはずだ。
+tmuxしてCtrl+b "をしておこう。
+</p>
+
+<h2>rxvt-unicode</h2>
+
+<h3>インストール</h3>
+
+<p>
+個人的にrxvt-unicodeが好みなので、それをインストールする。
+</p>
+
+<p><code>% sudo emerge -av rxvt-unicode</code></p>
+
+<p>
+よくわからないがunicode3とwcwidthを有効にしておこう。
+</p>
+
+<p><code>% sudoedit /etc/portage/make.conf<br/>
+...<br/>
+USE="...<br/>
+...<br/>
+... unicode3 wcwidth"<br/>
+...</code></p>
+
+<p>
+上記のUSEフラグを適用するためには-vanillaが必要だ。
+システム全体に設定するのはなんとなく嫌なので、
+/etc/portage/package.useに書いておく。
+</p>
+
+<p><code>% sudoedit /etc/portage/package.use<br/>
+...<br/>
+x11-terms/rxvt-unicode		-vanilla</code></p>
+
+<p><code>% sudo emerge -av rxvt-unicode</code></p>
+
+<p>
+しばらく待つ。
+10分ほどで終わると思われる。
+</p>
+
+<p>試しに立ち上げてみる。</p>
+
+<p><code>% urxvt</code></p>
+
+<h3>デフォルトのターミナルにする</h3>
+
+<p>
+まずはxmonadのデフォルトの設定ファイルをホームディレクトリに作成する。
+</p>
+
+<p><code>% mkdir ~/.xmonad<br/>
+% vi ~/.xmonad/xmonad.hs<br/>
+import XMonad<br/>
+<br/>
+main :: IO ()<br/>
+main = xmonad defaultConfig
+</code></p>
+
+<p>
+Ctrl-qで新しい設定でxmonadを立ち上げ直すことができる。
+実際に新しい設定が適応されたかどうかは~/.xmonadディレクトリをのぞけばわかる。
+</p>
+
+<p><code>% ls ~/.xmonad<br/>
+xmonad-i386-linux xmonad.errors xmonad.hi xmonad.hs xmonad.o</code></p>
+
+<p>
+xmonad.hsがちゃんとコンパイルできたことがわかる。
+</p>
+
+<p>
+次にterminalの設定を変更する。
+</p>
+
+<p><code>% vi ~/.xmonad/xmonad.hs<br/>
+...<br/>
+main = xmonad $ defaultConfig {<br/>
+	terminal	= "urxvt"<br/>
+	}</code></p>
+
+<p>
+Ctrl-qで設定を反映させる。
+うまくいっていればCtrl+Alt-Returnでrxvt-unicodeが立ち上がるはずだ。
+</p>
+
+<h3>ターミナルの色を変える</h3>
+
+<p>
+白地に黒は見映えは良いが、長時間使っていると目が疲れるものだ。
+黒地に白とし、その他の色もそれに合わせて変更する。
+そのためには~/.Xdefaultsに設定を書き込めば良い。
+</p>
+
+<p>まずは背景を黒、文字を白とする。</p>
+
+<p><code>% vi ~/.Xdefaults<br/>
+urxvt*background:	black<br/>
+urxvt*foreground:	snow</code></p>
+
+<p>ここで、以下のコマンドを実行してみる。</p>
+
+<p><code>% ls --color=auto /</code></p>
+
+<p>
+するとディレクトリが青で表示されるが、黒の背景にはこの青は暗すぎる。
+もっと明るい青にしよう。
+</p>
+
+<p><code>% vi ~/.Xdefaults<br/>
+...<br/>
+urxvt*color12:	#7799FF</code></p>
+
+<p>またlsをls --color=autoのエイリアスとしよう。</p>
+
+<p><code>vi ~/.zshrc<br/>
+...<br/>
+alias ls='ls --color=auto'</code></p>
+
+<h3>ターミナルの履歴の保存を0にする</h3>
+
+<p>
+履歴はtmuxの機能でCtrl-b [で見ることができるので、
+rxvt-unicodeでの履歴機能は使わない。
+</p>
+
+<p><code>vi ~/.Xdefaults<br/>
+...<br/>
+urxvt*saveLines:	0<br/>
+...</code></p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/ghc.html"
+	>「GHCのインストール」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900"
+	>「Eee PC 900へのインストール」トップへ</a>
+</p>
