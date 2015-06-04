@@ -25,4 +25,54 @@ dev-qt/qtgui	-cups</code></p>
 <p><code>% sudoedit /etc/portage/package.use/xmlto<br/>
 app-text/xmlto	-latex</code></p>
 
-<p>166パッケージがコンパイルされるのでそれなりに時間がかかるだろう。</p>
+<p>
+166パッケージがコンパイルされるのでそれなりに時間がかかるだろう。
+13時間40分かかった。
+</p>
+
+<p>
+/etc/locale.genはもとのファイルを維持する。
+</p>
+
+<p><code>% sudo etc-update</code></p>
+
+<h2>つぎはworld</h2>
+
+<p>
+worldに含まれるパッケージとそれが依存しているパッケージをアップデートする。
+</p>
+
+<p><code>% sudo emerge -avu --deep --newuse world</code></p>
+
+<p>worldはすでに最新のようだ。</p>
+
+<h2>sync</h2>
+
+<p>
+portage樹を最新のものにする。
+</p>
+
+<p><code>% sudo emerge --sync</code></p>
+
+<h2>もう一度system</h2>
+
+<p><code>% sudo emerge -pvu --deep --newuse system</code></p>
+
+<p>
+gccが最インストールされるようだ。
+せっかくならgo言語のコンパイラも含めるようにしてしまおうか。
+</p>
+
+<p><code>% sudoedit /etc/portage/make.conf<br/>
+...<br/>
+USE="...<br/>
+...<br/>
+... go"<br/>
+...</code></p>
+
+<p><code>% sudo emerge -avu --deep --newuse system</code></p>
+
+<p>
+gccのコンパイルにはわりと時間がかかる。
+今のところ3時間半経過したが終わらず。
+</p>
