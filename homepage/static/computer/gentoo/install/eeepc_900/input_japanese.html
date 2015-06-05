@@ -1,0 +1,75 @@
+Gentoo LinuxのEee PC 900へのインストール: 日本語入力システムのインストール
+
+<p>(工事中 90%)</p>
+
+<h2>はじめに</h2>
+
+<p>uim上にTUT-Codeを乗せる。</p>
+
+<h2>uimのインストール</h2>
+
+<p><code>% emerge -pv uim</code></p>
+
+<p>/etc/portage/make.confのCPU_FLUGS_X86にsseを追加した。</p>
+
+<p><code>% sudo emerge -av uim</code></p>
+
+<p>
+31パッケージがインストールされるのですこし時間がかかるかもしれない。
+1時間20分かかった。
+</p>
+
+<h2>.xinitrcの編集</h2>
+
+<p>
+日本語入力を可能にするためにはいくつかの環境変数の設定が必要になる。
+またuim-ximに--engine=tutcodeオプションをつけて立ち上げる。
+これはXを立ち上げるときに行うので.xinitrcに書き込む。
+</p>
+
+<p><code>% vi ~/.xinitrc<br/>
+export LANG="ja_JP.UTF-8"<br/>
+export XMODIFIERS="@im=uim"<br/>
+uim-xim --engine=tutcode&amp;<br/>
+exec xmonad</code></p>
+
+<p>
+一度Xから抜けて再度入る。
+Shift-Spaceで日本語の入力が可能となる。
+</p>
+
+<h2>交ぜ書き変換用の辞書</h2>
+
+<p>
+ホームディレクトリに交ぜ書き含換用の辞書を置いておく。
+ここにとりあえずの<a href="/computer/gentoo/install/eeepc_900/mazegaki.dic"
+>.mazegaki.dic</a>を置く。
+</p>
+
+<p>
+以下のようにしてファイルを取得する。
+</p>
+
+<p><code>% curl -o ~/.mazegaki.dic https://skami.iocikun.jp/computer/genmtoo/install/eeepc_900/mazegaki.dic</code></p>
+
+<p>
+Xに入り直すと交ぜ書き変換が可能となる。
+</p>
+
+<h2>成功</h2>
+
+<p>これで日本語入力が可能となった。</p>
+
+<h2>追加の設定</h2>
+
+<p>
+現在の入力モードがわからないと面倒なので追加の設定をする。
+またEscキーで日本語入力も抜けられるとvimで使う場合に便利。
+</p>
+
+<p><code>% uim-pref-gtk</code></p>
+
+<p>
+「カーソルの側に入力モードを表示」をチェックする。
+「TUT-Code」のページに移動し「vi協調モードを有効にする」をチェックする。
+</p>

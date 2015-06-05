@@ -1,0 +1,60 @@
+Gentoo LinuxのEee PC 900へのインストール: Firefoxのインストール
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+Webを参考にインストール作業を行っているので、
+Firefoxを入れておけばEee PC 900単体でのインストールも可能となる。
+よってここでFirefoxを入れておく。
+</p>
+
+<h2>syncとアップデート</h2>
+
+<p>
+Firefoxのインストールにもかなりの時間がかかるので、
+せっかくならば最新版を入れておきたい。
+よって先にsyncをする。
+syncしたらまずは既存のシステムを最新にする。
+</p>
+
+<p>
+また、忘れていたが循環依存の問題のために一時的に無効にしていたUSE変数を
+もとにもどしておくことにする。
+また、suspendパッケージに必要だった追加のUSEがxmltoファイルに入っている。
+suspendパッケージは使わなかったのでこれもついでに消してしまおう。
+</p>
+
+<p><code>% sudo rm /etc/portage/package.use/xmlto<br/>
+% sudo rm /etc/portage/package.use/qtgui</code></p>
+
+<p>Portage樹の更新。</p>
+
+<p><code>% sudo emerge --sync</code></p>
+
+<p>
+3分ほどかかる。
+システムのアップデート。
+</p>
+
+<p><code>% sudo emerge -avu --deep --newuse system</code></p>
+
+<p>
+USEの変更を行った部分で4つのパッケージが再コンパイルされる。
+1時間20分かかった。
+</p>
+
+<p>次はシステムに含まれないパッケージのアップデートを行う。</p>
+
+<p><code>% emerge -pvu --deep --newuse world</code></p>
+
+<p>古いパッケージはとくにないようだ。</p>
+
+<h2>firefoxのインストール</h2>
+
+<p><code>% emerge -pv firefox</code></p>
+
+<p>とくに問題なさそうだ。</p>
+
+<p><code>% sudo emerge -av firefox</code></p>

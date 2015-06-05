@@ -1,0 +1,140 @@
+Gentoo LinuxのEee PC 900へのインストール: ハイバネーション
+
+<p>(工事中 40%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+Gentoo Linuxではコンパイル作業に時間がかかることが多い。
+またEee PC 900は持ち運ぶことが想定されている。
+よって、コンパイル作業を一時中断して、再開できる必要がある。
+そのためにハイバネーションできるようにする。
+</p>
+
+<h2>参考にするページ</h2>
+
+<p><a href="https://wiki.gentoo.org/wiki/Suspend_and_hibernate"
+>gentoo linuxのSuspend and hibernate</a>を参考にする。</p>
+
+<h2>カーネルの設定の確認</h2>
+
+<p>
+まずはカーネルの設定のSUSPENDやHIBERNATIONがyesになっていることを確認する。
+</p>
+
+<p><code>% zcat /proc/config.gz | grep -i hibernation<br/>
+% zcat /proc/config.gz | grep -i suspend</code></p>
+
+<h2>sys-power/suspendのインストール</h2>
+
+<p>
+sys-power/suspendパッケージをインストールする。
+</p>
+
+<p><code>% sudo emerge -av sys-power/suspend</code></p>
+
+<p>
+dev-libs/libgpg-error, dev-libs/lzo, dev-libs/libgcryptパッケージの
+USEフラグにstatic-libsを追加する必要がある。
+</p>
+
+<p><code>% sudo emerge -av sys-power/suspend</code></p>
+
+<p>
+5パッケージインストールされるがそんなに時間はかからないと思われる。
+</p>
+
+<h2>メモリへのサスペンド</h2>
+
+<p>
+まずはメモリへのサスペンドを試す。
+</p>
+
+<p><code>% sudo s2ram</code></p>
+
+<p>
+サスペンド状態となる。
+電源スイッチでもとにもどる。
+</p>
+
+<h2>メモ</h2>
+
+<p>
+このあと色々やったがなかなかうまくいかない。
+結局、sys-power/suspendパッケージやsys-power/hibernate-scriptを使用せずに、
+直接、以下のようにしたらうまく動いた。
+</p>
+
+<p><code>% echo disk | sudo tee /sys/power/state</code></p>
+
+<p>
+suspend, hibernate-scriptはTuxOnIce用なのだろうか?
+</p>
+
+<p>
+色々いじりすぎて、どうなっているのかわからないので、
+インストールの詳細は次のインストール時に記載することにする。
+</p>
+
+<p>
+とりあえずsuspend, hibernate-scriptはunmergeしておく。
+</p>
+
+<p><code>sudo emerge -avC suspend hibernate-script</code></p>
+
+<p>
+この後、ハイバネートが2回起こってしまうという問題が生じた。
+以下のように対処した。
+</p>
+
+<p><code>sudo emerge -av hibernate-script<br/>
+sudo rc-update add hibernate-cleanup boot</code></p>
+
+<h2>スイッチボタンでサスペンド</h2>
+
+<p>
+スイッチボタンを押したらメモリへのサスペンドをするようにする。
+まずはacpidのインストールから。
+</p>
+
+<p><code>% sudo emerge -av acpid<br/>
+% sudo rc-update add acpid default<br/>
+% sudo /etc/init.d/acpid start</code></p>
+
+<p>
+/etc/acpi/default.shを編集してスイッチを押されたというイベントに
+メモリへのサスペンドを関連づける。
+</p>
+
+<p><code>% sudoedit /etc/acpi/default.sh<br/>
+...<br/>
+case "$group" in<br/>
+	button)<br/>
+		case "$action" in<br/>
+			power)<br/>
+				# /etc/actions/powerbtn.sh<br/>
+				echo mem &gt; /sys/power/state<br/>
+				;;<br/>
+...</code></p>
+
+
+<h2>画面を閉じたときにハイバネート</h2>
+
+<p><code>% sudoedit /etc/acpi/default.sh
+...<br/>
+case "$group" in<br/>
+	button)<br/>
+		case $action" in<br/>
+			power)<br/>
+				echo mem &gt; /sys/power/state<br/>
+				;;<br/>
+			lid)<br/>
+				echo disk &gt; /sys/power/state<br/>
+				;;<br/>
+...</code></p>
+
+<h2>できたけど</h2>
+
+<p>
+ページはまとまらなかったのでもう一台にインストールするときにまとめること。
+</p>
