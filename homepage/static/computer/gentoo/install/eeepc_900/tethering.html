@@ -1,0 +1,46 @@
+Gentoo LinuxのEee PC 900へのインストール: テザリング
+
+<p>(工事中 90%)</p>
+
+<h2>はじめに</h2>
+
+<p>携帯電話を使ってインターネットに接続できるようにする。</p>
+
+<h2>カーネルの設定</h2>
+
+<p><code>% cd /usr/src/linux<br/>
+% sudo make menuconfig<br/>
+Device Drivers ---&gt;<br/>
+	[*] Network device support ---&gt;<br/>
+		[*] USB Network Adapters ---&gt;<br/>
+			&lt;*&gt; Multi-purpose USB Network Framework ---&gt;<br/>
+				&lt;*&gt; Host for RNDS and ActiveSync devices<br/>
+% sudo make &amp;&amp; sudo make modules_install<br/>
+% sudo make install</code></p>
+
+<p>再起動する。設定の確認。</p>
+
+<p><code>% zcat /proc/config.gz | grep -i rndis_host<br/>
+CONFIG_USB_NET_RNDIS_HOST=y</code></p>
+
+<p>
+最近は/etc/init.d/net.XXXは必要ないのだろうか。
+試してみる。
+</p>
+
+<p>
+一度シャットダウンし、携帯電話を接続してLANケーブルを抜いて
+立ち上げ直す。
+インターネットへの接続を確認する。
+</p>
+
+<p><code>% ping gentoo.org -c 3</code></p>
+
+<p>うまく接続されているようだ。</p>
+
+<h2>成功</h2>
+
+<p>
+いろいろなことが自動化されたようで、カーネルにドライバを追加するだけで、
+テザリングは可能になったようだ。
+</p>

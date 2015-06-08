@@ -1,0 +1,70 @@
+Gentoo LinuxのEee PC 900へのインストール: 音の再生、録音ができるようにする
+
+<p>(工事中 70%)</p>
+
+<h2>カーネルの設定</h2>
+
+<p>
+まずはPCIカードの種類を調べる。
+</p>
+
+<p><code>% /usr/sbin/lspci | grep -i audio<br/>
+... Intel ... High Definition Audio Controller (rev 04)</code></p>
+
+<p>
+Intel HDAであることがわかる。
+コーデックがいくつもあるので、何を使っているのかを調べる。
+</p>
+
+<p><code>% head -n 1 /proc/asound/card0/codec\#0<br/>
+Codec: Realtek ALC662 rev1</code></p>
+
+<p>これらの情報をもとにカーネルの設定を行う。</p>
+
+<p><code>% cd /usr/src/linux<br/>
+% sudo make menuconfig<br/>
+Device Drivers ---&gt;<br/>
+	[*] Sound card support ---&gt;<br/>
+		[*] Advanced Linux Sound Architecture ---&gt;<br/>
+			HD-audio ---&gt;<br/>
+				&lt;*&gt; Build Realtek HD-audio codec support<br/>
+% sudo make &amp;&amp; sudo make modules_install<br/>
+% sudo make install
+</code></p>
+
+<h2>audioグループ</h2>
+
+<p>
+使用しているユーザをaudioグループに入れる。
+</p>
+
+<p><code>% sudo vigr<br/>
+% sudo vigr -s</code></p>
+
+<h2>alsa-utils</h2>
+
+<p>alsa-utilsのインストール。</p>
+
+<p><code>% sudo emerge -av alsa-utils</code></p>
+
+<p>デーモンの設定</p>
+
+<p><code>% sudo rc-update add alsasound boot</code></p>
+
+<p>再起動する。</p>
+
+<p>ボリュームの調整。</p>
+
+<p><code>% alsamixer</code></p>
+
+<p>上下左右の矢印キーと'M'キーで設定する。</p>
+
+<h2>テスト</h2>
+
+<p>録音のテスト</p>
+
+<p><code>% arecord -d 2 test.wav</code></p>
+
+<p>再生のテスト</p>
+
+<p><code>% aplay test.wav</code></p>
