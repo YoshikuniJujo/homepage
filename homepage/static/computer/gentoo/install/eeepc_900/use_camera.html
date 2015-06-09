@@ -1,0 +1,70 @@
+Gentoo LinuxのEee PC 900へのインストール: カメラを使えるようにする
+
+<p>(工事中 90%)</p>
+
+<h2>デバイスの情報</h2>
+
+<p>
+まずはデバイスの情報を得る必要がある。
+おそらくUSBとして接続されているので、usbutilsパッケージの
+lsusbを使う。
+</p>
+
+<p><code>% sudo emerge -av usbutils<br/>
+% lsusb | grep -i genesys</code></p>
+
+<p>Genesys Logic社はWeb Cameraを作っている会社なのでおそらくこれだ。</p>
+
+<h2>カーネルの設定</h2>
+
+<p><code>% cd /usr/src/linux<br/>
+% sudo make menuconfig<br/>
+Device Drivers ---&gt;<br/>
+	&lt;*&gt; Multimedia support ---&gt;<br/>
+		[*] Camera/video grabbers support<br/>
+		[*] Media USB Adapters ---&gt;<br/>
+			&lt;*&gt; USB Video Class</code></p>
+
+<p><code>% sudo make &amp;&amp; sudo make modules_install<br/>
+% sudo make install</code></p>
+
+<p>再起動する。確認する。</p>
+
+<p><code>% dmesg | grep -i uvc<br/>
+% ls /dev/video0</code></p>
+
+<p>
+テスト用にシンプルなビューワを入れる。
+とりあえずcamoramaを選択したが、もっとシンプルなものがあればそちらのほうがいいが。
+
+<p><code>% sudo emerge -av camorama</code></p>
+
+<p>1時間40分かかる。</p>
+
+<p><code>% sudo camorama</code></p>
+
+<p>
+エラーメッセージは出るがカメラはちゃんと動いている。
+使用している一般ユーザをvideoグループに入れると良さそうだ。
+</p>
+
+<p><code>% sudo vigr<br/>
+...<br/>
+video:x:27:root,yoshio<br/>
+...</code></p>
+
+<p><code>% sudo vigr -s<br/>
+...<br/>
+video:::root,yoshio<br/>
+...</code></p>
+
+<p>
+もっと良い方法もあるが、とりあえず簡単なので一度ログアウトして
+ログインし直す。
+</p>
+
+<p><code>% camorama</code></p>
+
+<p>
+これで一般ユーザでもWeb Cameraが使えるようになった。
+</p>

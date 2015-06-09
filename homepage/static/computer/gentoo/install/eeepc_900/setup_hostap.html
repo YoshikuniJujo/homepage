@@ -1,0 +1,186 @@
+Gentoo LinuxのEee PC 900へのインストール: HostAPでアクセスポイントとする
+
+<p>(工事中 30%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+Eee PC 900はWi-Fiカードを内蔵している。
+Gentooからそれを使うことができる。
+アクセスポイントを構築する。
+アクセスポイント自体のテストにはスマホを使うことにする。
+</p>
+
+<h2>参考にしたページ</h2>
+
+<ul>
+<li><a href="https://wiki.gentoo.org/wiki/Home_Router"
+	>gentoo linux: Home Router</a></li>
+<li><a href="http://masap.sakura.ne.jp/wireless/hostapd.html"
+	>hostapdを用いた無線LANアクセスポイントの構築</a></li>
+</ul>
+
+<h2>デバイスの確認</h2>
+
+<p><code>% /usr/sbin/lspci | grep -i wireless<br/>
+01:00.0 Ethernet controller: Qualcom Atheros AR242x / AR542x
+Wireless Network Adapter (PCI-Express) (rev 01)</code></p>
+
+<h2>カーネルの設定</h2>
+
+<p>
+今回は再起動を省略するためにモジュールとしてコンパイルする。
+</p>
+
+<p><code>% cd /usr/src/linux<br/>
+% sudo make menuconfig<br/>
+Device Drivers ---&gt;<br/>
+	[*] Network device support ---&gt;<br/>
+		[*] Wireless LAN ---&gt;<br/>
+			&lt;M&gt; Atheros Wireless Cards ---&gt;<br/>
+				&lt;M&gt; Atheros 5xxx wireless cards suport<br/>
+% sudo make &amp;&amp; sudo make modules_install</code></p>
+
+<p>
+これでモジュールができた。
+さきに今あるEthernetのインターフェースを確認しておく。
+</p>
+
+<p><code>% ifconfig</code></p>
+
+<p>次にモジュールを読み込んでからもう一度確認する。</p>
+
+<p><code>% sudo modprobe ath5k<br/>
+% ifconfig</code></p>
+
+<p>wlp1s0というインターフェースが増えているのがわかる。</p>
+
+<h2>hostapdパッケージのインストール</h2>
+
+<p><code>% sudo emerge -av hostapd</code></p>
+
+<p>opensslパッケージはUSEフラグbindistをオフにする必要がある。</p>
+
+<p><code>% sudo etc-update<br/>
+% sudo emerge -av hostapd</code></p>
+
+<p>
+opensshのUSEフラグbindistもオフにする必要がありそうだ。
+/etc/portage/package.use/以下のファイルにnet-misc/openssh -bindistを追加する。
+</p>
+
+<p><code>% sudo emerge -av hostapd openssh</code></p>
+
+<h2>iwコマンドのインストール</h2>
+
+<p>hostapdではiwconfigが使えないのでiwコマンドをインストールする。</p>
+
+<p><code>% sudo emerge -av iw</code></p>
+
+<h2>色々とごちゃごちゃ</h2>
+
+<p>
+色々とごちゃごちゃやった。
+覚えているかぎりで記録する。
+</p>
+
+<p>
+/etc/conf.d/netに設定を追加。
+</p>
+
+<p><code>% sudoedit /etc/conf.d/net<br/>
+...<br/>
+modules_wlp1s0="!iwconfig !wpa_supplicant"<br/>
+config_wlp1s0="192.168.0.1/24"</code></p>
+
+<p>
+/etc/conf.d/hostapdの設定を変更。
+</p>
+
+<p><code>% sudoedit /etc/conf.d/hostapd<br/>
+...<br/>
+INTERFACES="wlp1s0"<br/>
+...
+</code></p>
+
+<p><code>
+% sudoedit /etc/hostapd/hostapd.conf<br/>
+interface=wlp1s0<br/>
+hw_mode=g<br/>
+ieee80211d=1<br/>
+<br/>
+ssid=hoge<br/>
+auth_algs=3<br/>
+wpa=2<br/>
+wpa_key_mgmg=WPA-PSK<br/>
+rsn_pairwise=CCMP<br/>
+wpa_passphrase=hogepiyo<br/>
+</code></p>
+
+<p>% sudo /etc/init.d/hostapd</p>
+
+<h2>dhcpの導入</h2>
+
+<p><code>% sudo emerge -av dhcp</code></p>
+
+<p>/etc/conf.d/netの設定が何故かうまくいかないので手動でIPアドレスを設定。</p>
+
+<p><code>% sudo ifconfig wlp1s0 192.168.42.1 netmask 255.255.255.0</code></p>
+
+<p>DHCPサーバの設定をする。</p>
+
+<p><code>sudoedit /etc/dhcp/dhcpd.conf<br/>
+subnet 192.168.42.0 netmask 255.255.255.0 {<br/>
+	range 192.168.42.10 192.168.42.20;
+}</code></p>
+
+<p><code>sudo /etc/init.d/dhcpd start</code></p>
+
+<h2>IPマスカレードの設定</h2>
+
+
+<p><code>% sudo iptables -F<br/>
+% sudo iptables -t nat -F<br/>
+% sudo iptables -P INPUT ACCEPT<br/>
+% sudo iptables -P OUTPUT ACCEPT<br/>
+% export LAN=wlp1s0<br/>
+% export WAN=enp3s0<br/>
+% sudo iptables -I INPUT 1 -i ${LAN} -j ACCEPT<br/>
+% sudo iptables -I INPUT 1 -i lo -j ACCEPT<br/>
+% sudo iptables -A INPUT -p UDP --dport bootps ! -i ${LAN} -j REJECT<br/>
+% sudo iptables -A INPUT -p UDP --dport domain ! -i ${LAN} -j REJECT<br/>
+(% sudo iptables -A INPUT -p TCP --dport ssh -i ${WAN} -j ACCEPT)<br/>
+% sudo iptables -A INPUT -p TCP ! -i ${LAN} -d 0/0 --dport 0:1023 -j DROP<br/>
+% sudo iptables -A INPUT -p UDP ! -i ${LAN} -d 0/0 --dport 0:1023 -j DROP<br/>
+% sudo iptables -I FORWARD -i ${LAN} -d 192.168.0.0/255.255.0.0 -j DROP<br/>
+% sudo iptables -A FORWARD -i ${LAN} -s 192.168.0.0/255.255.0.0 -j ACCEPT<br/>
+% sudo iptables -A FORWARD -i ${WAN} -d 192.168.0.0/255.255.0.0 -j ACCEPT<br/>
+% sudo iptables -t nat -A POSTROUTInG -o ${WAN} -j MASQUERADE<br/>
+% echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward<br/>
+% for f in /proc/sys/net/ipv4/conf/*/rp_filter; do echo 1 | sudo tee $f; done<br/>
+% sudo /etc/init.d/iptables save<br/>
+% sudo rc-update add iptables default
+</code></p>
+
+<p>以下はまだやっていないが...</p>
+
+<p><code>sudoedit /etc/sysctl.conf<br/>
+net.ipv4.ip_forward = 1<br/>
+net.ipv4.conf.default.rp_filter = 1<br/>
+net.ipv4.ip_dynaddr = 1</code></p>
+
+<h2>SSIDを公開しない</h2>
+
+<p>SSIDを公開しないことでセキュリティがすこし向上する。</p>
+
+<p><code>% sudoedit /etc/hostapd/hostapd.conf<br/>
+ignore_broadcast_ssid=1</code></p>
+
+<p>
+ただし、イタズラ防止程度の意味しかない。
+ステルスにしないほうがセキュリティ上望ましいという意見もある。
+単純化するとアクセスポイント側がSSIDを公開しないということは、
+接続を要求する側がSSIDを指定する必要があるということ。
+つまり、アクセスポイント側からSSIDが漏れる可能性は減少するが、
+接続を要求する側から漏れる可能性は増加するということ。
+</p>

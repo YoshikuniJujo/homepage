@@ -1,6 +1,6 @@
 Gentoo LinuxのEee PC 900へのインストール: スカイプのインストール
 
-<p>(工事中 0%)</p>
+<p>(工事中 80%)</p>
 
 <h2>skypeパッケージのインストール</h2>
 
@@ -11,4 +11,26 @@ Gentoo LinuxのEee PC 900へのインストール: スカイプのインスト�
 <p><code>% sudo etc-update<br/>
 % sudo emerge -av skype</code></p>
 
-<p>ある程度時間がかかりそうだ。</p>
+<p>ある程度時間がかかりそうだ。6時間くらいかかる。</p>
+
+<h2>失敗</h2>
+
+<p>
+おそらくpulseaudioあたりの問題かと思われる。
+alsaは使えているし、とくにSkypeを使う予定もないので「まあいいや」
+</p>
+
+<h2>成功</h2>
+
+<p>
+dbusが走っていなかったのが問題だったようだ。
+</p>
+
+<p><code>% sudo /etc/init.d/dbus start<br/>
+% pulseaudio --start</code></p>
+
+<h2>dbusを起動時に走らせる</h2>
+
+<p><code>% sudo rc-update add dbus default</code></p>
+
+<p>再起動してチェックしてみる。</p>
