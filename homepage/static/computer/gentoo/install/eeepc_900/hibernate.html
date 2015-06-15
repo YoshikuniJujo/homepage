@@ -129,7 +129,10 @@ case "$group" in<br/>
 				echo mem &gt; /sys/power/state<br/>
 				;;<br/>
 			lid)<br/>
-				echo disk &gt; /sys/power/state<br/>
+				state=$(cat /proc/acpi/button/lid/LID/state | sed -e 's/\s\+/ /g' | cut -d' ' -f2)<br/>
+				if [ "$state" == "closed" ]; then<br/>
+					echo disk &gt; /sys/power/state<br/>
+				fi<br/>
 				;;<br/>
 ...</code></p>
 
