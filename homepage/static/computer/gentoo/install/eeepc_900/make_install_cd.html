@@ -1,23 +1,22 @@
 Gentoo LinuxをEee PC 900へインストールする: インストールCDの作成
 
-<p>(工事中 90%)</p>
-
 <h2>ここですること</h2>
 
 <p>
 インストールCDを作成する。
-インストール作業はこのCDからブートした環境上で行っていくことになる。
+インストール作業はこのCDからブートした環境で行う。
 </p>
 
 <h2>参考にするページ</h2>
 
 <p>
 Gentoo LinuxのオフィシャルなページのHandbookを参考にする。
-CPUの種類によって分かれているので適切なページを選ぶ必要がある。
-たいていはx86かAMD64(x86_64)のどちらかを選べば良い。
-Eee PC 900はWikipediaによるとCeleron-M ULV 353相当とのこと。
+CPUの種類によって分かれているので適切なページを選ぶ。
+PC/AT互換機ではx86かAMD64(x86_64)のどちらかだ。
+Wikipediaによると<a href="http://ja.wikipedia.org/wiki/Eee_PC"
+>Eee PC</a> 900はCeleron-M ULV 353相当である。
 これの機能を見てみるとMMX, SSE, SSE2とあり、Intel 64がないので、
-x86のほうを参照すれば良いことがわかる。
+x86のほうを参照すれば良い。
 </p>
 
 <p>
@@ -39,7 +38,7 @@ x86のほうを参照すれば良いことがわかる。
 
 <h2>ISOイメージの取得</h2>
 
-<p>まずはミラーサイトを選ぼう。</p>
+<p>ミラーサイトを選ぶ。</p>
 
 <p><a href="https://www.gentoo.org/downloads/mirrors/#JP">日本のミラー</a></p>
 
@@ -92,7 +91,7 @@ b2df48...63cf39 install-x86-minimal-20150526.iso</code></p>
 
 <h2>CD-Rへの書き込み</h2>
 
-<p>用意したCD-Rを挿入したうえで以下のようにする。</p>
+<p>用意したCD-Rを挿入し以下のようにする。</p>
 
 <p><code>% cdrecord install-minimal-20150526.iso</code></p>
 
@@ -107,7 +106,7 @@ README.txt gentoo.efimg gentoo.efimg.mountPoint image.squashfs isolinux livecd<b
 % sudo eject</code></p>
 
 <p>
-CDにラベルをつけよう。
+CDにラベルをつける。
 マジックペンでinstall-x86-minimal-20150526.isoと書いておく。
 念のためSHA512HASH: b2df48...63cf39も書いておくことにする。
 </p>
