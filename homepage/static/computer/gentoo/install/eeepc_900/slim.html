@@ -1,0 +1,28 @@
+Gentoo LinuxのEee PC 900へのインストール: SLiMのインストールと設定
+
+<h2>SLiMのインストール</h2>
+
+<p><code>% sudo emerge -av x11-misc/slim</code></p>
+
+<h2>起動時に走らせる</h2>
+
+<p><code>% sudoedit /etc/conf.d/xdm<br/>
+DISPLAYMANAGER="slim"<br/>
+% sudo rc-update add xdm default</code></p>
+
+<h2>.xinitrcを使うようにする</h2>
+
+<p><code>% sudoedit /etc/slim.conf</code></p>
+
+<h2>再起動</h2>
+
+<p>再起動してみる。</p>
+
+<h2>成功</h2>
+
+<p>
+うまくいったが、SLiMは今開発がストップしているようだ。
+他に良さそうなディスプレイマネージャも見当たらないし、どうしようか。
+一番良さそうなのはフォークしてしまい、Haskellで書き直していくこと、かな。
+あるいはSLiMを参考にして1からHaskellで書くか。
+</p>

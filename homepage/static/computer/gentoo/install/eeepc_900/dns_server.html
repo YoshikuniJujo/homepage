@@ -1,0 +1,106 @@
+Gentoo LinuxのEee PC 900へのインストール: DNSサーバにする
+
+<p>(工事中 40%)</p>
+
+<h2>BINDの導入</h2>
+
+<p><code>% sudo emerge -av bind</code></p>
+
+<p>
+USEフラグdlzが必要らしい。
+</p>
+
+<p><code>% sudoedit /etc/portage/package.use/bind<br/>
+&gt;=net-dns/bind-9.10.1_p1	dlz</code></p>
+
+<p><code>% sudo emerge -av bind</code></p>
+
+<h2>奥が深い</h2>
+
+<p>
+DNSやBINDについてよく学ぶ必要がありそうだ。
+</p>
+
+<h2>すこし学んだ</h2>
+
+<p>色々とぐちゃぐちゃとしたので、正確ではないが、うまくいったのでメモする。</p>
+
+<p>
+BINDの設定をする。
+</p>
+
+<p><code>% sudoedit /etc/bind/named.conf<br/>
+...<br/>
+acl "trusted" {<br/>
+	...<br/>
+	192.168.42.0/24;<br/>
+	...<br/>
+}<br/>
+...<br/>
+	listen-on { 127.0.0.1; 192.168.42.1; };
+...</code></p>
+
+<p>
+走らせる。
+</p>
+
+<p><code>% sudo rc-update add named default<br/>
+% sudo rc-service named start</code></p>
+
+<p>
+必要かわからないが一応iptablesの設定を行っておく。
+</p>
+
+<p><code>% sudo iptables -A INPUT -p udp --sport 53 -m state --state ESTABLISHED,RELATED -j ACCEPT<br/>
+% sudo iptables -A INPUT -p tcp --dport 53 -j ACCEPT<br/>
+% sudo iptables -A INPUT -p udp --dport 53 -j ACCEPT</code></p>
+
+<p>DHCPの設定の変更。</p>
+
+<p><code>% sudoedit /etc/dhcp/dhcpd.conf<br/>
+...<br/>
+option domain-name-servers 192.168.42.1<br/>
+...<br/>
+% sudo rc-service dhcpd restart</code></p>
+
+<h2>テストのためapacheをインストール</h2>
+
+<p><code>sudo emerge -av apache</code></p>
+
+<p><code>sudo rc-service apache2 start</code></p>
+
+<h2>local.hoge.jpを追加</h2>
+
+<p>
+hoge.jpの部分には自分が持っているドメインを入れる。
+</p>
+
+<p><code>% sudo cp /etc/bind/pri/localhost.zone /etc/bind/pri/localhoge.zone<br/>
+% sudoedit /etc/bind/pri/localhoge.zone<br/>
+...<br/>
+@	IN	SOA	local. root.local. (
+...</code></p>
+
+<p>localhoge.zoneファイルの変更のしかたは正しいかどうか自信がない。</p>
+
+<p>BINDの設定にlocal.hoge.jpを追加する。</p>
+
+<p><code>% sudoedit /etc/bind/named.conf<br/>
+...<br/>
+zone "local.hoge.jp" IN {<br/>
+	type master;<br/>
+	file "pri/localhoge.zone";<br/>
+	notify no;<br/>
+};<br/>
+...</code></p>
+
+<h2>スマホから確認</h2>
+
+<p>
+キャッシュ等をクリアするために再起動したほうが良さそうだ。
+</p>
+
+<p>
+ブラウザでlocal.hoge.jpに接続してみる。
+It works!が出れば成功。
+</p>

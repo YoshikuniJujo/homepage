@@ -1,0 +1,142 @@
+Gentoo LinuxのEee PC 900へのインストール: xmobarのインストールと設定
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>上のほうにバーをつけていろいろな情報を表示するとかっこいいように思う。</p>
+
+<h2>xmobarのインストール</h2>
+
+<p><code>% sudo emerge -av xmobar</code></p>
+
+<p>いくつかのパッケージについてACCEPT_KEYWORDSの変更が必要だ。</p>
+
+<p><code>% sudo etc-update<br/>
+% sudo emerge -av xmobar</code></p>
+
+<p>xmonadの便利な機能を集めたパッケージであるxmonad-contribをインストールする。</p>
+
+<p><code>% sudo emerge -av xmonad-contrib</code></p>
+
+<p>これもしばらくかかる。</p>
+
+<h2>デフォルトの設定でのxmobar</h2>
+
+<p>
+まずはデフォルトの設定でxmobarをxmonadに組み込む。
+.xmonad/xmonad.hsを編集する。
+</p>
+
+<p><code>% vi ~/.xmonad/xmonad.hs<br/>
+...<br/>
+import XMonad.Hooks.ManageDocks (avoidStruts)<br/>
+import XMonad.Util.Run (spawnPipe, hPutStrLn)<br/>
+import XMonad.Hooks.DynamicLog (dynamicLogWithPP, defaultPP, PP(ppOutput))<br/>
+<br/>
+main :: IO ()<br/>
+main = do<br/>
+	<span class="indent1">h &lt;- spawnPipe "xmobar"</span><br/>
+	<span class="indent1">xmonad defaultConfig {</span><br/>
+		<span class="indent2">terminal = "urxvt",</span><br/>
+		<span class="indent2">layoutHook = myLayout,</span><br/>
+		<span class="indent2">logHook = dynamicLogWithPP $ defaultPP {</span><br/>
+			<span class="indent3">ppOutput = hPutStrLn h } }</span><br/>
+<br/>
+myLayout = avoidStruts (tiled ||| Mirror tiled ||| Full) ||| Full<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">tiled = Tall 1 (3 / 100) (1 / 2)</span></code></p>
+
+<h2>.xmobarrc</h2>
+
+<p>
+まず、デフォルトのフォントだと日本語の表示が汚ないので、フォントを変更する。
+</p>
+
+<p><code>% vi ~/.xmobarrc<br/>
+Config {<br/>
+	<span class="indent1">font = "xft:Kochi Gothic-10:bold"</span><br/>
+	<span class="indent1">}</span><br/>
+</code></p>
+
+<p>ステータスバーに表示したいものは以下のようになる。</p>
+
+<ul>
+<li>時間</li>
+<li>CPUの使用率</li>
+<li>メモリの使用率</li>
+<li>ネットワークの使用バイト数</li>
+<li>バッテリーの残り容量(%)</li>
+</ul>
+
+<h3>時間</h3>
+
+<p>
+まずは時間を表示する。
+この時、stdinからの入力も表示することにする。
+これはxmonad側からの情報を表示するのに使う。
+</p>
+
+<p><code>% vi ~/.xmobarrc<br/>
+Config {<br/>
+	<span class="indent1">font = "xft:Kochi Gothic-10:bold",</span><br/>
+	<span class="indent1">commands = [</span><br/>
+	<span class="indent2">Run StdinReader,</span><br/>
+	<span class="indent2">Run Date "%Y/%m/%_d %a %H:%M:%S" "date" 10</span><br/>
+	<span class="indent2">],</span><br/>
+	<span class="indent1">template = "%StdinReader% }{ &lt;fc=#ee9a00&gt;%date%&lt;/fc&gt;"</span><br/>
+<span class="indent1">}</span></code></p>
+
+<h3>バッテリー用量</h3>
+
+<p>バッテリーの残りの用量を表示するにはBatteryコマンドを追加する。</p>
+
+<p><code>% vi ~/.xmobarrc<br/>
+...<br/>
+	<span class="indent1">commands = {</span><br/>
+		<span class="indent2">...</span><br/>
+		<span class="indent2">Run Battery [</span><br/>
+			<span class="indent3">"-t", "Bat: <left>%", "-L", "50", "-H", "95",</span><br/>
+			<span class="indent3">"--low", "red", "--normal", "blue", "--high", "green" ] 10</span><br/>
+		<span class="indent2">... ],</span><br/>
+	<span class="indent1">template = "%StdinReader% }{ %battery% | &lt;fc=#ee9a00&gt;%date%&lt;/fc&gt;"</span></code></p>
+
+<h2>ネットワークの使用バイト数</h2>
+
+<p><code>% vi ~/.xmobarrc<br/>
+...<br/>
+	<span class="indent1">commands = [</span><br/>
+		<span class="indent2">...</span><br/>
+		<span class="indent2">Run Network "wlp1s0" [</span><br/>
+			<span class="indent3">"-L", "0", "-H", "32000",</span><br/>
+			<span class="indent3">"--normal", "green", "--high", "red"</span><br/>
+			<span class="indent3">] 10</span><br/>
+		<span class="indent2">Run Network "enp3s0" [</span><br/>
+			<span class="indent3">"-L", "0", "-H", "32000",</span><br/>
+			<span class="indent3">"--normal", "green", "--high", "red"</span><br/>
+			<span class="indent3">] 10</span><br/>
+		<span class="indent2">...</span><br/>
+		<span class="indent2">],</span><br/>
+	<span class="indent1">template = "... }{ %enp3s0% | %wlp1s0% | %battery% | ..." }</span>
+</code></p>
+
+<h2>CPUとメモリの使用率</h2>
+
+<p><code>% vi ~/.xmobarrc<br/>
+...<br/>
+	<span class="indent1">commands = [</span><br/>
+	<span class="indent2">...</span><br/>
+	<span class="indent2">Run Cpu [</span><br/>
+	<span class="indent3">"-L", "3", "-H", "50",</span><br/>
+	<span class="indent3">"--normal", "green", "--high", "red"</span><br/>
+	<span class="indent3">] 10,</span><br/>
+	<span class="indent2">Run Memory [ "-t", "Mem: <usedratio>%" ] 10,</span><br/>
+	<span class="indent2">Run Swap [] 10,</span><br/>
+	<span class="indent2">...</span><br/>
+	<span class="indent2">],</span><br/>
+	<span class="indent1">template = "... }{ %cpu% | %memory% * %swap% | ..." }</span><br/>
+</code></p>
+
+<h2>楽しい</h2>
+
+<p>実用性はともかくステータスバーにいろいろな情報が出て楽しい。</p>

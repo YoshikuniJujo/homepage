@@ -1,0 +1,32 @@
+Gentoo LinuxのEee PC 900へのインストール: HostAPでアクセスポイントとする
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+Eee PC 900はWi-Fiカードを内蔵している。
+Gentooからそれを使うことができる。
+しかし、それをテストするにはアクセスポイントが必要である。
+そのために、まずはアクセスポイントを構築することにする。
+アクセスポイント自体のテストにはスマホを使うことにする。
+</p>
+
+<h2>使用するデバイス</h2>
+
+<p>
+USB無線LANアダプター: SONY UWA-BR100
+</p>
+
+<h2>参考にしたページ</h2>
+
+<a href="http://masap.sakura.ne.jp/wireless/hostapd.html"
+	>hostapdを用いた無線LANアクセスポイントの構築</a>
+
+<h2>デバイスの確認</h2>
+
+<p><code>% lsusb | grep -i uwa-br100<br/>
+Bus 001 Device 006: ID 0411:017f BUFFALO INC. (formerly MelCo., Inc.) Sony
+UWA-BR100 802.11abgn Wireless Adapter [Atheros AR7010+AR9280]</code></p>
+
+<h2>カーネルの設定</h2>

@@ -1,0 +1,62 @@
+Gentoo LinuxのEee PC 900へのインストール: 充電容量の低下でハイバネートする
+
+<p>(工事中 0%)</p>
+
+<h2>アラームの設定</h2>
+
+<p><code>% echo 1300000 | sudo tee /sys/class/power_supply/BAT0/alarm</code></p>
+
+<h2>/etc/acpi/default.shの編集</h2>
+
+<h3>30%未満ならハイバネートする</h3>
+
+<p><code>% sudoedit /etc/acpi/default.sh<br/>
+...<br/>
+	battery)<br/>
+		capacityPercent=$[ \<br/>
+			`cat /sys/class/power_supply/BAT0/charge_now` * 100 /\<br/>
+			`cat /sys/class/power_supply/BAT0/charge_full_design` ]<br/>
+		if [ "${capacityPercent}" -lt 30 ]; then<br/>
+			echo disk &gt; /sys/power/state<br/>
+		fi<br/>
+		;;<br/>
+...</code></p>
+
+<h3>ACアダプタが接続されていたらハイバネートしない</h3>
+
+<p>
+上記の設定だとACアダプタを接続しても30%以上充電されないと
+すぐにハイバネートしてしまうので、
+ACアダプタの接続をテストする処理を入れる。
+</p>
+
+<p>
+まずはACアダプタの状態を入手する方法を試してみる。
+ACアダプタを接続した状態と外した状態とで以下を実行してみる。
+</p>
+
+<p><code>% cat /sys/class/power_supply/AC0/online</code></p>
+
+<p>
+この値が1か0になる。
+よって以下のように条件式を使えば良いだろう。
+</p>
+
+<p><code>if test `cat /sys/class/power_supply/AC0/online` -eq 0; then echo "hoge"; fi</code></p>
+
+<p>このコマンドをACアダプタをつけたり外したりして実行してみる。</p>
+
+<h3>/etc/acpi/default.shの編集</h2>
+
+<p><code>% sudoedit /etc/acpi/default.sh<br/>
+...<br/>
+	battery)<br/>
+		capacityPercent=$[ \<br/>
+			`cat /sys/class/power_supply/BAT0/charge_now` * 100 /\<br/>
+			`cat /sys/class/power_supply/BAT0/charge_full_design` ]<br/>
+		acOnline=`cat /sys/class/power_supply/AC0/online`<br/>
+		if [ "${capacityPercent}" -lt 30 -a ${acOnline} -eq 0 ]; then<br/>
+			echo disk &gt; /sys/power/state<br/>
+		fi<br/>
+		;;<br/>
+...</code></p>
