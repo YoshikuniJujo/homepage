@@ -1,6 +1,6 @@
 Gentoo Linux: Eee PC 900へのインストール
 
-<p>(工事中 50%)</p>
+<p>(工事中 60%)</p>
 
 <h2>CUIの設定まで</h2>
 
@@ -38,18 +38,20 @@ Gentoo Linux: Eee PC 900へのインストール
 <li><a href="/computer/gentoo/install/eeepc_900/hibernate.html"
 	>ハイバネーション</a> (工事中 90%)</li>
 <li><a href="/computer/gentoo/install/eeepc_900/useradd.html"
-	>一般ユーザの追加</a> (工事中 90%)</li>
+	>一般ユーザの追加</a></li>
 <li><a href="/computer/gentoo/install/eeepc_900/cui.html"
-	>CUI環境を整える</a> (工事中 90%)</li>
+	>CUI環境を整える</a></li>
 </ul>
 
 <h2>GUIの設定</h2>
 
 <ul>
 <li><a href="/computer/gentoo/install/eeepc_900/gui_prelude.html"
-	>はじめに</a> (工事中 90%)</li>
+	>はじめに</a></li>
 <li><a href="/computer/gentoo/install/eeepc_900/xorg.html"
-	>Xorgのインストール</a> (工事中 90%)</li>
+	>Xorgのインストール</a></li>
+<li><a href="/computer/gentoo/install/eeepc_900/update1.html"
+	>パッケージのアップデート</a> (工事中 0%)</li>
 <li><a href="/computer/gentoo/install/eeepc_900/ghc.html"
 	>GHCのインストール</a> (工事中 90%)</li>
 <li><a href="/computer/gentoo/install/eeepc_900/xmonad.html"
@@ -61,6 +63,7 @@ Gentoo Linux: Eee PC 900へのインストール
 <ul>
 <li><a href="/computer/gentoo/install/eeepc_900/update_package.html"
 	>パッケージのアップデート</a> (工事中 90%)</li>
+<li>rcのログを保存する (工事中 0%)</li>
 <li><a href="/computer/gentoo/install/eeepc_900/ssh_remotehost.html"
 	>sshによるリモートホストの操作</a> (工事中 60%)</li>
 <li><a href="/computer/gentoo/install/eeepc_900/input_japanese.html"
@@ -91,5 +94,8 @@ Gentoo Linux: Eee PC 900へのインストール
 
 <h2>メモ</h2>
 
-<p>/etc/rc.confでrc_logger="YES"とする。</p>
+<p>
+/etc/rc.confでrc_logger="YES"とする。
+すると/var/log/rc.logでrcのログが読める。
+</p>
 <p>/etc/bind/named.confでresolv.confのnameserverを追加する。</p>

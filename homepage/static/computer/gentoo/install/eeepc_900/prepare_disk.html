@@ -158,6 +158,17 @@ lost+found</code></p>
 
 <p>lost+foundディレクトリがマウントの成功の目安になる。</p>
 
+<h2>メモ: 時間の計測について</h2>
+
+<p>
+timeコマンドを使うか、あるいはdate &gt;&gt; time.tmp ; ...; date &gt;&gt; time.tmp
+とすればどのくらい時間がかかるか記録できる。
+今回の用途では体感が大事なのでdateコマンドを使った方法のほうが良いかもしれない。
+一度試してみる。
+</p>
+
+<p><code># date &gt;&gt; time.tmp; sleep 120; date &gt;&gt; time.tmp</code></p>
+
 <p>
 <a href="/computer/gentoo/install/eeepc_900/boot_from_cd.html"
 	>「インストールCDからのブート」へもどる</a>

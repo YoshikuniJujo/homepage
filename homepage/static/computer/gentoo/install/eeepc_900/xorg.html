@@ -1,7 +1,5 @@
 Gentoo LinuxのEee PC 900へのインストール: Xorgのインストール
 
-<p>(工事中 90%)</p>
-
 <h2>カーネルの設定</h2>
 
 <h3>evdev</h3>
@@ -16,6 +14,11 @@ evdevに統一されてずいぶん楽になった。
 evdevが有効になっていることを確認する。
 </p>
 
+<p><code>% zcat /proc/config.gz | grep -i evdev<br/>
+CONFIG_INPUT_EVDEV=y</code></p>
+
+<p>有効になっていなければ以下のようにして有効にしておく。</p>
+
 <p><code>% cd /usr/src/linux<br/>
 % sudo make menuconfig<br/>
 Device Drivers ---&gt;<br/>
@@ -24,23 +27,14 @@ Device Drivers ---&gt;<br/>
 
 <p>
 tmuxを使ってペインを分割している場合、ターミナルの大きさが19行に満たない。
-この場合Ctrl-b jで上のペインを大きくしてそこでmenuconfigを行えば良い。
-今回はすでにevdevは有効だった。
+Ctrl-b jで上のペインを大きくする。
 </p>
-
-<p>
-あるいは以下のようにも確認できる。
-こっちのほうがスマートだ。
-</p>
-
-<p><code>% zcat /proc/config.gz | grep -i evdev<br/>
-CONFIG_INPUT_EVDEV=y</code></p>
 
 <h3>Kernel modesetting(KMS)</h3>
 
 <p>
 KMSが使われるようになってXのインストールは格段に簡単で安心できるようになった。
-CUIの時点ですでにGUI用のモニタの設定ができているので、
+CUIの時点ですでにGUI用のモニタの設定ができている。
 Xを入れる前にドライバが問題なく働いていることがわかる。
 </p>
 
@@ -58,13 +52,25 @@ Device Drivers ---&gt;<br/>
 
 <p><code>% /usr/sbin/lspci | grep -i graphics<br/>
 00:02.0 VGA compatible controller: Intel Corporation Mobile 915GM/GMS/901GML Express Graphics Controller (rev 04)<br/>
-00:02.1 Display controller: Intel Corporation Monile 915GM/GMS/910GML Express Graphics Controller (rev 04)</code></p>
+00:02.1 Display controller: Intel Corporation Mobile 915GM/GMS/910GML Express Graphics Controller (rev 04)</code></p>
 
 <p>Intelのカードであることがわかる。</p>
 
 <p>カーネルの設定を確認する。</p>
 
-<p><code>sudo make menuconfig<br/>
+<p><code>% zcat /proc/config.gz | grep -i drm_i915<br/>
+CONFIG_DRM_I915=y<br/>
+CONFIG_DRM_I915_KMS=y<br/>
+CONFIG_DRM_I915_FBDEV=y<br/>
+# CONFIG_DRM_I915_PRELIMINARY_HW_SUPPORT is not set<br/>
+</code></p>
+
+<p>
+以上のようになっていれば(多分)大丈夫だ。
+そうでなければ以下のようにIntel用のKMSを有効にする。
+</p>
+
+<p><code>% sudo make menuconfig<br/>
 Device Drivers ---&gt;<br/>
 	Graphics support ---&gt;<br/>
 		/dev/agpgart (AGP Support) ---&gt;<br/>
@@ -73,13 +79,11 @@ Device Drivers ---&gt;<br/>
 			&lt;*&gt; Intel 8xx/9xx/G3x/G4x/HD Graphics<br/>
 			[*]	Enable modesetting on intel by default</code></p>
 
-<p>そのままの設定で問題ない。</p>
-
 <h2>make.confの設定</h2>
 
 <p>
 make.confに2つの環境変数を設定する。
-ついでにここでシステムのデフォルトの言語を日本語に設定してしまおう。
+ついでに言語を日本語に設定しておく。
 VIDEO_CARDS, INPUT_DEVICES, LINGUASを設定する。
 </p>
 
@@ -90,16 +94,18 @@ LINGUAS="ja"</code></p>
 
 <h2>Xorgのインストール</h2>
 
-<p>まずは環境変数が正しく設定されていることを確認する。</p>
+<h3>USE変数等の確認</h3>
 
-<p><code>emerge --ask --verbose --pretend x11-base/xorg-drivers</code></p>
+<p>環境変数が正しく設定されていることを確認する。</p>
+
+<p><code>emerge --pretend --verbose x11-base/xorg-drivers</code></p>
 
 <p>
-表示が流れて消えていってしまった場合、tmuxを使っているのならば、
+表示が流れて消えていってしまうなら、tmuxを使っている場合は、
 Ctrl-b [としCtrl-uで上を見ていけば良い。
 下にもどるにはCtrl-dを使う。
 より細かく移動したければCtrl-y, Ctrl-eを使う。
-コマンド入力にもどるにはESCを押す。
+コマンド入力にもどるにはESCを入力する。
 </p>
 
 <p>
@@ -110,38 +116,50 @@ Ctrl-b [としCtrl-uで上を見ていけば良い。
 ...<br/>
 CPU_FLAGS_X86="sse2"</code></p>
 
-<p>またついでにUSEにclangを入れておこう。</p>
+<p>また、USEにclang, v4lを入れておこう。</p>
 
 <p><code>% sudoedit /etc/portage/make.conf<br/>
 ...<br/>
 USE="...<br/>
 ...<br/>
-zsh-complition clang"<br/>
+zsh-complition clang v4l"<br/>
 ...</code></p>
 
-<p>Xorgをインストールする。</p>
+<h3>インストールされるパッケージの確認</h3>
+
+<p>Xorgとともにインストールされるパッケージを確認する。</p>
+
+<p><code>sudo emerge --pretend --verbose x11-base/xorg-server</code></p>
+
+<h3>llvmのインストール</h3>
+
+<p>
+llvmパッケージのインストールに非常に時間がかかるので、
+さきにそれをインストールしてしまう。
+</p>
+
+<p><code>% sudo emerge --ask --verbose llvm</code></p>
+
+<p>
+6時間ほどかかる。
+何か別の仕事をするべきだろう。
+とりあえずは昼食とする。
+</p>
+
+<h3>Xorgのインストール</h3>
 
 <p><code>sudo emerge --ask --verbose x11-base/xorg-server</code></p>
 
 <p>
 USE等の変数をざっとチェックする。
-72個のパッケージがインストールされるので相当時間がかかるはずだ。
-</p>
-
-<p>
-現在llvmのインストール中。
-これに非常に時間がかかる様子。
-次回はllvmを別にインストールしてからXorgをインストールしたほうが良いかもしれない。
-</p>
-
-<p>
-最終的に8時間半かかった。
+70個のパッケージがインストールされる。
+2時間半かかる。
 </p>
 
 <p><code>% startx</code></p>
 
 <p>
-xtermがないためにエラーとなったようだ。
+xtermがないためにエラーとなる。
 xtermをインストールする。
 </p>
 
@@ -158,11 +176,11 @@ twmというウィンドウマネージャが立ち上がる。
 
 <h2>成功</h2>
 
-<p>これでXorgのインストールに成功した。</p>
+<p>Xorgのインストールに成功した。</p>
 
 <p>
 <a href="/computer/gentoo/install/eeepc_900/gui_prelude.html"
 	>「GUI: はじめに」へもどる</a>
-<a href="/computer/gentoo/install/eeepc_900/ghc.html"
-	>「GHCのインストール」へ</a>
+<a href="/computer/gentoo/install/eeepc_900/update1.html"
+	>「パッケージのアップデート」へ</a>
 </p>

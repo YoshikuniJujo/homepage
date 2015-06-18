@@ -1,0 +1,184 @@
+パッケージのアップデート
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+Xをインストールが終わったこの段階で、そろそろパッケージをアップデートしておこう。
+いくつかの問題が生じる。
+これらの問題は例でありインストールのタイミングによって異なる問題が生じるはずだ。
+</p>
+
+<h2>systemのアップデート</h2>
+
+<p>
+今までemergeのオプションを--pretend, --ask, --verboseと冗長に書いてきたが、
+これらに関しては今後-pvや-avのようにまとめることにする。
+アップデートにはさらに--update, --deep, --newuseを追加することにする。
+</p>
+
+<p>systemはシステムの中核となるパッケージをまとめたメタパッケージである。</p>
+
+<p><code>% emerge -pv --update --deep --newuse system</code></p>
+
+<p>
+依存関係に循環参照(circular dependencies)が生じている。
+よくあることだ。
+このような場合は適切なUSE変数を一度無効にしてemergeする。
+あとで、そのUSEを有効にしてインストールし直すのが良い。
+</p>
+
+<p>
+今回はqt4はとくに使う気はないので、全体のUSE変数のqt4を無効にする。
+</p>
+
+<p><code>% sudoedit /etc/portage/make.conf<br/>
+USE="...<br/>
+...<br/>
+... -qt4"<br/>
+...</code></p>
+
+<p>
+まだ解消しないのでxmltoのUSE変数からlatexを無効にする。
+これはあとで有効にしてemergeし直すことにする。
+</p>
+
+<p><code>% sudoedit /etc/portage/package.use/xmlto<br/>
+=app-text/xmlto-0.0.26	-latex</code></p>
+
+<p><code>% emerge -pv --update --deep --newuse system</code></p>
+
+<p>
+USE変数をざっと見ておこう。
+上のほうに流れていった部分はCtrl-b [とし、Ctrl-u, Ctrl-dで大きく移動したり、
+Ctrl-y, Ctrl-eで1行ずつ移動しながら見ていくと良い。
+</p>
+
+<p>問題なさそうなので実際にインストールする。</p>
+
+<p><code>% emerge -av --update --deep --newuse system</code></p>
+
+<p>
+159パッケージがコンパイルされる。
+11時間かかる。
+</p>
+
+<p>xmltoパッケージのUSE変数latexを有効にして再コンパイルする。</p>
+
+<p><code>% sudo rm /etc/portage/package.use/xmlto</code></p>
+
+<p>
+xmltoパッケージは依存関係上インストールされるパッケージであり
+目的としてインストールするパッケージではない。
+このような場合、その意図をはっきりさせるために--oneshotをつけると良い。
+</p>
+
+<p><code>% sudo emerge -av --oneshot xmlto</code></p>
+
+<p>
+41パッケージがコンパイルされる。
+2時間ほどかかる。
+</p>
+
+<p>
+システムの中核となるパッケージがアップデートされたので再起動してみよう。
+</p>
+
+<p><code>% sudo reboot</code></p>
+
+<h2>worldのアップデート</h2>
+
+<p><code>% emerge -pv --update --deep --newuse world</code></p>
+
+<p>とくにアップデートの必要なパッケージはないようだ。</p>
+
+<h2>revdep-rebuild</h2>
+
+<p>
+ライブラリ等の依存関係をチェックしてパッケージをアップデートする。
+まずはgentoolkitをインストールする。
+</p>
+
+<p><code>% sudo emerge -av gentoolkit</code></p>
+
+<p>
+これは1分で終わる。
+zshを使っているなら以下のコマンドを実行しておくと補完のデータが更新される。
+</p>
+
+<p><code>% rehash</code></p>
+
+<p>
+依存関係をチェックしてコンパイルし直す。
+'--'のあとに指定することでemergeにオプションを渡すことができる。
+</p>
+
+<p><code>% sudo revdep-rebuild -- -av</code></p>
+
+<h2>depclean</h2>
+
+<p>依存関係的に不要となったパッケージを消去する。</p>
+
+<p><code>% sudo emerge -av --depclean</code></p>
+
+<p>
+nanoとperl-Module-Buildが消去されるらしい。
+問題ないのでyesとする。
+</p>
+
+<h2>Portageデータベースの更新</h2>
+
+<p>Portageデータベースを更新する。</p>
+
+<p><code>% sudo emerge --sync</code></p>
+
+<p>ネットワークの速さによるが4分ほどで終わった。</p>
+
+<h2>system, worldの更新</h2>
+
+<p>
+systemの更新。
+今度は@systemという表記を使ってみる。
+また--updateもまとめて-pvu, -avuのようにする。
+</p>
+
+<p><code>% emerge -pvu --deep --newuse @system</code></p>
+
+<p>
+worldの更新。
+</p>
+
+<p><code>% emerge -pvu --deep --newuse @world</code></p>
+
+<p>
+どうやらカーネルのバージョンアップがあるようだ。
+</p>
+
+<p><code>% sudo emerge -avu --deep --newuse @world</code></p>
+
+<h2>カーネルのアップデート</h2>
+
+<p>まずは.configをコピーする。</p>
+
+<p><code>% cd /usr/src<br/>
+% sudo cp linux/.config inux-4.0.5-gentoo/</code></p>
+
+<p>
+menuconfigを一度走らせる。
+Ctrl-b jあたりで画面上の領域を広げておく。
+</p>
+
+<p><code>% cd linux-4.0.5-gentoo/<br/>
+% sudo make menuconfig</code></p>
+
+<p>.configを保存し終了させる。</p>
+
+<p><code>% sudo make &amp;&amp; sudo make modules_install</code></p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/xorg.html"
+	>「Xorgのインストール」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900/ghc.html"
+	>「GHCのインストール」へ</a>
+</p>
