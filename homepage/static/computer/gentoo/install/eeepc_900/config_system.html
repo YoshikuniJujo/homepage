@@ -1,12 +1,9 @@
 システムの設定
 
-<p>(工事中 90%)</p>
-
 <h2>fstabの作成</h2>
 
 <p>
-ブート時にマウントするパーティションを指定する等のために
-/etc/fstabファイルを作成する必要がある。
+ブート時にマウントするパーティション等を指定するために/etc/fstabを作成する。
 </p>
 
 <h3>今回のパーティション構成</h3>
@@ -39,7 +36,12 @@
 
 <p><code># vi /etc/fstab</code></p>
 
-<p>以下のような内容にする。</p>
+<p>
+以下のような内容にする。
+UUIDで指定しても良いが今回は簡単なほうを取る。
+ブートのたびにディスクの読み込みの順番が変わってしまうような場合には
+/dev/sda1等の部分をUUID=...にする。
+</p>
 
 <p><code>/dev/sda2 / ext4 noatime 0 1<br/>
 /dev/sdb1 /usr ext4 noatime 0 2<br/>
@@ -52,16 +54,24 @@
 <h3>ホスト名とドメイン情報</h3>
 
 <p>
-PCの名前を決める。この名前は後から変えることができる。
-今回のPCには黒猫のシールがはってあるのでblack_catとしておく。
+PCの名前を決める。名前は後から変えることができる。
+前回のPCには黒猫のシールがはってあったのでblack_catとした。
+今回はキーボードが黄ばんでいるのでyellow_keysとしておく。
 </p>
 
 <p><code>vi /etc/conf.d/hostname<br/>
-hostname="black_cat"</code></p>
+hostname="yellow_keys"</code></p>
 
 <p>
-今回はドメイン名を指定する必要はない。
-ログイン時にhoge.(none)と表示されないように、以下のようにしておく。
+ドメイン名をとりあえずlocal.hoge.jpのようにしてみることにする。
+</p>
+
+<p><code>vi /etc/conf.d/net<br/>
+dns_domain_lo="local.hoge.jp"</code></p>
+
+<p>
+ドメイン名を指定しない場合には、
+ログイン時にhoge.(none)と表示されないように以下のようにする。
 </p>
 
 <p><code>vi /etc/issue<br/>
@@ -69,11 +79,7 @@ hostname="black_cat"</code></p>
 
 <h3>ネットワークへの接続の設定</h3>
 
-<p>
-最終的には有線LANの他にテザリングでも接続できるようにする。
-余力があれば無線LANの設定もしたい。
-しかし、現段階では有線LANのみを扱う。
-</p>
+<p>今は有線LANのみとする。</p>
 
 <p>
 netifrcをインストールする。
@@ -83,20 +89,18 @@ netifrcをインストールする。
 <p><code># emerge --ask --noreplace net-misc/netifrc</code></p>
 
 <p>
-今回はすでにインストールされていたようだ。
-DHCPクライアントは後でインストールする。
+すでにインストールされていた。
+DHCPクライアントはあとでインストールする。
 </p>
 
 <p>
-有線LANに関してはDHCPを使用することにする。
-まずは有線LANのインターフェース名を調べよう。
+有線LANに関してはDHCPを使用する。
+まずは有線LANのインターフェース名を調べる。
 </p>
 
 <p><code># ifconfig | less</code></p>
 
-<p>
-ここで表示されるインターフェースのうちenp3s0が有線LANのインターフェースのようだ。
-</p>
+<p>enp3s0が有線LANのインターフェース名だ。</p>
 
 <p><code># vi /etc/conf.d/net<br/>
 config_enp3s0="dhcp"</code></p>
@@ -111,33 +115,29 @@ config_enp3s0="dhcp"</code></p>
 <p><code># rc-update add net.enp3s0 default</code></p>
 
 <p>しかし、今回はブート後に明示的に
-/etc/init.d/net.enp3s0 startのようにすることにする。</p>
+/etc/init.d/net.enp3s0 startのようにすることとした。</p>
 
 <h3>hostsファイルの作成</h3>
 
 <p>
-/etc/hostsファイルを作成する。
-今回は自分の名前だけ登録しておけば良い。
+/etc/hostsファイルの作成。
+今回は自分の名前だけ登録しておく。
 </p>
 
 <p><code># vi /etc/hosts<br/>
-127.0.0.1 black_cat localhost<br/>
-:1 black_cat localhost</code></p>
+127.0.0.1 yellow_keys localhost<br/>
+:1 yellow_keys localhost</code></p>
 
 <h2>rootパスワードの設定</h2>
-
-<p>
-rootパスワードを設定する。
-</p>
 
 <p><code># passwd</code></p>
 
 <h2>システムの構成の設定</h2>
 
 <p>
-/etc/rc.conf, /etc/conf.d/keymaps, /etc/conf.d/hwclockをいろいろといじる必要がある
-場合があるが、
-今回はそのままの設定で問題ない。
+/etc/rc.conf, /etc/conf.d/keymaps, /etc/conf.d/hwclockを
+いろいろといじる必要がある場合がある。
+今回はそのままの設定で良い。
 </p>
 
 <p>

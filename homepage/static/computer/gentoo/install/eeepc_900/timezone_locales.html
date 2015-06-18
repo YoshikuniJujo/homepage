@@ -1,21 +1,16 @@
 Gentoo LinuxのEee PC 900へのインストール: タイムゾーンとロケールの設定
 
-<p>(工事中 5%)</p>
-
 <h2>タイムゾーンの設定</h2>
 
-<p>
-タイムゾーンを設定する。
-まずは何があるかを調べる。
-</p>
+<p>タイムゾーンを設定する。何があるかを調べる。</p>
 
 <p><code># ls /usr/share/zoneinfo</code></p>
 
-<p>上記の結果のなかからタイムゾーンを選び/etc/timezoneファイルに記述する。</p>
+<p>上記の結果からタイムゾーンを選び/etc/timezoneに記述。</p>
 
 <p><code># echo "Japan" &gt; /etc/timezone</code></p>
 
-<p>timezone-dateパッケージを再設定する。</p>
+<p>timezone-dateパッケージの再設定。</p>
 
 <p><code># emerge --config sys-libs/timezone-data</code></p>
 
@@ -23,7 +18,7 @@ Gentoo LinuxのEee PC 900へのインストール: タイムゾーンとロケ�
 
 <p><code># vi /etc/locale.gen</code></p>
 
-<p>アメリカ英語と日本語の値だけをデコメントする。</p>
+<p>アメリカ英語と日本語の値だけをデコメント。</p>
 
 <p><code># locale-gen<br/>
 # locale -a</code></p>

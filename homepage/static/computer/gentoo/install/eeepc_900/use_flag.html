@@ -1,21 +1,18 @@
 Gentoo LinuxのEee PC 900へのインストール: USEフラグの設定
 
-<p>(工事中 90%)</p>
-
 <h2>USEフラグとは</h2>
 
 <p>
-USEフラグこそが他のディストリビューションとは一線を画すGentooオリジナルな機能
-とも言える。
-USEフラグを指定することでコンパイル段階で、
-それぞれのソフトウェアがどの機能を含み、どの機能を含まないかを決めることができる。
-また、GentooはUSEフラグも加味したうえでパッケージの依存関係を計算してくれる。
+USEフラグは他の多くのディストリビューションと一線を画すGentooオリジナルな機能だ。
+USEフラグによってコンパイル段階で、
+それぞれのソフトウェアがどの機能を含み、どの機能を含まないかを決められる。
+GentooはUSEフラグも加味したうえでパッケージの依存関係を計算してくれる。
 </p>
 
 <p>
-パッケージレベルでも、パッケージ内のコードレベルでも、
-自分の求めるシステムにとって必要なものだけを残し、不要なものを削ることができる。
-システムを自分の色に染めるための強力な道具である。
+パッケージレベルでもコードレベルでも、
+自分の求めるシステムに必要なものだけを残し不要なものを削ることができる。
+システムを自分の色に染めるための強力な道具だ。
 </p>
 
 <h2>USEフラグのピックアップ</h2>
@@ -28,24 +25,24 @@ USEフラグを指定することでコンパイル段階で、
 
 <ul>
 <li>clamav: Clam AntiVirusのサポート</li>
-<li>cracklib: cracklib強力パスワードチェックのサポート</li>
+<li>cracklib: パスワードの強度チェックのサポート</li>
 <li>crypt: 暗号化のサポート(mcryptやgpgを使う)</li>
-<li>curl: client側におけるURL変換ライブラリのサポート</li>
+<li>curl: client側におけるURL変換ライブラリ</li>
 <li>ftp: FTPのサポートの追加</li>
 <li>ipv6: IP version 6のサポート</li>
 <li>mime: MIMEのサポート</li>
-<li>nsplugin: Netscapeプラグインアーキテクチャによるブラウザへのプラグイン</li>
+<li>nsplugin: Netscapeプラグインアーキテクチャのサポート</li>
 <li>rss: RSSフィードのサポート</li>
 <li>sasl: Simple Authentication and Security Layerのサポート</li>
 <li>ssl: SSLのサポート</li>
 <li>wifi: ワイアレスネットワークを有効化</li>
 <li>xmpp: XMPPのサポート</li>
+<li>apache2: apache2のサポート</li>
 </ul>
 
 <h4>今回デフォルトの設定にするもの</h4>
 
 <ul>
-<li>apache2: apache2のサポート</li>
 <li>jabber: jabber IMプロトコルのサポート</li>
 <li>jingle: jabberの音声通話を有効にする</li>
 <li>msn: MSNメッセンジャーのサポート</li>
@@ -76,10 +73,10 @@ USEフラグを指定することでコンパイル段階で、
 <li>cairo: cairoグラフィックのサポート</li>
 <li>fontconfig: media-libs/fontconfigによるフォントの設定やカスタマイズのサポート</li>
 <li>glut: GLUTライブラリを使ってOpenGLプラグインを作成する</li>
-<li>gpm: sys-libs/gpm(コンソール上でのマウスドライバー)のサポート</li>
+<li>gpm: コンソール上でのマウスドライバーのサポート</li>
 <li>gtk: gtk+のサポート</li>
 <li>opengl: OpenGLのサポート</li>
-<li>startup-notification: アプリケーション開始のフィードバック機構を有効化</li>
+<li>startup-notification: アプリケーション開始のフィードバックを有効化</li>
 <li>wxwidgets: wxWidgets/wxGTK GUIツールキットのサポート</li>
 <li>xcb: X C-language Bindingのサポート。Xlibを置き換える</li>
 <li>xft: XFTフォントレンダラーのサポート</li>
@@ -140,8 +137,8 @@ dts acpi mmx fxsr sse sse2 ss tm pbe nx bts<br/>
 <li>dbus: dbusのサポート</li>
 <li>dvd: DVDのサポート</li>
 <li>dvdr: DVDの書き込みのサポート</li>
-<li>foomaticdb: プリンタドライバのデータベースfoomaticのサポート</li>
-<li>lm_sensors: lm_sensorsというLinuxのハードウェアセンサーのサポート</li>
+<li>foomaticdb: プリンタドライバのデータベースのサポート</li>
+<li>lm_sensors: Linuxのハードウェアセンサーのサポート</li>
 <li>oss: OSSのサポート</li>
 <li>pulseaudio: PulseAudioのサポート</li>
 <li>scanner: スキャナのサポート</li>

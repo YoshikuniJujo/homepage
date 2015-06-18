@@ -1,29 +1,42 @@
 Gentoo LinuxのEee PC 900へのインストール: Portage樹のインストール
 
-<p>(工事中 90%)</p>
+<h2>portageのスナップショット</h2>
 
-<h2>portageのスナップショットのインストール</h2>
-
-<p>emerge-webrsyncを使ってportageのスナップショットをインストールする。</p>
+<p>emerge-webrsyncでportageのスナップショットをインストール。</p>
 
 <p><code># emerge-webrsync</code></p>
+
+<p>
+portage樹の全体をダウンロードして配置するので多少時間がかかる。
+僕の環境では10分かかった。
+</p>
 
 <h2>portage樹の更新</h2>
 
 <p>
-emerge-webrsyncはたいていは24時間以内のスナップショットをインストールするので、
-特に更新の必要はない。
-ここではインストールが上手くいっていることの確認として行うこととする。
+emerge-webrsyncはたいていは24時間以内のスナップショットをインストールする。
+更新の必要はない。
+インストールがうまくいっていることの確認としてportage樹を更新してみる。
 </p>
 
 <p><code># emerge --sync</code></p>
+
+<p>
+2分ほどかかる。
+RMSの「フリーソフトウェアと自由な社会」でも読んで時間をつぶそう。
+</p>
 
 <h3>ニュース</h3>
 
 <p>
 portage樹を更新したときにニュースがとどく場合がある。
-これはeselect news list, eselect news readによって読むことができる。
-またeslect news purgeでニュースを削除できる。
+これはeselect news list, eselect news read [番号]によって読める。
+またeslect news purgeで読んだニュースを削除できる。
+</p>
+
+<p>
+時々重要なニュースがあったりする。
+「/usrを別パーティションにしている場合initramfsを作らないと起動しなくなる」とか。
 </p>
 
 <h2>プロファイルを選択する</h2>
@@ -36,9 +49,9 @@ portage樹を更新したときにニュースがとどく場合がある。
 <p><code>eselect profile list</code></p>
 
 <p>
-現在のプロファイルはdefault/linux/x86/13.0であることがわかる。
-また3番目にdefault/linux/x86/13.0/desktopがある。
-今回はデスクトップの用途なので一応3番目のプロファイルにしておくことにする。
+デフォルトのプロファイルはdefault/linux/x86/13.0である。
+3番目にdefault/linux/x86/13.0/desktopがある。
+デスクトップの用途なのでこのプロファイルにしておく。
 </p>
 
 <p><code>eselect profile set 3</code></p>

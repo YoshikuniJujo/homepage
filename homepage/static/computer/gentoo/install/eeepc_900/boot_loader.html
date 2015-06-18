@@ -3,16 +3,20 @@ Gentoo LinuxのEee PC 900へのインストール: ブートローダの設定
 <h2>ブートローダについて</h2>
 
 <p>
-BIOSを使っている場合にはGRUB2またはLILOを使い、
-UEFIを使っている場合にはefibootmgrを使う。
-今回はGRUB2を使うことにする。
+使っているマシンに
+BIOSが使われている場合にはGRUB2またはLILOを使い、
+UEFIが使われている場合にはefibootmgrを使う。
+Eee PC 900にはBIOSが使われている。
+GRUB2を使うことにする。
 </p>
 
 <h2>GRUB2</h2>
 
-<p>まずはgrubパッケージをインストールする。</p>
+<p>grubパッケージのインストール。</p>
 
-<p><code># emerge --ask sys-boot/grub</code></p>
+<p><code># emerge --ask --verbose sys-boot/grub</code></p>
+
+<p>20分ほどかかる。</p>
 
 <p><code># grub2-install /dev/sda</code></p>
 
@@ -37,45 +41,34 @@ UEFIを使っている場合にはefibootmgrを使う。
 
 <p>
 /mnt/gentoo/sysがumountできない。
-シャットダウンしてしまえば良いと思う。
+シャットダウンしてしまおう。
 </p>
 
 <p>
 CDは出しておこう。
 </p>
 
-<h2>大失敗(一回目)</h2>
+<h2>成功</h2>
 
 <p>
-原因はだいたいわかった。
-はじめのパーティションを切るところで
-grub用のパーティションを作成する必要があったらしい。
-パーティションの切りかたのミスなので、
-ほど最初からやりなおすことになる。
-</p>
-
-<h2>成功(二回目)</h2>
-
-<p>
-grub用のパーティションを作成して再度インストール作業を遂行したところ、
-うまくいった。
+grub用のパーティションを作成しておいたのでうまくいった。
 プロンプトが出る。
 </p>
 
-<p><code>black_cat login: </code></p>
+<p><code>yellow_keys login: </code></p>
 
 <p>
 rootと入力しリターンを押す。
-以前に設定したroot用のパスワードとリターンを入力する。
+設定したroot用のパスワードとリターンを入力。
 </p>
 
-<p><code>black_cat login: root<br/>
+<p><code>yellow_keys login: root<br/>
 Password:<br/>
-black_cat ~ #</code></p>
+yellow_keys ~ #</code></p>
 
 <p>
 <a href="/computer/gentoo/install/eeepc_900/system_tools.html"
-	>「システムツールのインストール」へ</a>
-<a href="/computer/gentoo/install/eeepc_900/useradd.html"
-	>「一般ユーザの追加」へ</a>
+	>「システムツールのインストール」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900/hibernate.html"
+	>「ハイバネーション」へ</a>
 </p>

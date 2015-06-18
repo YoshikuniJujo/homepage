@@ -1,7 +1,5 @@
 Gentoo LinuxのEee PC 900へのインストール: インストールCDからのブート
 
-<p>(工事中 90%)</p>
-
 <h2>Eee PC本体の用意</h2>
 
 <ol>
@@ -9,30 +7,37 @@ Gentoo LinuxのEee PC 900へのインストール: インストールCDからの
 <li>有線LANを接続する</li>
 <li>キーボードを接続する</li>
 <li>USB CD(DVD)-ROMドライバを接続する
-	<ol>
-	<li>インストールCDを挿入する</li>
-	</ol></li>
+<li>インストールCDを挿入する</li>
 </ol>
 
 <h2>ブート</h2>
 
 <ol>
-<li>電源を入れる</li>
-<li>「boot: 」という表示が出たらキーボードからリターンキーを入力する
+<li>電源ボタンを押す</li>
+<li>「boot: 」という表示が出たらキーボードからリターンキーを入力
 	<ul>
-	<li>キーを押さないで15秒たつとディスクからブートしてしまう</li>
+	<li>キーを押さないと15秒でディスクからブートしてしまう</li>
 	</ul></li>
-<li>ルートでログインしたコンソールが表示される
+<li>コンソールが表示される
 	<ul>
 	<li>livecd ~ # </li>
 	</ul></li>
 </ol>
 
+<h2>x86_64でないことの確認</h2>
+
+<p><code># lscpu<br/>
+...<br/>
+CPU op-mode(s):	32-bit<br/>
+...</code></p>
+
+x86_64であればCPU op-mode(s): 32-bit, 64-bitとなる。
+
 <h2>ネットワーク接続の確認</h2>
 
 <p>
-DHCPが適切に動いている環境であればこの時点でネットに接続できているはずだ。
-pingで確認してみよう。
+DHCPが適切に動いていればすでにネットに接続されているはずだ。
+pingで確認する。
 </p>
 
 <p><code># ping gentoo.org -c 3<br/>
@@ -43,6 +48,10 @@ PING gentoo.org ...<br/>
 <br/>
 --- gentoo.org ping statistics ---<br/>
 3 packets transmitted, 3 recieved, ...</code></p>
+
+<p>
+ちゃんと接続されているようだ。
+</p>
 
 <p>
 <a href="/computer/gentoo/install/eeepc_900/make_install_cd.html"

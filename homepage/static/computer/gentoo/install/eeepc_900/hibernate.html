@@ -1,20 +1,23 @@
 Gentoo LinuxのEee PC 900へのインストール: ハイバネーション
 
-<p>(工事中 40%)</p>
+<p>(工事中 90%)</p>
 
 <h2>はじめに</h2>
 
 <p>
-Gentoo Linuxではコンパイル作業に時間がかかることが多い。
-またEee PC 900は持ち運ぶことが想定されている。
-よって、コンパイル作業を一時中断して、再開できる必要がある。
-そのためにハイバネーションできるようにする。
+Gentoo Linuxではコンパイル作業に時間がかかる。
+コンパイル作業を一時中断して電源を切り再開したい場合がある。
+ハイバネーションを利用すると良い。
 </p>
 
 <h2>参考にするページ</h2>
 
-<p><a href="https://wiki.gentoo.org/wiki/Suspend_and_hibernate"
->gentoo linuxのSuspend and hibernate</a>を参考にする。</p>
+<ul>
+<li><a href="https://wiki.gentoo.org/wiki/Suspend_and_hibernate"
+	>gentooのSuspend and hibernate</a></li>
+<li><a href="https://archlinuxjp.kusakata.com/wiki/Acpid"
+	>archのacpid</a></li>
+</ul>
 
 <h2>カーネルの設定の確認</h2>
 
@@ -22,27 +25,8 @@ Gentoo Linuxではコンパイル作業に時間がかかることが多い。
 まずはカーネルの設定のSUSPENDやHIBERNATIONがyesになっていることを確認する。
 </p>
 
-<p><code>% zcat /proc/config.gz | grep -i hibernation<br/>
-% zcat /proc/config.gz | grep -i suspend</code></p>
-
-<h2>sys-power/suspendのインストール</h2>
-
-<p>
-sys-power/suspendパッケージをインストールする。
-</p>
-
-<p><code>% sudo emerge -av sys-power/suspend</code></p>
-
-<p>
-dev-libs/libgpg-error, dev-libs/lzo, dev-libs/libgcryptパッケージの
-USEフラグにstatic-libsを追加する必要がある。
-</p>
-
-<p><code>% sudo emerge -av sys-power/suspend</code></p>
-
-<p>
-5パッケージインストールされるがそんなに時間はかからないと思われる。
-</p>
+<p><code># zcat /proc/config.gz | grep -i suspend<br/>
+# zcat /proc/config.gz | grep -i hibernation</code></p>
 
 <h2>メモリへのサスペンド</h2>
 
@@ -50,63 +34,60 @@ USEフラグにstatic-libsを追加する必要がある。
 まずはメモリへのサスペンドを試す。
 </p>
 
-<p><code>% sudo s2ram</code></p>
+<p><code># echo mem &gt; /sys/power/state</code></p>
+
+<p>サスペンド状態となる。電源スイッチでもとにもどる。</p>
+
+<h2>SWAP領域のUUIDを調べる</h2>
+
+<p>以下のどちらかの方法でUUIDを調べる。</p>
+
+<p><code># ls -l /dev/disk/by-uuid/ | grep sda</code></p>
+
+<p><code># blkid /dev/sda3</code></p>
+
+<h2>grubの設定を変更</h2>
 
 <p>
-サスペンド状態となる。
-電源スイッチでもとにもどる。
+/boot/default/grubを編集する。
+UUID=5c5d81e1-...の部分には上で調べたUUIDをいれる。
 </p>
 
-<h2>メモ</h2>
+<p><code># vi /boot/default/grub<br/>
+...<br/>
+GRUB_CMDLINE_LINUX_DEFAULT="resume=UUID=5c5d81e1-..."<br/>
+...<br/>
+# grub2-mkconfig -o /boot/grub/grub.cfg</code></p>
+
+<p>試してみよう。</p>
+
+<p><code># echo disk &gt; /sys/power/state</code></p>
 
 <p>
-このあと色々やったがなかなかうまくいかない。
-結局、sys-power/suspendパッケージやsys-power/hibernate-scriptを使用せずに、
-直接、以下のようにしたらうまく動いた。
+電源が切れる。
+電源スイッチでもとの画面に復帰できれば成功。
 </p>
-
-<p><code>% echo disk | sudo tee /sys/power/state</code></p>
-
-<p>
-suspend, hibernate-scriptはTuxOnIce用なのだろうか?
-</p>
-
-<p>
-色々いじりすぎて、どうなっているのかわからないので、
-インストールの詳細は次のインストール時に記載することにする。
-</p>
-
-<p>
-とりあえずsuspend, hibernate-scriptはunmergeしておく。
-</p>
-
-<p><code>sudo emerge -avC suspend hibernate-script</code></p>
-
-<p>
-この後、ハイバネートが2回起こってしまうという問題が生じた。
-以下のように対処した。
-</p>
-
-<p><code>sudo emerge -av hibernate-script<br/>
-sudo rc-update add hibernate-cleanup boot</code></p>
 
 <h2>スイッチボタンでサスペンド</h2>
 
 <p>
-スイッチボタンを押したらメモリへのサスペンドをするようにする。
-まずはacpidのインストールから。
+スイッチボタンを押したらメモリへのサスペンドをするようにしたい。
+まずはacpidをインストールする。
 </p>
 
-<p><code>% sudo emerge -av acpid<br/>
-% sudo rc-update add acpid default<br/>
-% sudo /etc/init.d/acpid start</code></p>
+<p><code># emerge -av acpid</code></p>
+
+<p>1分ほどかかる。</p>
+
+<p><code># rc-update add acpid default<br/>
+# rc-service acpid start</code></p>
 
 <p>
 /etc/acpi/default.shを編集してスイッチを押されたというイベントに
 メモリへのサスペンドを関連づける。
 </p>
 
-<p><code>% sudoedit /etc/acpi/default.sh<br/>
+<p><code># vi /etc/acpi/default.sh<br/>
 ...<br/>
 case "$group" in<br/>
 	button)<br/>
@@ -117,27 +98,106 @@ case "$group" in<br/>
 				;;<br/>
 ...</code></p>
 
+<h3>問題発生</h3>
+
+<p>
+この設定だとスイッチボタンを押したときに2回サスペンドが発生する。
+ACPIイベントをチェックしてみる。
+</p>
+
+<p><code># acpi_listen</code></p>
+
+<p>
+このようにしておきスイッチボタンを押すと以下のようになる。
+</p>
+
+<p><code>button/power PBTN 00000080 00000000<br/>
+button/power LNXPWRBN:00 00000080 00000018</code></p>
+
+<p>
+よくわからないがPBTNと表示されるイベント以外にLNXPWRBNと表示されるイベントも
+生じてしまっている。
+よってPBTNと表示されるイベントのみに応答するようにすれば良い。
+</p>
+
+<p>
+acpi_listenの出力は$1, $2, $3, $4パラメータとして/etc/acpi/handler.shに送られる。
+</p>
+
+<p><code># vi /etc/acpi/default.sh<br/>
+...<br/>
+case "$group" in<br/>
+	button)<br/>
+		case "$action" in<br/>
+			power)<br/>
+				# /etc/actions/powerbtn.sh<br/>
+				case "$device" in
+					PBTN)
+						echo mem &gt; /sys/power/state<br/>
+						;;
+				esac
+				;;<br/>
+...</code></p>
+
+<p>これでサスペンドは一度だけになる。</p>
 
 <h2>画面を閉じたときにハイバネート</h2>
+
+<p>
+画面の開閉で生じるイベントを確認する。
+acpi_listenコマンドを実行したまま画面を閉めてまた開く。
+</p>
+
+<p><code># acpi_listen<br/>
+button/lid LID close<br/>
+button/lid LID open</code></p>
+
+<p>
+画面を閉じたときには
+以下のようなパラメータが/etc/acpi/handler.shに送られることがわかる。
+</p>
+
+<ul>
+<li>$1 button/lid</li>
+<li>$2 LID</li>
+<li>$3 close</li>
+</ul>
 
 <p><code>% sudoedit /etc/acpi/default.sh
 ...<br/>
 case "$group" in<br/>
 	button)<br/>
-		case $action" in<br/>
-			power)<br/>
-				echo mem &gt; /sys/power/state<br/>
-				;;<br/>
+		case "$action" in<br/>
+			...<br/>
 			lid)<br/>
-				state=$(cat /proc/acpi/button/lid/LID/state | sed -e 's/\s\+/ /g' | cut -d' ' -f2)<br/>
-				if [ "$state" == "closed" ]; then<br/>
-					echo disk &gt; /sys/power/state<br/>
-				fi<br/>
+				case "$id" in<br/>
+					close)<br/>
+						echo disk&gt; /sys/power/state<br/>
+						;;<br/>
+				esac<br/>
 				;;<br/>
 ...</code></p>
 
-<h2>できたけど</h2>
+<h2>メモ</h2>
+
+<h3>パッケージについて</h3>
 
 <p>
-ページはまとまらなかったのでもう一台にインストールするときにまとめること。
+sys-power/suspendパッケージやsys-power/hibernate-scriptを使用すると
+うまくいかなかった。
+これらのパッケージはTuxOnIceのみに対応しているのだろうか。
+</p>
+
+<h3>一般ユーザからのサスペンド/ハイバネート</h3>
+
+<p>sudoで何でもできる一般ユーザからは以下のようにできる。</p>
+
+<p><code>% echo mem | sudo tee /sys/power/state<br/>
+% echo disk | sudo tee /sys/power/state</code></p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/boot_loader.html"
+	>「ブートローダの設定」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900/useradd.html"
+	>「一般ユーザの追加」へ</a>
 </p>

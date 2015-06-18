@@ -1,17 +1,18 @@
 システムツールのインストール
 
-<p>(工事中 90%)</p>
-
 <h2>システムロガー</h2>
 
 <p>
 Gentooではすくなくとも3つからロガーを選択することになる。
 sysklogd, syslog-ng, metalogである。
-あまりよくわからないが、metalogが良さそうな気がする。
+あまりよくわからないが、metalogが良さそうだ。
 </p>
 
-<p><code># emerge --ask app-admin/metalog<br/>
-# rc-update add metalog default</code></p>
+<p><code># emerge --ask --verbose app-admin/metalog</code></p>
+
+<p>2分ほどかかる。</p>
+
+<p><code># rc-update add metalog default</code></p>
 
 <h2>クロンデーモン</h2>
 
@@ -20,30 +21,37 @@ sysklogd, syslog-ng, metalogである。
 これもなんとなくfcronを選択。
 </p>
 
-<p><code># emerge --ask sys-process/fcron<br/>
-# rc-update add fcron default<br/>
+<p><code># emerge --ask --verbose sys-process/fcron</code></p>
+
+<p>
+11パッケージがインストールされる。
+30分ほどかかる。
+</p>
+
+<p><code># rc-update add fcron default<br/>
 # crontab /etc/crontab</code></p>
 
 <h2>ファイルインデックス</h2>
 
-<p>mlocateをとりあえずインストールしておく。</p>
+<p>mlocateをとりあえずインストールしておく。1分ほどかかる。</p>
 
-<p><code># emerge --ask sys-apps/mlocate</code></p>
+<p><code># emerge --ask --verbose sys-apps/mlocate</code></p>
 
 <h2>ファイルシステムツール</h2>
 
 <p>
 ファイルシステムにはext4のみを使っている。
-e2fsprogsはすでにインストールされているのでここで新たにインストールする必要はない。
+ext4を扱うツールを集めたパッケージe2fsprogsはすでにインストールされている。
 </p>
 
 <h2>DHCPクライアント</h2>
 
 <p>
-ネットワークの設定にはDHCPを使用するのでDHCPクライアントが必要となる。
+ネットワークの設定にDHCPを使用するのでDHCPクライアントが必要だ。
+1分ほどかかる。
 </p>
 
-<p><code># emerge --ask net-misc/dhcpcd</code></p>
+<p><code># emerge --ask --verbose net-misc/dhcpcd</code></p>
 
 <p>
 <a href="/computer/gentoo/install/eeepc_900/config_system.html"

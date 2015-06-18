@@ -1,8 +1,10 @@
-Gentoo LinuxのEee PC 900へのインストール
-
-<p>(工事中 90%)</p>
+Gentoo LinuxのEee PC 900へのインストール: カーネルの設定
 
 <h2>ソースコードのインストール</h2>
+
+<p>
+カーネルのソースをダウンロードし設置する。10分ほどかかる。
+</p>
 
 <p><code># emerge -av sys-kernel/gentoo-sources<br/>
 # ls -l /usr/src/linux</code></p>
@@ -10,38 +12,37 @@ Gentoo LinuxのEee PC 900へのインストール
 <h2>pciutilsのインストール</h2>
 
 <p>
-カーネルの設定をするにはハードウェアについてよく調べる必要がある。
-pciutilsパッケージを使うことで様々な周辺機器について調べることができる。
+カーネルの設定をするにはハードウェアについて知る必要がある。
+pciutilsパッケージを使えば多くの周辺機器について調べられる。
 </p>
 
 <p><code># emerge -av sys-apps/pciutils</code></p>
+
+<p>1分ほどかかる。</p>
 
 <h2>カーネルの設定を行う</h2>
 
 <p><code># cd /usr/src/linux<br/>
 # make menuconfig</code></p>
 
-<h3>カーネルの設定の取得</h3>
+<h3>CPUファミリーの選択</h3>
 
-<p>動いているカーネルの設定が取得できると便利だ。</p>
+<p>64-bit kernelというオプションを無効にする。</p>
 
-<p><code>General setup ---&gt;<br/>
-	&lt;*&gt; Kernel .config support<br/>
-	[*] Enable access to .config through /proc/config.gz</code></p>
+<p><code>[ ] 64-bit kernel</code></p>
 
-<p>こうしておくと、
-/proc/config.gzで動いているカーネルの設定を取得することができる。</p>
+<p>
+CPUファミリーはPentium-4/Celeron(P4-based)/Pentium-4 M/older Xeonを選んだ。
+</p>
+
+<p><code>Processor type and features ---&gt;<br/>
+	Processor family (Pentium-4/Celeron(P4-based)/Pentium-4 M/older Xeon)</code></p>
 
 <h3>devtmpfsの有効化</h3>
 
 <p>
-ブート時に重要なデバイスファイルが使えるようにdevtmpfsファイルシステムを
-有効にする必要がある。
-</p>
-
-<p>
-ただし、今回使用したカーネルでははじめから有効になっているため以下は
-あえてする必要がない。
+ブート時に重要なデバイスファイルが使えるようにdevtmpfsファイルシステムを有効にする。
+今回使用したパッケージでははじめから有効になっている。
 </p>
 
 <p><code>Device Drivers ---&gt;<br/>
@@ -60,12 +61,8 @@ pciutilsパッケージを使うことで様々な周辺機器について調べ
 <h3>使用するファイルシステムのサポート</h3>
 
 <p>
-今回構成ではExt4のみを使用している。
-よってそれ以外のファイルシステムのサポートは必要ない。
-</p>
-
-<p>
-これもデフォルトで有効。
+今回構成ではExt4のみ。他のファイルシステムのサポートは必要ない。
+デフォルト設定のままで良い。
 </p>
 
 <p><code>File systems ---&gt;<br/>
@@ -73,22 +70,13 @@ pciutilsパッケージを使うことで様々な周辺機器について調べ
 	&lt;*&gt; The Extended 4 (ext4) filesystem<br/>
 	...</code></p>
 
-<h3>CPUファミリーの選択</h3>
+<p>一度menuconfigを抜けて設定を保存しておこう。</p>
 
-<p>64bit CPUではないので、とりあえずIntel P4 ...を選んでおいた。</p>
-
-<p><code>Processor type and features ---&gt;<br/>
-	Processor family (Intel P4 / older netburst based Xeon)</code></p>
-
-<p>また64-bit kernelというオプションを無効にする必要がある。</p>
-
-<p><code>[ ] 64-bit kernel</code></p>
-
-<h3>有線LANのドライバを追加する</h3>
+<h3>有線LANのドライバの追加</h3>
 
 <p>
-Eee PC 900のLANカードを認識させるためのドライバーを組み込むために、
-カーネルに追加の設定が必要となる。
+Eee PC 900のLANカードを認識させるためのドライバーを組み込む。
+まずは使っているLANカードの種類を調べる。
 </p>
 
 <p><code># lspci | grep -i ethernet<br/>
@@ -96,34 +84,69 @@ Eee PC 900のLANカードを認識させるためのドライバーを組み込�
 03:00.0 Ethernet controller: Qualcomm Atheros Attansic L2 Fast Ethernet (rev a0)</code></p>
 
 <p>
-有線LANはQualcomm Atheros Attansic L2 Fast Ethernetという製品であるようだ。
-このカードのドライバを追加することにする。
+有線LANはQualcomm Atheros Attansic L2 Fast Ethernetという製品のようだ。
+このカードのドライバを追加する。
 </p>
 
-<p><code># cd /usr/src/linux<br/>
-# make menuconfig<br/>
+<p><code># make menuconfig<br/>
 Device Driver ---&gt;<br/>
 	[*] Network device support ---&gt;<br/>
 		[*] Ethernet driver support ---&gt;<br/>
 			[*] Atheros devices<br/>
 				&lt;*&gt; Atheros L2 Fast Ethernet support</code></p>
 
-<h3>さらに追加が必要だが</h3>
+<h3>カーネルの設定の取得</h3>
+
+<p>動いているカーネルの設定が取得できると便利だ。</p>
+
+<p><code>General setup ---&gt;<br/>
+	&lt;*&gt; Kernel .config support<br/>
+	[*] Enable access to .config through /proc/config.gz</code></p>
 
 <p>
-とりあえず最低限の設定だけしておいた。
-後でまた追加の設定は必要になるが、
-とりあえずはブートしてCUIで使えるところまで持っていき、
-必要に応じてカーネルの設定を追加していくことにする。
+こうすると/proc/config.gzで動いているカーネルの設定を取得できる。
 </p>
+
+<h3>さらに追加が必要</h3>
+
+<p>
+とりあえず最低限の設定だけ。ブートしてCUIで使えるようにする。
+必要に応じてカーネルの設定を追加する。
+</p>
+
+<h2>tmuxのインストール</h2>
+
+<p>
+画面を分割して使えるとコンパイル画面を見ながら他の作業ができる。
+tmuxをインストールしておく。
+</p>
+
+<p><code># emerge -av tmux</code></p>
+
+<p>
+4分ほどかかる。tmuxを立ち上げて画面を2つに分割しておこう。
+</p>
+
+<p><code># tmux</code></p>
+
+<p>画面の分割は以下のようにする。</p>
+
+<p><code>Ctrl-B "</code></p>
+
+<p>分割された画面間の移動には以下を使う。</p>
+
+<p><code>Ctrl-B o</code></p>
 
 <h2>コンパイル、インストール</h2>
 
 <p><code># make &amp;&amp; make modules_install</code></p>
 
 <p>
-かなり時間がかかるので何か別のことをしよう。
-1時間以上はかかると考えられる。
+1時間弱かかる。何か別のことをしよう。
+お勧めは「フリーソフトウェアと自由な社会」を読むことだ。
+この書籍の内容がまとまっているフリーなページはないのだろうか。
+近いうちにこの書籍に収録されているエッセイの原文を見つけて
+翻訳して掲載したい。
 </p>
 
 <p><code># make install<br/>
@@ -133,10 +156,12 @@ Device Driver ---&gt;<br/>
 
 <p>
 /usr/や/var/が別のパーティションにある場合、initramfsを作成する必要がある。
-sys-kernel/genkernelパッケージが必要になる。
+genkernelを使う。
 </p>
 
 <p><code># emerge -av sys-kernel/genkernel</code></p>
+
+<p>5分ほどかかる。</p>
 
 <p>
 genkernelを使ってinitramfsのインストールを行う。
@@ -145,11 +170,12 @@ genkernelを使ってinitramfsのインストールを行う。
 <p><code># genkernel --install initramfs</code></p>
 
 <p>
-これはある程度時間がかかるようだ。5分ほど待つ。
+「* WARNING: Failed to mount /boot」と言われるが問題ない。
+5分弱待つ。
 </p>
 
 <p>
-ファイルが生成されたことを確認する。
+ファイルがインストールされたことを確認。
 </p>
 
 <p><code># ls /boot/initramfs*</code></p>

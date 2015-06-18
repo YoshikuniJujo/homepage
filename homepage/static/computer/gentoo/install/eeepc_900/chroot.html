@@ -1,43 +1,38 @@
 Gentoo LinuxのEee PC 900へのインストール: chroot: 新しいシステムに入る
 
-<p>(工事中 90%)</p>
-
 <h2>はじめに</h2>
 
 <p>
 chrootを使って/mnt/gentoo/ディレクトリを/とする環境に入り
 インストールを続ける。
-そのために、いくつかの準備が必要となる。
+いくつか準備が必要だ。
 </p>
 
 <h2>ミラーサイトの設定</h2>
 
 <p>
 <a href="https://wiki.gentoo.org/wiki/Handbook:X86/Installation/Base#Optional:_Selecting_mirrors"
->HandbookのSlecting mirrors</a>によるとmirrorselectは
-使わなくなっていく方向とのこと。
-よって、ミラーサイトの設定は飛ばすことにする。
+>HandbookのSelecting mirrors</a>によるとmirrorselectは
+使わなくなっていく方向とのこと。ミラーサイトの設定は飛ばす。
 </p>
 
 <h2>DNS情報のコピー</h2>
 
 <p>
-DNS情報をコピーする必要がある。
-/etc/resolv.confを/mnt/gentoo/etc/にコピーすれば良い。
-cpに-Lオプションを与えることで、
-/etc/resolv.confがシンボリックリンクであったとしても、
-実体のほうをコピーすることができる。
+/etc/resolv.confを/mnt/gentoo/etc/にコピーする。
+cpに-Lオプションを与えることで
+/etc/resolv.confがシンボリックリンクであっても実体のほうをコピーできる。
 </p>
 
 <p><code>cp -L /etc/resolv.conf /mnt/gentoo/etc/</code></p>
 
-<h2>必要なファイルシステムのマウント</h2>
+<h2>ファイルシステムのマウント</h2>
 
 <h3>/proc/</h3>
 
 <p>
-/proc/にマウントされるのは疑似的なファイルシステムであり、
-Linuxカーネルからの情報を参照するのに使われる。
+/proc/にマウントされるのは疑似的なファイルシステムである。
+カーネルからの情報を参照するのに使う。
 </p>
 
 <h3>/sys/</h3>
@@ -57,6 +52,11 @@ udev等のデバイスマネージャーによって扱われるファイルシ�
 
 <h3>実際のマウント</h3>
 
+<p>
+--make-rslaveに何の意味があるのかはわからないがドキュメントに書いてあったので
+そのまま実行する。
+</p>
+
 <p><code>mount -t proc proc /mnt/gentoo/proc<br/>
 mount --rbind /sys /mnt/gentoo/sys<br/>
 mount --make-rslave /mnt/gentoo/sys<br/>
@@ -65,14 +65,15 @@ mount --make-rslave /mnt/gentoo/dev</code></p>
 
 <h2>新しい環境へと移行する</h2>
 
-<p>
-CDからブートされた環境から、
-ディスク上のファイルシステムをルートとする環境への移行を行う。
-</p>
+<p>ディスク上のファイルシステムをルートとする環境への移行。</p>
 
 <p><code># chroot /mnt/gentoo /bin/bash<br/>
 # source /etc/profile<br/>
 # export PS1="(chroot) $PS1"</code></p>
+
+<p>
+3行目はchroot環境下であることを忘れないようにするため。
+</p>
 
 <p>
 <a href="/computer/gentoo/install/eeepc_900/stage3.html"
