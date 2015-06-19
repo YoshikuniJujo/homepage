@@ -40,6 +40,8 @@ showProduct (Product p v) =
 	BSC.unpack p ++ "" `fromMaybe` ((' ' :) . BSC.unpack <$> v)
 showProduct (ProductComment c) = BSC.unpack c
 
+--        Mozilla 5.0 Mobile; LGL25; rv:32.0 Gecko 32.0 Firefox 32.0
+
 testProducts :: [([Product], String)]
 testProducts = [
 	([
@@ -49,9 +51,9 @@ testProducts = [
 		Product "Firefox" (Just "24.0") ], "PC"),
 	([
 		Product "Mozilla" (Just "5.0"),
-		ProductComment "Android; Mobile; rv:37.0",
-		Product "Gecko" (Just "37.0"),
-		Product "Firefox" (Just "37.0") ], "Phone")
+		ProductComment "Mobile; LGL25; rv:32.0",
+		Product "Gecko" (Just "32.0"),
+		Product "Firefox" (Just "32.0") ], "Phone")
 	]
 
 {-
