@@ -6,7 +6,8 @@ Gentoo LinuxのEee PCへのインストール: GHCのインストール
 
 <p>
 ウィンドウマネージャとしてxmonadを使用する。
-xmonadはHaskellで書かれていて、コンパイルのためにGHCが必要になる。
+xmonadはHaskellで書かれている。
+コンパイルのためにGHCが必要だ。
 </p>
 
 <h2>GHCのインストール</h2>
@@ -15,7 +16,7 @@ xmonadはHaskellで書かれていて、コンパイルのためにGHCが必要�
 GHCのインストールには非常に時間がかかる。
 すくなくとも以前はとても時間がかかった。
 覚悟してemergeする。
-まずはUSEフラグの確認から。
+まずはUSEフラグの確認。
 </p>
 
 <p><code>% emerge -pv ghc</code></p>
@@ -28,22 +29,26 @@ GHCのインストールには非常に時間がかかる。
 ...<br/>
 USE="bindist \<br/>
 ...<br/>
-zsh-complition clang llvm"<br/>
+zsh-complition clang v4l -qt4 llvm"<br/>
 ...<br/>
 </code></p>
+
+<p>USE変数を変更したので一応システムを更新しておく。</p>
+
+<p><code>% sudo emerge -avu --deep --newuse @world</code></p>
+
+<p>とくに更新はないようだ。GHCをインストールする。</p>
 
 <p><code>% sudo emerge -av ghc</code></p>
 
 <p>
-以前は10時間ほどかかったこともあったが、最近はかなり速くなっている。
-それでもそれなりの時間はかかると思われるので、
 お茶でも飲んで待つことにする。
-4時間半かかった。
+4時間半かかる。
 </p>
 
 <p>
 <a href="/computer/gentoo/install/eeepc_900/update1.html"
 	>「パッケージのアップデート」へもどる</a>
-<a href="/computer/gentoo/install/eeepc_900"
-	>「Eee PC 900へのインストール」トップへ</a>
+<a href="/computer/gentoo/install/eeepc_900/revert_kernel.html"
+	>「カーネルのバージョンをもどす」へ</a>
 </p>

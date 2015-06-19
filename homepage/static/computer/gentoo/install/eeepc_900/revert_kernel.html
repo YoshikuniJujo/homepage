@@ -1,0 +1,81 @@
+Gentoo GNU/LinuxのEee PC 900へのインストール: カーネルのバージョンをもどす
+
+<p>(工事中 60%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+カーネルのバージョンを4.0.5にしたところハイバネーション後に
+電源が落ちなくなった。
+とりあえずはバージョン3.18.12にもどす。
+すこしコードを調べて問題の個所がわかった段階でバグ報告したいと思う。
+</p>
+
+<h2>古いバージョンのカーネルをemerge</h2>
+
+<p><code>% sudo emerge -av '&lt;sys-kernel/gentoo-sources-4.0.5'</code></p>
+
+<p>10分ほどかかる。</p>
+
+<h2>設定からインストール</h2>
+
+<p>
+.configをコピーし一度menuconfigしておく。
+</p>
+
+<p><code>% cd /usr/src<br/>
+% cp linux/.config linux-3.18.12-gentoo/<br/>
+% cd linux-3.18.12-gentoo/<br/>
+% sudo make menuconfig</code></p>
+
+<p>設定を保存する。</p>
+
+<p>
+コンパイルする。
+</p>
+
+<p><code>% sudo make</code></p>
+
+<p>
+1時間ほどかかる。
+インストールする。
+</p>
+
+<p><code>% sudo make modules_install<br/>
+% sudo make install</code></p>
+
+<h2>initramfsの作成</h2>
+
+<p>/usr/src/linuxのリンク先を変える。</p>
+
+<p><code>% cd /usr/src<br/>
+% sudo rm linux<br/>
+% sudo ln -sf linux-3.18.12-gentoo linux</code></p>
+
+<p>initramfsの作成。</p>
+
+<p><code>% sudo genkernel --install initramfs</code></p>
+
+<h2>grub.cfgの作成</h2>
+
+<p><code>% sudo grub2-mkconfig -o /boot/grub/grub.cfg</code></p>
+
+<p>あまり正しい方法ではないがgrub.cfgの4.0.5の部分を3.18.12に変更する。</p>
+
+<p><code>% sudoedit /boot/grub/grub.cfg<br/>
+(menuentry 'Gentoo GNU/Linux'下の4.0.5の部分を3.18.12に変更する)</code></p>
+
+<h2>再起動</h2>
+
+<p>再起動し確認する。</p>
+
+<p><code>% sudo reboot</code></p>
+
+<p><code>% uname -r</code></p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/ghc.html"
+	>「GHCの導入」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900/xmonad.html"
+	>「Xmonadの導入」へ</a>
+</p>

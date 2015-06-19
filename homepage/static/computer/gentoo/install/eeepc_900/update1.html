@@ -1,6 +1,6 @@
 パッケージのアップデート
 
-<p>(工事中 0%)</p>
+<p>(工事中 70%)</p>
 
 <h2>はじめに</h2>
 
@@ -159,6 +159,8 @@ worldの更新。
 
 <h2>カーネルのアップデート</h2>
 
+<h3>カーネルの設定</h3>
+
 <p>まずは.configをコピーする。</p>
 
 <p><code>% cd /usr/src<br/>
@@ -172,9 +174,92 @@ Ctrl-b jあたりで画面上の領域を広げておく。
 <p><code>% cd linux-4.0.5-gentoo/<br/>
 % sudo make menuconfig</code></p>
 
-<p>.configを保存し終了させる。</p>
+<p>設定を保存し終了させる。</p>
+
+<h3>コンパイルとインストール</h3>
 
 <p><code>% sudo make &amp;&amp; sudo make modules_install</code></p>
+
+<p>1時間弱かかる。</p>
+
+<p>/bootヘのインストール。</p>
+
+<p><code>% sudo make install<br/>
+% ls /boot</code></p>
+
+<h3>initramfsの作り直し</h3>
+
+<p>/usr/src/linuxのリンク先を更新する。</p>
+
+<p><code>% cd ..<br/>
+% sudo rm linux<br/>
+% sudo ln -sf linux-4.0.5-gentoo linux</code></p>
+
+<p><code>% sudo genkernel --install initramfs</code></p>
+
+<p>20秒ほどかかる。確認する。</p>
+
+<p><code>% ls /boot/initramfs*</code></p>
+
+<h3>ブートローダーの設定</h3>
+
+<p><code>% sudo grub2-mkconfig -o /boot/grub/grub.cfg</code></p>
+
+<p>再起動してみよう。</p>
+
+<p><code>% sudo reboot</code></p>
+
+<h3>成功</h3>
+
+<p><code>% uname -r<br/>
+4.0.5-gentoo</code></p>
+
+<p>カーネルモジュールを作成するパッケージの再インストール。</p>
+
+<p><code>% sudo emerge -av @module-rebuild</code></p>
+
+<p>今回はとくにないようだ。</p>
+
+<h2>最新</h2>
+
+<p>これでシステムが最新の状態にアップデートされた。</p>
+
+<h2>不要なパッケージやファイルを削除する</h2>
+
+<p>
+ここらへんで不要なパッケージやファイルを削除してディスクの使用量を
+減らしておこう。
+</p>
+
+<p><code>% sudo revdep-rebuild -- -av<br/>
+% sudo emerge -av --depclean</code></p>
+
+<p>古いカーネル等を削除する。</p>
+
+<p><code>% sudo rm -R /usr/src/linux-3.18.12<br/>
+% sudo rm -R /lib/modules/3.18.12-gentoo<br/>
+% sudo rm /boot/System.map-3.18.12-gentoo<br/>
+% sudo rm /boot/config-3.18.12-gentoo<br/>
+% sudo rm /boot/initramfs-genkernel-x86-3.18.12-gentoo<br/>
+% sudo rm /boot/vmlinuz-3.18.12-gentoo</code></p>
+
+<p>念のためgrubの設定も更新しておく。</p>
+
+<p><code>% sudo grub2-mkconfig -o /boot/grub/grub.cfg</code></p>
+
+<p>システムを壊していないかどうか再起動してみる。</p>
+
+<p><code>% sudo reboot</code></p>
+
+<p>インストール時に使ったファイルも削除してしまおう。</p>
+
+<p><code>% sudo rm /stage3-i686-*</code></p>
+
+<h2>すっきり</h2>
+
+<p>
+システムを最新にし古いファイル等も削除してすっきりした。
+</p>
 
 <p>
 <a href="/computer/gentoo/install/eeepc_900/xorg.html"
