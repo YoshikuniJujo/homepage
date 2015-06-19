@@ -28,7 +28,7 @@ contentType fp = case takeExtension fp of
 	".ico" -> ico; ".png" -> png; ".jpg" -> jpg; ".svg" -> svg
 	".css" -> css; ".html" -> html; ".hs" -> plain; ".cabal" -> plain
 	".ebuild" -> plain; ".txt" -> plain; ".mf" -> plain; ".sf" -> plain
-	".gz" -> gz; ".tar.gz" -> targz; ".xpi" -> xpi
+	".gz" -> gz; ".tar.gz" -> targz; ".xpi" -> xpi; ".js" -> js
 	_ -> octet
 
 isHtml, isBinary :: ContentType -> Bool
@@ -43,6 +43,7 @@ svg = ContentType (TypeRaw "image") (SubtypeRaw "svg+xml") []
 css = ContentType Text Css []
 html = ContentType Text Html []
 plain = ContentType Text Plain []
+js = ContentType Text (SubtypeRaw "javascript") []
 gz = ContentType (TypeRaw "application") (SubtypeRaw "gzip") []
 targz = ContentType (TypeRaw "application") (SubtypeRaw "x-tar-gz") []
 xpi = ContentType (TypeRaw "application") (SubtypeRaw "x-xpinstall") []
