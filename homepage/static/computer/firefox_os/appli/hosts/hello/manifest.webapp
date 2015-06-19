@@ -1,0 +1,5 @@
+{
+"name": "Hello Firefox OS",
+"description": "My first app",
+"launch_path": "/computer/firefox_os/app/hosts/hello/index.html"
+}
