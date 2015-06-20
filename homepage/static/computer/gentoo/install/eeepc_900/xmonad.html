@@ -1,6 +1,6 @@
 Xmonadのインストール
 
-<p>(工事中 90%)</p>
+<p>(工事中 95%)</p>
 
 <h2>Xmonadをインストールする</h2>
 
@@ -15,14 +15,14 @@ USE変数ではhscolour, profileの2つとdocをどうするかだ。
 
 <p>
 16パッケージあるのでそれなりに時間がかかる。
-40分ほどかかった。
+40分弱かかる。
 </p>
 
 <h2>.xinitrcの作成</h2>
 
 <p>
 とりあえずはCUIからstartxでxmonadを立ち上げるようにする。
-xdmを使うかどうかはあとで決めることにする。
+ディスプレイマネージャを使うかどうかはあとで決める。
 </p>
 
 <p><code>% vi ~/.xinitrc<br/>
@@ -35,10 +35,9 @@ exec xmonad</code></p>
 <p><code>% startx</code></p>
 
 <p>
-真黒な画面になるはずだ。
-それでいい、問題ない。
+真黒な画面になる。
 Ctrl+Alt+Returnを押してみよう。
-ターミナルが立ち上がるはずだ。
+ターミナルが立ち上がる。
 tmuxしてCtrl+b "をしておこう。
 </p>
 
@@ -47,31 +46,26 @@ tmuxしてCtrl+b "をしておこう。
 <h3>インストール</h3>
 
 <p>
-個人的にrxvt-unicodeが好みなので、それをインストールする。
+rxvt-unicodeが好みなので、それをインストールする。
 </p>
 
-<p><code>% sudo emerge -av rxvt-unicode</code></p>
+<p><code>% emerge -pv rxvt-unicode</code></p>
 
 <p>
-よくわからないがunicode3とwcwidthを有効にしておこう。
+USE変数をチェックする。
+256-color, unicode3, wcwidthあたりが気になる。
+これらを有効にする。
 </p>
 
-<p><code>% sudoedit /etc/portage/make.conf<br/>
-...<br/>
-USE="...<br/>
-...<br/>
-... unicode3 wcwidth"<br/>
-...</code></p>
+<p><code>% sudoedit /etc/portage/package.use/rxvt-unicode<br/>
+x11-terms/rxvt-unicode		256-color unicode3 wcwidth</code></p>
 
-<p>
-上記のUSEフラグを適用するためには-vanillaが必要だ。
-システム全体に設定するのはなんとなく嫌なので、
-/etc/portage/package.useに書いておく。
-</p>
+<p><code>% emerge -pv rxvt-unicode</code></p>
 
-<p><code>% sudoedit /etc/portage/package.use<br/>
-...<br/>
-x11-terms/rxvt-unicode		-vanilla</code></p>
+<p>vanillaを無効にする必要があるようだ。</p>
+
+<p><code>% sudoedit /etc/portage/package.use/rxvt-unicode<br/>
+x11-terms/rxvt-unicode		256-color unicode3 wcwidth -vanilla</code></p>
 
 <p><code>% sudo emerge -av rxvt-unicode</code></p>
 
@@ -87,7 +81,7 @@ x11-terms/rxvt-unicode		-vanilla</code></p>
 <h3>デフォルトのターミナルにする</h3>
 
 <p>
-まずはxmonadのデフォルトの設定ファイルをホームディレクトリに作成する。
+xmonadのデフォルトの設定ファイルをホームディレクトリに作成する。
 </p>
 
 <p><code>% mkdir ~/.xmonad<br/>
@@ -99,38 +93,39 @@ main = xmonad defaultConfig
 </code></p>
 
 <p>
-Ctrl-qで新しい設定でxmonadを立ち上げ直すことができる。
-実際に新しい設定が適応されたかどうかは~/.xmonadディレクトリをのぞけばわかる。
+Ctrl-qで新しい設定でxmonadを立ち上げ直す。
+~/.xmonadディレクトリを見て実際に新しい設定が適応されたことを確かめる。
 </p>
 
 <p><code>% ls ~/.xmonad<br/>
-xmonad-i386-linux xmonad.errors xmonad.hi xmonad.hs xmonad.o</code></p>
+xmonad-i386-linux xmonad.errors xmonad.hi xmonad.hs xmonad.o<br/>
+% cat ~/.xmonad/xmonad.errors</code></p>
 
 <p>
-xmonad.hsがちゃんとコンパイルできたことがわかる。
+エラーメッセージがないのはxmonad.hsがちゃんとコンパイルできたということ。
 </p>
 
 <p>
-次にterminalの設定を変更する。
+terminalの設定を変更する。
 </p>
 
 <p><code>% vi ~/.xmonad/xmonad.hs<br/>
 ...<br/>
 main = xmonad $ defaultConfig {<br/>
-	terminal	= "urxvt"<br/>
-	}</code></p>
+	<span class="indent1">terminal	= "urxvt"</span><br/>
+	<span class="indent1">}</span></code></p>
 
 <p>
 Ctrl-qで設定を反映させる。
-うまくいっていればCtrl+Alt-Returnでrxvt-unicodeが立ち上がるはずだ。
+うまくいけばCtrl+Alt-Returnでrxvt-unicodeが立ち上がる。
 </p>
 
 <h3>ターミナルの色を変える</h3>
 
 <p>
-白地に黒は見映えは良いが、長時間使っていると目が疲れるものだ。
-黒地に白とし、その他の色もそれに合わせて変更する。
-そのためには~/.Xdefaultsに設定を書き込めば良い。
+白地に黒は見映えは良いが長時間使っていると目が疲れる。
+黒地に白としほかの色もそれに合わせて変更する。
+~/.Xdefaultsに設定を書き込む。
 </p>
 
 <p>まずは背景を黒、文字を白とする。</p>
@@ -170,9 +165,33 @@ rxvt-unicodeでの履歴機能は使わない。
 urxvt*saveLines:	0<br/>
 ...</code></p>
 
+<h2>lsに色を</h2>
+
+<p>
+lsに色をつける設定をする。
+</p>
+
+<p><code>% vi .zshrc<br/>
+...<br/>
+alias ls='ls --color=auto'</code></p>
+
+<h2>自動的にtmuxを立ち上げる</h2>
+
+<p><code>% vi .zshrc<br/>
+...<br/>
+if test $TERM '!=' 'screen'; then tmux; fi</code></p>
+
+<h2>成功</h2>
+
+<p>
+最低限のGUI環境が整った。
+次は<a href="/computer/gentoo/install/eeepc_900/update_package.html"
+>環境を整える: パッケージのアップデート</a>へ進む。
+</p>
+
 <p>
 <a href="/computer/gentoo/install/eeepc_900/ghc.html"
-	>「GHCのインストール」へもどる</a>
-<a href="/computer/gentoo/install/eeepc_900/update_package.html"
-	>「パッケージのアップデート」へ</a>
+	>「GHCの導入」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900"
+	>「Eee PC 900への導入」トップへ</a>
 </p>

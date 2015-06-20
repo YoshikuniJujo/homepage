@@ -1,30 +1,27 @@
 Gentoo LinuxのEee PC 900へのインストール: 日本語入力システムのインストール
 
-<p>(工事中 90%)</p>
-
 <h2>はじめに</h2>
 
-<p>uim上にTUT-Codeを乗せる。</p>
+<p>uim上でTUT-Codeを使う。</p>
 
 <h2>uimのインストール</h2>
 
 <p><code>% emerge -pv uim</code></p>
 
-<p>/etc/portage/make.confのCPU_FLUGS_X86にsseを追加した。</p>
-
 <p><code>% sudo emerge -av uim</code></p>
 
 <p>
-31パッケージがインストールされるのですこし時間がかかるかもしれない。
-1時間20分かかった。
+14パッケージがインストールされる。
+30分かかる。
 </p>
 
 <h2>.xinitrcの編集</h2>
 
 <p>
-日本語入力を可能にするためにはいくつかの環境変数の設定が必要になる。
-またuim-ximに--engine=tutcodeオプションをつけて立ち上げる。
-これはXを立ち上げるときに行うので.xinitrcに書き込む。
+日本語入力を可能にするためにはいくつかの環境変数の設定が必要だ。
+uim-ximに--engine=tutcodeオプションをつけて立ち上げる。
+これはXを立ち上げるときに行う。
+.xinitrcに書き込む。
 </p>
 
 <p><code>% vi ~/.xinitrc<br/>
@@ -34,7 +31,7 @@ uim-xim --engine=tutcode&amp;<br/>
 exec xmonad</code></p>
 
 <p>
-一度Xから抜けて再度入る。
+Alt-Shift-qでXから抜けて再度入る。
 Shift-Spaceで日本語の入力が可能となる。
 </p>
 
@@ -50,7 +47,7 @@ Shift-Spaceで日本語の入力が可能となる。
 以下のようにしてファイルを取得する。
 </p>
 
-<p><code>% curl -o ~/.mazegaki.dic https://skami.iocikun.jp/computer/genmtoo/install/eeepc_900/mazegaki.dic</code></p>
+<p><code>% curl -o ~/.mazegaki.dic https://skami.iocikun.jp/computer/gentoo/install/eeepc_900/mazegaki.dic</code></p>
 
 <p>
 Xに入り直すと交ぜ書き変換が可能となる。
@@ -72,4 +69,11 @@ Xに入り直すと交ぜ書き変換が可能となる。
 <p>
 「カーソルの側に入力モードを表示」をチェックする。
 「TUT-Code」のページに移動し「vi協調モードを有効にする」をチェックする。
+</p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/ssh_remotehost.html"
+	>「SSHによるリモートホストの操作」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900/install_firefox.html"
+	>「Firefoxの導入」へ</a>
 </p>

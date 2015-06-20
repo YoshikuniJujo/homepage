@@ -1,55 +1,11 @@
 Gentoo LinuxのEee PC 900へのインストール: Firefoxのインストール
 
-<p>(工事中 90%)</p>
-
 <h2>はじめに</h2>
 
 <p>
-Webを参考にインストール作業を行っているので、
-Firefoxを入れておけばEee PC 900単体でのインストールも可能となる。
-よってここでFirefoxを入れておく。
+Webを参考にインストール作業を行っている。
+Firefoxを入れておけばEee PC 900単体でのインストールができる。
 </p>
-
-<h2>syncとアップデート</h2>
-
-<p>
-Firefoxのインストールにもかなりの時間がかかるので、
-せっかくならば最新版を入れておきたい。
-よって先にsyncをする。
-syncしたらまずは既存のシステムを最新にする。
-</p>
-
-<p>
-また、忘れていたが循環依存の問題のために一時的に無効にしていたUSE変数を
-もとにもどしておくことにする。
-また、suspendパッケージに必要だった追加のUSEがxmltoファイルに入っている。
-suspendパッケージは使わなかったのでこれもついでに消してしまおう。
-</p>
-
-<p><code>% sudo rm /etc/portage/package.use/xmlto<br/>
-% sudo rm /etc/portage/package.use/qtgui</code></p>
-
-<p>Portage樹の更新。</p>
-
-<p><code>% sudo emerge --sync</code></p>
-
-<p>
-3分ほどかかる。
-システムのアップデート。
-</p>
-
-<p><code>% sudo emerge -avu --deep --newuse system</code></p>
-
-<p>
-USEの変更を行った部分で4つのパッケージが再コンパイルされる。
-1時間20分かかった。
-</p>
-
-<p>次はシステムに含まれないパッケージのアップデートを行う。</p>
-
-<p><code>% emerge -pvu --deep --newuse world</code></p>
-
-<p>古いパッケージはとくにないようだ。</p>
 
 <h2>firefoxのインストール</h2>
 
@@ -59,14 +15,21 @@ USEの変更を行った部分で4つのパッケージが再コンパイルさ�
 
 <p><code>% sudo emerge -av firefox</code></p>
 
-<p>9時間かかった。</p>
+<p>9時間強かかる。</p>
 
 <h2>vimperatorの導入</h2>
 
 <p>
-firefox内で拡張機能vimperatorを導入する。
+拡張機能vimperatorを導入。
 .vimperatorrcの作成。
 </p>
 
 <p><code>% vi ~/.vimperatorrc<br/>
 set noinsertmode</code></p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/input_japanese.html"
+	>「日本語入力システムの導入」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900/dmenu.html"
+	>「dmenuの導入」へ</a>
+</p>

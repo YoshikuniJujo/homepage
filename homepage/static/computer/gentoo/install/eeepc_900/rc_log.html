@@ -1,0 +1,37 @@
+Gentoo GNU/LinuxのEee PC 900へのインストール: rcのログを記録
+
+<p>(工事中 90%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+デーモンの開始に失敗した場合、画面にはエラーメッセージが表示されるが、
+デフォルトの設定ではログには残らない。
+これをログに記録しあとから読めるようにする。
+</p>
+
+<h2>rc_loggerをYESに</h2>
+
+<p><code>% sudoedit /etc/rc.conf<br/>
+...<br/>
+rc_logger="YES"<br/>
+...</code></p>
+
+<h2>試してみる</h2>
+
+<p>
+再起動する。
+exitを何回かしてターミナルを終了し、
+Ctrl-Alt-qでXを終了したうえで
+</p>
+
+<p><code>% sudo reboot</code></p>
+
+<p><code>% cat /var/log/rc.log</code></p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/update_package.html"
+	>「パッケージのアップデート」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900/ssh_remotehost.html"
+	>「リモートホストの操作」へ</a>
+</p>

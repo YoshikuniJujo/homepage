@@ -6,7 +6,7 @@ Gentoo LinuxのEee PC 900へのインストール: テザリング
 
 <p>携帯電話を使ってインターネットに接続できるようにする。</p>
 
-<h2>カーネルの設定</h2>
+<h2>カーネルの設定と導入</h2>
 
 <p><code>% cd /usr/src/linux<br/>
 % sudo make menuconfig<br/>
@@ -18,13 +18,24 @@ Device Drivers ---&gt;<br/>
 % sudo make &amp;&amp; sudo make modules_install<br/>
 % sudo make install</code></p>
 
-<p>再起動する。設定の確認。</p>
+<p>2分ほどで終わる。</p>
+
+<h2>再起動と設定の確認</h2>
+
+<p>
+exitコマンドでターミナルエミュレータを抜ける。
+Alt-Shift qでXを終了させて再起動する。
+</p>
+
+<p><code>% sudo reboot</code></p>
 
 <p><code>% zcat /proc/config.gz | grep -i rndis_host<br/>
 CONFIG_USB_NET_RNDIS_HOST=y</code></p>
 
+<h2>接続の確認</h2>
+
 <p>
-最近は/etc/init.d/net.XXXは必要ないのだろうか。
+最近では/etc/init.d/net.XXXは必要ないようだ。
 試してみる。
 </p>
 
@@ -36,11 +47,18 @@ CONFIG_USB_NET_RNDIS_HOST=y</code></p>
 
 <p><code>% ping gentoo.org -c 3</code></p>
 
-<p>うまく接続されているようだ。</p>
+<p>うまく接続された。</p>
 
 <h2>成功</h2>
 
 <p>
 いろいろなことが自動化されたようで、カーネルにドライバを追加するだけで、
-テザリングは可能になったようだ。
+テザリングは可能だ。
+</p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/dmenu.html"
+	>「dmenu」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900/use_camera.html"
+	>「カメラの使用」へ</a>
 </p>

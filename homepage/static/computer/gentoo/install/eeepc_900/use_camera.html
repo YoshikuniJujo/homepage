@@ -5,15 +5,19 @@ Gentoo LinuxのEee PC 900へのインストール: カメラを使えるよう�
 <h2>デバイスの情報</h2>
 
 <p>
-まずはデバイスの情報を得る必要がある。
-おそらくUSBとして接続されているので、usbutilsパッケージの
-lsusbを使う。
+デバイスの情報を得る。
+USBとして接続されていると思われるのでusbutilsパッケージのlsusbを使う。
 </p>
 
-<p><code>% sudo emerge -av usbutils<br/>
-% lsusb | grep -i genesys</code></p>
+<p><code>% emerge -pv usbutils<br/>
+% sudo emerge -av usbutils</code></p>
 
-<p>Genesys Logic社はWeb Cameraを作っている会社なのでおそらくこれだ。</p>
+<p>1分半ほどかかる。</p>
+
+<p><code>% lsusb | grep -i genesys<br/>
+Bus 001 Device 005: ID 05e3:0505 Genesys Logic, Inc.</code></p>
+
+<p>Genesys Logic社はWeb Cameraを作っている会社だ。</p>
 
 <h2>カーネルの設定</h2>
 

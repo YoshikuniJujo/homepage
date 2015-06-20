@@ -4,47 +4,27 @@
 
 <h2>はじめに</h2>
 
-<p>ここらへんでそろそろシステムやパッケージを(安定版の)最新にしておく。</p>
+<p>もう一度パッケージを(安定版の)最新にする。</p>
 
 <h2>まずはsystemから</h2>
 
-<p><code>% sudo emerge -avu --deep --newuse system</code></p>
+<p><code>% emerge -pvu --deep --newuse @system</code></p>
 
-<p>
-cupsがらみの循環依存がある。
-一時的にdev-qt/qtguiのcupsフラグを無効にしてみる。
-</p>
-
-<p><code>% sudoedit /etc/portage/package.use/qtgui<br/>
-dev-qt/qtgui	-cups</code></p>
-
-<p>このファイルはあとで削除してemergeし直す。</p>
-
-<p>同様にapp-text/xmltoのlatexフラグを無効にする。</p>
-
-<p><code>% sudoedit /etc/portage/package.use/xmlto<br/>
-app-text/xmlto	-latex</code></p>
-
-<p>
-166パッケージがコンパイルされるのでそれなりに時間がかかるだろう。
-13時間40分かかった。
-</p>
-
-<p>
-/etc/locale.genはもとのファイルを維持する。
-</p>
-
-<p><code>% sudo etc-update</code></p>
+<p>とくに変更はない。</p>
 
 <h2>つぎはworld</h2>
 
-<p>
-worldに含まれるパッケージとそれが依存しているパッケージをアップデートする。
-</p>
-
-<p><code>% sudo emerge -avu --deep --newuse world</code></p>
+<p><code>% emerge -pvu --deep --newuse @world</code></p>
 
 <p>worldはすでに最新のようだ。</p>
+
+<h2>depclean</h2>
+
+<p>gentoo-sources-3.18.12は明示的に保存する。</p>
+
+<p><code>% sudo emerge -av --noreplace '=sys-kernel/gentoo-sources-3.18.12'</code></p>
+
+<p><code>% sudo emerge -av --depclean</code></p>
 
 <h2>sync</h2>
 
@@ -54,42 +34,23 @@ portage樹を最新のものにする。
 
 <p><code>% sudo emerge --sync</code></p>
 
+<p>2分半ほどかかった。</p>
+
 <h2>もう一度system</h2>
 
-<p><code>% sudo emerge -pvu --deep --newuse system</code></p>
+<p><code>% emerge -pvu --deep --newuse @system</code></p>
 
-<p>
-gccが最インストールされるようだ。
-せっかくならgo言語のコンパイラも含めるようにしてしまおうか。
-</p>
-
-<p><code>% sudoedit /etc/portage/make.conf<br/>
-...<br/>
-USE="...<br/>
-...<br/>
-... go"<br/>
-...</code></p>
-
-<p><code>% sudo emerge -avu --deep --newuse system</code></p>
-
-<p>
-gccのコンパイルにはわりと時間がかかる。
-今のところ3時間半経過したが終わらず。
-4時間半かかった。
-</p>
+<p>とくに更新はない。</p>
 
 <h2>もう一度world</h2>
 
-<p><code>% sudo emerge -avu --deep --newuse world</code></p>
+<p><code>% sudo emerge -pvu --deep --newuse @world</code></p>
+
+<p>とくに更新はない。</p>
 
 <p>
-DHCPクライアントのdhcpcdが更新された。
-これには2分くらい。
-</p>
-
-<p>
-<a href="/computer/gentoo/install/eeepc_900/xmonad.html"
-	>「Xmonadのインストール」へ</a>
 <a href="/computer/gentoo/install/eeepc_900"
 	>「Eee PC 900へのインストール」トップへ</a>
+<a href="/computer/gentoo/install/eeepc_900/rc_log.html"
+	>「rcのログを記録」へ</a>
 </p>

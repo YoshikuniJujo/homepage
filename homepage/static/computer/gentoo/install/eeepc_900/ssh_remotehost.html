@@ -1,10 +1,10 @@
 Gentoo LinuxのEee PC 900へのインストール: SSHによるリモートホストの操作
 
-<p>(工事中 60%)</p>
+<p>(工事中 90%)</p>
 
 <h2>はじめに</h2>
 
-<p>Eee PCからもリモート端末が操作したいので。</p>
+<p>Eee PCからもリモート端末が操作したい。</p>
 
 <h2>メインマシンからの秘密鍵、公開鍵をコピー</h2>
 
@@ -18,6 +18,16 @@ Gentoo LinuxのEee PC 900へのインストール: SSHによるリモートホ�
 <p><code>% cp [USBメモリ等]/id_rsa ~/.ssh<br/>
 % cp [USBメモリ等]/id_rsa.pub ~/.ssh</code></p>
 
+<p>% chmod 600 ~/.ssh/id_rsa<br/>
+% chmod 644 ~/.ssh/id_rsa.pub</p>
+
 <h2>SSHによる接続</h2>
 
 <p><code>ssh -p [ポート番号] [ユーザ名]@[ホスト名]</code></p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/rc_log.html"
+	>「rcのログを記録」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900/input_japanese.html"
+	>「日本語入力システムのインストール」へ</a>
+</p>
