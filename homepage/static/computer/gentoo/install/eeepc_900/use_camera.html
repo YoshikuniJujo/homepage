@@ -1,7 +1,5 @@
 Gentoo LinuxのEee PC 900へのインストール: カメラを使えるようにする
 
-<p>(工事中 90%)</p>
-
 <h2>デバイスの情報</h2>
 
 <p>
@@ -32,14 +30,15 @@ Device Drivers ---&gt;<br/>
 <p><code>% sudo make &amp;&amp; sudo make modules_install<br/>
 % sudo make install</code></p>
 
-<p>再起動する。確認する。</p>
+<p>10分ほどかかる。再起動し確認。</p>
 
-<p><code>% dmesg | grep -i uvc<br/>
+<p><code>% dmesg | grep -C 1 -i uvc<br/>
 % ls /dev/video0</code></p>
 
 <p>
 テスト用にシンプルなビューワを入れる。
-とりあえずcamoramaを選択したが、もっとシンプルなものがあればそちらのほうがいいが。
+とりあえずcamoramaを選択した。
+もっとシンプルなものがあればそちらにしたいが。
 
 <p><code>% sudo emerge -av camorama</code></p>
 
@@ -62,13 +61,17 @@ video:x:27:root,yoshio<br/>
 video:::root,yoshio<br/>
 ...</code></p>
 
-<p>
-もっと良い方法もあるが、とりあえず簡単なので一度ログアウトして
-ログインし直す。
-</p>
+<p>一度ログアウトしてログインし直す。</p>
 
 <p><code>% camorama</code></p>
 
 <p>
 これで一般ユーザでもWeb Cameraが使えるようになった。
+</p>
+
+<p>
+<a href="/computer/gentoo/install/eeepc_900/tethering.html"
+	>「テザリング」へもどる</a>
+<a href="/computer/gentoo/install/eeepc_900/install_alsa.html"
+	>「音の再生、録音」へ</a>
 </p>

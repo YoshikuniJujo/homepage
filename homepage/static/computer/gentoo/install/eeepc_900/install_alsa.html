@@ -5,7 +5,7 @@ Gentoo LinuxのEee PC 900へのインストール: 音の再生、録音がで�
 <h2>カーネルの設定</h2>
 
 <p>
-まずはPCIカードの種類を調べる。
+PCIカードの種類を調べる。
 </p>
 
 <p><code>% /usr/sbin/lspci | grep -i audio<br/>
@@ -17,9 +17,9 @@ Intel HDAであることがわかる。
 </p>
 
 <p><code>% head -n 1 /proc/asound/card0/codec\#0<br/>
-Codec: Realtek ALC662 rev1</code></p>
+Codec: Realtek ALC662</code></p>
 
-<p>これらの情報をもとにカーネルの設定を行う。</p>
+<p>これらの情報をもとにカーネルを設定する。</p>
 
 <p><code>% cd /usr/src/linux<br/>
 % sudo make menuconfig<br/>
@@ -32,14 +32,22 @@ Device Drivers ---&gt;<br/>
 % sudo make install
 </code></p>
 
+<p>2分ほどかかる。再起動する。</p>
+
 <h2>audioグループ</h2>
 
-<p>
-使用しているユーザをaudioグループに入れる。
-</p>
+<p>使用しているユーザをaudioグループに入れる。</p>
 
 <p><code>% sudo vigr<br/>
-% sudo vigr -s</code></p>
+...<br/>
+audio:x:18:yoshio
+...<br/>
+% sudo vigr -s<br/>
+...<br/>
+audio:::yoshio
+...</code></p>
+
+<p>一度ログアウトし入り直す。</p>
 
 <h2>alsa-utils</h2>
 
@@ -47,11 +55,12 @@ Device Drivers ---&gt;<br/>
 
 <p><code>% sudo emerge -av alsa-utils</code></p>
 
+<p>5分弱かかる。</p>
+
 <p>デーモンの設定</p>
 
-<p><code>% sudo rc-update add alsasound boot</code></p>
-
-<p>再起動する。</p>
+<p><code>% sudo rc-update add alsasound boot<br/>
+% sudo rc-service alsasound start</code></p>
 
 <p>ボリュームの調整。</p>
 
