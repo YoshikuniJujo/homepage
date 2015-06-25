@@ -1,0 +1,72 @@
+Gentoo GNU/Linuxの自作機(CLM)へのインストール: state3
+
+<p>(工事中 0%)</p>
+
+<h2>時間を合わせる</h2>
+
+<p><code># date<br/>
+# rc-service ntp-client start<br/>
+# date</code></p>
+
+<p>ハードウェアクロックも合わせておく。</p>
+
+<p><code># hwclock<br/>
+# hwclock --systohc<br/>
+# hwclock</code></p>
+
+<h2>tarballのダウンロード</h2>
+
+<p><code># cd /mnt/gentoo</code></p>
+
+<p><code># links https://www.gentoo.org/downloads/mirrors/</code></p>
+
+<p>
+ミラーサイトを選び以下のようにディレクトリをたどる。
+</p>
+
+<ol>
+<li>releases</li>
+<li>amd64</li>
+<li>autobuilds</li>
+</ol>
+
+<p>
+stage3ファイルをダウンロードする。
+.DIGESTS.ascフォイルもダウンロードしておこう。
+</p>
+
+<h2>完全性の確認</h2>
+
+<p>DIGESTSファイルの検証。</p>
+
+<p><code># gpg --recv-keys 0xBB572E0E2D182910<br/>
+# gpg --verify state3-amd64-&lt;release&gt;.tar.bz2.DIGESTS.asc</code></p>
+
+<p>フィンガープリントを<a href="https://www.gentoo.org/downloads/signatures/"
+>Gentoo署名ページ</a>で確認する。</p>
+
+<p>SHA512のチェック。</p>
+
+<p><code># sha512sum stage3-amd64-&lt;release&gt;.tar.bz2<br/>
+# grep -A 1 -i sha512 stage3-amd64-&lt;release&gt;.tar.bz2.DIGESTS.asc</code></p>
+
+<h2>解凍と展開</h2>
+
+<p><code># tar xvjpf stage3-amd64-XXXXXXXX.tar.bz2 --xattrs</code></p>
+
+<h2>コンパイルオプション</h2>
+
+<p><code># vi /etc/portage/make.conf<br/>
+...<br/>
+CFLAGS="-march=native -O2 -pipe"<br/>
+...</code></p>
+
+<p>
+並行コンパイルの数を決めることができる。
+目安はコア数+1とのこと。
+</p>
+
+<p><code># vi /etc/portage/make.conf<br/>
+...<br/>
+MAKEOPTS="-j5"<br/>
+...</code></p>

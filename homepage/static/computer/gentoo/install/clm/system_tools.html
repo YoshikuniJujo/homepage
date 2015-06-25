@@ -1,0 +1,26 @@
+Gentoo GNU/Linuxの自作機(CLM)へのインストール: システムツールの導入
+
+<p>(工事中 0%)</p>
+
+<h2>システムロガー</h2>
+
+<p>ここではmetalogを選択しておく。</p>
+
+<p><code># emerge -av metalog<br/>
+# rc-update add metalog default</code></p>
+
+<h2>クロンデーモン</h2>
+
+<p>とりあえずfcronを選択。</p>
+
+<p><code># emerge -av fcron<br/>
+# rc-update add fcron default<br/>
+# crontab /etc/crontab</code></p>
+
+<h2>ファイルのインデクシング</h2>
+
+<p><code># emerge -av mlocate</code></p>
+
+<h2>DHCPクライアント</h2>
+
+<p><code># emerge -av dhcpcd</code></p>

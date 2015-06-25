@@ -1,0 +1,26 @@
+Gentoo GNU/Linuxの自作機(CLM)へのインストール: tmuxの導入
+
+<p>(工事中 0%)</p>
+
+<h2>インストール</h2>
+
+<p><code># emerge -pv tmux</code></p>
+
+<p>
+39パッケージがインストールされるとのこと。
+Xの導入、設定はあとでするので今回はUSE="-X"としてみる。
+</p>
+
+<p><code># USE="-X" emerge -pv tmux</code></p>
+
+<p>
+vimもあとで入れるのでUSE変数vim-syntaxも無効にする。
+</p>
+
+<p><code># USE="-X -vim-syntax" emerge -pv tmux</code></p>
+
+<p>
+良さそうなのでこれでインストールする。
+</p>
+
+<p><code># USE="-X -vim-syntax" emerge -av tmux</code></p>

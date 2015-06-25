@@ -1,0 +1,228 @@
+Gentoo GNU/Linuxの自作機(CLM)へのインストール: パーティションの作成
+
+<p>(工事中 0%)</p>
+
+<h2>パーティションの計画</h2>
+
+<h3>ハードディスク容量の確認</h3>
+
+<p><code># parted /dev/sda<br/>
+(parted) print<br/>
+...<br/>
+Disk /dev/sda: 3001GB<br/>
+...<br/>
+(parted) quit</code></p>
+
+<p>3TBあることがわかる。</p>
+
+<h3>メモリ容量の確認</h3>
+
+<p>
+SWAP領域はメモリ容量の2倍程度という目安がある。
+昔のことかもしれないが一応それに従うことにする。
+</p>
+
+<p><code># free -m</code></p>
+
+<p>
+このマシンは潤沢なメモリを積んでいる。
+16GBある。
+</p>
+
+<h3>LVM2</h3>
+
+<p>
+LVMという仕組みを使うことで論理パーティションを作成することができる。
+論理パーティションにすることで容量が不足したパーティションに容量を追加したり
+できるようになる。
+</p>
+
+<p>
+LVM2を利用したパーティション切りをインストール時に利用する場合
+<a href="https://gentoo-handbook.lugons.org/doc/ja/lvm2.xml"
+>Gentoo LVM2インストール</a>が役に立つ。
+</p>
+
+<h3>パーティション構成</h3>
+
+<ol>
+<li>grubが使用するパーティション(grub): 2MiB(bios_grub)</li>
+<li>/bootのパーティション(boot): 1GB - 3MiB</li>
+<li>/のパーティション(root): 5GB</li>
+<li>SWAP領域(swap): 32GB</li>
+<li>LVM2パーティション(lvm_0): 1TB - 38GB</li>
+<li>LVM2パーティション(lvm_1): 1TB</li>
+<li>残リ(space): 1TB</li>
+</ol>
+
+<h4>パーティション構成(より細かく)</h4>
+
+<p>以下のページを参照。</p>
+
+<ul>
+<li><a href="http://support.hp.com/gb-en/document/c03479326"
+	>HPのページ</a></li>
+<li><a href="http://rainbow.chard.org/2013/01/30/how-to-align-partitions-for-best-performance-using-parted/"
+	>How to align partitions for best performance using parted</a></li>
+</ul>
+
+<ol>
+<li>Always use the reported alignment offset as offset.</li>
+<li><ol>
+	<li>If optimal io size is present in the topology info,
+		use that as grain</li>
+	<li>If optimal io size is not present in topology info
+		and alignment offset is 0 and minimum io size is a power of 2,
+		use the default optimal alignment (grain 1MiB).</li>
+	<li>If not 2-1 and 2-2, use the minimum io size,
+		or if that is not defined the physical sector size as grain
+		(iow the minimum alignment).</li>
+	</ol></li></ol>
+
+<p><code># cat /sys/block/sda/queue/optimal_io_size<br/>
+0<br/>
+# cat /sys/block/sda/queue/minimum_io_size<br/>
+512<br/>
+# cat /sys/block/sda/alignment_offset<br/>
+0<br/>
+# cat /sys/block/sda/queue/physical_block_size<br/>
+512</code></p>
+
+<p>
+optimal io sizeが0でalignment offsetも0でminimum io sizeが2のべき乗なので、
+上記の2-2にあてはまる。
+この場合パーティションの粒度は1MiBとなる。
+</p>
+
+<p>上記のパーティションをMiB単位で書き直す。</p>
+
+<ol>
+<li>grub: 2MiB (1 - 3)</li>
+<li>boot: 1021MiB (3 - 1024)</li>
+<li>root: 5120MiB (1024 - 6144)</li>
+<li>swap: 32768MiB (6144 - 38912)</li>
+<li>lvm2_0: 1009664 (38912 - 1048576)</li>
+<li>lvm2_1: 1048576MiB (1048576 - 2097152)</li>
+<li>space: ?MiB (2097152 - -1)</li>
+</ol>
+
+<h3>論理パーティション構成</h3>
+
+<ul>
+<li>/usr: 10GB</li>
+<li>/home: 10GB</li>
+<li>/opt: 5GB</li>
+<li>/var: 5GB</li>
+<li>/tmp: 2GB</li>
+</ul>
+
+<h2>パーティションの削除</h2>
+
+<p>GPTラベルを作成する。</p>
+
+<p><code>% parted /dev/sda<br/>
+(parted) mklabel gpt<br/>
+(parted) print</code></p>
+
+<h2>パーティションの作成</h2>
+
+<p>GRUBが使用するパーティションを作成する。</p>
+
+<p><code>(parted) unit mib<br/>
+(parted) mkpart grub 1 3<br/>
+(parted) set 1 bios_grub on<br/>
+(parted) print</code></p>
+
+<p>bootパーティションの作成</p>
+
+<p><code>(parted) mkpart boot 3 1024<br/>
+(parted) set 2 boot on<br/>
+(parted) print</code></p>
+
+<p>rootパーティションの作成</p>
+
+<p><code>(parted) mkpart root 1024 6144</code></p>
+
+<p>swapパーティションの作成</p>
+
+<p><code>(parted) mkpart swap 6144 38912</code></p>
+
+<p>lvm2_0, lvm2_1パーティションの作成</p>
+
+<p><code>(parted) mkpart lvm2_0 38912 1048576<br/>
+(parted) mkpart lvm2_1 1048576 2097152</code></p>
+
+<p>予備のパーティションの作成</p>
+
+<p><code>(parted) mkpart space 2097152 -1<br/>
+(parted) print<br/>
+(parted) quit</code></p>
+
+<h2>論理パーティションの作成</h2>
+
+<a href="https://gentoo-handbook.lugons.org/doc/ja/lvm2.xml"
+>Gentoo LVM2インストール</a>を参考にする。
+
+<h3>dm-modモジュールのロード</h3>
+
+<p><code># modprobe dm-mod</code></p>
+
+<h3>パーティションの準備</h3>
+
+<p><code># pvcreate /dev/sda5 /dev/sda6</code></p>
+
+<h3>ボリュームグループの作成</h3>
+
+<p><code># vgcreate vg /dev/sda5</code></p>
+
+<h3>物理ユニットの追加</h3>
+
+<p><code># vgextend vg /dev/sda6</code></p>
+
+<h3>論理パーティションの作成</h3>
+
+<p><code># lvcreate -L10G -nusr vg<br/>
+# lvcreate -L5G -nhome vg<br/>
+# lvcreate -L5G -nopt vg<br/>
+# lvcreate -L10G -nvar vg<br/>
+# lvcreate -L2G -ntmp vg<br/>
+# lvextend -L+5G /dev/vg/home</code></p>
+
+<h2>SWAP領域の作成と有効化</h2>
+
+<p><code># mkswap /dev/sda4<br/>
+# swapon /dev/sda4<br/>
+# free -g</code></p>
+
+<h2>ファイルシステムの作成</h2>
+
+<p><code># mkfs.ext4 /dev/sda2<br/>
+# mkfs.ext4 /dev/sda3</code></p>
+
+<p><code># mkfs.ext4 /dev/vg/usr<br/>
+# mkfs.ext4 /dev/vg/home<br/>
+# mkfs.ext4 /dev/vg/opt<br/>
+# mkfs.ext4 /dev/vg/var<br/>
+# mkfs.ext4 /dev/vg/tmp</code></p>
+
+<p><code></code></p>
+
+<h2>パーティションのマウント</h2>
+
+<p><code># mount /dev/sda3 /mnt/gentoo/<br/>
+# mkdir /mnt/gentoo/boot<br/>
+# mkdir /mnt/gentoo/usr<br/>
+# mkdir /mnt/gentoo/home<br/>
+# mkdir /mnt/gentoo/opt<br/>
+# mkdir /mnt/gentoo/var<br/>
+# mkdir /mnt/gentoo/tmp<br/>
+# mount /dev/sda2 /mnt/gentoo/boot<br/>
+# mount /dev/vg/usr /mnt/gentoo/usr<br/>
+# mount /dev/vg/home /mnt/gentoo/home<br/>
+# mount /dev/vg/opt /mnt/gentoo/opt<br/>
+# mount /dev/vg/var /mnt/gentoo/var<br/>
+# mount /dev/vg/tmp /mnt/gentoo/tmp</code></p>
+
+<h2>/tmp/のパーミッション</h2>
+
+<p><code># chmod 1777 /mnt/gentoo/tmp</code></p>

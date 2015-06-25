@@ -1,0 +1,66 @@
+Gentoo GNU/Linuxの自作機(CLM)へのインストール: システムの設定
+
+<p>(工事中 0%)</p>
+
+<h2>fstab</h2>
+
+<p>
+/etc/fstabを編集する。
+以下のような構成にする。
+</p>
+
+<ul>
+<li>/dev/sda3 /</li>
+<li>/dev/sda2 /boot</li>
+<li>/dev/vg/usr /usr</li>
+<li>/dev/vg/home /home</li>
+<li>/dev/vg/opt /opt</li>
+<li>/dev/vg/var /var</li>
+<li>/dev/vg/tmp /tmp</li>
+<li>/dev/sda4 swap</li>
+</ul>
+
+<p><code># nano /etc/fstab<br/>
+/dev/sda3	/		ext4	noatime		0 1<br/>
+/dev/sda2	/boot		ext4	noatime		0 2<br/>
+/dev/vg/usr	/usr		ext4	noatime		0 2<br/>
+/dev/vg/home	/home		ext4	noatime		0 2<br/>
+/dev/vg/opt	/opt		ext4	noatime		0 2<br/>
+/dev/vg/var	/var		ext4	noatime		0 2<br/>
+/dev/vg/tmp	/tmp		ext4	noatime		0 2<br/>
+/dev/sda4	none		swap	sw		0 0<br/>
+/dev/cdrom	/mnt/cdrom	auto	noauto,ro	0 0</code></p>
+
+<h2>hostname</h2>
+
+<p>
+ホスト名はとりあえずclmとしておくことにする。
+</p>
+
+<p><code># nano -w /etc/conf.d/hostname<br/>
+...<br/>
+hostname="clm"</code></p>
+
+<p>
+一応ドメイン名も設定しておくことにする。
+</p>
+
+<p><code># nano -w /etc/conf.d/net<br/>
+...<br/>
+dns_domain_lo="local.hogehoge.jp"</code></p>
+
+<h2>hosts</h2>
+
+<p>
+/etc/hostsファイルに自分の名前を設定しておく。
+</p>
+
+<p><code># nano -w /etc/hosts<br/>
+...<br/>
+127.0.0.1	clm clm.local.hogehoge.jp localhost</code></p>
+
+<h2>passwd</h2>
+
+<p>ルートユーザのパスワードの設定。</p>
+
+<p><code># passwd</code></p>

@@ -1,0 +1,61 @@
+Gentoo GNU/Linuxの自作機(CLM)へのインストール: インストールCDの作成
+
+<p>(工事中 0%)</p>
+
+<h2>ISOイメージのダウンロード</h2>
+
+<p>
+<a href="https://www.gentoo.org/downloads/mirrors/">ミラーリスト</a>から
+ミラーサイトを選択し以下のようにディレクトリをたどる。
+</p>
+
+<ol>
+<li>releases/</li>
+<li>amd64/</li>
+<li>autobuilds/</li>
+<li>current-install-amd64-minimal/</li>
+</ol>
+
+<p>
+install-amd64-minimal-2015XXXX.isoと
+install-amd64-minimal-2015XXXX.iso.DIGESTS.ascをダウンロードする。
+</p>
+
+<h2>ファイルの完全性の確認</h2>
+
+<p><code>% gpg --recv-keys 0xBB572E0E2D182910<br/>
+% gpg --verify install-amd64-minimal-2015XXXX.iso.DIGESTS.asc<br/>
+...<br/>
+主鍵のフィンガー・プリント: 13EB BDBE DE7A 1277 5DFD B1BA BB57 2E0E 2910</code></p>
+
+<p>
+フィンガー・プリントを<a href="https://www.gentoo.org/downloads/signatures/"
+>Gentoo署名ページ</a>で確認する。
+</p>
+
+<p><code>% grep -A 1 -i sha512 install-amd64-minimal-2015XXXX.iso.DIGESTS.asc<br/>
+# SHA512 HASH<br/>
+d3e4d5b7... install-amd64-minimal-2015XXXX.iso<br/>
+# SHA512 HASH<br/>
+...<br/>
+% sha512sum install-amd64-minimal-2015XXXX.iso<br/>
+d3e4d5b7...
+</code></p>
+
+<h2>CDに焼く</h2>
+
+<p><code>% cdrecord install-amd64-minimal-2015XXXX.iso</code></p>
+
+<p>確認。</p>
+
+<p><code>% sudo mount /dev/cdrom /mnt/free/<br/>
+% ls /mnt/free/<br/>
+README.txt gentoo.efimg gentoo.efimg.mountPoint image.squashfs isolinux livecd<br/>
+% sudo eject</code></p>
+
+<p>ラベルを書く。</p>
+
+<p>
+Gentoo GNU/Linux install-amd64-minimal-20150618.iso
+sha512sum: d3e4d5b7da51a316db0cb0db ... 535d9a9ebea4aab32a
+</p>

@@ -1,0 +1,18 @@
+Gentoo GNU/Linuxの自作機(CLM)へのインストール: rcのログの保存
+
+<p>(工事中 0%)</p>
+
+<h2>rcのログの保存</h2>
+
+<p>いくつかrcのエラーガあったのでログを保存して見てみることにする。</p>
+
+<p><code># nano -w /etc/rc.conf<br/>
+...<br/>
+rc_loger="YES"<br/>
+...</code></p>
+
+<h2>確認</h2>
+
+<p><code># reboot</code></p>
+
+<p><code>cat /var/log.rc.log</code></p>

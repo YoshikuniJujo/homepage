@@ -1,0 +1,21 @@
+Gentoo GNU/Linuxの自作機(CLM)へのインストール: /mnt/gentoo下の環境に入る
+
+<p>(工事中 0%)</p>
+
+<h2>DNS情報のコピー</h2>
+
+<p><code># cp -L /etc/resolv.conf /mnt/gentoo/etc/</code></p>
+
+<h2>ファイルシステムのマウント</h2>
+
+<p><code># mount -t proc proc /mnt/gentoo/proc<br/>
+# mount --rbind /sys /mnt/gentoo/sys<br/>
+# mount --make-rslave /mnt/gentoo/sys<br/>
+# mount --rbind /dev /mnt/gentoo/dev<br/>
+# mount --make-rslave /mnt/gentoo/dev</code></p>
+
+<h2>/mnt/gentoo下の環境に入る</h2>
+
+<p><code># chroot /mnt/gentoo /bin/bash<br/>
+# source /etc/profile<br/>
+# export PS1="(chroot) $PS1"</code></p>

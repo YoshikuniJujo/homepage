@@ -1,0 +1,78 @@
+Gentoo GNU/Linuxの自当機(CLM)へのインストール: Portage樹の取得と更新
+
+<p>(工事中 0%)</p>
+
+<h2>Portage樹の取得</h2>
+
+<p><code># emerge-webrsync</code></p>
+
+<h2>Portage樹の更新</h2>
+
+<p><code># emerge --sync</code></p>
+
+<h2>プロファイルの選択</h2>
+
+<p><code># eselect profile list<br/>
+# eselect profile set 3</code></p>
+
+<h2>USE変数の設定</h2>
+
+<h3>CPU関連</h3>
+
+<p>CPUの機能をチェックする。</p>
+
+<p><code># cat /proc/cpuinfo | grep flags</code></p>
+
+<p>USE変数のうち上記で表示されたもの。</p>
+
+<ul>
+<li>mmx</li>
+<li>sse</li>
+<li>sse2</li>
+<li>ssse3</li>
+<li>sse4_1</li>
+</ul>
+
+<p>表示されなかったもの。</p>
+
+<ul>
+<li>3dnow</li>
+<li>3dnowext</li>
+<li>mmxext</li>
+<li>sse3</li>
+</ul>
+
+<h3>その他</h3>
+
+<h3>設定</h3>
+
+<p><code># nano -w /etc/portage/make.conf<br/>
+...<br/>
+USE="bindist \<br/>
+clamav cracklib crypt curl ftp ipv6 mime nsplugin rss \<br/>
+sasl ssl wifi xmpp X cairo fontconfig glut gpm gtk opengl \<br/>
+startup-notification wxwidgets xcb xft xinerama \<br/>
+xscreensaver mmx sse sse2 ssse3 sse4_1 acpi alsa cdr cups \<br/>
+dbus dvd dvdr foomaticdb lm_sensors oss pulseaudio scanner \<br/>
+udev udisks upower usb v4l cscope hscolour javascript jit \<br/>
+lua pcre perl python ruby vim-syntax bzip2 exif gzip \<br/>
+imagemagick imlib jpeg jpeg2k latex mng mp3 mpeg pdf png \<br/>
+postscript svg tiff xml xpm zlib cjk iconv m17n-lib nls \<br/>
+unicode git modules ncurses postgres profile skey \<br/>
+sound sqlite sqlite3 zsh-complition "<br/>
+...</code></p>
+
+<h2>タイムゾーンの決定</h2>
+
+<p><code># ls /usr/share/zoneinfo<br/>
+# echo "Japan" &gt; /etc/timezone</code></p>
+
+<p><code># emerge --config sys-libs/timezone-data</code></p>
+
+<h2>ロケールの設定</h2>
+
+<p><code># nano -w /etc/locale.gen<br/>
+# locale-gen</code></p>
+
+<p><code># eselect locale list<br/>
+# eselect locale set ...</code></p>
