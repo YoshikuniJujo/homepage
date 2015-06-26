@@ -1,0 +1,25 @@
+zshの導入
+
+<p>(工事中 0%)</p>
+
+<p><code>$ sudo emerge -av zsh</code></p>
+
+<p><code>$ sudo vipw</code></p>
+
+<p>ログインし直す。</p>
+
+<p>コマンド履歴を1000000(0が6個)とする。</p>
+<p>補完システムはデフォルト設定でon。</p>
+<p>指づかいはviを選択。</p>
+<p>パターンマッチの拡張と背景ジョブの即時報告。</p>
+
+<p><code>% vi .zshrc<br/>
+...<br/>
+setopt share_history</code></p>
+
+^[はCtrl-V ESC。
+
+<p><code>% vi .zshrc<br/>
+PROMPT="%{^[[;32;1m%} [%D{%H:%M}] %#%{^[[m%} "<br/>
+PROMPT2="%_&gt; "<br/>
+RPROMPT="[%40&lt;...&lt;%~]"</code></p>

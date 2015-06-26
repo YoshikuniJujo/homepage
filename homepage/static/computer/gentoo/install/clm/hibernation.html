@@ -1,0 +1,47 @@
+Gentoo GNU/Linuxの自作機(CLM)へのインストール: ハイバネーション
+
+<p>(工事中 0%)</p>
+
+<h2>カーネル設定の確認</h2>
+
+<p><code># zcat /proc/config.gz | grep -i suspend<br/>
+# zcat /proc/config.gz | grep -i hibernation</code></p>
+
+<h2>メモリへのサスペンド</h2>
+
+<p><code># echo mem &gt; /sys/power/state</code></p>
+
+<h2>SWAP領域のUUIDを調べる</h2>
+
+<p><code># blkid /dev/sda4</code></p>
+
+<h2>grubの設定を変更</h2>
+
+<p><code># nano -w /etc/default/grub<br/>
+...<br/>
+GRUB_CMDLINE_LINUX_DEFAULT="resume=UUID=..."<br/>
+...<br/>
+# mount /boot/<br/>
+# grub2-mkconfig -o /boot/grub/grub.cfg</code></p>
+
+<p><code># echo disk &gt; /sys/power/state</code></p>
+
+<h2>スイッチボタンでハイバネート</h2>
+
+<p><code># emerge -av acpid<br/>
+# rc-update add acpid default<br/>
+# rc-service acpid start</code></p>
+
+<p><code>nano -w /etc/acpi/default.sh<br/>
+...<br/>
+	case "$group" in<br/>
+		button)<br/>
+			case "$action" in<br/>
+				power)<br/>
+					case "$device" in<br/>
+						PBTN)<br/>
+							echo disk &gt; /sys/power/state<br/>
+							;;<br/>
+					esac<br/>
+					;;<br/>
+...</code></p>

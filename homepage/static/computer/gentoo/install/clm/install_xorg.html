@@ -1,0 +1,22 @@
+Xorgのインストール
+
+<p>(工事中 0%)</p>
+
+<h2>make.conf</h2>
+
+<p><code>% sudoedit /etc/portage/make.conf<br/>
+USE="...<br/>
+... clang"<br/>
+CPU_FLAGS_X86="sse2 ssse3"<br/>
+INPUT_DEVICES="evdev"<br/>
+VIDEO_CARDS="intel"<br/>
+LINGUAS="ja"</code></p>
+
+<h2>USE変数等の確認</h2>
+
+<p><code>% sudo emerge -av xorg-server</code></p>
+
+<h2>テスト</h2>
+
+<p><code>% sudo emerge -av twm xterm<br/>
+% startx</code></p>

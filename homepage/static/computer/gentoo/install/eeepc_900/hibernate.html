@@ -49,7 +49,7 @@ Gentoo Linuxではコンパイル作業に時間がかかる。
 <h2>grubの設定を変更</h2>
 
 <p>
-/boot/default/grubを編集する。
+/etc/default/grubを編集する。
 UUID=5c5d81e1-...の部分には上で調べたUUIDをいれる。
 </p>
 
@@ -131,11 +131,11 @@ case "$group" in<br/>
 		case "$action" in<br/>
 			power)<br/>
 				# /etc/actions/powerbtn.sh<br/>
-				case "$device" in
-					PBTN)
+				case "$device" in<br/>
+					PBTN)<br/>
 						echo mem &gt; /sys/power/state<br/>
 						;;
-				esac
+				esac<br/>
 				;;<br/>
 ...</code></p>
 

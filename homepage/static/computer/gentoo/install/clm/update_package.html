@@ -1,0 +1,49 @@
+パッケージのアップデート
+
+<p>(工事中 0%)</p>
+
+<p><code>% sudo emerge -avu --deep --newuse system</code></p>
+
+<p><code>% sudoedit /etc/portage/make.conf<br/>
+USE="...<br/>
+... -qt4"<br/>
+...</code></p>
+
+<p><code>% sudoedit /etc/portage/package.use/xmlto<br/>
+=app-text/xmlto-0.0.26		-latex</code></p>
+
+<p><code>% sudo emerge -avu --deep --newuse system</code></p>
+
+<p><code>% sudo emerge -av gentoolkit</code></p>
+
+<p><code>% sudo rm /etc/portage/package.use/xmlto<br/>
+% sudo emerge -av --oneshot xmlto</code></p>
+
+<p><code>% sudo revdep-clean -- -av<br/>
+% sudo emerge -av --depclean</code></p>
+
+<p><code>% sudo emerge -avu --deep --newuse world</code></p>
+
+<p><code>% sudo emerge --sync</code></p>
+
+<p><code>% sudo emerge -avu --deep --newuse @system</code></p>
+
+<p><code>% sudo emerge -avu --deep --newuse @world</code></p>
+
+<p><code>% sudo revdep-rebuild -- -av<br/>
+% sudo emerge -av --depclean</code></p>
+
+<p><code>% sudoedit /etc/portage/make.conf<br/>
+USE="...<br/>
+... llvm"<br/>
+...<br/>
+% sudo emerge -av ghc</code></p>
+
+<p><code>% sudo emerge -av xmonad</code></p>
+
+<p><code>% vi .xinitrc<br/>
+exec xmonad</code></p>
+
+<p><code>% sudoedit /etc/portage/package.use/rxvt-unicode<br/>
+x11-terms/rxvt-unicode		-vanilla 256-color unicode3 wcwidth<br/>
+% sudo emerge -av rxvt-unicode</code></p>

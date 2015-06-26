@@ -1,0 +1,24 @@
+一般ユーザの追加
+
+<p>(工事中 0%)</p>
+
+<p><code># useradd -m -G users,portage,wheel -s /bin/bash yoshio<br/>
+# passwd yoshio</code></p>
+
+<p>ログインし直してsu</p>
+
+<p><code># su</code></p>
+
+<p><code># emerge -av sudo</code></p>
+
+<p><code># vi /etc/portage/package.use/sudo<br/>
+app-admin/sudo	-skey</code></p>
+
+<p><code># emerge -av sudo</code></p>
+
+<p><code># USE="-postgres" emerge -av sudo</code></p>
+
+<p><code># visudo<br/>
+%wheel ALL=(ALL) ALL</code></p>
+
+<p><code>$ sudo echo hoge</code></p>

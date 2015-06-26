@@ -1,0 +1,19 @@
+Gentoo GNU/Linuxの自作機(CLM)へのインストール: vimの導入
+
+<p>(工事中 0%)</p>
+
+<h2>emerge</h2>
+
+<p><code># emerge -pv vim</code></p>
+
+<p>まだXは入れないのでUSE変数を"-X"とする。</p>
+
+<p><code># USE="-X" emerge -pv vim</code></p>
+
+<p>Rubyはここでついでに入れてしまおう。</p>
+
+<p><code># USE="-X" emerge -av vim</code></p>
+
+<p><code># eselect editor list<br/>
+# eselect editor set 3<br/>
+# . /etc/profile</code></p>
