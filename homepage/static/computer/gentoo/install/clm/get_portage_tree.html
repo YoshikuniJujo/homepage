@@ -15,6 +15,14 @@ Gentoo GNU/Linuxの自当機(CLM)へのインストール: Portage樹の取得�
 <p><code># eselect profile list<br/>
 # eselect profile set 3</code></p>
 
+<h2>tmuxの導入</h2>
+
+<p><code># emerge -av tmux</code></p>
+
+<h2>vimの導入</h2>
+
+<p><code># emerge -av vim</code></p>
+
 <h2>USE変数の設定</h2>
 
 <h3>CPU関連</h3>
@@ -46,7 +54,7 @@ Gentoo GNU/Linuxの自当機(CLM)へのインストール: Portage樹の取得�
 
 <h3>設定</h3>
 
-<p><code># nano -w /etc/portage/make.conf<br/>
+<p><code># vim /etc/portage/make.conf<br/>
 ...<br/>
 USE="bindist \<br/>
 clamav cracklib crypt curl ftp ipv6 mime nsplugin rss \<br/>
@@ -71,7 +79,7 @@ sound sqlite sqlite3 zsh-complition "<br/>
 
 <h2>ロケールの設定</h2>
 
-<p><code># nano -w /etc/locale.gen<br/>
+<p><code># vim /etc/locale.gen<br/>
 # locale-gen</code></p>
 
 <p><code># eselect locale list<br/>
