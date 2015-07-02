@@ -209,6 +209,18 @@ optimal io sizeが0でalignment offsetも0でminimum io sizeが2のべき乗な�
 
 <h2>パーティションのマウント</h2>
 
+<p>
+一度haltした後もどってきた場合は以下のコマンドが必要。
+</p>
+
+<p><code># modprobe dm-mod<br/>
+# vgscan<br/>
+# vgchange -a y</code></p>
+
+<p>
+パーティションをマウントする。
+</p>
+
 <p><code># mount /dev/sda3 /mnt/gentoo/<br/>
 # mkdir /mnt/gentoo/boot<br/>
 # mkdir /mnt/gentoo/usr<br/>

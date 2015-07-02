@@ -1,0 +1,7 @@
+account default
+host hoge.hige.jp
+port 587
+user yoshio
+password yoshioda
+from Yoshio Tanaka <yoshio@hoge.hige.jp>
+auth on

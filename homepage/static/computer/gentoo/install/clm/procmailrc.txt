@@ -1,0 +1,13 @@
+MAILDIR=$HOME/phd03_white/MuttMail
+LOGFILE=$HOME/.procmaillog
+LOGABSTRACT=no
+VERBOSE=off
+FORMAIL=/usr/bin/formail
+NL="
+"
+
+:0
+* .*
+default
+
+# End of file

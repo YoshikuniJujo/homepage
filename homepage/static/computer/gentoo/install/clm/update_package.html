@@ -47,3 +47,44 @@ exec xmonad</code></p>
 <p><code>% sudoedit /etc/portage/package.use/rxvt-unicode<br/>
 x11-terms/rxvt-unicode		-vanilla 256-color unicode3 wcwidth<br/>
 % sudo emerge -av rxvt-unicode</code></p>
+
+<p><code>% vi ~/.Xdefaults<br/>
+urxvt*background: black<br/>
+urxvt*foreground: snow<br/>
+urxvt*color12: #7799FF<br/>
+<br/>
+urxvt*saveLines: 0</code></p>
+
+<p><code>% mkdir ~/.xmonad<br/>
+% vi ~/.xmonad/xmonad.hs<br/>
+import XMonad<br/>
+<br/>
+main :: IO ()<br/>
+main = xmonad defaultConfig {<br/>
+	<span class="indent1">terminal = "urxvt"</span><br/>
+	<span class="indent1">}</span></code></p>
+
+<p><code>% sudo emerge -av xfce4-meta xfce4-notifyd<br/>
+% sudo emerge --deselect=y xfce4-notifyd</code></p>
+
+<p><code>% sudo emerge -av mirrorselect</code></p>
+
+<p><code>% sudo mkdir /etcportage/repos.conf<br/>
+% sudo cp /usr/share/portage/config/repos.conf /etc/portage/repos.conf/gentoo.conf</code></p>
+
+<p><code>% mirrorselect -i -o | sudo tee -a /etc/portage/make.conf</code></p>
+
+<p><code>% sudo useradd -m -G users -s /bin/zsh guest</code></p>
+
+<p><code>% vi .xinitrc<br/>
+exec startxfce4</code></p>
+
+<p><code>% sudo emerge -av uim</code></p>
+
+<p><code>% sudo emerge -av dmenu</code></p>
+
+<p><code>% sudo mkdir /mnt/free<br/>
+% sudo mount /dev/sdb1 /mnt/free<br/>
+% cp /mnt/free/tmp/id_rsa ~/.ssh/<br/>
+% cp /mnt/free/tmp/id_rsa.pub ~/.ssh/<br/>
+% ssh -p 12345 foo@bar.buz.jp</code></p>

@@ -1,0 +1,26 @@
+set folder = $HOME/phd03_white/MuttMail
+set record = $HOME/phd03_white/MuttMail/sent
+mailboxes  = default
+set from   = "Yoshikuni Jujo <PAF01143@nifty.ne.jp>"
+
+color quoted default default
+
+set pager = "/usr/bin/less"
+
+macro index F "!fetchmail -a -m 'procmail -d %T'\r"
+macro index F "!fetchmail -a -m 'procmail -d %T'\r"
+
+set sendmail="/usr/bin/msmtp"
+
+# set send_charset="us-ascii:iso-2022-jp"
+set charset="utf-8"
+set send_charset="utf-8"
+
+auto_view text/html
+
+macro index \cl |urlview\n 'call urlview to extract URLs out of a message'
+macro pager \cl |urlview\n 'call urlview to extract URLs out of a message'
+
+bind index G last-entry
+
+set editor="vim -c 'set fileencoding=utf-8'"
