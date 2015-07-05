@@ -1,0 +1,351 @@
+ゲストOSの導入
+
+<p>(工事中 0%)</p>
+
+<h2>パーティションの作成</h2>
+
+<h3>パーティション構成</h3>
+
+<p>
+とりあえず100GBのハードディスクを用意した。
+メモリは2GBとしておいた。
+パーティションは細かく分けずにまとめてしまう。
+/bootだけ別パーティションにしておくことにする。
+</p>
+
+<ul>
+<li>/dev/sda1 2MB GRUB2</li>
+<li>/dev/sda2 1GB /boot</li>
+<li>/dev/sda3 6GB swap</li>
+<li>/dev/sda4 93GB /</li>
+</ul>
+
+<h3>パーティションの作成</h3>
+
+<p><code># parted /dev/sda<br/>
+(parted) mklabel gpt<br/>
+(parted) unit mib<br/>
+(parted) mkpart grub 1 3<br/>
+(parted) set 1 bios_grub on<br/>
+(parted) print</code></p>
+
+<p><code>(parted) mkpart boot 3 1000<br/>
+(parted) set 2 boot on<br/>
+(parted) mkpart swap 1000 7000<br/>
+(parted) mkpart rootfs 7000 -1<br/>
+(parted) print<br/>
+(parted) quit</code></p>
+
+<h3>ファイルシステムの作成</h3>
+
+<h4>SWAP</h4>
+
+<p><code># mkswap /dev/sda3</code></p>
+
+<h4>その他</h4>
+
+<p><code># mkfs.ext4 /dev/sda2<br/>
+# mkfs.ext4 /dev/sda4</code></p>
+
+<h3>マウント</h3>
+
+<h4>SWAP</h4>
+
+<p><code># swapon /dev/sda3<br/>
+# free -h</code></p>
+
+<h4>その他</h4>
+
+<p><code># mount /dev/sda4 /mnt/gentoo<br/>
+# mkdir /mnt/gentoo/boot<br/>
+# mount /dev/sda2 /mnt/gentoo/boot<br/>
+# ls /mnt/gentoo<br/>
+# ls /mnt/gentoo/boot</code></p>
+
+<h2>Stage3</h2>
+
+<h3>日付と時刻</h3>
+
+<p><code># date<br/>
+# rc-service ntp-client start<br/>
+# date</code></p>
+
+<p><code># hwclock<br/>
+# hwclock --systohc<br/>
+# hwclock</code></p>
+
+<h3>tarボールのダウンロード</h3>
+
+<p><code># cd /mnt/gentoo</code></p>
+
+<p><code># links https://www.gentoo.org/downloads/mirrors/#JP<br/>
+releases/amd64/autobuilds/current-stage3-amd64/stage3-amd64-2015XXXX.tar.bz2<br/>
+releases/amd64/autobuilds/current-stage3-amd64/stage3-amd64-2015XXXX.tar.bz2.DIGESTS.asc</code></p>
+
+<h3>完全性の確認</h3>
+
+<p><code># gpg --recv-keys 0xBB572E0E2D182910<br/>
+# gpg --recv-keys 0xBB572E0E2D182910<br/>
+# gpg --verify stage3-amd64-2015XXXX.tar.bz2.DIGESTS.asc</code></p>
+
+<p><a href="https://www.gentoo.org/downloads/signatures/"
+>Gentooの署名用の鍵のページ</a>でフィンガープリントを確認する。</p>
+
+<p><code># sha512sum stage3-amd64-2015XXXX.tar.bz2<br/>
+# grep -A 1 SHA512 stage3-amd64-2015XXXX.tar.bz2.DIGESTS.asc</code></p>
+
+<h3>解凍と設置</h3>
+
+<p><code># tar xvjpf stage3-amd64-2015XXXX.tar.bz2 --xattrs</code></p>
+
+<h3>コンパイルオプションの設定</h3>
+
+<p><code># vi /mnt/gentoo/etc/portage/make.conf<br/>
+CFLAGS="-march=native -O2 -pipe"<br/>
+CXXFLAGS="${CFLAGS}"<br/>
+<br/>
+MAKEOPTS="-j2"</code></p>
+
+<h2>新しいシステムに入る</h2>
+
+<p><code># mirrorselect -o -i &gt;&gt; /mnt/gentoo/etc/portage/make.conf</code></p>
+
+<p><code># cp -L /etc/resolv.conf /mnt/gentoo/etc/<br/>
+# mount -t proc proc /mnt/gentoo/proc<br/>
+# mount --rbind /sys /mnt/gentoo/sys<br/>
+# mount --make-rslave /mnt/gentoo/sys<br/>
+# mount --rbind /dev /mnt/gentoo/dev<br/>
+# mount --make-rslave /mnt/gentoo/dev</code></p>
+
+<p><code># chroot /mnt/gentoo /bin/bash<br/>
+# source /etc/profile<br/>
+# export PS1="(chroot) $PS1"</code></p>
+
+<h2>Portage樹の導入</h2>
+
+<p><code># emerge-webrsync</code></p>
+
+<p><code># eselect profile list<br/>
+# eselect profile set 3</code></p>
+
+<h2>USEフラグの設定</h2>
+
+<h3>エディタ等の導入</h3>
+
+<p><code># emerge -av tmux</code></p>
+
+<p><code># USE="-X" emerge -av vim</code></p>
+
+<h3>CPUのフラグを確認</h3>
+
+<p><code># emerge -av cpuinfo2cpuflags<br/>
+# cpuinfo2cpuflags-x86<br/>
+# cpuinfo2cpuflags-x86 &gt;&gt; /etc/portage/make.conf</code></p>
+
+<h3>USEフラグの設定</h3>
+
+<p><code># vim /etc/portage/make.conf<br/>
+...<br/>
+USE="bindist mmx mmxext popcnt sse sse2 sse3 \<br/>
+clamav cracklib crypt curl ftp ipv6 mime nsplugin rss \<br/>
+sasl ssl wifi xmpp X cairo fontconfig glut gpm gtk opengl \<br/>
+startup-notification wxwidgets xcb xft xinerama \<br/>
+xscreensaver acpi alsa cdr cups \<br/>
+dbus dvd dvdr foomaticdb lm_sensors oss pulseaudio scanner \<br/>
+udev udisks upower usb v4l cscope hscolour javascript jit \<br/>
+lua pcre perl python ruby vim-syntax bzip2 exif gzip \<br/>
+imagemagick imlib jpeg jpeg2k latex mng mp3 mpeg pdf png \<br/>
+postscript svg tiff xml xpm zlib cjk iconv m17n-lib nls \<br/>
+unicode git modules ncurses postgres profile skey \<br/>
+sound sqlite sqlite3 zsh-complition \<br/>
+"<br/>
+...</code></p>
+
+<h2>タイムゾーンとロケールの設定</h2>
+
+<p><code># echo "Japan" &gt; /etc/timezone<br/>
+# emerge --config sys-libs/timezone-data</code></p>
+
+<p><code># vim /etc/locale.gen<br/>
+# locale-gen<br/>
+# eselect locale list<br/>
+# eselect locale set ...</code></p>
+
+<h2>カーネルの設定</h2>
+
+<p><code># emerge -av gentoo-sources<br/>
+# emerge -av pciutils</code></p>
+
+<p><code># cd /usr/src/linux<br/>
+# make menuconfig</code></p>
+
+<h3>コンフィグ</h3>
+
+<p><code>General setup ---&gt;<br/>
+	&lt;*&gt; Kernel .config support<br/>
+		[*] Enable access to .config through /proc/config.gz</code></p>
+
+<h3>有線LAN</h3>
+
+<p><code># lspci -k | grep -A 2 -i ethernet<br/>
+# grep -i e1000 .config</code></p>
+
+<h3>CPUファミリ</h3>
+
+<p><code>CPUファミリをセットする</code></p>
+
+<h3>カーネルの作成と導入</h3>
+
+<p><code># make &amp;&amp; make modules_install<br/>
+# make install</code></p>
+
+<h3>initramfsの作成</h3>
+
+<p><code># emerge -av genkernel<br/>
+# genkernel --install initramfs<br/>
+# ls /boot</code></p>
+
+<h2>システムの設定</h2>
+
+<p><code># vim /etc/fstab<br/>
+/dev/sda2	/boot	ext4	noatime,noauto	0 2<br/>
+/dev/sda4	/	ext4	noatime		0 1<br/>
+/dev/sda3	none	swap	sw		0 0</code></p>
+
+<p><code># vim /etc/conf.d/hostname<br/>
+hostname="virtual_20150703"<br/>
+# vim /etc/conf.d/net<br/>
+dns_domain_lo="local.hogehoge.jp"</code></p>
+
+<p><code># vim /etc/hosts<br/>
+...<br/>
+127.0.0.1	virtual_20150703 virtual_20150703.local.hogehoge.jp localhost<br/>
+::1		...</code></p>
+
+<p><code># passwd</code></p>
+
+<h2>システムツールの導入</h2>
+
+<p><code># emerge -av metalog<br/>
+# rc-update add metalog default</code></p>
+
+<p><code># emerge -av fcron<br/>
+# rc-update add fcron default<br/>
+# crontab /etc/crontab</code></p>
+
+<p><code># emerge -av mlocate<br/>
+# emerge -av dhcpcd</code></p>
+
+<h2>ブートローダの導入</h2>
+
+<p><code># emerge -av grub<br/>
+# grub2-install /dev/sda<br/>
+# grub2-mkconfig -o /boot/grub/grub.cfg</code></p>
+
+<h2>再起動</h2>
+
+<p><code># halt</code></p>
+
+<p><code>% qemu-system-x86_64 -enable-kvm -cdrom /dev/cdrom -boot c -m 2047 -net nic,macaddr=00:00:00:00:00:01,model=e1000 -net tap,ifname=tap0,script=qemu-ifup,downscript=qemu-ifdown -vnc :0 -monitor stdio -vga cirrus</code></p>
+
+<h2>CUIの設定</h2>
+
+<h3>ハイバネーション</h3>
+
+<p><code># blkid /dev/sda3<br/>
+# vim /etc/default/grub<br/>
+...<br/>
+GRUB_CMDLINE_LINUX_DEFAULT="resume=UUID=..."<br/>
+...<br/>
+# mount /boot<br/>
+# grub2-mkconfig -o /boot/grub/grub.cfg<br/>
+# echo disk &gt; /sys/power/state</code></p>
+
+<h3>一般ユーザの追加</h3>
+
+<p><code># useradd -m -G users,portage,wheel -s /bin/bash yoshio<br/>
+# passwd yoshio</code></p>
+
+<p>ログインし直してsu</p>
+
+<p><code>$ su<br/>
+# vim /etc/portage/package.use/sudo<br/>
+app-admin/sudo -skey<br/>
+# USE="-postgres" emerge -av sudo<br/>
+# eselect editor list<br/>
+# eselect editor set 3<br/>
+# visudo<br/>
+%wheel ALL=(ALL) ALL<br/>
+$ sudo echo hoge</code></p>
+
+<h3>zshの導入</h3>
+
+<p><code>$ sudo emerge -av zsh<br/>
+$ sudo vipw</code></p>
+
+<p>ログインし直す。</p>
+
+<ul>
+<li>コマンド履歴は1000000(0が6個)とする</li>
+<li>補完システムはデフォルト設定でon</li>
+<li>指づかいはvi</li>
+<li>パターンマッチの拡張</li>
+<li>背景ジョブの即時報告</li>
+</ul>
+
+<p>^[はCtrl-v ESC</p>
+
+<p><code>% vi .zshrc<br/>
+setopt share_history<br/>
+<br/>
+PROMPT="%{^[[;32;1m%}[%D{%H:%M}] %#%{^[[m%} "<br/>
+PROMPT2="%_&gt; "<br/>
+RPROMPT="[%40&lt;...&lt;%~]"</code></p>
+
+<h3>tmuxの設定</h3>
+
+<p><code>vim ~/.tmux.conf<br/>
+set-window-option -g mode-keys vi<br/>
+<br/>
+bind-key j resize-pane -D<br/>
+bind-key k resize-pane -U<br/>
+bind-key J resize-pane -D 8<br/>
+bind-key K resize-pane -U 8<br/>
+bind-key O select-pane -U</code></p>
+
+<h2>GUIの導入</h2>
+
+<h3>Xorgの導入</h3>
+
+<p><code>% sudoedit /etc/portage/make.conf<br/>
+USE="...<br/>
+... clang llvm \<br/>
+"<br/>
+...<br/>
+INPUT_DEVICES="evdev"<br/>
+VIDEO_CARDS="cirrus"<br/>
+LINGUAS="ja"</code></p>
+
+<p><code>% sudo emerge -av xorg-server twm xterm xclock<br/>
+% startx</code></p>
+
+<h2>システムの更新</h2>
+
+<p><code>% sudoedit /etc/portage/package.use/xmlto<br/>
+=app-text/xmlto-0.0.26		-latex<br/>
+% sudo emrege -avu --deep --newuse @system<br/>
+% sudo rm /etc/portage/package.use/xmlto<br/>
+% sudo emerge --oneshot xmlto<br/>
+% sudo emrege -avu --deep --newuse @world<br/>
+% sudo emerge -av gentoolkit<br/>
+% sudo revdep-rebuild -- -av<br/>
+% sudo emerge --sync<br/>
+% sudo emerge -avu --deep --newuse @system<br/>
+% sudo emerge -avu --deep --newuse @world<br/>
+% sudo revdep-rebuild -- -av<br/>
+% sudo emerge -av --depclean</code></p>
+
+<h2>メモ</h2>
+
+<p><code>% sudo lvextend -L+10G /dev/vg/home<br/>
+% sudo resize2fs /dev/vg/home</code></p>
