@@ -16,6 +16,13 @@ dd.list { margin-left : 80px }
 
 li { margin-top: 0.4em; margin-bottom: 0.5em; }
 
-span.indent1 { padding-left: 4em; }
-span.indent2 { padding-left: 8em; }
-span.indent3 { padding-left: 12em; }
+span.indent1  { padding-left: 4em;  }
+span.indent2  { padding-left: 8em;  }
+span.indent3  { padding-left: 12em; }
+span.indent4  { padding-left: 16em; }
+span.indent5  { padding-left: 20em; }
+span.indent6  { padding-left: 24em; }
+span.indent7  { padding-left: 28em; }
+span.indent8  { padding-left: 32em; }
+span.indent9  { padding-left: 36em; }
+span.indent10 { padding-left: 40em; }
