@@ -345,6 +345,161 @@ LINGUAS="ja"</code></p>
 % sudo revdep-rebuild -- -av<br/>
 % sudo emerge -av --depclean</code></p>
 
+<h2>xmonadの導入</h2>
+
+<p><code>% sudo emerge -av ghc</code></p>
+
+<p>
+ghc-7.6.3-r1はHostへのインストールに失敗している。
+ゲストへのインストールも一度試してみて、だめなら7.8.4に~amd64キーワードをつける。
+</p>
+
+<p><code>% sudo emerge -av xmonad</code></p>
+
+<p><code>% vi .xinitrc<br/>
+exec xmonad</code></p>
+
+<h3>ホスト側で</h3>
+
+<p><code>% sudo emerge -av xmodmap</code></p>
+
+<p><code>% vi .Xmodmap<br/>
+keycode 102	= Meta_L<br/>
+keycode 100	= Meta_R<br/>
+<br/>
+remove mod1	= Meta_L<br/>
+remove mod1	= Alt_L<br/>
+remove mod1	= Alt_R<br/>
+<br/>
+add mod3	= Meta_R<br/>
+add mod3	= Meta_L<br/>
+remove mod3	= Alt_L<br/>
+remove mod3	= Alt_R<br/>
+add mod1	= Alt_L<br/>
+add mod1	= Alt_R</code></p>
+
+<p><code>% vi .xmonad/xmonad.hs<br/>
+...<br/>
+main = do<br/>
+	<span class="indent1">...<br/></span>
+	<span class="indent1">xmonad defaultConfig {<br/></span>
+	<span class="indent2">...<br/></span>
+	<span class="indent2">modMask = mod3Mask,<br/></span>
+	<span class="indent2">...<br/></span>
+	<span class="indent2">}<br/></span>
+...</code></p>
+
+<p><code>% xmodmap .Xmodmap</code></p>
+
+<p>Alt+qでxmonadを再開。</p>
+
+<p><code>% vi .xinitrc<br/>
+...<br/>
+xmodmap .Xmodmap<br/>
+...</code></p>
+
+<p><code>% sudo emerge -av xmonad-contrib</code></p>
+
+<p><code>% vi .xmonad/xmonad.hs<br/>
+...<br/>
+import XMonad.Layout.NoBorders(smartBorders)<br/>
+...<br/>
+myLayout = tiled ||| Mirror tiled ||| Full<br/>
+	<span class="indent1">where<br/></span>
+	<span class="indent1">tiled = Tall 1 (3 / 100) (1 / 2)<br/></span>
+...<br/>
+		<span class="indent2">layoutHook = smartBorders myLayout,<br/></span>
+...</code></p>
+
+<p>ssvncviewerを一度終了してから</p>
+
+<p><code>% ssvncviewer -scale 1.17 127.0.0.1:5900</code></p>
+
+<h3>ゲスト側にもどる</h3>
+
+<p><code>% startx</code></p>
+
+<p><code>% sudoedit /etc/portage/package.use/rxvt-unicode<br/>
+x11-terms/rxvt-unicode		-vanilla 256-colors unicode3 wcwidth<br/>
+% sudo emerge -av rxvt-unicode</code></p>
+
+<p><code>% mkdir .xmonad<br/>
+% vi .xmonad/xmonad.hs<br/>
+import XMonad<br/>
+<br/>
+main :: IO ()<br/>
+main = do<br/>
+	<span class="indent1">xmonad defaultConfig {<br/></span>
+		<span class="indent2">terminal	= "urxvt"<br/></span>
+		<span class="indent2">}</span></code></p>
+
+<p><code>% vi .Xdefaults<br/>
+urxvt*background:	black<br/>
+urxvt*foreground:	snow<br/>
+urxvt*color12:		#7799FF<br/>
+<br/>
+urxvt*saveLines:	0</code></p>
+
+<p><code>% vi .zshrc<br/>
+...<br/>
+alias ls="ls --color=auto"<br/>
+alias grep="grep --color=auto"</code></p>
+
+<h2>firefoの導入</h2>
+
+<p><code>% sudo emerge -av firefox<br/>
+% sudo emerge -av dmenu</code></p>
+
+<h2>NFSの導入</h2>
+
+<h3>ホスト側</h3>
+
+<p><code>% zcat /proc/config.gz | grep -i nfsd</code></p>
+
+カーネルの設定。
+
+<p><code>% cd /usr/src/linux<br/>
+% sudo make menuconfig<br/>
+File Systems ---&gt;<br/>
+	[*] Network File Systems ---&gt;<br/>
+		&lt;*&gt; NFS server support<br/>
+			[*] NFS server support for NFS version 4<br/>
+% sudo make &amp;&amp; sudo make modules_install<br/>
+% sudo mount /boot<br/>
+% sudo make install</code></p>
+
+<p>再起動する。</p>
+
+<p><code>% zcat /proc/config.gz | grep -i nfsd<br/>
+% sudo emerge -av nfs-utils<br/>
+% mkdir export<br/>
+% mkdir export/test<br/>
+% sudoedit /etc/exports<br/>
+/home/yoshio/export		192.168.100.0/24(rw,fsid=0,no_subtree_check)<br/>
+/home/yoshio/export/test	192.168.100.0/24(rw,nohide,insecure,no_subtree_check)<br/>
+% sudo rc-update add nfs default<br/>
+% sudo rc-service nfs start</code></p>
+
+<h3>ゲスト側</h3>
+
+<p><code>% sudo emerge -av nfs-utils<br/>
+% rc-update add nfsclient<br/>
+% rc-service nfsclient start<br/>
+% sudo mount 192.168.100.254:/test /mnt/free</code></p>
+
+<h2>SSHの設定</h2>
+
+<h3>ホスト側</h3>
+
+<p><code>% cp ~/.ssh/id_rsa ~/export/test/<br/>
+% cp ~/.ssh/id_rsa.pub ~/export/test/</code></p>
+
+<h3>ゲスト側</h3>
+
+<p><code>% mv ~/export/test/id_rsa ~/.ssh/<br/>
+% mv ~/export/test/id_rsa.pub ~/.ssh<br/>
+% ssh -p 12345 yoshio@hoge.hige.jp</code></p>
+
 <h2>メモ</h2>
 
 <p><code>% sudo lvextend -L+10G /dev/vg/home<br/>
