@@ -34,14 +34,14 @@ GRUB_CMDLINE_LINUX_DEFAULT="resume=UUID=..."<br/>
 
 <p><code>nano -w /etc/acpi/default.sh<br/>
 ...<br/>
-	case "$group" in<br/>
-		button)<br/>
-			case "$action" in<br/>
-				power)<br/>
-					case "$device" in<br/>
-						PBTN)<br/>
-							echo disk &gt; /sys/power/state<br/>
-							;;<br/>
-					esac<br/>
-					;;<br/>
+	<span class="indent1">case "$group" in<br/></span>
+		<span class="indent2">button)<br/><span>
+			<span class="indent3">case "$action" in<br/></span>
+				<span class="indent4">power)<br/></span>
+					<span class="indent5">case "$device" in<br/></span>
+						<span class="indent6">PBTN)<br/></span>
+							<span class="indent7">echo disk &gt; /sys/power/state<br/></span>
+							<span class="indent7">;;<br/></span>
+					<span class="indent5">esac<br/></span>
+					<span class="indent5">;;<br/></span:
 ...</code></p>
