@@ -1,0 +1,13 @@
+USE="bindist mmx mmxext popcnt sse sse2 sse3 \
+clamav cracklib crypt curl ftp ipv6 mime nsplugin rss \
+sasl ssl wifi xmpp X cairo fontconfig glut gpm gtk opengl \
+startup-notification wxwidgets xcb xft xinerama \
+xscreensaver acpi alsa cdr cups \
+dbus dvd dvdr foomaticdb lm_sensors oss pulseaudio scanner \
+udev udisks upower usb v4l cscope hscolour javascript jit \
+lua pcre perl python ruby vim-syntax bzip2 exif gzip \
+imagemagick imlib jpeg jpeg2k latex mng mp3 mpeg pdf png \
+postscript svg tiff xml xpm zlib cjk iconv m17n-lib nls \
+unicode git modules ncurses postgres profile skey \
+sound sqlite sqlite3 zsh-complition \
+"

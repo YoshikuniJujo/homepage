@@ -1,0 +1,1 @@
+sudo qemu-system-x86_64 -enable-kvm -cdrom /dev/cdrom -boot c -m 2047 -net nic,macaddr=00:00:00:00:00:01,model=e1000 -net tap,ifname=tap0,script=qemu-ifup -vnc :0 -monitor stdio -hda sda.img -vga cirrus
