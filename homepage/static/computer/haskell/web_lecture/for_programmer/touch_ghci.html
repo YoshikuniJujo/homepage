@@ -4,56 +4,47 @@ GHCi: 対話環境に触れる
 
 <p>
 Haskell Platformをインストールする。
-Windowsでは<a href="https://www.haskell.org/platform/windows.html">ここ</a>、
-Macでは<a href="https://www.haskell.org/platform/mac.html">ここ</a>に
-インストーラがある。
-Linuxではディストリビューションごとにそれぞれのやりかたがある。
-<a href="https://www.haskell.org/platform/linux.html">ここ</a>に
-情報がまとまっている。
-以下、Haskell Platformがインストールされているものとして話を進める。
+それぞれのプラットホーム向けのバイナリやソースへのリンクを以下に示す。
+</p>
+
+<p>
+<a href="https://www.haskell.org/platform/windows.html">Windows</a>
+<a href="https://www.haskell.org/platform/mac.html">Mac</a>
+<a href="https://www.haskell.org/platform/linux.html">Linux</a>
 </p>
 
 <h2>ghcのチェック</h2>
 
 <p>
-ghcがインストールされているかどうかのチェック。
-コマンドプロンプトを立ち上げて以下を入力。
-先頭の'%'はコマンドプロンプトに対する入力であることを示すため。
-これは入力しない。
+ghcがインストールされているかどうかチェックする。
+コマンドプロンプトを立ち上げて以下を入力しよう。
+先頭の'%'はコマンドプロンプトに対する入力であることを示すためなので入力しない。
 </p>
 
 <code>% ghc --version<br/>
 The Glorious Glasgow Haskell Compilation System, version X.Y.Z</code>
 
-<p>
-ghcの名前とバージョンが表示されればghcはインストールされている。
-</p>
+<p>X.Y.Zはバージョン番号。</p>
 
-<h2>終わらせかた</h2>
+<h2>対話環境の開始と終了</h2>
 
-<p>
-さっそく対話環境を立ち上げてみよう。
-</p>
+<p>対話環境を立ち上げる。</p>
 
 <pre><code>% ghci
 Prelude&gt;</code></pre>
 
 <p>
-Prelude&gt;はプロンプトである。
-何事もまずは終わらせかたを知っておくべきだ。
-そうでないと対話環境から抜けられなくて困惑するはめになる。
-プロンプトに':q'を入力し続けてリターンキーを押す。
-':q'は':quit'の略。
-省略せずに':quit'と入力しても良い。
+Prelude&gt;はプロンプトだ。
+何事もまずは終わらせかたを知っておかなければならない。
+プロンプトに':quit'を入力し続けてリターンキーを押す。
+省略して':q'とすることもできる。
 </p>
 
-<pre><code>Prelude&gt; :q</code></pre>
+<pre><code>Prelude&gt; :quit</code></pre>
 
 <h2>値の入力</h2>
 
-<p>
-再度、ghciを立ち上げていろいろな値を入力してみよう。
-</p>
+<p>いろいろな値を入力してみよう。</p>
 
 <pre><code>% ghci
 Prelude&gt; 4492
@@ -65,26 +56,24 @@ Prelude&gt; pi
 
 <p>
 対話環境は入力した式を評価し結果を表示する。
-4492や'c'はリテラルでありそのまま出力される。
-piは定義済みの変数だ。円周率の値が表示される。
+4492や'c'はリテラルなのでそのまま出力される。
+piは定義済みの変数。円周率の値が表示される。
 </p>
 
 <h3>便利な変数it</h3>
 
 <p>
-複雑な計算をしたあと、そこで表示した値を再度使いたいような場合がある。
-このようなときに変数itが便利だ。
-対話環境で評価された値は自動的に変数itに保存される。
-以下の例を見てみよう。
-演算子*は乗算を意味する演算子だ。
+複雑な計算のあと表示した値を再度使いたいような場合に変数itが便利だ。
+対話環境で評価された値は自動的に変数itを束縛する。
+演算子(*)は乗算を示す。
 </p>
 
 <p><code>Prelude&gt; 344925345991 * 36251192382<br/>
 12503955074947653440562</code></p>
 
 <p>
-ここで返された結果にさらに15をかけたいとする。
-値を手で入力し直しても良いが変数itを使えばより簡単にできる。
+返された結果にさらに15をかけたい。
+値を手で入力し直すよりも変数itを使ったほうが簡単だ。
 </p>
 
 <p><code>Prelude&gt; it * 15<br/>
@@ -109,7 +98,7 @@ piは定義済みの変数だ。円周率の値が表示される。
 <h3>リンゴが好き</h3>
 
 <p>
-ファイルの読み込み、再読み込みの練習。
+ファイルの読み込みの練習をする。
 fruits.hsを作成する。
 </p>
 
@@ -120,7 +109,7 @@ fruits.hsを作成する。
 
 <p>引数としてファイル名を指定してghciを立ち上げる。</p>
 
-<p><code>ghci fuits.hs<br/>
+<p><code>ghci fruits.hs<br/>
 *Main&gt; </code></p>
 
 <p>myFavoriteFruitと入力しリターンキーを押す。</p>
@@ -132,8 +121,7 @@ fruits.hsを作成する。
 
 <p>
 リンゴよりもバナナのほうが好きかもしれない。
-対話環境はそのまま走らせておく。
-エディタでfruit.hsを編集。
+対話環境はそのまま走らせておきエディタでfruit.hsを編集する。
 </p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/00_touch_ghci/fruits_2.hs"
@@ -147,9 +135,9 @@ fruits.hsを作成する。
 "apple"</code></pre>
 
 <p>
-「おや?変更が反映されてない!」。
-ファイルを変更した後には再読み込みだ。
-':r'または':reload'と入力。
+「変更が反映されてないぞ!」。
+ファイルを変更した後には再読み込みが必要だ。
+':reload'または省略形の':r'を入力する。
 </p>
 
 <pre><code>*Main&gt; :reload
@@ -177,10 +165,10 @@ Haskell Platformをインストールすれば、コンパイラ、インタプ�
 	</ul></li>
 <li>myFavoriteColor変数を定義したファイルを作成する
 	<ul>
-	<li>まずは2番目に好きな色を指定してみよう</li>
+	<li>まずは2番目に好きな色を指定する</li>
 	<li>対話環境に読み込み表示する</li>
 	<li>1番好きな色に変更する</li>
-	<li>再読み込みして再度表示してみよう</li>
+	<li>再読み込みして表示する</li>
 	</ul></li>
 </ol>
 
