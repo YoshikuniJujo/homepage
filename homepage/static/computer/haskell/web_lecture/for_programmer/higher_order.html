@@ -27,7 +27,10 @@ alt="[引数として関数を取る関数の図]"
 src="/computer/haskell/web_lecture/for_programmer/images/fun_arg_machine.svg"
 />
 
-<p>第1引数の関数を第2引数の値に2回適用する関数を考える。</p>
+<p>
+第1引数の関数を第2引数の値に2回適用する関数を考える。
+以下のファイルを作成する。
+</p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/03_higher_order/higher.hs"
 	>higher.hs</a></p>
@@ -35,6 +38,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/fun_arg_machine.svg"
 <p><code>twice f x = f (f x)</code></p>
 
 <p>
+以下のように試してみよう。
 pred, succはそれぞれ1つ前の値、1つ後の値を返す関数である。
 </p>
 
@@ -59,9 +63,9 @@ pred, succはそれぞれ1つ前の値、1つ後の値を返す関数である�
 
 <p>
 ような関数だ。
-返り値が関数であるような関数は複数の引数を取る関数と考えることができる。
-引数が関数であるような関数を使うことで特別な構文を使うことなく、
-「くりかえし」等の様々な制御構造を単なる関数として表現することができる。
+返り値が関数であるような関数は複数の引数を取る関数と考えられる。
+引数が関数であるような関数を使うと特別な構文を使わずに
+「くりかえし」等の制御構造を単なる関数として表現できる。
 </p>
 
 <h2>課題</h2>
