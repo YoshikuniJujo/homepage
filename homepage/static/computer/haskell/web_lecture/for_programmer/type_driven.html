@@ -3,10 +3,8 @@
 <h2>型駆動開発とは</h2>
 
 <p>
-「型駆動開発」という言葉は単なる思いつきだ。
-Haskellプログラマの多くはコードを書く前に型を考える。
-そのあたりをキャッチーな言葉で表現してみた。
-「型から考える」コーディングの単純な例を見ていこう。
+コードを書く前に型を考えることで開発効率の向上が期待できる。
+「型から考える」コーディングを「型駆動開発」とここでは呼んでおく。
 </p>
 
 <h2>題材</h2>
@@ -30,7 +28,7 @@ alt="[BMIの人達の図]"
 src="/computer/haskell/web_lecture/for_programmer/images/bmi_men.svg"
 />
 
-<p>日本の基準では25以上が肥満とされる。</p>
+<p>日本の基準では25以上が肥満となっている。</p>
 
 <h2>仕様</h2>
 
@@ -43,7 +41,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/bmi_men.svg"
 
 <p>
 BMIは少数点以下も意味があるので実数とする。
-Haskellでの代表的な実数型はDouble型である。
+Haskellでの代表的な実数型はDouble型だ。
 体重、身長、BMIはDouble型の値とする。
 肥満かどうかは真か偽かなのでTrueとFalseを値とするBool型が良いだろう。
 </p>
@@ -68,9 +66,8 @@ isObeseは身長と体重を取って肥満かどうか(Bool)を返す関数で�
 
 <p>
 型駆動開発とかかげたので型をさきに定義する。
-型の情報をさきにGHCiでチェックする。
-型宣言のみでは読み込みエラーとなる。
-スタブとしてエラー値undefinedを使おう。
+型の情報をさきにGHCiでチェックしてみる。
+型宣言のみでは読み込みエラーとなるのでスタブとしてエラー値undefinedを使おう。
 </p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/04_type_driven/bmi_v0.hs"
@@ -101,7 +98,7 @@ isObese :: Double -&gt; Double -&gt; Bool</code></pre>
 
 <p>
 トップダウンか、ボトムアップかという問題がある。
-どちらにも利点があり状況に応じて使いわけるのが賢明だ。
+どちらにも利点・欠点がある。
 </p>
 
 <img
@@ -136,7 +133,7 @@ isObeseをさきに作るときは「もしbmiが適切に定義されている�
 <h2>関数isObeseの定義</h2>
 
 <p>
-「関数bmiがBMI値を返すならば」isObese関数は値が25以上かどうかを返せば良い。
+「関数bmiがBMI値を返すならば」isObese関数はその返り値が25以上かどうかを返せば良い。
 </p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/04_type_driven/bmi_v1.hs"
