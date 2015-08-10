@@ -25,7 +25,7 @@
 <pre><code>sqrt' x = sqrtBool (x &lt; 0) x</code></pre>
 
 <pre><code>sqrtBool True _ = Nothing
-sqrtBool _ x = Just $ sqrt x</code></pre>
+sqrtBool _ x = Just (sqrt x)</code></pre>
 
 <h3>ガードを使う</h3>
 
@@ -36,7 +36,7 @@ sqrtBool _ x = Just $ sqrt x</code></pre>
 
 <pre><code>sqrt' x
 	| x &lt; 0 = Nothing
-	| otherwise = Just $ sqrt x</code></pre>
+	| otherwise = Just (sqrt x)</code></pre>
 
 <h2>ガードの記法</h2>
 
@@ -92,7 +92,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/layout_rule_0.svg"
 
 <p>ガードには改行は必要ないので以下のように続けて書ける。</p>
 
-<code>sqrt' x | x &lt; 0 = Nothing | otherwise = Just $ sqrt x</code>
+<code>sqrt' x | x &lt; 0 = Nothing | otherwise = Just (sqrt x)</code>
 
 <p>
 たいていは見やすさのために複数行にわける。
