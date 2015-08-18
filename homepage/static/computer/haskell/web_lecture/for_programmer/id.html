@@ -1,16 +1,8 @@
 そのままにする関数
 
-<h2>多相関数とは</h2>
-
-<p>
-複数の型の値を引数や返り値とすることができる関数を多相関数と呼ぶ。
-</p>
-
 <h2>関数id</h2>
 
 <h3>動作</h3>
-
-<p>関数idの動作を見てみよう。</p>
 
 <pre><code>% ghci
 Prelude&gt; id 8
@@ -27,33 +19,33 @@ src="/computer/haskell/web_lecture/for_programmer/images/function_id.svg"
 />
 
 <p>
-関数idは引数と同じ値を返す関数だ。
-id 8は8と同じである。
-「同じ値を返す」という動作はどのような型でも可能だ。
-関数idはすべての型の値を引数とし同じ型の値を返り値とする。
-関数定義は以下のようになる。</p>
+関数idは引数と同じ値を返す。
+id 8は8である。
+値の型を問わずすべての値で「同じ値を返す」ことができる。
+つまり関数idはすべての型の値が引数となる。
+</p>
+
+<h3>定義</h3>
 
 <code>id x = x</code>
 
 <h3>使い道</h3>
 
 <p>
-どう使うのか。
-今の段階で理解できる例で説明する。
-第1引数で第2引数を割った値を返す関数を作る。
-第1引数が0のときは第2引数をそのまま返す。
+ここまでの説明で理解できる例で使い道を示す。
+第1引数で第2引数を除算した値を返す関数を作る。
+第1引数が0のときは第2引数をそのまま返すことにする。
 </p>
 
-<pre><code>devide :: Double -&gt; Double -&gt; Double
-devide 0 b = b
-devide a b = b / a</code></pre>
+<p><code>devide :: Double -&gt; Double -&gt; Double<br/>
+devide 0 b = b<br/>
+devide a b = b / a</code></p>
 
 <p>
-簡潔にしよう。
-2行目は演算子の部分適用で<code>devide a = (/ a)</code>と書ける。
+2行目は演算子の部分適用で<code>devide a = (/ a)</code>とできる。
 「devide aは引数をaで割る関数」だ。
-1行目はどうなるだろうか。
-関数idが使える。<code>devide 0 = id</code>とする。
+1行目はどうなるだろう。
+ここで関数idが使える。<code>devide 0 = id</code>だ。
 「devide 0は引数をそのまま返す関数」だ。
 </p>
 
@@ -61,14 +53,11 @@ devide a b = b / a</code></pre>
 href="/computer/haskell/web_lecture/for_programmer/05_polymorphic/id.hs"
 	>id.hs</a></p>
 
-<pre><code>devide :: Double -&gt; Double -&gt; Double
-devide 0 = id
-devide a = (/ a)</code></pre>
+<p><code>devide :: Double -&gt; Double -&gt; Double<br/>
+devide 0 = id<br/>
+devide a = (/ a)</code></p>
 
-<p>
-仮引数を減らすことでより「直接的」な表現になる。
-対話環境で試してみよう。
-</p>
+<p>仮引数を減らすことでより「直接的」な表現にできる。</p>
 
 <pre><code>% ghci id.hs
 *Main&gt; devide 6 9
@@ -79,49 +68,44 @@ devide a = (/ a)</code></pre>
 <h3>型</h3>
 
 <p>
-関数idの型は何だろう。
-たとえばInteger型の値8に対して適用されたとき、関数idの型は以下のようになる。
+関数idの型はどうなるだろう。
+Integer型の値8に対して適用された(id 8)とき関数idの型は以下のようになる。
 </p>
 
-<pre><code>Integer -&gt; Integer</code></pre>
+<pre><code>id :: Integer -&gt; Integer</code></pre>
 
-<p>id "hello"では以下のようになる。</p>
+<p>文字列"hello"に適用された(id "hello")ときは以下のようになる。</p>
 
-<pre><code>String -&gt; String</code></pre>
+<pre><code>id :: String -&gt; String</code></pre>
 
 <p>
-[型X] -&gt; [型X]のような形になっている。
-引数と返り値の型が同じであればどの型でも良い。
-これを表現するのに「型変数」を使う。
-型変数は小文字で始まる識別子だ。
-しばしば小文字1文字で表される。
-idの型は以下のようになる。
+[型X] -&gt; [型X]のような形だ。
+引数と返り値の型が同じであれば良い。
+「型変数」を使う。
+型変数は小文字で始まる識別子でありしばしば小文字1文字で表される。
 </p>
 
-<code>a -&gt; a</code>
+<code>id :: a -&gt; a</code>
 
-<p>
-何でも良いので型aの値を取って同じ型aの値を返す。
-対話環境で関数idの型を確認してみよう。
-</p>
+<p>型aの値を取って同じ型aの値を返す。確認してみる。</p>
 
-<pre><code>% ghci
-Prelude&gt; :t id
-id :: a -&gt; a</code></pre>
+<p><code>% ghci<br/>
+Prelude&gt; :t id<br/>
+id :: a -&gt; a</code></p>
 
 <h2>まとめ</h2>
 
 <p>
-最も単純な多相関数を見た。
-関数idは引数をそのまま返す関数である。
-無駄な関数のように見えるが、この関数にはいろいろな使い道がある。
-そのうちの1つを紹介した。
+関数idはもっとも単純な多相関数と言える。
+引数をそのまま返す関数だ。
+使い道がないように思えるが有用な関数だ。
+いろいろな用途に使える。
 </p>
 
 <h2>課題</h2>
 
 <ol>
-<li>関数fromMaybeを関数maybeと関数idを使って定義せよ</li>
+<li>関数fromMaybeを関数maybeと関数idで定義せよ</li>
 </ol>
 
 <p>
