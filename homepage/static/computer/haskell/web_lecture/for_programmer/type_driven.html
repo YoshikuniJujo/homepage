@@ -4,21 +4,18 @@
 
 <p>
 コードを書く前に型を考えることで開発効率の向上が期待できる。
-「型から考える」コーディングを「型駆動開発」とここでは呼んでおく。
+「型から考える」コーディングを「型駆動開発」と呼ぼう。
 </p>
 
 <h2>題材</h2>
 
-<p>
-身長と体重を入力するとBMIを計算し肥満かどうか判断する関数を作成する。
-</p>
+<p>身長と体重からBMIを計算し肥満かどうか判定する関数。</p>
 
 <h2>BMIとは</h2>
 
 <p>
 <a href="https://ja.wikipedia.org/wiki/ボディマス指数">BMI</a>とは
-体重と身長から計算される肥満度を表す指数だ。
-以下の式で計算する。
+体重と身長から計算される肥満度を表す指数。
 </p>
 
 <pre><code>BMI = [体重(kg)] / [身長(m)] ^ 2</code></pre>
@@ -28,12 +25,12 @@ alt="[BMIの人達の図]"
 src="/computer/haskell/web_lecture/for_programmer/images/bmi_men.svg"
 />
 
-<p>日本の基準では25以上が肥満となっている。</p>
+<p>日本の基準では25以上が肥満とされる。</p>
 
 <h2>仕様</h2>
 
 <p>
-身長と体重を引き数に取り肥満かどうかを表す値を返り値とする。
+身長と体重を引き数とし肥満かどうかを表す値を返り値とする。
 身長はcm単位とする。
 </p>
 
@@ -43,7 +40,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/bmi_men.svg"
 BMIは少数点以下も意味があるので実数とする。
 Haskellでの代表的な実数型はDouble型だ。
 体重、身長、BMIはDouble型の値とする。
-肥満かどうかは真か偽かなのでTrueとFalseを値とするBool型が良いだろう。
+肥満かどうかは真か偽かなのでTrueとFalseを値とするBool型で良いだろう。
 </p>
 
 <h2>定義する関数</h2>
@@ -51,54 +48,54 @@ Haskellでの代表的な実数型はDouble型だ。
 <p>
 BMIを求めて25と比較して真偽値を返す。
 関数bmiとそれを利用する関数isObeseを作成する。
-それぞれの型は以下のようになる。
 </p>
 
 <code>bmi :: Double -&gt; Double -&gt; Double<br/>
 isObese :: Double -&gt; Double -&gt; Bool</code>
 
 <p>
-bmiは身長(Double)と体重(Double)を取ってBMI(Double)を返す関数。
-isObeseは身長と体重を取って肥満かどうか(Bool)を返す関数である。
+bmiは身長(Double)と体重(Double)を取ってBMI(Double)を返す。
+isObeseは身長と体重を取って肥満かどうか(Bool)を返す。
 </p>
 
 <h2>型をさきに定義</h2>
 
 <p>
 型駆動開発とかかげたので型をさきに定義する。
-型の情報をさきにGHCiでチェックしてみる。
-型宣言のみでは読み込みエラーとなるのでスタブとしてエラー値undefinedを使おう。
+型の情報をさきにGHCiでチェックする。
+型宣言のみでは読み込みエラーとなるのでエラー値undefinedをスタブとする。
 </p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/04_type_driven/bmi_v0.hs"
 	>bmi.hs</a></p>
 
-<pre><code>bmi :: Double -&gt; Double -&gt; Double
-bmi = undefined
+<p><code>bmi :: Double -&gt; Double -&gt; Double<br/>
+bmi = undefined</code></p>
 
-isObese :: Double -&gt; Double -&gt; Bool
-isObese = undefined</code></pre>
+<p><code>
+isObese :: Double -&gt; Double -&gt; Bool<br/>
+isObese = undefined</code></p>
 
-<p>型を表示してみよう。</p>
+<p>確かめてみる。</p>
 
-<pre><code>% ghci bmi.hs
-*Main&gt; :t bmi
-bmi :: Double -&gt; Double -&gt; Double
-*Main&gt; :t isObese
-isObese :: Double -&gt; Double -&gt; Bool</code></pre>
+<p><code>% ghci bmi.hs<br/>
+*Main&gt; :t bmi<br/>
+bmi :: Double -&gt; Double -&gt; Double<br/>
+*Main&gt; :t isObese<br/>
+isObese :: Double -&gt; Double -&gt; Bool</code></p>
 
-<p>呼び出そうとするとエラーとなる。</p>
+<p>関数を呼び出すとエラーが発生する。</p>
 
-<pre><code>*Main&gt; bmi 172 66
-*** Exception: Prelude.undefined
-*Main&gt; isObese 172 66
-*** Exception: Prelude.undefined</code></pre>
+<p><code>*Main&gt; bmi 172 66<br/>
+*** Exception: Prelude.undefined<br/>
+*Main&gt; isObese 172 66<br/>
+*** Exception: Prelude.undefined</code></p>
 
 <h2>トップダウンかボトムアップか</h2>
 
 <p>
 トップダウンか、ボトムアップかという問題がある。
-どちらにも利点・欠点がある。
+それぞれ利点・欠点がある。
 </p>
 
 <img
@@ -112,28 +109,28 @@ src="/computer/haskell/web_lecture/for_programmer/images/bottomup.svg"
 />
 
 <p>
-トップダウンでは全体の構成がわかりやすくなる。
-それぞれの部品が果たす役割が明確となる。
+トップダウンでは全体の構成がわかりやすい。
+それぞれの部品が果たす役割が明確だ。
 反面、実装について十分に考慮しないと
-部品を作るときに二重化等の無駄が出てしまう。
-ボトムアップでは汎用の部品を作ることが意識される。
-流用の利くものを作ることで仕様の変更に強くなる。
+部品を作るときに二重化等の無駄が出る。
+ボトムアップでは汎用の部品を作ることを意識する。
+流用の利くものが作られ仕様の変更に強くなる。
 反面、全体を構成する部品としての役割を配慮しないと、
-実際に使うときに手直しが必要になる。
+組み込むときに手直しが必要になる。
 </p>
 
 <p>
 BMIの例では関数isObeseをさきに作ればトップダウンな開発となる。
 関数bmiをさきに作ればボトムアップな開発となる。
 isObeseをさきに作るときは「もしbmiが適切に定義されているならば」と仮定する。
-このような仮定は再帰関数の作成にも必要だ。
+この仮定は再帰関数の作成にも必要だ。
 慣れのためにトップダウンの手法を使う。
 </p>
 
 <h2>関数isObeseの定義</h2>
 
 <p>
-「関数bmiがBMI値を返すならば」isObese関数はその返り値が25以上かどうかを返せば良い。
+「関数bmiがBMI値を返すならば」関数isObeseはその返り値が25以上かどうかを返せば良い。
 </p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/04_type_driven/bmi_v1.hs"
@@ -145,7 +142,7 @@ isObeseをさきに作るときは「もしbmiが適切に定義されている�
 
 <p>
 関数bmiは身長(h)と体重(w)からBMIを計算する。
-身長はcmからmに変換するので100分の1にする。
+身長はcmからmに変換する。100分の1にする。
 </p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/04_type_driven/bmi_v2.hs"
@@ -155,13 +152,13 @@ isObeseをさきに作るときは「もしbmiが適切に定義されている�
 
 <h2>試してみる</h2>
 
-<p>172cmは日本人男性の平均身長から。</p>
+<p>172cmは日本人男性の平均身長。</p>
 
-<pre><code>*Main&gt; :reload
-*Main&gt; isObese 172 70
-False
-*Main&gt; isObese 172 80
-True</code></pre>
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; isObese 172 70<br/>
+False<br/>
+*Main&gt; isObese 172 80<br/>
+True</code></p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/type_declaration.html"
