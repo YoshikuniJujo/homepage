@@ -7,29 +7,20 @@ src="/computer/haskell/web_lecture/for_programmer/images/type.svg"
 
 <h2>型とは「何ができるか」である</h2>
 
-<p>
-値には型がある。
-型は以下の2つのことを示す。
-</p>
+<p>値には型がある。型は以下の2つのことを示す。</p>
 
 <ul>
-<li>その値にどの関数が適用できるか</li>
+<li>値にどの関数が適用できるか</li>
 <li>どの関数がその値を返すか</li>
 </ul>
 
-<p>
-その値を使って何ができるかを示すのが「型」だ。
-</p>
+<p>型は値で何ができるかを示す。</p>
 
-<h2>Char型は小文字にできる</h2>
+<h2>Char型の値は小文字にできる</h2>
 
 <p>
-文字を表すChar型という型がある。
-Char型の値はtoLowerという関数を使って小文字にすることができる。
-toLowerを使うにはData.Charモジュールを読み込む必要がある。
-対話環境でモジュールを読み込むには':m'コマンドを使う。
-また':t'コマンドで値の型を表示することもできる。
-それぞれ':module'と':type'の略記だ。
+文字を表す値はChar型である。
+Char型の値はtoLowerという関数で小文字にできる。
 </p>
 
 <pre><code>% ghci
@@ -37,22 +28,28 @@ Prelude&gt; :m Data.Char
 Prelude Data.Char&gt; :t 'L'
 'L' :: Char</code></pre>
 
-<p>文字'L'という値の型はChar型であることがわかる。</p>
+<p>
+toLowerはData.Charモジュールが公開している。
+対話環境でのモジュールの読み込みは':m'コマンドだ。
+値の型を表示するには':t'コマンドを使う。
+':module', ':type'の略記だ。
+文字'L'を表す値の型はChar型だ。
+</p>
 
 <pre><code>Prelude Data.Char&gt; toLower 'L'
 'l'</code></pre>
 
 <p>
-Char型の値はtoLower関数で小文字にすることができる。
-正確に言えば、toLower関数で小文字の値と関連づけられているということであり、
-'L'自体が変化しているわけではない。
+Char型の値はtoLower関数で小文字にできる。
+正確にはtoLower関数で小文字の値と関連づけられるということ。
+値'L'自体は変化しない。
 </p>
 
-<h2>Bool型は小文字にできない</h2>
+<h2>Bool型の値は小文字にできない</h2>
 
 <p>
-TrueやFalseという値はBool型の値である。
-これはChar型の値ではないので小文字にすることはできない。
+FalseやTrueという値の型はBool型でありChar型ではない。
+小文字にすることはできない。
 </p>
 
 <code>Prelude Data.Char&gt; :t False<br/>
@@ -65,12 +62,12 @@ Prelude Data.Char&gt; toLower False<br/>
     In the expression: toLower False<br/>
     In an equation for `it': it = toLower False</code>
 
-<p>「型が一致してないよ」と怒られてしまった。</p>
+<p>「型が一致してないよ」と怒られる。</p>
 
 <h2>課題</h2>
 
 <ol>
-<li>対話環境で以下の値の型を調べてみよう
+<li>対話環境で以下の値の型を調べよ
 	<ul>
 	<li>'c', True, otherwise</li>
 	</ul></li>
