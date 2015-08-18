@@ -1,19 +1,19 @@
 関数の型
 
-<h2>関数も値</h2>
+<h2>関数は値</h2>
 
 <p>
-Haskellでは関数は「値」である。
-より具体的に言えば関数は「<a
+関数は「値」だ。
+「<a
 href="https://ja.wikipedia.org/wiki/第一級オブジェクト"
 >第一級オブジェクト</a>」だ。
-関数も「型」を持つ。
+関数にも「型」がある。
 </p>
 
-<h2>関数の型の表現</h2>
+<h2>関数の型とは</h2>
 
 <p>
-関数の型は引数の型と返り値の型で指定する。
+関数の型は引数の型と返り値の型から成る。
 '-&gt;'で引数の型と返り値の型をつなぐ。
 </p>
 
@@ -40,20 +40,20 @@ src="/computer/haskell/web_lecture/for_programmer/images/two_arg_fun.svg"
 
 <pre><code>[引数1の型] -&gt; [引数2の型] -&gt; [返り値の型]</code></pre>
 
-<p>丸括弧を省略すると2引数関数のように見える。</p>
+<p>丸括弧を省略すると2引数関数のようになる。</p>
 
-<h2>関数の型の例</h2>
+<h2>例</h2>
 
 <h3>関数toLower</h3>
 
 <p>
-関数toLowerは引数として文字を取り小文字の値を返す関数。
-引数、返り値ともにChar型なのでその型は以下のようになる。
+関数toLowerは引数として文字を取り小文字の値を返す。
+引数、返り値ともにChar型である。
 </p>
 
-<pre><code>Char -&gt; Char</code></pre>
+<pre><code>toLower :: Char -&gt; Char</code></pre>
 
-<p>対話環境で見てみよう。</p>
+<p>確認してみよう。</p>
 
 <p><code>% ghci<br/>
 Prelude&gt; :m Data.Char<br/>
@@ -63,16 +63,15 @@ toLower :: Char -&gt; Char</code></p>
 <h3>関数xxcrypt</h3>
 
 <p>
-関数xxcryptは整数値を3つ取って整数値を返す関数だ。
-整数型としてIntegerがある。
-よって関数xxcryptの型は以下のようになる。
+関数xxcryptは整数値を3つ取って整数値を返す。
+整数型としてここではIntegerを考えよう。
 </p>
 
 <pre><code>Integer -&gt; (Integer -&gt; (Integer -&gt; Integer))</code></pre>
 
 <p>
-整数を取って関数を返す型となっている。
-'-&gt;'が右結合であることを利用して丸括弧を省略すると3引数関数のように見える。
+整数をとって「整数をとって「整数をとって整数を返す関数」を返す関数」を返す関数だ。
+'-&gt;'は右結合なので丸括弧を省略すると3引数関数のようになる。
 </p>
 
 <pre><code>Integer -&gt; Integer -&gt; Integer -&gt; Integer</code></pre>
