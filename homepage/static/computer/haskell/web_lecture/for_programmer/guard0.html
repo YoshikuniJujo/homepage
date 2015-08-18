@@ -13,11 +13,11 @@
 
 <h2>0未満を考慮した平方根</h2>
 
-「0未満のときにはNothingを返すsqrt'」を定義する。
+「0未満のときにはNothingを返す関数sqrt'」を定義する。
 
 <h3>今まで学んできた範囲内で</h3>
 
-<p>今まで学んできた内容のみで定義すると以下のようになる。</p>
+<p>今まで学んできた内容のみで定義してみる。</p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/03_7_guard0/sqrt0.hs"
 	>sqrt0.hs</a></p>
@@ -34,24 +34,25 @@ sqrtBool _ x = Just (sqrt x)</code></pre>
 <p><a href="/computer/haskell/web_lecture/for_programmer/03_7_guard0/sqrt1.hs"
 	>sqrt1.hs</a></p>
 
-<pre><code>sqrt' x
-	| x &lt; 0 = Nothing
-	| otherwise = Just (sqrt x)</code></pre>
+<p><code>sqrt' x<br/>
+	<span class="indent1">| x &lt; 0 = Nothing</span><br/>
+	<span class="indent1">| otherwise = Just (sqrt x)</span></code></p>
 
 <h2>ガードの記法</h2>
 
 <p>ガードは以下のような記法で使われる。</p>
 
-<pre><code>[関数名]
-	| [Bool値を返す式1] = [結果の式1]
-	| [Bool値を返す式2] = [結果の式2]
-		...</code></pre>
+<p><code>[関数名] [引数1] [引数2] ...<br/>
+	<span class="indent1">| [Bool値を返す式1] = [結果の式1]</span><br/>
+	<span class="indent1">| [Bool値を返す式2] = [結果の式2]</span><br/>
+		<span class="indent2">...</span><br/>
+	<span class="indent1">| otherwise = [結果の式n]</span></code></p>
 
 <p>
-Bool値を返す式の部分がガードである。
-ガードの部分がFalseなら次のガードへ進む。
+「Bool値を返す式」がガードだ。
+ガードがFalseなら次のガードへ進む。
 Trueなら対応する「結果の式」が全体の結果となる。
-sqrt'の例にあるotherwiseはpiと同じように事前に束縛された変数だ。
+otherwiseはpiと同じように束縛ずみの変数だ。
 Trueに束縛されている。
 読みやすさのために定義されているだけなので直接Trueと書いても良い。
 </p>
@@ -62,7 +63,6 @@ Trueに束縛されている。
 Haskellにはレイアウトルールがある。
 明示的に{}で囲ったり';'で区切ったりする代わりに、
 見た目に分かりやすいレイアウトで構造を表現できる。
-一部を紹介する。
 </p>
 
 <p>
@@ -77,35 +77,35 @@ src="/computer/haskell/web_lecture/for_programmer/images/layout_rule_0.svg"
 />
 
 <p>
-1行に入り切らないときや、わかりやすさのために複数行にわけるときには、
-インデントを大きくすることで、続きであることを示せる。
+1行が長くなるときや、わかりやすさのために複数行にわけるときは、
+インデントを大きくし続きであることを示す。
 </p>
 
 <pre><code>some n = n * 1234567890 + 9876543210
 	* 789345123</code></pre>
 
 <p>
-* 789345123の行は関数定義の行よりインデントが深くなっているため、
+* 789345123の行は関数定義の行よりインデントが深くなっている。
 関数someの定義の続きとなる。
-インデントしないと'* 789345123'は新たな定義のはじまりと解釈されエラーとなる。
+インデントしないと'* 789345123'が新たな定義のはじまりと解釈されエラーとなる。
 </p>
 
-<p>ガードには改行は必要ないので以下のように続けて書ける。</p>
+<p>ガードには改行は必要ない。</p>
 
 <code>sqrt' x | x &lt; 0 = Nothing | otherwise = Just (sqrt x)</code>
 
 <p>
 たいていは見やすさのために複数行にわける。
-そのとき、ガードが関数定義の続きであることを示すために、
-関数定義の1行目よりも深くインデントする必要がある。
+ガードが関数定義の続きであることを示すために、
+関数定義の1行目よりも深くインデントする。
 </p>
 
 <h2>まとめ</h2>
 
 <p>
-True, Falseに対するパターンマッチはしばしば使われるので略記法がある。
-そのうちのひとつが関数定義につけることができるガードだ。
-以下のような表記で関数定義に複数つけられる。
+True, Falseに対するパターンマッチは頻出なので略記法がある。
+関数定義につけることができるガードだ。
+以下の表記で関数定義に複数つけられる。
 </p>
 
 <pre><code>	| [Bool値を返す式] = [結果となる式]</code></pre>
