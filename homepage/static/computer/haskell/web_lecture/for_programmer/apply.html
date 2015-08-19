@@ -5,10 +5,9 @@
 <h3>動作</h3>
 
 <p>
-演算子($)は関数を値に適用する演算子だ。
-f $ xとするとxにfを適用するという意味になる。
+演算子($)は関数を値に適用する。
+f $ xとするとxにfを適用する。
 f xと同じだ。
-対話環境で試してみよう。
 </p>
 
 <p><code>% ghci</br>
@@ -44,7 +43,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/function_apply.svg"
 
 <p>
 f $ xがf xと同じならf xと書けば良い。
-演算子($)は何のためにあるのだろうか。
+演算子($)は何のためにあるのだろう。
 いくつかの答えがある。ひとつは「丸括弧の省略」だ。
 recip (1 + 3)のような表現をrecip $ 1 + 3に書き換えられる。
 複雑な表現ではこの書き換えでコードが読みやすくなる。
@@ -54,51 +53,45 @@ f $ ...と書くと...の部分が全体としてfの引数になることが保
 
 <h3>型</h3>
 
-<p>($)の型はどうなるだろう。以下の例について見てみよう。</p>
-
 <code>($) recip 8</code>
 
 <p>
-recipはDouble -&gt; Double、8はDoubleと考えよう。
-($)はDouble -&gt; DoubleとDoubleを引数として取りDoubleを返す。
+関数recipの型をDouble -&gt; Double、値8をDoubleと考える。
+($)はDouble -&gt; DoubleとDoubleを引数としDoubleを返す。
 </p>
 
-<code>(Double -&gt; Double) -&gt; Double -&gt; Double</code>
+<p><code>($) :: (Double -&gt; Double) -&gt; Double -&gt; Double</code></p>
 
-<p>
-oddは「奇数である」ことを確認する関数だ。整数を取って真偽値を返す。
-以下の例を見てみよう。
-</p>
+<p>oddは「奇数である」ことを確認する関数だ。整数を取って真偽値を返す。</p>
 
 <pre><code>($) odd 11</code></pre>
 
 <p>
 oddをInteger -&gt; Boolとし11をIntegerとする。
-この場合の($)の型は以下のようになる。
 </p>
 
-<pre><code>(Integer -&gt; Bool) -&gt; Integer -&gt; Bool</code></pre>
+<p><code>($) :: (Integer -&gt; Bool) -&gt; Integer -&gt; Bool</code></p>
 
 <p>
 ($)の第1引数である関数の引数と($)の第2引数の型は同じだ。
 ($)の第1引数である関数の返り値と($)の返り値も同じだ。
-よって($)の型は以下のようになる。
+それぞれ型変数a, bで表す。
 </p>
 
-<pre><code>($) :: (a -&gt; b) -&gt; a -&gt; b</code></pre>
+<p><code>($) :: (a -&gt; b) -&gt; a -&gt; b</code></p>
 
 <h2>まとめ</h2>
 
 <p>
-関数適用演算子($)について学んだ。
-f $ xとすると値xに関数fを適用する。
+関数適用演算子($)を学んだ。
+f $ xで値xに関数fを適用する。
 不要な演算子のように思えるが括弧の数を減らすのに使える。
 </p>
 
 <h2>課題</h2>
 
 <ol>
-<li>recip ((3 + 5) / 2)を演算子($)を使って書き直せ</li>
+<li>recip ((3 + 5) / 2)を演算子($)で書き直せ</li>
 <li>第1引数の値に第2引数の関数を適用する関数applyを定義せよ</li>
 <li>[挑戦問題] 演算子($)と関数idの関係について考えよ</li>
 </ol>

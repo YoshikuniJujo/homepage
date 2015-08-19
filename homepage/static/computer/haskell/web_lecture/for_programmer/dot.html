@@ -7,20 +7,16 @@
 <p>
 演算子(.)は関数を合成する。
 f . gは引数にgを適用した結果にfを適用する関数だ。
-3足して2をかける関数は以下のように書ける。
+3足して2をかける関数は以下のようになる。
 </p>
 
-<code>(* 2) . (+ 3)</code>
+<p><code>(* 2) . (+ 3)</code></p>
 
-<p>試してみよう。</p>
-
-<code>% ghci<br/>
+<p><code>% ghci<br/>
 Prelude&gt; ((* 2) . (+ 3)) 8<br/>
-22</code>
+22</code></p>
 
 <h3>定義</h3>
-
-<p>演算子(.)の定義は以下のようになる。</p>
 
 <p><code>(.) f g x = f (g x)</code></p>
 
@@ -32,7 +28,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/function_dot.svg"
 
 <p>
 第3引数xに第2引数である関数gを適用した結果に第1引数であるfを適用する。
-演算子であることを強調したければ以下のように書く。
+演算子であることを強調したければ以下のようにも書ける。
 </p>
 
 <p><code>(f . g) x = f (g x)</code></p>
@@ -61,7 +57,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/operator_dot.svg"
 
 <h3>型</h3>
 
-<p>(.)の型はどうなるだろう。以下のような式を作る。</p>
+<p>(.)の型はどうなるだろう。</p>
 
 <p><code>f . g</code></p>
 
@@ -70,7 +66,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/operator_dot.svg"
 <p><code>(.) f g</code></p>
 
 <p>
-g、fの順に適用するのでgの返り値とfの引数は同じ型だ。
+g、fの順に適用するのでgの返り値とfの引数は同じ型となる。
 gの型をa -&gt; bとしfの型をb -&gt; cとする。
 結果としてできるf . gはgの引数を引数としfの返り値を返り値とする。
 </p>
@@ -86,9 +82,9 @@ f . g :: a -&gt; c</code></p>
 <h2>まとめ</h2>
 
 <p>
-いくつかの多相関数を見た。
-多相関数とくに高階多相関数は制御構造と考えることができる。
-Haskellでは独自の制御構造を単なる関数として定義可能だ。
+関数合成演算子(.)を学んだ。
+これを使うことで「関数gを適用しそれに関数fを適用する」といった処理を
+より直接的に書くことができる。
 </p>
 
 <h2>課題</h2>
@@ -96,7 +92,7 @@ Haskellでは独自の制御構造を単なる関数として定義可能だ。
 <ol>
 <li>小文字にしてから文字コードを求める関数を関数合成によって定義せよ
 	<ul>
-	<li>Data.CharモジュールのtoLower, ordを使用する</li>
+	<li>Data.CharモジュールのtoLower, ordを使う</li>
 	</ul></li>
 </ol>
 

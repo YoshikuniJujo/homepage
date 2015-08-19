@@ -1,11 +1,5 @@
 引数を入れ替える
 
-<h2>はじめに</h2>
-
-<p>
-引数を入れ替える多相関数を学ぼう。
-</p>
-
 <h2>関数flip</h2>
 
 <h3>動作</h3>
@@ -16,18 +10,16 @@
 関数flipが定義されている。
 </p>
 
-<pre><code>% ghci
-Prelude&gt; mod 8 3
-2
-Prelude&gt; flip mod 3 8
-2
-Prelude&gt; let mod3 = flip mod 3
-Prelude&gt; mod3 8
-2</code></pre>
+<p><code>% ghci<br/>
+Prelude&gt; mod 8 3<br/>
+2<br/>
+Prelude&gt; flip mod 3 8<br/>
+2<br/>
+Prelude&gt; let mod3 = flip mod 3<br/>
+Prelude&gt; mod3 8<br/>
+2</code></p>
 
 <h3>定義</h3>
-
-<p>関数flipの定義を見る。</p>
 
 <pre><code>flip :: (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
 flip f x y = f y x</code></pre>
@@ -39,11 +31,13 @@ flip f x y = f y x</code></pre>
 
 <h3>演算子の部分適用</h3>
 
-<p>演算子は(`mod` 3)のように第2引数に部分適用できる。flipでも書ける。</p>
+<p>
+演算子は(`mod` 3)のように第2引数に部分適用できる。
+同じことが関数flipでできる。</p>
 
 <p><code>flip mod 3</code></p>
 
-<p>(/ 3)は以下のようになる。</p>
+<p>(/ 3)を以下のように書ける。</p>
 
 <p><code>flip (/) 3</code></p>
 
@@ -51,7 +45,7 @@ flip f x y = f y x</code></pre>
 
 <p>
 関数flipは2引数関数の2つの引数を入れ替える。
-この関数は演算子の部分適用の際に暗黙に使われていると考えられる。
+この関数は演算子の部分適用のときに暗黙に使われているとも考えられる。
 </p>
 
 <h2>課題</h2>
