@@ -9,7 +9,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/distance_from_origin.sv
 
 <p>
 点(x, y)から原点までの距離を求めたい。
-原点からの距離はxの二乗とyの二乗を足したものの平方根だ。
+原点からの距離はxの2乗とyの2乗を足したものの平方根だ。
 </p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/06_dist_tuple/distXY.hs"
@@ -18,53 +18,50 @@ src="/computer/haskell/web_lecture/for_programmer/images/distance_from_origin.sv
 <pre><code>dist0 :: Double -&gt; Double -&gt; Double
 dist0 = sqrt $ x ^ 2 + y ^ 2</code></pre>
 
-<p>試してみる。</p>
-
 <pre><code>% ghci distXY.hs
 *Main&gt; dist0 7 9
 11.40175425099138
 *Main&gt; dist0 3 4
 5.0</code></pre>
 
-<p>点pの座標を保存してみる。</p>
+<p>点pの座標を保存する。</p>
 
-<pre><code>px, py :: Double
-px = 9.0
-py = 5.0</code></pre>
+<p><code>px, py :: Double<br/>
+px = 9<br/>
+py = 5</code></p>
 
-<pre><code>*Main&gt; dist0 px py
-10.295630140987</code></pre>
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; dist0 px py<br/>
+10.295630140987</code></p>
 
 <h2>タプルにまとめる</h2>
 
 <p>
 「点」というひとつのものをpx, pyという2つの変数で表した。
-複数の値をひとつの値としてまとめるのにタプルという構造が使える。
-点pをタプルで表す。
+複数の値をひとつの値としてまとめるタプルという構造がある。
 </p>
 
-<pre><code>p :: (Double, Double)
-p = (9.0, 5.0)</code></pre>
+<p><code>p :: (Double, Double)<br/>
+p = (9, 5)</code></p>
 
-<p>x1 :: T1, x2 :: T2, x3 :: T3, ...を含むタプルtの定義は以下のようになる。</p>
+<p>x1 :: T1, x2 :: T2, x3 :: T3, ...を含むタプルtの定義を示す。</p>
 
-<code>t :: (T1, T2, T3, ...)<br/>
-t = (x1, x2, x3, ...)</code>
+<p><code>t :: (T1, T2, T3, ...)<br/>
+t = (x1, x2, x3, ...)</code></p>
 
 <h2>タプルに対するパターンマッチ</h2>
 
 <p>
-タプルから要素を取り出すにはパターンマッチを使う。
+パターンマッチでタプルから要素を取り出せる。
 パターン(x, y)に(9, 5)をマッチさせるとx, yはそれぞれ9, 5に束縛される。
 </p>
 
-<pre><code>dist0' :: (Double, Double) -&gt; Double
-dist0' (x, y) = sqrt $ x ^ 2 + y ^ 2</code></pre>
+<p><code>dist0' :: (Double, Double) -&gt; Double<br/>
+dist0' (x, y) = sqrt $ x ^ 2 + y ^ 2</code></p>
 
-<p>試してみよう。</p>
-
-<pre><code>*Main&gt; dist0' p
-10.295630140987</code></pre>
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; dist0' p<br/>
+10.295630140987</code></p>
 
 <h2>課題</h2>
 
