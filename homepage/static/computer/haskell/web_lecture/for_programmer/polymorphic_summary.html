@@ -1,0 +1,195 @@
+まとめ: 多相関数
+
+<h2>多相関数とは</h2>
+
+<ul>
+<li>複数の型の値を引数としてとる</li>
+<li>複数の型の値のうちどれかを返す</li>
+</ul>
+
+<p>
+のどちらかまたは両方であるものを多相関数と呼ぶ。
+ここではパラメトリック多相について学ぶ。
+多相性は以下のどちらかで確保される。
+</p>
+
+<ul>
+<li>構造の部分にだけ作用してなかみの値をいじらない</li>
+<li>値をいじるのは引数としてとった関数にまかせる</li>
+</ul>
+
+<p>後者は多相関数であると同時に高階関数でもある。</p>
+
+<h2>Maybe型からの値のとりだし</h2>
+
+<h3>関数fromMaybe</h3>
+
+<h4>動き</h4>
+
+<p>デフォルト値を指定してMaybe値から値をとりだす。</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; fromMaybe 0 (Just 8)<br/>
+8<br/>
+Prelude&gt; fromMaybe 0 Nothing<br/>
+0</code></p>
+
+<h4>定義</h4>
+
+<p><code>fromMaybe _ (Just x) = x<br/>
+fromMaybe d _ = d</code></p>
+
+<h4>型</h4>
+
+<p><code>fromMaybe :: a -&gt; Maybe a -&gt; a</code></p>
+
+<h3>関数maybe</h3>
+
+<h4>動き</h4>
+
+<p>デフォルト値を指定してMaybe値のなかみに関数を適用する。</p>
+
+<p><code>Prelude&gt; :m Data.Char<br/>
+Prelude Data.Char&gt; maybe 0 ord (Just 'c')<br/>
+99<br/>
+Prelude Data.Char&gt; maybe 0 ord Nothing<br/>
+0</code></p>
+
+<h4>定義</h4>
+
+<p><code>maybe _ f (Just x) = f x<br/>
+maybe d _ _ = d</code></p>
+
+<h4>型</h4>
+
+<p><code>maybe :: b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b</code></p>
+
+<h2>そのままにする関数</h2>
+
+<h3>関数id</h3>
+
+<h4>動き</h4>
+
+<p>引数の値をそのまま返り値として返す。</p>
+
+<p><code>Prelude&gt; id 8<br/>
+8</code></p>
+
+<h4>定義</h4>
+
+<p><code>id x = x</code></p>
+
+<h4>型</h4>
+
+<p><code>id :: a -&gt; a</code></p>
+
+<h2>値を無視する関数</h2>
+
+<h3>関数const</h3>
+
+<h4>動き</h4>
+
+<p>
+引数として値xをとり「引数を問わずいつも値xを返す関数」を返す。
+2引数関数として見ると2つの引数をとり第1引数の値を返す関数となる。
+</p>
+
+<p><code>Prelude&gt; const 'c' False<br/>
+'c'</code></p>
+
+<h4>定義</h4>
+
+<p><code>const x _ = x</code></p>
+
+<h4>型</h4>
+
+<p><code>const :: a -&gt; b -&gt; a</code></p>
+
+<h2>関数適用</h2>
+
+<h3>演算子($)</h3>
+
+<h4>動き</h4>
+
+<p>第1引数の関数を第2引数の値に適用する。</p>
+
+<p><code>Prelude&gt; recip $ 8<br/>
+0.125</code></p>
+
+<h4>定義</h4>
+
+<p><code>f $ x = f x</code></p>
+
+<h4>型</h4>
+
+<p><code>($) :: (a -&gt; b) -&gt; a -&gt; b</code></p>
+
+<h2>関数合成</h2>
+
+<h3>演算子(.)</h3>
+
+<h4>動き</h4>
+
+<p>f . gのようにしてgの返り値をfにわたす関数を作成する。</p>
+
+<p><code>Prelude&gt; ((* 2) . (+ 3)) 8<br/>
+22</code></p>
+
+<h4>定義</h4>
+
+<p><code>(f . g) x = f (g x)</code></p>
+
+<h4>型</h4>
+
+<p><code>(.) :: (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c</code></p>
+
+<h2>引数を入れ替える</h2>
+
+<h3>関数flip</h3>
+
+<h4>動き</h4>
+
+<p>2引数関数の第1引数と第2引数をいれかえる。</p>
+
+<p><code>Prelude&gt; flip mod 3 8<br/>
+2</code></p>
+
+<h4>定義</h4>
+
+<p><code>flip f x y = f y x</code></p>
+
+<h4>型</h4>
+
+<p><code>flip :: (b -&gt; a -&gt; c) -&gt; a -&gt; b -&gt; c</code></p>
+
+<h2>2つの引数に同じ関数を適用</h2>
+
+<h3>関数on</h3>
+
+<h4>動き</h4>
+
+<p>2つの値のそれぞれに同じ関数を適用し返ってきた値を2引数関数に与える。</p>
+
+<p><code>Prelude&gt; ((==) `on` (`mod` 3)) 11 8<br/>
+True</code></p>
+
+<h4>定義</h4>
+
+<p><code>(op `on` f) x y = f x `op` f y</code></p>
+
+<h4>型</h4>
+
+<p><code>on :: (b -&gt; b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; a -&gt; c</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+さまざまな多相関数を見てきた。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/type_summary.html"
+	>「型」にもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer"
+	>「1から学ぶHaskell」トップへ</a>
+</p>

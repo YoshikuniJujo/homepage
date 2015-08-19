@@ -1,0 +1,117 @@
+まとめ: 型
+
+<h2>型とは何か</h2>
+
+<p>
+型はその値で何ができるかを示す。
+具体的には以下の2つが型によって決まる。
+</p>
+
+<ul>
+<li>どの関数が適用可能か</li>
+<li>どの関数がその値を返すか</li>
+</ul>
+
+<h3>例</h3>
+
+<p><code>Bool</code></p>
+<p><code>Char</code></p>
+<p><code>Integer</code></p>
+
+<h3>試してみる</h3>
+
+<p><code>Prelude&gt; :t True<br/>
+True :: Bool<br/>
+Prelude&gt; :t 'c'<br/>
+'c' : Char</code></p>
+
+<h2>関数の型</h2>
+
+<p>
+関数も値なので型を持つ。
+関数の型は引数の型と返り値の型から成る。
+</p>
+
+<h3>書式</h3>
+
+<p>[引数の型] -&gt; [返り値の型]</p>
+
+<h3>多引数関数</h3>
+
+<p>多引数関数に見えるものは関数を返す関数である。</p>
+
+<p>[引数1の型] -&gt; ([引数2の型] -&gt; [返り値の型])</p>
+
+<p>'-&gt;'が右結合なので丸括弧が省略できる。</p>
+
+<p>[引数1の型] -&gt; [引数2の型] -&gt; [返り値の型]</p>
+
+<h3>例</h3>
+
+<p><code>Char -&gt; Bool</code></p>
+<p><code>Char -&gt; Integer -&gt; Bool</code></p>
+
+<h3>試してみる</h3>
+
+<p><code>Prelude&gt; :m Data.Char<br/>
+Data.Char&gt; :t isDigit<br/>
+Char -&gt; Bool</code></p>
+
+<h2>型宣言</h2>
+
+<h3>書式</h3>
+
+<p>[変数], [変数], ... :: [型]</p>
+
+<h3>例</h3>
+
+<p><code>num1, num2 :: Integer</code></p>
+<p><code>fun :: Char -&gt; Integer -&gt; Bool</code></p>
+
+<h2>型注釈</h2>
+
+<p>多相的な値に型注釈をつけることで型を定めることができる。</p>
+
+<h3>書式</h3>
+
+<p>[値] :: [型]</p>
+
+<h3>例</h3>
+
+<p><code>8 :: Integer</code></p>
+<p><code>8 :: Double</code></p>
+
+<h3>試してみる</h3>
+
+<p><code>Data.Char&gt; 8 :: Integer<br/>
+8<br/>
+Data.Char&gt; :t it<br/>
+it :: Integer<br/>
+Data.Char&gt; 8 :: Double<br/>
+8.0<br/>
+Data.Char&gt; :t it<br/>
+it :: Double</code></p>
+
+<h2>モジュールの読み込み</h2>
+
+<h3>書式</h3>
+
+<p>import [モジュール名]</p>
+<p>import [モジュール名] ([インポートリスト])</p>
+<p>import qualified [モジュール名] as [別名]</p>
+
+<p>使い捨てのコード以外では2個目、3個目の形を使ったほうが良い。</p>
+
+<h2>まとめ</h2>
+
+<p>
+型宣言、型注釈の書式について学んだ。
+モジュールの読み込みについてもここで学んだ。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/function_summary.html"
+	>「関数」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/polymorphic_summary.html"
+	>「多相関数」へ</a>
+</p>
