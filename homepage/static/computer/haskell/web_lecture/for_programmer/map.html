@@ -6,44 +6,40 @@
 「0から3nまでの3の倍数の総和」は「0からnの整数を3倍した値の総和」と同じだ。
 列挙した値を変換して蓄積する。
 リストの各要素に同じ関数を適用した結果のリストがほしい。
-関数mapが用意されている。
+関数mapを使う。
 </p>
 
 <h2>転写</h2>
 
 <p>
-関数mapは第1引数としてリストの要素のすべてに適用する関数を取る。
-今回は引数を3倍する関数だ。
+関数mapは第1引数として関数をとる。
+それを第2引数のリストの要素すべてに適用する。
 </p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/11_map/sum3N.hs"
 	>sum3N.hs</a></p>
 
-<pre><code>sum3N :: Integer -&gt; Integer
-sum3N n = sum $ map (* 3) [0 .. n]</code></pre>
+<p><code>sum3N :: Integer -&gt; Integer<br/>
+sum3N n = sum $ map (* 3) [0 .. n]</code></p>
 
-<p>試してみる。</p>
-
-<pre><code>% ghci sum3N.hs
-*Main&gt; sum3N 10
-165</code></pre>
+<p><code>% ghci sum3N.hs<br/>
+*Main&gt; sum3N 10<br/>
+165</code></p>
 
 <h2>ろ過と転写の両方を使う例</h2>
 
 <p>
-0からnまでで5の倍数ではない数を3倍したものの総和を求める。
+0からnまでの5の倍数ではない数を3倍したものの総和を求める。
 整数を列挙後に「5の倍数でない」でろ過する。
 </p>
 
 <p><code>sum3N5 :: Integer -&gt; Integer<br/>
 sum3N5 n = sum .  map (* 3) $ filter ((/= 0) . (`mod` 5)) [0 .. n]</code></p>
 
-<p>
-sumとmap ...とを関数合成したうえでfilter ...に適用している。
-試してみる。</p>
+<p>sumとmap ...とを関数合成したうえでfilter ...に適用している。</p>
 
-<pre><code>*Main&gt; sum3N5 10
-120</code></pre>
+<p><code>*Main&gt; sum3N5 10<br/>
+120</code></p>
 
 <h2>課題</h2>
 
@@ -53,8 +49,6 @@ productOdd3を作成せよ</li>
 </ol>
 
 <h2>リストによる「くりかえし」のまとめ</h2>
-
-<p>リストによる「くりかえし」では以下のような段階を踏む。</p>
 
 <ol>
 <li>列挙</li>
@@ -66,7 +60,7 @@ productOdd3を作成せよ</li>
 「リスト」を変化させていくという、
 わかりやすいメタファーで「くりかえし」を実現する。
 書きやすく、読みやすく、検証しやすい。
-コーディング時にバグが入りにくい。
+バグが入りにくい。
 </p>
 
 <p>

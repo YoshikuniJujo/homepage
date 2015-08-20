@@ -2,9 +2,7 @@
 
 <h2>3の倍数のみ</h2>
 
-<p>
-0から3nまでの整数の3の倍数のみの総和を求める。
-</p>
+<p>0から3nまでの整数の3の倍数のみの総和を求める。</p>
 
 <h3>手続き的に</h3>
 
@@ -28,18 +26,15 @@
 <h2>ろ過</h2>
 
 <p>
-リストから条件を満たすものだけを取り出すことを「ろ過」と呼ぶ。
+リストから条件を満たすものだけをとりだすことを「ろ過」と呼ぶ。
 関数filterが用意されている。
-関数filterは第1引数にBool値を返す関数を取る。
-3の倍数かどうかを判断するには
+関数filterは第1引数にBool値を返す関数をとる。
+3の倍数かどうかは3で割った余りが0と等しいかどうか調べれば良い。
 </p>
 
-<pre><code>(== 0) . (`mod` 3)</code></pre>
+<p><code>(== 0) . (`mod` 3)</code></p>
 
-<p>
-3で割った余りが0と等しいかどうか調べる。
-列挙と総和のあいだにfilterによるろ過をはさむ。
-</p>
+<p>列挙と総和のあいだにfilterによるろ過をはさむ。</p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/10_filter/sum3N.hs"
 	>sum3N.hs</a></p>
@@ -47,19 +42,17 @@
 <pre><code>sum3N :: Integer -&gt; Integer
 sum3N n = sum $ filter ((== 0) . (`mod` 3)) [0 .. 3 * n]</code></pre>
 
-<p>試してみる。</p>
-
-<pre><code>% ghci sum3N.hs
-*Main&gt; sum3N 10
-165</code></pre>
+<p><code>% ghci sum3N.hs<br/>
+*Main&gt; sum3N 10<br/>
+165</code></p>
 
 <h2>まとめ</h2>
 
 <p>
 列挙した値のうち条件を満たすもののみを蓄積の対象にした。
 要素をしぼりこんだ新しいリストを作成する。
-しぼりこむ段階をろ過と呼ぶ。関数filterが用意されている。
-関数filterの第1引数はBool値を返す関数だ。
+しぼりこむ段階をろ過と呼ぶ。
+第1引数にBool値を返す関数をとる関数filterを使う。
 </p>
 
 <h2>課題</h2>
@@ -67,7 +60,7 @@ sum3N n = sum $ filter ((== 0) . (`mod` 3)) [0 .. 3 * n]</code></pre>
 <ol>
 <li>1から2 * n + 1までのすべての奇数の積を求める関数productOddsを作成せよ
 	<ul>
-	<li>奇数であることを確認する関数oddが使える</li>
+	<li>奇数であることを確認する関数oddを使う</li>
 	</ul></li>
 </ol>
 
