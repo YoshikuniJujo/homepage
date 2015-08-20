@@ -28,24 +28,21 @@ introduction (n, a) =
 <p><code>*Main&gt; introduction ("Yoshikuni Jujo", 10)<br/>
 "My name is Yoshikuni Jujo. I'm 10 years old."</code></p>
 
-<p>
-これで「どうして解散するんですか?」というページを作ればみんな見てくれる。
-バレたら本当のことを言おう。
-</p>
+<p>「僕はまだ小4だよ」。バレたら本当のことを言おう。</p>
 
 <p><code>*Main&gt; introduction ("Yoshikuni Jujo", 34)<br/>
 "My name is Yoshikuni Jujo. I'm 34 years old."</code></p>
 
 <p>
-サバ読むときやバレたときのことを考えると
-"Yoshikuni Jujo"専用の自己紹介関数を作っておきたい。
-名前だけに部分適用しよう。
-しかし、名前と年齢はタプルにまとまっている。部分適用できない。
+サバ読むときやバレたときのことを考えて
+"Yoshikuni Jujo"専用の自己紹介関数を作る。
+名前だけに部分適用したいが、
+名前と年齢はタプルにまとまっていて部分適用できない。
 </p>
 
 <h2>そこでカリー化ですよ</h2>
 
-<h3>カリー化とは</h3>
+<h3>Haskellにおけるカリー化とは</h3>
 
 <p>
 「カリー化」によって「複数の引数を取る関数」は「関数を返す関数」に変換され
@@ -86,11 +83,10 @@ introductionYj = curry introduction "Yoshikuni Jujo"</code></p>
 *Main&gt; introductionYj 10<br/>
 "My name is Yoshikuni Jujo. I'm 10 years old."</code></p>
 
-<h2>関数curryの定義</h2>
+<h2>関数curryの型と定義</h2>
 
 <p>
 関数curryは「引数としてタプルを期待する関数」の引数をばらばらにする。
-定義はどうなっているだろうか。
 </p>
 
 <h3>型</h3>
@@ -102,15 +98,13 @@ introductionYj = curry introduction "Yoshikuni Jujo"</code></p>
 
 <p><code>((String, Integer) -&gt; String) -&gt; (String -&gt; Integer -&gt; String)</code></p>
 
-<p>
-より一般的な形では
-</p>
+<p>一般化すると以下のようになる。</p>
 
 <p><code>((a, b) -&gt; c) -&gt; (a -&gt; b -&gt; c)</code></p>
 
 <p>
-「(a, b)型のタプルを取って返り値cを返す関数」を
-「a型の値とb型の値を取って返り値cを返す関数」に変換する。
+「(a, b)型のタプルをとってc型の値を返す関数」を
+「a型の値とb型の値をとってc型の値を返す関数」に変換する。
 '-&gt;'は右結合なので右側の丸括弧は省略できる。
 </p>
 
@@ -124,8 +118,6 @@ introductionYj = curry introduction "Yoshikuni Jujo"</code></p>
 
 <h3>定義</h3>
 
-<p>以下のように定義できる。</p>
-
 <p><code>curry :: ((a, b) -&gt; c) -&gt; a -&gt; b -&gt; c<br/>
 curry f x y = f (x, y)</code></p>
 
@@ -135,8 +127,8 @@ src="/computer/haskell/web_lecture/for_programmer/images/curry.svg"
 />
 
 <p>
-関数curryの第2引数xと第3引数yをタプルにまとめて関数fに与えている。
-つまり、ばらばらの引数をタプルにまとめるという仕事をしている。
+関数curryの第2引数xと第3引数yというばらばらの引数を
+タプルにまとめて関数fに与えている。
 </p>
 
 <h2>課題</h2>
@@ -157,10 +149,16 @@ src="/computer/haskell/web_lecture/for_programmer/images/curry.svg"
 	<ul>
 	<li>全ての数が1以上であり</li>
 	<li>どの数も他の2数の和よりも小さければ良い</li>
-	<li>演算子&gt;, 演算子&lt;, 演算子&amp;&amp;等が使える</li>
+	<li>演算子(&gt;), 演算子(&lt;), 演算子(&amp;&amp;)等が使える</li>
+	<li>(&gt;), (&lt;)はそれぞれ「大なり」「小なり」を意味する</li>
+	<li>(&amp;&amp;)は「かつ」という意味だ</li>
 	<li>triangle (3, 5, 7)はTrueとなりtriangle (5, 7, 12)はFalseとなる</li>
 	</ul></li>
-<li>3要素タプルを引数として取る関数を3引数関数に変換するcurry3を定義せよ</li>
+<li>3要素タプルを引数として取る関数を3引数関数に変換するcurry3を定義せよ
+	<ul>
+	<li>上記のtriangleで試してみる</li>
+	<li>curry3 triangle 3 5 7のようにしてみよう</li>
+	</ul></li>
 </ol>
 
 <p>

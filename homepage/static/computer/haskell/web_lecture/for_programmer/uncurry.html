@@ -1,13 +1,13 @@
 非カリー化
 
-<h2>非カリー化とは</h2>
+<h2>Haskellにおける非カリー化とは</h2>
 
 <p>
-タプルとして引数を受けとる関数を、
-ばらばらの引数を受けとる関数に変換することをカリー化と呼び、
-関数curryが用意されていた。
-逆に、ばらばらの引数を受けとる関数を、
-タプルとして引数を受けとる関数に変換することを非カリー化と呼び、
+タプルとして引数を受けとる関数を
+ばらばらの引数を受けとる関数に変換することをカリー化と呼ぶ。
+関数curryが用意されている。
+逆に、ばらばらの引数を受けとる関数を
+タプルとして引数を受けとる関数に変換することを非カリー化と呼ぶ。
 関数uncurryが用意されている。
 </p>
 
@@ -31,22 +31,19 @@ Prelude&gt; uncurry (+) (3, 8)<br/>
 整数の組の足し算の例では、
 <code>Integer -&gt; Integer -&gt; Integer</code>を
 <code>(Integer, Integer) -&gt; Integer</code>に変換する。
-型は以下のようになる。
 </p>
 
-<pre><code>(Integer -&gt; Integer -&gt; Integer) -&gt; ((Integer, Integer) -&gt; Integer)</code></pre>
+<p><code>(Integer -&gt; Integer -&gt; Integer) -&gt; ((Integer, Integer) -&gt; Integer)</code></p>
 
-<p>一般的にすると</p>
+<p>一般的にすると以下のようになる。</p>
 
 <pre><code>(a -&gt; b -&gt; c) -&gt; ((a, b) -&gt; c)</code></pre>
 
-<p>右側の丸括弧は省略できる。</p>
+<p>右側の丸括弧を省略する。</p>
 
 <pre><code>(a -&gt; b -&gt; c) -&gt; (a, b) -&gt; c</code></pre>
 
 <h3>定義</h3>
-
-<p>関数uncurryの定義を見る。</p>
 
 <p><code>uncurry :: (a -&gt; b -&gt; c) -&gt; (a, b) -&gt; c<br/>
 uncurry f (x, y) = f x y</code></p>
@@ -57,16 +54,25 @@ src="/computer/haskell/web_lecture/for_programmer/images/uncurry.svg"
 />
 
 <p>
-第2引数のタプル(x, y)の第1、第2要素をばらばらにして第1引数の関数fに与えている。
+第2引数のタプル(x, y)の第1、第2要素をばらばらにして第1引数の関数fに与える。
 </p>
 
 <h2>課題</h2>
 
 <ol>
-<li>第1引数に値段を第2引数に税率を取り税込み価格を返す関数を作成せよ</li>
-<li>上記関数をuncurryを使って値段と税率から成るタプルを取る関数に変換せよ</li>
-<li>第2引数と第3引数を第1引数で割った余りが等しいことを確認する関数congruentを作成せよ</li>
-<li>3引数関数を3要素タプルを取る関数に変換する関数uncurry3を定義せよ</li>
+<li>第1引数に値段を第2引数に税率をとり税込み価格を返す関数を作成せよ</li>
+<li>上記関数をuncurryで値段と税率から成るタプルをとる関数に変換せよ</li>
+<li>第2引数と第3引数を第1引数で割った余りが等しいことを確認する関数congruentを作成せよ
+	<ul>
+	<li>congruent 3 8 11は8も11も3で割った余りが2となり等しいのでTrue</li>
+	<li>congruent 5 8 14は8を5で割った余りは3で14を5で割った余りは4なのでFalse</li>
+	<li>aをbで割った余りをはa `mod` bで求めることができる</li>
+	<li>aとbが等しいかどうかはa == bで確かめられる</li>
+	</ul></li>
+<li>3引数関数を3要素タプルを取る関数に変換する関数uncurry3を定義せよ
+	<ul>
+	<li>uncurry3 congruent (3, 8, 11)のようにして確認せよ</li>
+	</ul></li>
 </ol>
 
 <p>
