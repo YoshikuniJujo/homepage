@@ -1,0 +1,82 @@
+追加: ($)の連続を(.)に置き換える
+
+<h2>はじめに</h2>
+
+<p>Haskellでは連続した($)を最後以外を(.)に置き換えることができる。</p>
+
+<h2>例</h2>
+
+<p>
+文字を小文字化し文字コードを求め7で割った余りが偶数であることを
+確認する関数を考える。
+以下のようになるだろう。
+</p>
+
+<p><code>import Data.Char</code></p>
+
+<p><code>fun c = even $ (`mod` 7) $ toLower c</code></p>
+
+<p>これを以下のように書き換えられる。</p>
+
+<p><code>fun c = even . (`mod` 7) $ toLower c</code></p>
+
+<h2>一般的に</h2>
+
+<p>以下の2つは同じだ。</p>
+
+<p><code>f $ g $ h $ x</code></p>
+
+<p><code>f . g . h $ x</code></p>
+
+<p>
+値xに関数hを適用しそれにgを適用しfを適用するのと
+3つの関数f, g, hを関数合感しそれを値xに適用するのとは同じことだ。
+</p>
+
+<h2>演算子の優先順位</h2>
+
+<p>
+(.)の演算子の優先順位が($)よりも高いために置き換えが可能となる。
+明示的に丸括弧をつけると以下のようになる。
+</p>
+
+<p><code>f $ (g $ (h $ x))</code></p>
+
+<p><code>(f . (g . h)) $ x</code></p>
+
+<p>3つの関数f, g, hの関数合成をしてから値xに適用している。</p>
+
+<h2>どちらが良いか</h2>
+
+<p><code>fun c = even . (`mod` 7) $ toLower c</code></p>
+
+<p>これをさらに以下のように変換できる。</p>
+
+<p><code>fun c = even . (`mod` 7) . toLower $ c</code></p>
+
+<p>
+「関数funを値cに適用したもの」と
+「関数even . (`mod` 7) . toLowerを値cに適用したもの」とが等しい。
+</p>
+
+<p><code>fun = even . (`mod` 7) . toLower</code></p>
+
+<p>
+以上のように($)を(.)に変換することで仮引数を消せることに気づいた。
+そのような側面や単に見た目の美しさの点で(.)に置き換えた形のほうが
+良いのではないかと考えられる。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+僕なりのコーディング規約のようなものだが、
+($)が連続する場合には最後の($)以外を(.)に置き換えることにしている。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/polymorphic_summary.html"
+	>「多相関数」にもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer"
+	>「1から学ぶHaskell」トップへ</a>
+</p>
