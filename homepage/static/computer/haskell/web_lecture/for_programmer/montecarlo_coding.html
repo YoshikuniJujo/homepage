@@ -40,7 +40,7 @@ inCirclePoints g n = filter inCircle . take n $ points g</code>
 
 <p><code>[正方形の面積] * [円内の点の数] / [正方形内の点の数]</code></p>
 
-<p>ランダムな点の系列と点の数を指定し円周率の推測を計算する。</p>
+<p>ランダムな点の系列と点の数を指定し円周率の推測値を計算する。</p>
 
 <code>guessPi :: Int -&gt; Int -&gt; Double<br/>
 guessPi g n = 4 * fromIntegral (length $ inCirclePoints g n) / fromIntegral n</code>
