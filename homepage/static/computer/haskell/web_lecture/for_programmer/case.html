@@ -2,14 +2,12 @@ case式
 
 <h2>はじめに</h2>
 
-<p>
-case式を使うことでより柔軟な形でのパターンマッチが可能となる。
-</p>
+<p>case式を使うことでより柔軟な形でのパターンマッチが可能となる。</p>
 
 <h2>仮引数部でのパターンマッチ</h2>
 
 <p>
-仮引数の部分でのパターンマッチは関数定義という特殊な場面でのみ使える構文糖である。
+仮引数の部分でのパターンマッチは関数定義という特殊な場面でのみ使える構文糖だ。
 case式はより広い範囲をカバーする。
 仮引数部でのパターンマッチとcase式の関係は
 「関数定義」と「関数リテラル」の関係と似ている。
@@ -19,12 +17,12 @@ case式はより広い範囲をカバーする。
 
 <p>
 仮引数部でのパターンマッチは略記法だ。
-脱糖しcase式で表現するとどうなるだろうか。
-safeRecipを例にして見てみよう。
+脱糖しcase式で表現するとどうなるだろう。
+safeRecipの例を見てみよう。
 </p>
 
 <p><code>safeRecip 0 = Nothing<br/>
-safeRecp x = Just $ 1 / x</code></p>
+safeRecip x = Just $ 1 / x</code></p>
 
 <p>関数リテラルとcase式によって書き直す。</p>
 
@@ -32,15 +30,9 @@ safeRecp x = Just $ 1 / x</code></p>
 	<span style="padding-left: 2em">0 -&gt; Nothing<br/>
 	<span style="padding-left: 2em">_ -&gt; Just $ 1 / x</span></code></p>
 
-<p>
-上の表現は下の表現を構文糖によって書き換えたと考えられる。
-</p>
+<p>上の表現は下の表現の構文糖による書き換えと考えられる。</p>
 
 <h2>case式の構文</h2>
-
-<p>
-case式の構文は以下のようになる。
-</p>
 
 <p><code>case [式0] of<br/>
 	<span style="padding-left: 2em">[パターン1] -&gt; [式1]</span><br/>
@@ -48,8 +40,8 @@ case式の構文は以下のようになる。
 	<span style="padding-left: 2em">...</span></code></p>
 
 <p>
-式0のところには単純な変数でなく複雑な式も置ける。
-仮引数部を使ったパターンマッチよりも自由な書きかたができる。
+式0のところには単純な変数だけでなく複雑な式も置ける。
+仮引数部を使ったパターンマッチよりも自由に書ける。
 </p>
 
 <h2>レイアウトルール再び</h2>
@@ -57,14 +49,14 @@ case式の構文は以下のようになる。
 <p>
 Haskellではレイアウトルールによって明示的な{}や;を省略できる。
 兄弟要素の列挙はインデントをそろえることで表現する。
-[パターン1], [パターン2], ...はインデントがそろっているので並列の要素だ。
+[パターン1], [パターン2], ...は並列の要素なのでインデントをそろえる。
 並列の要素内で複数行に分けるときはインデントを深くする。
 </p>
 
 <h2>case式でないと書きにくい例</h2>
 
 <p>
-小文字に直したときに'y'か'n'かそれ以外かをチェックする関数を見てみよう。
+小文字に直したときに'y'か'n'かそれ以外かをチェックする関数を考える。
 </p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/15_5_case/checkAnswer.hs"
@@ -94,10 +86,17 @@ checkAnswer c = case toLower c of<br/>
 
 <p><code>diffRecip :: Double -&gt; Double -&gt; Maybe Double<br/>
 diffRecip x y = case x - y of<br/>
+	<span class="indent1">0 -&gt; Nothing</span><br/>
+	<span class="indent1">d</span>
+<!--	<span class="indent1">| d &gt; 0 -&gt; Just $ recip d</span><br/> -->
+	<span style="padding-left: 3em">| d &gt; 0 -&gt; Just $ recip d</span><br/>
+	<span class="indent2">| otherwise -&gt; Just $ recip (- d)</span>
+<!--
 	<span style="padding-left: 2em">0 -&gt; Nothing</span><br/>
 	<span style="padding-left: 2em">d</span>
 	<span style="padding-left: 1em">| d &gt; 0 -&gt; Just $ recip d</span><br/>
 	<span style="padding-left: 4em">| otherwise -&gt; Just $ recip (- d)</span>
+	-->
 	</code></p>
 
 <p>'-&gt; [式]'の代わりに'| [真偽値] -&gt; [式]'を必要なだけ置く。</p>
