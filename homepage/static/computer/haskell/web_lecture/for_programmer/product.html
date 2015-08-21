@@ -3,17 +3,14 @@
 <h2>はじめに</h2>
 
 <p>
-今度はリストに含まれる値すべてをかけ算する関数を作成する。
+リストに含まれる値すべてをかけ算する関数を作成する。
 総和を求めるのと考えかたは同じだ。
-重要なところなので、
-同じことをもう一度やってみよう。
+重要なところなので同じことをもう一度やってみよう。
 </p>
 
 <h2>関数product</h2>
 
-<p>
-リストの要素すべてをかけ算する関数は用意されている。
-</p>
+<p>関数productはリストの要素すべてをかけあわせる。</p>
 
 <p><code>% ghci<br/>
 Prelude&gt; product [3, 18, 9]<br/>
@@ -21,15 +18,11 @@ Prelude&gt; product [3, 18, 9]<br/>
 
 <h2>関数myProduct</h2>
 
-<p>
-Integer型の値のリストに対してproductと同じ動作をする関数を作る。
-</p>
+<p>Integer型の値のリストに対してproductと同じ動作をする関数を作る。</p>
 
 <h3>型</h3>
 
-<p>
-Integer型の値のリストを引数として取りInteger型の値を返す。
-</p>
+<p>Integer型の値のリストを引数としInteger型の値を返す。</p>
 
 <p><code>myProduct :: [Integer] -&gt; Integer</code></p>
 
@@ -37,8 +30,8 @@ Integer型の値のリストを引数として取りInteger型の値を返す。
 
 <p>
 リストに値を追加したら結果の値はどう変化するか。
-myProduct xsとmyProduct (x : xs)の関係はどうなるか。
-後者は前者のx倍となるだろう。
+結果の値はもとの値に追加した値をかけた値となるはずだ。
+myProduct (x : xs)はmyProduct xsのx倍となる。
 </p>
 
 <p><code>myProduct (x : xs) = x * myProduct xs</code></p>
@@ -50,7 +43,7 @@ myProduct xsとmyProduct (x : xs)の関係はどうなるか。
 myProduct [3, 14, 9]はmyProduct [14, 9]の3倍であり、
 myProduct [14, 9]はmyProduct [9]の14倍である。
 同様にmyProduct [9]がmyProduct []の9倍となれば良い。
-つまりmyProduct []の値は1j。
+つまりmyProduct []の値は1。
 </p>
 
 <p><code>myProduct [] = 1</code></p>
@@ -79,17 +72,15 @@ mySumとmyProductを比較する。
 mySumでは(+)でありmyProductでは(*)だ。
 それ以外の全体としての枠組みは同じだ。
 Haskellではメタ的な関数によってこのような枠組みを抽象化できる。
-後のほうでまた触れる。
+そのような抽象化について次に学ぶ。
 </p>
 
 <h2>まとめ</h2>
 
-<p>
-リストを引数に取る再帰関数の作りかたの基本は以下のようになる。
-</p>
+<p>リストを引数に取る再帰関数の作りかたの基本を学んだ。</p>
 
 <ul>
-<li>空リストの場合の値を定義</li>
+<li>空リストに対する値を定義</li>
 <li>先頭の要素と「残りの要素のリストに関数を適用したもの」を作って値を定義</li>
 </ul>
 
