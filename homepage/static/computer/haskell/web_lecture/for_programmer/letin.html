@@ -2,6 +2,58 @@
 
 <p>(工事中 0%)</p>
 
+<h2>ローカル変数</h2>
+
+<p>
+ローカル変数が使いたい。
+可読性のためのときもありDRY(Don't repeat yourself)原則を守るためであるときもある。
+二重化による実行効率の低下を避けるためにも必要だ。
+</p>
+
+<h2>使えるよ</h2>
+
+<p>
+今までの枠組みだけでローカル変数を作って使うことは可能だ。
+</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; (\x -&gt; x ^ x) 5<br/>
+3125</code></p>
+
+<p>
+これはローカルな変数xに5を代入したうえでxのx等を計算している。
+</p>
+
+<h2>つまり</h2>
+
+<p>ローカル変数と仮引数とは同じものである。</p>
+
+<p><code>(\var -&gt; [varを使った式]) val</code></p>
+
+<p>ローカル変数varをvalで束縛して式を評価することができる。</p>
+
+<h2>もっとローカル変数らしく</h2>
+
+<p>
+もうすこし甘さが必要だ。
+僕を含め多くの人がそう思う。
+let ... in ...という構文糖を使おう。
+上の形を以下のように書くことができる。
+</p>
+
+<p><code>let var = val in [varを使った式]</code></p>
+
+<h2>再帰的定義への対応</h2>
+
+<p>
+ここの項目は別ページへのリンクとする。
+再帰関数の最後にfixの話題を扱いそれを学んだあとに読むようにとの注意書きを
+追加する。
+</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/letin_recursive.html"
+	>let ... in ...による変数定義における再帰(スタブ)</a></p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/montecarlo_coding.html"
 	>「モンテカルロ法のコーディング」へもどる</a>
