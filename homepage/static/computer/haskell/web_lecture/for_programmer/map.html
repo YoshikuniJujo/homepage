@@ -30,13 +30,14 @@ sum3N n = sum $ map (* 3) [0 .. n]</code></p>
 
 <p>
 0からnまでの5の倍数ではない数を3倍したものの総和を求める。
-整数を列挙後に「5の倍数でない」でろ過する。
 </p>
 
 <p><code>sum3N5 :: Integer -&gt; Integer<br/>
 sum3N5 n = sum .  map (* 3) $ filter ((/= 0) . (`mod` 5)) [0 .. n]</code></p>
 
-<p>sumとmap ...とを関数合成したうえでfilter ...に適用している。</p>
+<p>
+0からnまでの整数を「5の倍数でない」でろ過しそれらを3倍した値の総和を求めている。
+</p>
 
 <p><code>*Main&gt; sum3N5 10<br/>
 120</code></p>

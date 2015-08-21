@@ -3,7 +3,7 @@
 <h2>はじめに</h2>
 
 <p>
-「遅延性」という言葉がある。僕の知っているかぎりでは使っているのは僕だけだ。
+適切な言葉がないので「遅延性」という言葉を考えた。
 「遅延評価」と「遅延データ構造」をひっくるめて「遅延性」と呼ぶ。
 「遅延データ構造」の一例として「遅延リスト」がある。
 </p>
@@ -80,8 +80,6 @@
 <p><code>factor n<br/>
 	<span style="padding-left:2em">| n &lt; 2 = 1</span><br/>
 	<span style="padding-left:2em">| otherwise = head $ filter ((== 0) . (n `mod`)) [2 ..]</span></code></p>
-
-<p>試してみよう。</p>
 
 <code>% ghci factor.hs<br/>
 *Main&gt; factor 221<br/>

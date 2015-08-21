@@ -3,8 +3,8 @@
 <h2>動機</h2>
 
 <p>
-モンテカルロ法で円周率を計算しよう。
-正方形内にランダムな点をプロットする必要がある。
+モンテカルロ法で円周率を計算するために
+正方形内にランダムな点をプロットする。
 </p>
 
 <h2>Haskell98における疑似乱数</h2>
@@ -26,7 +26,7 @@ Prelude&gt; :m System.Random<br/>
 Prelude System.Random&gt;</code>
 
 <p>
-エラーメッセージが表示されずプロンプトにSystem.Randomが追加されれば、
+エラーメッセージが表示されずプロンプトにSystem.Randomが追加されれば
 ライブラリはシステムにインストールされている。
 </p>
 
@@ -56,9 +56,9 @@ StdGen型の値を与えるとDouble型の値のリストを返す。
 
 <p>
 StdGen型は「乱数の種」だ。
-この値によって乱数は変わる。
-値が同じならば同じ値が返る。
-この値は関数mkStdGenでIntから生成できる。
+この値によって異なった乱数列が生成される。
+値が同じならば同じ列が返る。
+StdGen型の値は関数mkStdGenでIntから生成できる。
 </p>
 
 <pre><code>mkStdGen :: Int -&gt; StdGen</code></pre>
@@ -81,6 +81,13 @@ takeを使っていくつかだけを表示する。
 <code>Prelude System.Random&gt; take 3 . randoms $ mkStdGen 8 :: [Double]<br/>
 [0.6022994713892826, 0.62331532360708, 0.9885723665310981]</code>
 
+<p>
+型注釈':: [Double]'が必要だ。
+randomsは多相関数でありさまざまな型のランダム値を生成することができる。
+学習ずみのパラメトリック多相ではなく型クラスのところで学習する
+アドホック多相なのでここでは深い話はしない。
+</p>
+
 <h2>関数randomRs</h2>
 
 <p>
@@ -96,12 +103,18 @@ takeを使っていくつかだけを表示する。
 [3.2045989427785653, 3.24663064721416, 3.9771447330621963]
 </code>
 
+<p>
+2から4のあいだの乱数列が生成される。
+</p>
+
 <h2>関数split</h2>
 
 <p>
 座標の指定のためにはx, yの2つのランダムな値の系列が必要だ。
 「ランダムの種」を2つに分けるために関数splitがある。
 </p>
+
+<p><code>split :: StdGen -&gt; (StdGen, StdGen)</code></p>
 
 <code>Prelude System.Random&gt; split $ mkStdGen 8<br/>
 (10 40692, 360126 2147483398)</code>
@@ -124,13 +137,13 @@ Prelude System.Random Control.Arrow&gt; take 3 . uncurry zip .
 
 <h3>関数split</h3>
 
-<p>1つずつ組み立てていく。</p>
-
 <p><code>split $ mkStdGen 8</code></p>
 
 <p>2つの乱数の種をタプルにして返す。</p>
 
 <h3>演算子(***)</h3>
+
+<h4>動作</h4>
 
 <p>
 演算子(***)は2要素タプルの1要素目と2要素目の両方に関数を適用する関数だ。
@@ -140,7 +153,7 @@ Prelude System.Random Control.Arrow&gt; take 3 . uncurry zip .
 <p><code>Prelude System.Random Control.Arrow&gt; (* 2) *** (+ 3) $ (4, 2)<br/>
 (8,5)</code></p>
 
-<p>これを使って以下のようにする。</p>
+<h4>使用</h4>
 
 <code>(randomRs (-1, 1) *** randomRs (-1, 1)) . split $ mkStdGen 8</code>
 
@@ -152,24 +165,40 @@ Prelude System.Random Control.Arrow&gt; take 3 . uncurry zip .
 
 <h3>関数zip</h3>
 
+<h4>動作</h4>
+
 <p>
-zipは2つのリストを取ってそれをタプルのリストにして返す。
-型は[a] -&gt; [b] -&gt; [(a, b)]だ。
-uncurryによって引数である2つのリストをタプルにまとめた。
-uncurry zipの型は([a], [b]) -&gt; [(a, b)]となる。
+zipは2つのリストをとりタプルのリストにする。
 </p>
+
+<p><code>zip :: [a] -&gt; [b] -&gt; [(a, b)]</code></p>
+
+<p><code>Prelude System.Random Control.Arrow&gt; zip [0 ..] "hello"<br/>
+[(0,'h'),(1,'e'),(2,'l'),(3,'l'),(4,'o')]</code></p>
+
+<p>
+uncurryによって引数である2つのリストをタプルにまとめる。
+uncurry zipは「リストのタプルをタプルのリストにする」関数となる。
+</p>
+
+<p><code>uncurry zip :: ([a], [b]) -&gt; [(a, b)]</code></p>
+
+<p><code>Prelude System.Random Control.Arrow&gt; uncurry zip ([0 ..], "hello")<br/>
+[(0,'h'),(1,'e'),(2,'l'),(3,'l'),(4,'o')]</code></p>
+
+<h4>使用</h4>
 
 <p><code>uncurry zip . (randomRs (-1, 1) *** randomRs (-1, 1)) . split $ mkStdGen 8</code></p>
 
 
 <p>
-x座標のリストとy座標のリストのタプルを、x座標とy座標から成るタプルのリストとした。
+x座標のリストとy座標のリストのタプルをx座標とy座標から成るタプルのリストとした。
 </p>
 
 <h2>まとめ</h2>
 
 <p>
-原点を中心とする1辺2の正方形内にあるランダムな点の列は以下のように生成できる。
+原点を中心とする1辺2の正方形内のランダムな点の列を以下のように生成する。
 </p>
 
 <code>uncurry zip . (randomRs (-1, 1) *** randomRs (-1, 1))

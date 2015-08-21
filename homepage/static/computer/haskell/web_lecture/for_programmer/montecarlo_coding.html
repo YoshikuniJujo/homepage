@@ -12,7 +12,7 @@ href="/computer/haskell/web_lecture/for_programmer/13_montecarlo/montecarlo.hs"
 	. split $ mkStdGen 8</code>
 
 <p>
-乱数の種を決めるための整数を指定し、
+乱数の種を決めるための整数を引数とし
 いろいろな系列のランダムな点の列を返す関数とする。
 </p>
 
@@ -36,14 +36,11 @@ inCirclePoints g n = filter inCircle . take n $ points g</code>
 
 <h2>円周率の推測値を出す</h2>
 
-<p>円内の点の数を全体の点の数で割ったものを4倍する。</p>
+<p>円内の点の数を全体の点の数で割ったものに正方形の面積である4をかける。</p>
 
 <p><code>[正方形の面積] * [円内の点の数] / [正方形内の点の数]</code></p>
 
-<p>
-上記の計算を関数にする。
-ランダムな点の系列と点の数を指定し円周率の推測を計算する。
-</p>
+<p>ランダムな点の系列と点の数を指定し円周率の推測を計算する。</p>
 
 <code>guessPi :: Int -&gt; Int -&gt; Double<br/>
 guessPi g n = 4 * fromIntegral (length $ inCirclePoints g n) / fromIntegral n</code>
@@ -88,7 +85,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/monteGraphLog.svg"/>
 <p>
 モンテカルロ法で円周率を求める例題を見た。
 ランダムな点を列挙した無限リストを作成。
-円内にあるものを数え全体の点の数で割った値から円周率の近似値を求めた。
+円内にあるものを数え全体の点の数で割った値から円周率の近似値を求める。
 関数型言語の魂である「再帰関数」についてまだ学んでいないが
 「リストを使うだけでここまでできる」。
 </p>
