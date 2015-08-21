@@ -1,6 +1,61 @@
 構文: where
 
-<p>(工事中 0%)</p>
+<h2>例</h2>
+
+<p>
+where構文は関数定義につくので対話環境からだと試しにくい。
+ファイルに書き込んでから対話環境に読み込もう。
+</p>
+
+<p>where.hs</p>
+
+<p><code>v1 = x ^ x<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">x = 5</span></code></p>
+
+<p><code>v2 = x * y<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">x = 3</span><br/>
+	<span class="indent1">y = 5</span></code></p>
+
+<p><code>% ghci where.hs<br/>
+*Main&gt; v1<br/>
+3125<br/>
+*Main&gt; v2<br/>
+15</code></p>
+
+<h2>構文</h2>
+
+<p>以下のような対応となる。</p>
+
+<p><code>foo = let var = val in [varを使った式]</code></p>
+
+<p><code>foo = [varを使った式] where var = val</code></p>
+
+<h2>let ... in ...との違い</h2>
+
+<h3>定義が後に来る</h3>
+
+<p>
+where節は関数定義の後ろにつけることができる。
+これによって細かい定義を後回しにすることができる。
+</p>
+
+<h3>スコープ</h3>
+
+<p>
+where節は複数のガードをまたぐスコープを持つ。
+これはlet ... in ...ではできない。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+let ... in ...とほぼ同じ働きをするwhere節について見た。
+関数定義や変数定義にくっつけることができる。
+スコープの広さの違い等があるが意味論的にはlet ... in ...と同じだ。
+使いわけよう。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/letin.html"
