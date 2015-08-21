@@ -3,7 +3,7 @@
 <h2>例</h2>
 
 <p>
-where構文は関数定義につくので対話環境からだと試しにくい。
+where構文は関数定義や変数定義につくので対話環境からだと試しにくい。
 ファイルに書き込んでから対話環境に読み込もう。
 </p>
 
@@ -45,7 +45,7 @@ where節は関数定義の後ろにつけることができる。
 
 <p>
 where節は複数のガードをまたぐスコープを持つ。
-これはlet ... in ...ではできない。
+let ... in ...で同じことをするには明示的にcase文を使う必要がある。
 </p>
 
 <h2>まとめ</h2>
@@ -56,6 +56,11 @@ let ... in ...とほぼ同じ働きをするwhere節について見た。
 スコープの広さの違い等があるが意味論的にはlet ... in ...と同じだ。
 使いわけよう。
 </p>
+
+<p><small>自分用のメモ:<br/>
+<span class="indent1">where節がcase文のなかでも使えることをどこかに書くこと</span><br/>
+<span class="indent1">最後にappendixとして構文の全体像をまとめるのが良いかも</span>
+</small></p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/letin.html"
