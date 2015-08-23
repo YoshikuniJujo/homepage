@@ -6,72 +6,65 @@ href="/computer/haskell/web_lecture/for_programmer/02_partial_application/rsa.hs
 
 <h2>関数xxcrypt</h2>
 
-<p>encrypt関数とdecrypt関数は実は同じものだ。</p>
+<p>encrypt関数とdecrypt関数は同じものだ。</p>
 
 <pre><code>encrypt n e m = m ^ e `mod` n
 decrypt n d c = c ^ d `mod` n</code></pre>
 
-<p>ひとつにまとめてしまう。</p>
+<p>まとめてしまおう。</p>
 
 <pre><code>xxcrypt n ed mc = mc ^ ed `mod` n</code></pre>
 
-<h2>鍵を固定した関数</h2>
+<h2>鍵を固定する</h2>
 
 <p>
-同じ鍵でいろいろなメッセージを暗号化、復号するとき、
-いちいち鍵を引数として与えるのは面倒だ。
-鍵を固定した関数を作成する。
+同じ鍵でいろいろなメッセージを暗号化、復号する。
+いちいち鍵を引数として与えるのは面倒だ。鍵を固定する。
 </p>
 
-<pre><code>encrypt1 m = xxcrypt 138689 13 m
-decrypt1 c = xxcrypt 138689 95497 c</code></pre>
+<p><code>encrypt1 m = xxcrypt 138689 13 m<br/>
+decrypt1 c = xxcrypt 138689 95497 c</code></p>
 
-<p>試してみる。</p>
-
-<pre><code>*Main&gt; :reload
-*Main&gt; encrypt1 4492
-47255
-*Main&gt; decrypt1 47255
-4492</code></pre>
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; encrypt1 4492<br/>
+47255<br/>
+*Main&gt; decrypt1 47255<br/>
+4492</code></p>
 
 <p>
-encrypt1やdecrypt1の定義では、それぞれencryptやdecryptの
-第1、第2引数だけを指定し、第3引数は指定されていない。
-このような場合、以下のように書ける。
+encrypt1やdecrypt1の定義では、encryptやdecryptの
+第1、第2引数だけが指定され第3引数は指定されていない。
+以下のように書き直せる。
 </p>
 
 <pre><code>encrypt1' = xxcrypt 138689 13
 decrypt1' = xxcrypt 138689 95497</code></pre>
 
 <p>
-encrypt1'、decrypt1'はそれぞれencrypt、decryptの3つの引数のうち
-第1引数と第2引数のみに値を与えることで作成した。
-関数の引数のうち一部だけ指定することを部分適用と呼ぶ。
+encrypt1'、decrypt1'の定義ではencrypt、decryptの3つの引数のうち
+第1引数と第2引数のみを与えている。
+関数の引数の一部だけ指定することを部分適用と呼ぶ。
 第1引数のみを指定することもできる。
 </p>
 
 <pre><code>xxcrypt1 = xxcrypt 138689</code></pre>
 
-<p>これを使ってencrypt1やdecrypt1を定義することもできる。</p>
+<p>これを使ってencrypt1やdecrypt1を定義しても良い。</p>
 
 <pre><code>encrypt1'' = xxcrypt1 13
 decrypt1'' = xxcrypt1 95497</code></pre>
 
 <h2>展開</h2>
 
-<p>
-encrypt1'' 4492を展開してみる。
-</p>
-
 <pre><code>encrypt1'' 4492
-==&gt; (xxcrypt1 13) 4492
-==&gt; ((xxcrypt 138689) 13) 4492</code></pre>
+=&gt; (xxcrypt1 13) 4492
+=&gt; ((xxcrypt 138689) 13) 4492</code></pre>
 
 <p>
-この展開を逆にたどってみよう。
-xxcryptに引数138689を与えるとxxcrypt1という関数を返す。
-そのxxcrypt1に引数13を与えるとencrypt1''という関数を返す。
-そしてencrypt1''に4492を与えることで数値が返る。
+逆にたどる。
+xxcryptに引数138689を与えるとxxcrypt1という関数になる。
+xxcrypt1に引数13を与えるとencrypt1''という関数になる。
+encrypt1''に4492を与えると数値になる。
 </p>
 
 <img
@@ -81,38 +74,39 @@ src="/computer/haskell/web_lecture/for_programmer/images/three_arg_fun.svg"
 />
 
 <p>
-xxcryptという3引数関数に1つ引数を与えてやると、
-2引数関数が返り、その関数にまた1つ引数を与えてやると1引数関数が返り、
-そしてその関数にまた1つ引数を与えてやると数値が返る。
+3引数関数に引数を与えると2引数関数が返る。
+2引数関数に引数を与えると1引数関数が返る。
+1引数関数に引数を与えると数値が返る。
 </p>
 
-<h2>3引数関数はなかった</h2>
+<h2>3引数関数は幻だった</h2>
 
 <p>
-xxcryptを今までは3引数関数として扱ってきた。
-しかし、実はHaskellに2引数関数や3引数関数はない。
-2引数関数や3引数関数のように見えるものは、実は「関数を返す関数」だ。
-関数に3つの引数を与えているかのように見える以下のような記述を見てみよう。
+xxcryptを3引数関数として扱ってきた。
+本当はHaskellに2引数関数や3引数関数はない。
+2引数関数や3引数関数のように見えるものは「関数を返す関数」だ。
 </p>
 
-<pre><code>xxcrypt 138689 13 4492</code></pre>
+<p><code>xxcrypt 138689 13 4492</code></p>
 
-これは本当は以下のような意味である。
+<p>
+関数に3つの引数を与えているかのように見える。
+明示的に丸括弧をつける。
+</p>
 
 <pre><code>((xxcrypt 138689) 13) 4492</code></pre>
 
 <p>
 関数適用が左結合なのでこの括弧は省略できる。
-結果として上のような表記になる。
+結果としてうえのようになる。
 </p>
 
 <h2>まとめ</h2>
 
 <p>
-関数は一部の引数だけを指定できる。
-これを部分適用と呼ぶ。
-「部分適用」は特別に用意された機能ではない。
-「複数の引数を持つ関数」のほうが幻で「関数を返す関数」の連鎖が起きている。
+関数は引数の一部だけを指定できる。
+この「部分適用」は特別に用意された機能ではない。
+「複数の引数を持つ関数」のほうが幻だ。「関数を返す関数」の連鎖があるだけだ。
 </p>
 
 <h2>課題</h2>
@@ -121,6 +115,7 @@ xxcryptを今までは3引数関数として扱ってきた。
 <li>n進法の2桁の値を計算する関数naryを作成せよ
 	<ul>
 	<li>nary n a bとするとn進法の'ab'の値を計算する</li>
+	<li>nary 10 3 8は38となる</li>
 	<li>nary 2 1 1は3となりnary 16 3 4は52となる</li>
 	</ul></li>
 <li>関数naryを使って8進法の2桁の値を計算する関数octalを作成せよ
