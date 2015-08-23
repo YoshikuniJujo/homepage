@@ -14,11 +14,11 @@
 
 <p><code>import Data.Char</code></p>
 
-<p><code>fun c = even $ (`mod` 7) $ toLower c</code></p>
+<p><code>fun c = even $ (`mod` 7) $ ord $ toLower c</code></p>
 
 <p>これを以下のように書き換えられる。</p>
 
-<p><code>fun c = even . (`mod` 7) $ toLower c</code></p>
+<p><code>fun c = even . (`mod` 7) . ord $ toLower c</code></p>
 
 <h2>一般的に</h2>
 
@@ -48,18 +48,18 @@
 
 <h2>どちらが良いか</h2>
 
-<p><code>fun c = even . (`mod` 7) $ toLower c</code></p>
+<p><code>fun c = even . (`mod` 7) . ord $ toLower c</code></p>
 
 <p>これをさらに以下のように変換できる。</p>
 
-<p><code>fun c = even . (`mod` 7) . toLower $ c</code></p>
+<p><code>fun c = even . (`mod` 7) . ord . toLower $ c</code></p>
 
 <p>
 「関数funを値cに適用したもの」と
-「関数even . (`mod` 7) . toLowerを値cに適用したもの」とが等しい。
+「関数even . (`mod` 7) . ord . toLowerを値cに適用したもの」とが等しい。
 </p>
 
-<p><code>fun = even . (`mod` 7) . toLower</code></p>
+<p><code>fun = even . (`mod` 7) . ord . toLower</code></p>
 
 <p>
 以上のように($)を(.)に変換することで仮引数を消せることに気づいた。
