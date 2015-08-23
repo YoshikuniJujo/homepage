@@ -31,12 +31,16 @@
 説明の都合上、返り値は整数のリストとする。
 計算が完全に終わっていれば返り値であるリストの要素数は1である。
 演算子が足りず計算の途中であれば複数の整数がリストに残ることになる。
+数値が足りず演算が実行できないときは簡単のため実行時エラーとしてしまう。
+また、演算子としても数値としても解釈できない場合のエラー処理も省略する。
 </p>
 
 <h2>関数polish</h2>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/polish.hs"
 	>polish.hs</a></p>
+
+<h3>考えかた</h3>
 
 <h3>演算子のリスト</h3>
 
@@ -69,29 +73,26 @@ Integer型の値を2つとりInteger型を返す関数で表現できる。
 <h3>関数polishの再帰的な定義</h3>
 
 <p>
-第1引数は演算子や数値の列を文字列で表現したリストとする。
-第2引数は演算の対象となる数値のリストである。
+演算子や数値の列を文字列で表現したリストを引数とし数値のリストを返り値とする。
 </p>
 
 <h4>型</h4>
 
-<p><code>polish :: [String] -&gt; [Integer] -&gt; [Integer]</code></p>
+<p><code>polish :: [String] -&gt; [Integer]</code></p>
 
 <h4>基底部</h4>
 
 <p>
 基底として第1引数の文字列のリストが空である状態を考える。
-これは適用するべき命令が存在しないことと考えられるので
-第2引数の数値のリストをそのまま返せば良さそうだ。
 </p>
 
-<p><code>polish [] ns = ns</code></p>
+<p><code>polish [] = []</code></p>
 
 <h4>再帰部</h4>
 
 <p>まずは命令のリストをはじめの命令とそれ以外とにわける。</p>
 
-<p><code>polish (s : ss) ns = ...</code></p>
+<p><code>polish (s : ss) = ...</code></p>
 
 <p>演算子リストから対応する演算の動作を探す。</p>
 
@@ -111,7 +112,7 @@ Integer型の値を2つとりInteger型を返す関数で表現できる。
 全域関数でないのであまり推奨されないが使いやすい関数readを利用する。
 </p>
 
-<p><code><span class="indent1">_ -&gt; read s : polish ss ns</span></code></p>
+<p><code><span class="indent1">_ -&gt; read s : polish ss</span></code></p>
 
 <p>
 演算子リストに値が存在したときは数値リストの先頭の2つに対して
@@ -119,10 +120,6 @@ Integer型の値を2つとりInteger型を返す関数で表現できる。
 </p>
 
 <h3>動かしてみる</h3>
-
-<h1>!!! polish.hsはwhere構文を使って書き直す !!!</h1>
-
-<h1>!!! polish.hsの引数の順序をflipするかどうか考える !!!</h1>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/fold_right.html"
