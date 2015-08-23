@@ -13,8 +13,8 @@ Haskell Platform
 <h2>GHCのチェック</h2>
 
 <p>
-コマンドプロンプトを立ち上げて以下を入力する。
-先頭の'%'はコマンドプロンプトに対する入力であることを示すためなので入力しない。
+ターミナルから以下のように入力する。
+先頭の'%'はターミナルに対する入力であることを示すためなので入力しない。
 </p>
 
 <code>% ghc --version<br/>
@@ -30,17 +30,16 @@ The Glorious Glasgow Haskell Compilation System, version X.Y.Z</code>
 Prelude&gt;</code></pre>
 
 <p>
-Prelude&gt;はプロンプトだ。
-何事もまずは終わらせかたを知っておかなければならない。
-プロンプトに':quit'を入力し続けてリターンキーを押す。
-省略して':q'とすることもできる。
+Prelude&gt;はプロンプトだ。まずは終わらせかたを知ろう。
+プロンプトに':quit'を入力しリターンキーを入力する。
+':q'でも良い。
 </p>
 
 <pre><code>Prelude&gt; :quit</code></pre>
 
 <h2>値の入力</h2>
 
-<p>いろいろな値を入力してみよう。</p>
+<p>値を入力してみよう。</p>
 
 <pre><code>% ghci
 Prelude&gt; 4492
@@ -52,24 +51,21 @@ Prelude&gt; pi
 
 <p>
 対話環境は入力した式を評価し結果を表示する。
-4492や'c'はリテラルなのでそのまま出力される。
-piは定義済みの変数。円周率の値が表示される。
+4492や'c'はリテラルでそのまま出力される。
+piは定義済みの変数だ。円周率の値に束縛されている。
 </p>
 
-<h3>便利な変数it</h3>
+<h3>変数it</h3>
 
 <p>
-複雑な計算のあと表示した値を再度使いたいような場合に変数itが便利だ。
-対話環境で評価された値は自動的に変数itを束縛する。
-演算子(*)は乗算を示す。
+対話環境で評価した値は自動的に変数itを束縛する。
 </p>
 
 <p><code>Prelude&gt; 344925345991 * 36251192382<br/>
 12503955074947653440562</code></p>
 
 <p>
-返された結果にさらに15をかけたい。
-値を手で入力し直すよりも変数itを使ったほうが簡単だ。
+演算子(*)は乗算だ。返された結果に15をかける。
 </p>
 
 <p><code>Prelude&gt; it * 15<br/>
@@ -79,36 +75,33 @@ piは定義済みの変数。円周率の値が表示される。
 
 <h3>学習の流れ</h3>
 
-<p>入出力について学ぶまでは以下のような形で学習を進める。</p>
+<p>入出力を学ぶまでは以下の流れで進める。</p>
 
 <ol>
 <li>関数を定義したファイルを作成</li>
-<li>GHCiに読み込む</li>
-<li>関数を評価し結果を表示</li>
+<li>対話環境(GHCi)に読み込む</li>
+<li>値を評価し結果を表示</li>
 <li>ファイルを編集</li>
-<li>変更したファイルの再読み込み</li>
-<li>関数を評価し結果を表示</li>
+<li>再読み込み</li>
+<li>値を評価し結果を表示</li>
 <li>4から6をくりかえす</li>
 </ol>
 
 <h3>リンゴが好き</h3>
 
-<p>
-ファイルの読み込みの練習をする。
-fruits.hsを作成する。
-</p>
+<p>ファイルの読み込みの練習だ。fruits.hsを作成する。</p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/00_touch_ghci/fruits_1.hs"
 	>fruits.hs</a></p>
 
-<pre><code>myFavoriteFruit = "apple"</code></pre>
+<p><code>myFavoriteFruit = "apple"</code></p>
 
-<p>引数としてファイル名を指定してghciを立ち上げる。</p>
+<p>引数としてファイル名を指定しghciを立ち上げる。</p>
 
 <p><code>ghci fruits.hs<br/>
 *Main&gt; </code></p>
 
-<p>myFavoriteFruitと入力しリターンキーを押す。</p>
+<p>myFavoriteFruitと入力しリターンキーを入力する。</p>
 
 <p><code>*Main&gt; myFavoriteFruit<br/>
 "apple"</code></p>
@@ -116,37 +109,31 @@ fruits.hsを作成する。
 <h3>バナナが好き</h3>
 
 <p>
-リンゴよりもバナナのほうが好きかもしれない。
+リンゴよりもバナナのほうが好きだ。
 対話環境はそのまま走らせておきエディタでfruit.hsを編集する。
 </p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/00_touch_ghci/fruits_2.hs"
 	>fruits.hs</a></p>
 
-<code>myFavoriteFruit = "banana"</code>
+<p><code>myFavoriteFruit = "banana"</code></p>
 
-<p>試してみよう。</p>
+<p><code>*Main&gt; myFavoriteFruit<br/>
+"apple"</code></p>
 
-<pre><code>*Main&gt; myFavoriteFruit
-"apple"</code></pre>
+<p>「変更が反映されない!」。再読み込みする。':reload'か':r'を入力する。</p>
 
-<p>
-「変更が反映されてないぞ!」。
-ファイルを変更した後には再読み込みが必要だ。
-':reload'または省略形の':r'を入力する。
-</p>
-
-<pre><code>*Main&gt; :reload
-*Main&gt; myFavoriteFruit
-"banana"</code></pre>
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; myFavoriteFruit<br/>
+"banana"</code></p>
 
 <h2>まとめ</h2>
 
 <p>
-Haskell Platformをインストールすれば、コンパイラ、インタプリタ、対話環境だけでなく、
-パッケージ管理ソフトやドキュメントの自動生成ソフト、標準的なライブラリがそろう。
+Haskell Platformには、コンパイラ、インタプリタ、対話環境だけでなく、
+パッケージ管理ソフトやドキュメントの自動生成ソフト、標準的なライブラリが入っている。
 入出力について学ぶまでは対話環境で学習を進める。
-対話環境はghciコマンドで開始、':q'で終了。
+対話環境はghciコマンドで開始し':q'で終了する。
 定義ファイルを読み込むにはそのファイル名を引数にしてghciを立ち上げる。
 ファイルを編集したら:reloadで再読み込みする。
 </p>
@@ -154,14 +141,14 @@ Haskell Platformをインストールすれば、コンパイラ、インタプ�
 <h2>課題</h2>
 
 <ol>
-<li>ghciを立ち上げて自分の生まれた日を入力してみよう</li>
-<li>続いて自分の名前のイニシャル(1文字)を入力する
+<li>ghciを立ち上げて自分の生まれた日を入力せよ</li>
+<li>自分の名前のイニシャル(1文字)を入力せよ
 	<ul>
 	<li>文字は前後を'で囲んで入力する</li>
 	</ul></li>
-<li>myFavoriteColor変数を定義したファイルを作成する
+<li>myFavoriteColor変数を定義したファイルを作成せよ
 	<ul>
-	<li>まずは2番目に好きな色を指定する</li>
+	<li>2番目に好きな色で定義する</li>
 	<li>対話環境に読み込み表示する</li>
 	<li>1番好きな色に変更する</li>
 	<li>再読み込みして表示する</li>
