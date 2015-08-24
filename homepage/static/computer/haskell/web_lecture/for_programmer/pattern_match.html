@@ -3,9 +3,9 @@
 <h2>パターンマッチをここで学ぶ理由</h2>
 
 <p>
-何らかの条件分岐が使えないと関数の例を挙げていくうえで不便だ。
-Haskellの条件分岐の基本となるのがパターンマッチだ。
-if文の動作もパターンマッチで書ける。
+条件分岐が使えないと関数の例を挙げるのに不便だ。
+Haskellの条件分岐の基本がパターンマッチだ。
+if文もパターンマッチから導ける。
 </p>
 
 <h2>パターンマッチとは</h2>
@@ -19,19 +19,16 @@ src="/computer/haskell/web_lecture/for_programmer/images/pattern_match.svg"
 />
 
 <p>
-値がパターンに適合するかどうかで処理を分岐させ、
-構成的なデータ型から値を取り出すことができる。
+値がパターンに適合するかどうかで処理を分岐させ構成的なデータから値を取り出す。
 </p>
 
 <h2>仮引数はパターンだ</h2>
 
-<p>xxcryptを見てみよう。</p>
-
 <p><code>xxcrypt n ed mc = mc ^ ed `mod` n</code></p>
 
 <p>
-ここで'='の左側にあるn, ed, mcのような変数は仮引数である。
-これらの変数は「パターン」であり以下のような働きをする。
+ここで'='の左側にあるn, ed, mcのような変数は仮引数だ。
+これらの変数は「パターン」である。
 </p>
 
 <ul>
@@ -39,39 +36,29 @@ src="/computer/haskell/web_lecture/for_programmer/images/pattern_match.svg"
 <li>マッチした値がその変数を束縛する</li>
 </ul>
 
-<p>
-関数定義の関数名と'='のあいだには複数のパターンが置かれる。
-</p>
-
-<h2>もっとパターンらしい例を</h2>
+<h2>もっとパターンらしく</h2>
 
 <p>
-すべての値にマッチするパターンではパターンマッチの働きがよくわからない。
-よりパターンマッチらしい例を見よう。
-Maybe型の例だ。
+すべての値にマッチするのではパターンマッチの働きがよくわからない。
+よりパターンマッチらしいMaybe型の例を見る。
 Just 8という値がある。
 この値を使う人はこう思う。
-「失敗する可能性のある関数が適用された。その関数は成功し値は8だった」と。
-Just 8のままでは値8は使えない。
-値の部分を取り出したい。
+「失敗する可能性のある関数が適用された。結果は成功で値は8だった」と。
+値8を使うためには値の取り出しが必要だ。
 </p>
 
-<code>fun (Just x) = [xを使った演算]</code>
+<p><code>fun (Just x) = [xを使った演算]</code></p>
 
-<p>
-これでJust 8という値を分解して8の部分だけを取り出せた。
-Just xというパターンは以下のような働きをする。
-</p>
+<p>Just xというパターンの働きは以下のようになる。</p>
 
 <ul>
 <li>Just値だけにマッチ(Nothingにはマッチしない)</li>
-<li>Just [値]をJustと[値]に分解しその値で変数xを束縛</li>
+<li>Just [値]からとりだした値で変数xを束縛</li>
 </ul>
 
 <p>
-Just xはNothingにマッチしないので
-上の定義だとfun Nothingとした場合にエラーが発生する。
-以下のようにNothingの場合の定義するほうが良い。
+Just xはNothingにマッチしないのでうえの定義だとfun Nothingのときにエラーとなる。
+Nothingの定義を追加する。
 </p>
 
 <code>fun (Just x) = [xを使った演算]<br/>
@@ -80,7 +67,7 @@ fun Nothing = [Nothingだった場合に返す値]</code>
 <h2>ワイルドカード</h2>
 
 <p>
-上の例ではJust xにマッチしない値はNothingのみだ。
+例ではJust xにマッチしない値はNothingだけだ。
 パターンNothingでは束縛される変数もない。
 何にでもマッチし変数束縛を行わないワイルドカードを使うとスマートだ。
 </p>
@@ -89,16 +76,16 @@ fun Nothing = [Nothingだった場合に返す値]</code>
 fun _ = ...</code>
 
 <p>
-ワイルドカードは単一の'_'(アンダースコア)である。
-変数束縛のない変数パターンとも考えられる。
+ワイルドカードは'_'(アンダースコア)で表す。
+変数束縛のない変数パターンと考えられる。
 </p>
 
-<h2>数も文字も文字列もパターンである</h2>
+<h2>パターンとしての数や文字</h2>
 
 <p>
-数を含めリテラルもパターンとなる。
-Nothingと同じで値自体にマッチし何も束縛しない。
-0の場合にはNothingを、そうでなければ逆数を求めJust値として返す関数を示す。
+数などのリテラルもパターンだ。
+Nothingのように値自体にマッチし何も束縛しない。
+0の場合にはNothingをそうでなければ逆数を求める関数を示す。
 </p>
 
 <p><a
@@ -111,8 +98,8 @@ safeRecip x = Just (1 / x)</code>
 <p>
 safeRecipを適用すると引数と0とのマッチングが試される。
 マッチすればNothingを返す。
-マッチしなければ引数は0ではないということなので安全に1 / xができる。
-答えはJust値として返される。
+マッチしなければ引数は0ではないということだ。安全に1 / xができる。
+返り値はJust値となる。
 </p>
 
 <pre><code>% ghci safeRecip.hs
@@ -122,66 +109,64 @@ Just 0.125
 Nothing</code></pre>
 
 <p>
-文字列リテラルの例も見てみよう。
-以下は"Yoshikuni"だけには特別に丁寧に挨拶してくれる関数だ。
-各自、自分の名前に置き換えて楽しもう。
-ここでは(++)は文字列連結演算子と考えておこう。
+文字列リテラルもパターンだ。
+"Yoshikuni"だけには丁寧に挨拶させたい。
+自分の名前に置き換えて楽しもう。
+(++)は文字列連結演算子と考えておこう。
 </p>
 
 <p><a
 href="/computer/haskell/web_lecture/for_programmer/03_5_pattern_match/helloTo.hs"
 	>helloTo.hs</a></p>
 
-<code>helloTo "Yoshikuni" = "Good morning, sir."<br/>
-helloTo n = "Hello, " ++ n ++ "!"</code>
+<p><code>helloTo "Yoshikuni" = "Good morning, sir."<br/>
+helloTo n = "Hello, " ++ n ++ "!"</code></p>
 
-<p>試してみる。</p>
-
-<code>% ghci helloTo.hs<br/>
+<p><code>% ghci helloTo.hs<br/>
 *Main&gt; helloTo "Yoshikuni"<br/>
 "Good morning, sir."<br/>
 *Main&gt; helloTo "Ichiro"<br/>
-"Hello, Ichiro!"</code>
+"Hello, Ichiro!"</code></p>
 
 <p>
-最後は文字の例だ。
-引数の文字が数字だったらその数を返し、そうでなかったら-1を返す。
+文字リテラルもパターンだ。
+引数の文字が数字ならその数を、そうでなかったら-1を返す。
 </p>
 
 <p><a
 href="/computer/haskell/web_lecture/for_programmer/03_5_pattern_match/digit.hs"
 	>digit.hs</a></p>
 
-<pre><code>digit '0' = 0
-digit '1' = 1
-digit '2' = 2
-digit '3' = 3
-digit '4' = 4
-digit '5' = 5
-digit '6' = 6
-digit '7' = 7
-digit '8' = 8
-digit '9' = 9
-digit _ = -1</code></pre>
+<p><code>digit '0' = 0<br/>
+digit '1' = 1<br/>
+digit '2' = 2<br/>
+digit '3' = 3<br/>
+digit '4' = 4<br/>
+digit '5' = 5<br/>
+digit '6' = 6<br/>
+digit '7' = 7<br/>
+digit '8' = 8<br/>
+digit '9' = 9<br/>
+digit _ = -1</code></p>
 
 <h2>まとめ</h2>
 
 <ul>
-<li>パターンは値がマッチするかしないかをチェックする</li>
-<li>ワイルドカードは必ずマッチするパターンである</li>
-<li>変数は必ずマッチするパターンである
+<li>パターンは値のマッチを試す</li>
+<li>ワイルドカードは必ずマッチする</li>
+<li>変数は必ずマッチする
 	<ul>
-	<li>さらにマッチした値で自身を束縛する</li>
+	<li>マッチした値がその変数を束縛する</li>
 	</ul></li>
-<li>パターンマッチで構成的な値から中身の値を取り出せる</li>
-<li>関数定義を複数並べることで順にマッチを試すことができる</li>
+<li>パターンマッチで構成的な値からなかの値をとりだせる</li>
+<li>関数定義を並べると順にマッチを試していく</li>
 </ul>
 
 <h2>課題</h2>
 
 <ol>
-<li>引数がJust [名前]ならば"[名前] is my friend."を返しNothingなら"I'm alone."を返す関数friendを作成せよ</li>
-<li>引数が0ならばNothingをそうでないならばJust [引数]を返す関数notZeroを作成せよ</li>
+<li>Just [名前]ならば"[名前] is my friend."を、Nothingなら"I'm alone."を返す関数friendを作成せよ</li>
+<li>引数が0ならばNothingをそうでなければJust [引数]を返す関数notZeroを作成せよ</li>
 </ol>
 
 <p>
