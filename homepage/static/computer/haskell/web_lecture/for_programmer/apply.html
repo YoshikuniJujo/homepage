@@ -4,11 +4,7 @@
 
 <h3>動作</h3>
 
-<p>
-演算子($)は関数を値に適用する。
-f $ xとするとxにfを適用する。
-f xと同じだ。
-</p>
+<p>演算子($)は関数を値に適用する。f $ xとするとxにfを適用する。f xと同じだ。</p>
 
 <p><code>% ghci</br>
 Prelude&gt; recip 8</br>
@@ -42,8 +38,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/function_apply.svg"
 <h3>使い道</h3>
 
 <p>
-f $ xがf xと同じならf xと書けば良い。
-演算子($)は何のためにあるのだろう。
+f $ xがf xと同じならf xと書けば良い。演算子($)は何のためにあるのだろう。
 いくつかの答えがある。ひとつは「丸括弧の省略」だ。
 recip (1 + 3)のような表現をrecip $ 1 + 3に書き換えられる。
 複雑な表現ではこの書き換えでコードが読みやすくなる。
@@ -53,7 +48,7 @@ f $ ...と書くと...の部分が全体としてfの引数になることが保
 
 <h3>型</h3>
 
-<code>($) recip 8</code>
+<p><code>($) recip 8</code></p>
 
 <p>
 関数recipの型をDouble -&gt; Double、値8をDoubleと考える。
@@ -62,13 +57,11 @@ f $ ...と書くと...の部分が全体としてfの引数になることが保
 
 <p><code>($) :: (Double -&gt; Double) -&gt; Double -&gt; Double</code></p>
 
-<p>oddは「奇数である」ことを確認する関数だ。整数を取って真偽値を返す。</p>
+<p>oddは「奇数である」ことを確認する関数だ。整数をとって真偽値を返す。</p>
 
-<pre><code>($) odd 11</code></pre>
+<p><code>($) odd 11</code></p>
 
-<p>
-oddをInteger -&gt; Boolとし11をIntegerとする。
-</p>
+<p>oddをInteger -&gt; Boolとし11をIntegerとする。</p>
 
 <p><code>($) :: (Integer -&gt; Bool) -&gt; Integer -&gt; Bool</code></p>
 
@@ -83,9 +76,8 @@ oddをInteger -&gt; Boolとし11をIntegerとする。
 <h2>まとめ</h2>
 
 <p>
-関数適用演算子($)を学んだ。
-f $ xで値xに関数fを適用する。
-不要な演算子のように思えるが括弧の数を減らすのに使える。
+関数適用演算子($)を学んだ。f $ xで値xに関数fを適用する。
+不要な演算子のようだが丸括弧の数を減らすのに使える。
 </p>
 
 <h2>課題</h2>

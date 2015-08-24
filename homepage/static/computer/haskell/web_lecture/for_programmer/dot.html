@@ -7,7 +7,6 @@
 <p>
 演算子(.)は関数を合成する。
 f . gは引数にgを適用した結果にfを適用する関数だ。
-3足して2をかける関数は以下のようになる。
 </p>
 
 <p><code>(* 2) . (+ 3)</code></p>
@@ -15,6 +14,8 @@ f . gは引数にgを適用した結果にfを適用する関数だ。
 <p><code>% ghci<br/>
 Prelude&gt; ((* 2) . (+ 3)) 8<br/>
 22</code></p>
+
+<p>8に3を足して2をかけている。</p>
 
 <h3>定義</h3>
 
@@ -45,19 +46,17 @@ src="/computer/haskell/web_lecture/for_programmer/images/operator_dot.svg"
 
 <h3>使い道</h3>
 
-<p>RSA暗号の例のxxcryptは以下のような定義だ。</p>
+<p>RSA暗号の例の関数xxcryptを変形する。</p>
 
-<code>xxcrypt n ed mc = mc ^ ed `mod` n</code>
+<p><code>xxcrypt n ed mc = mc ^ ed `mod` n</code></p>
 
 <p>部分適用と関数合成で以下のように書き換えられる。</p>
 
-<code>xxcrypt n ed = (`mod` n) . (^ ed)</code>
+<p><code>xxcrypt n ed = (`mod` n) . (^ ed)</code></p>
 
-<p>「ed乗してnの剰余を取る」。</p>
+<p>「ed乗してnの剰余を取る」ということだ。</p>
 
 <h3>型</h3>
-
-<p>(.)の型はどうなるだろう。</p>
 
 <p><code>f . g</code></p>
 
@@ -83,14 +82,13 @@ f . g :: a -&gt; c</code></p>
 
 <p>
 関数合成演算子(.)を学んだ。
-これを使うことで「関数gを適用しそれに関数fを適用する」といった処理を
-より直接的に書くことができる。
+これを使うと「関数gを適用しそれに関数fを適用する」といった処理を直接的に書ける。
 </p>
 
 <h2>課題</h2>
 
 <ol>
-<li>小文字にしてから文字コードを求める関数を関数合成によって定義せよ
+<li>小文字にして文字コードを求める関数を関数合成によって定義せよ
 	<ul>
 	<li>Data.CharモジュールのtoLower, ordを使う</li>
 	</ul></li>
