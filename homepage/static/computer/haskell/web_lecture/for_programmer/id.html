@@ -18,12 +18,7 @@ alt="[関数idの図]"
 src="/computer/haskell/web_lecture/for_programmer/images/function_id.svg"
 />
 
-<p>
-関数idは引数と同じ値を返す。
-id 8は8である。
-値の型を問わずすべての値で「同じ値を返す」ことができる。
-つまり関数idはすべての型の値が引数となる。
-</p>
+<p>関数idは引数と同じ値を返す。すべての型の値で「同じ値を返す」ことはできる。</p>
 
 <h3>定義</h3>
 
@@ -32,9 +27,8 @@ id 8は8である。
 <h3>使い道</h3>
 
 <p>
-ここまでの説明で理解できる例で使い道を示す。
-第1引数で第2引数を除算した値を返す関数を作る。
-第1引数が0のときは第2引数をそのまま返すことにする。
+ひとつの使い道を示す。第1引数で第2引数を除算した値を返す関数を考える。
+第1引数が0のときは第2引数をそのまま返す。
 </p>
 
 <p><code>devide :: Double -&gt; Double -&gt; Double<br/>
@@ -42,10 +36,10 @@ devide 0 b = b<br/>
 devide a b = b / a</code></p>
 
 <p>
-2行目は演算子の部分適用で<code>devide a = (/ a)</code>とできる。
+2行目は演算子の部分適用で<code>devide a = (/ a)</code>となる。
 「devide aは引数をaで割る関数」だ。
-1行目はどうなるだろう。
-ここで関数idが使える。<code>devide 0 = id</code>だ。
+1行目の仮引数bは消せるだろうか。
+関数idが使える。<code>devide 0 = id</code>とする。
 「devide 0は引数をそのまま返す関数」だ。
 </p>
 
@@ -57,37 +51,32 @@ href="/computer/haskell/web_lecture/for_programmer/05_polymorphic/id.hs"
 devide 0 = id<br/>
 devide a = (/ a)</code></p>
 
-<p>仮引数を減らすことでより「直接的」な表現にできる。</p>
+<p>仮引数を減らすことでより直接的な表現になる。</p>
 
-<pre><code>% ghci id.hs
-*Main&gt; devide 6 9
-1.5
-*Main&gt; devide 0 8
-8.0</code></pre>
+<p><code>% ghci id.hs<br/>
+*Main&gt; devide 6 9<br/>
+1.5<br/>
+*Main&gt; devide 0 8<br/>
+8.0</code></p>
 
 <h3>型</h3>
 
-<p>
-関数idの型はどうなるだろう。
-Integer型の値8に対して適用された(id 8)とき関数idの型は以下のようになる。
-</p>
+<p>関数idをInteger型の値8に適用した(id 8)ときの型を示す。</p>
 
-<pre><code>id :: Integer -&gt; Integer</code></pre>
+<p><code>id :: Integer -&gt; Integer</code></p>
 
-<p>文字列"hello"に適用された(id "hello")ときは以下のようになる。</p>
+<p>文字列"hello"に適用した(id "hello")ときは以下のようになる。</p>
 
-<pre><code>id :: String -&gt; String</code></pre>
+<p><code>id :: String -&gt; String</code></p>
 
 <p>
-[型X] -&gt; [型X]のような形だ。
-引数と返り値の型が同じであれば良い。
-「型変数」を使う。
-型変数は小文字で始まる識別子でありしばしば小文字1文字で表される。
+[型X] -&gt; [型X]の形だ。引数と返り値の型が同じであれば良い。
+「型変数」で表現する。型変数は小文字で始まる識別子で多くは小文字1文字だ。
 </p>
 
-<code>id :: a -&gt; a</code>
+<p><code>id :: a -&gt; a</code></p>
 
-<p>型aの値を取って同じ型aの値を返す。確認してみる。</p>
+<p>型aの値を取って同じ型aの値を返す。</p>
 
 <p><code>% ghci<br/>
 Prelude&gt; :t id<br/>
@@ -96,10 +85,8 @@ id :: a -&gt; a</code></p>
 <h2>まとめ</h2>
 
 <p>
-関数idはもっとも単純な多相関数と言える。
-引数をそのまま返す関数だ。
-使い道がないように思えるが有用な関数だ。
-いろいろな用途に使える。
+関数idはもっとも単純な多相関数だ。引数をそのまま返す。
+使い道がなさそうだがけっこう使える。
 </p>
 
 <h2>課題</h2>
