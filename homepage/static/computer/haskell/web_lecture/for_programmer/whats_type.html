@@ -5,64 +5,54 @@ alt="[型の図]"
 src="/computer/haskell/web_lecture/for_programmer/images/type.svg"
 />
 
-<h2>型とは「何ができるか」である</h2>
+<h2>型とは「何ができるか」だ</h2>
 
-<p>値には型がある。型は以下の2つのことを示す。</p>
+<p>値には型がある。型は</p>
 
 <ul>
 <li>値にどの関数が適用できるか</li>
 <li>どの関数がその値を返すか</li>
 </ul>
 
-<p>型は値で何ができるかを示す。</p>
+<p>を示す。値で何ができるかということだ。</p>
 
 <h2>Char型の値は小文字にできる</h2>
 
-<p>
-文字を表す値はChar型である。
-Char型の値はtoLowerという関数で小文字にできる。
-</p>
+<p>文字を表す値はChar型だ。Char型の値は関数toLowerで小文字にできる。</p>
 
-<pre><code>% ghci
-Prelude&gt; :m Data.Char
-Prelude Data.Char&gt; :t 'L'
-'L' :: Char</code></pre>
+<p><code>% ghci<br/>
+Prelude&gt; :m Data.Char<br/>
+Prelude Data.Char&gt; :t 'L'<br/>
+'L' :: Char</code></p>
 
 <p>
 toLowerはData.Charモジュールが公開している。
-対話環境でのモジュールの読み込みは':m'コマンドだ。
-値の型を表示するには':t'コマンドを使う。
-':module', ':type'の略記だ。
-文字'L'を表す値の型はChar型だ。
+対話環境でのモジュールの読み込みは:moduleまたは:mだ。
+値の型は:typeまたは:tコマンドで表示する。
 </p>
 
-<pre><code>Prelude Data.Char&gt; toLower 'L'
-'l'</code></pre>
+<p><code>Prelude Data.Char&gt; toLower 'L'<br/>
+'l'</code></p>
 
-<p>
-Char型の値はtoLower関数で小文字にできる。
-正確にはtoLower関数で小文字の値と関連づけられるということ。
-値'L'自体は変化しない。
-</p>
+<p>Char型の値は関数toLowerで小文字になる。</p>
 
 <h2>Bool型の値は小文字にできない</h2>
 
 <p>
-FalseやTrueという値の型はBool型でありChar型ではない。
-小文字にすることはできない。
+FalseやTrueという値の型はBool型だ。Char型ではない。小文字にはできない。
 </p>
 
-<code>Prelude Data.Char&gt; :t False<br/>
+<p><code>Prelude Data.Char&gt; :t False<br/>
 False :: Bool<br/>
-Prelude Data.Char&gt; toLower False<br/>
-<br/>
-&lt;interactive&gt;:X:Y:<br/>
-    Couldn't match expected type `Char' with actual type `Bool'<br/>
-    In the first argument of `toLower', namely `False'<br/>
-    In the expression: toLower False<br/>
-    In an equation for `it': it = toLower False</code>
+Prelude Data.Char&gt; toLower False</code></p>
 
-<p>「型が一致してないよ」と怒られる。</p>
+<p><code>&lt;interactive&gt;:X:Y:<br/>
+<span style="margin-left: 2em">Couldn't match expected type `Char' with actual type `Bool'</span><br/>
+<span style="margin-left: 2em">In the first argument of `toLower', namely `False'</span><br/>
+<span style="margin-left: 2em">In the expression: toLower False</span><br/>
+<span style="margin-left: 2em">In an equation for `it': it = toLower False</span></code></p>
+
+<p>怒られた。「型が一致してないよ」だって。</p>
 
 <h2>課題</h2>
 

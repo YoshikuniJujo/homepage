@@ -7,14 +7,14 @@
 「<a
 href="https://ja.wikipedia.org/wiki/第一級オブジェクト"
 >第一級オブジェクト</a>」だ。
-関数にも「型」がある。
+だから「型」がある。
 </p>
 
 <h2>関数の型とは</h2>
 
 <p>
 関数の型は引数の型と返り値の型から成る。
-'-&gt;'で引数の型と返り値の型をつなぐ。
+-&gt;で引数の型と返り値の型をつなぐ。
 </p>
 
 <img
@@ -22,7 +22,7 @@ alt="[単純な関数の図]"
 src="/computer/haskell/web_lecture/for_programmer/images/simple_function.svg"
 />
 
-<pre><code>[引数の型] -&gt; [返り値の型]</code></pre>
+<p><code>[引数の型] -&gt; [返り値の型]</code></p>
 
 <p>
 Haskellには1引数関数しかない。
@@ -34,26 +34,24 @@ alt="[2引数関数の図]"
 src="/computer/haskell/web_lecture/for_programmer/images/two_arg_fun.svg"
 />
 
-<pre><code>[引数1の型] -&gt; ([引数2の型] -&gt; [返り値の型])</code></pre>
+<p><code>[引数1の型] -&gt; ([引数2の型] -&gt; [返り値の型])</code></p>
 
-<p>'-&gt;'は右結合なので丸括弧は省略できる。</p>
+<p>-&gt;は右結合なので丸括弧を省略する。</p>
 
-<pre><code>[引数1の型] -&gt; [引数2の型] -&gt; [返り値の型]</code></pre>
+<p><code>[引数1の型] -&gt; [引数2の型] -&gt; [返り値の型]</code></p>
 
-<p>丸括弧を省略すると2引数関数のようになる。</p>
+<p>丸括弧を省略すると2引数関数のようだ。</p>
 
 <h2>例</h2>
 
 <h3>関数toLower</h3>
 
 <p>
-関数toLowerは引数として文字を取り小文字の値を返す。
-引数、返り値ともにChar型である。
+関数toLowerは引数として文字をとり小文字の値を返す。
+引数、返り値ともにChar型だ。
 </p>
 
-<pre><code>toLower :: Char -&gt; Char</code></pre>
-
-<p>確認してみよう。</p>
+<p><code>toLower :: Char -&gt; Char</code></p>
 
 <p><code>% ghci<br/>
 Prelude&gt; :m Data.Char<br/>
@@ -63,23 +61,23 @@ toLower :: Char -&gt; Char</code></p>
 <h3>関数xxcrypt</h3>
 
 <p>
-関数xxcryptは整数値を3つ取って整数値を返す。
-整数型としてここではIntegerを考えよう。
+関数xxcryptは整数値を3つとり整数値を返す。
+整数型には型Integerがある。
 </p>
 
-<pre><code>Integer -&gt; (Integer -&gt; (Integer -&gt; Integer))</code></pre>
+<p><code>Integer -&gt; (Integer -&gt; (Integer -&gt; Integer))</code></p>
 
 <p>
 整数をとって「整数をとって「整数をとって整数を返す関数」を返す関数」を返す関数だ。
-'-&gt;'は右結合なので丸括弧を省略すると3引数関数のようになる。
+-&gt;は右結合なので丸括弧を省略すると3引数関数のようだ。
 </p>
 
-<pre><code>Integer -&gt; Integer -&gt; Integer -&gt; Integer</code></pre>
+<p><code>Integer -&gt; Integer -&gt; Integer -&gt; Integer</code></p>
 
 <h2>課題</h2>
 
 <ol>
-<li>以下の関数の型を対話環境で確認せよ(:m Data.Charが必要)
+<li>以下の関数の型を対話環境で確認せよ(:m Data.Charをしておく)
 	<ul>
 	<li>toUpper, isDigit</li>
 	</ul></li>
