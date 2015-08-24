@@ -2,24 +2,21 @@
 
 <h2>自己紹介</h2>
 
-<p>
-名前と年齢をまとめたタプルを引数にして自己紹介の文字列を返す関数を考える。
-関数showは値を表示用の文字列に変換する関数だ。
-</p>
+<p>名前と年齢をまとめたタプルを引数にして自己紹介の文字列を返す関数を考える。</p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/08_curry/introduction.hs"
 	>introduction.hs</a></p>
 
-<pre><code>introduction :: (String, Integer) -&gt; String
-introduction (n, a) =
-	"My name is " ++ n ++
-	". I'm " ++ show a ++ " years old."</code></pre>
+<p><code>introduction :: (String, Integer) -&gt; String<br/>
+introduction (n, a) =<br/>
+	<span class="indent1">"My name is " ++ n ++</span><br/>
+	<span class="indent1">". I'm " ++ show a ++ " years old."</span></code></p>
+
+<p>関数showは値を表示用の文字列に変換する。</p>
 
 <p><code>% ghci introduction.hs<br/>
 *Main&gt; introduction ("Yoshikuni Jujo", 34)<br/>
-"My name is Yoshikuni Jujo. I'm 34 years old."<!--
-*Main&gt; introduction ("Jun Natsukawa", 34)
-"My name is Jun Natsukawa. I'm 34 years old."--></code></p>
+"My name is Yoshikuni Jujo. I'm 34 years old."</code></p>
 
 <h2>年齢は変わる</h2>
 
@@ -34,10 +31,8 @@ introduction (n, a) =
 "My name is Yoshikuni Jujo. I'm 34 years old."</code></p>
 
 <p>
-サバ読むときやバレたときのことを考えて
-"Yoshikuni Jujo"専用の自己紹介関数を作る。
-名前だけに部分適用したいが、
-名前と年齢はタプルにまとまっていて部分適用できない。
+サバ読むときやバレたときのことを考えて"Yoshikuni Jujo"専用の自己紹介関数を作る。
+名前だけに部分適用したいが名前と年齢はタプルにまとまっていて部分適用できない。
 </p>
 
 <h2>そこでカリー化ですよ</h2>
@@ -45,20 +40,15 @@ introduction (n, a) =
 <h3>Haskellにおけるカリー化とは</h3>
 
 <p>
-「カリー化」によって「複数の引数を取る関数」は「関数を返す関数」に変換され
-部分適用できるようになる。
-Haskellでは「複数の引数を取る関数(のようなもの)」は
-そもそも「関数を返す関数」である。
-「複数の引数を取る関数(のようなもの)」ははじめからカリー化されている。
-他の言語での「複数の引数を取る関数」は
-Haskellの「タプルを引数に取る関数」に相当する。
-よって、Haskellでのカリー化は「タプルを引数に取る関数」を
-「複数の引数を取る関数(のようなもの)」に変換することとなる。
+カリー化で複数の引数をとる関数は関数を返す関数になる。
+これで部分適用が可能になる。
+Haskellでは複数の引数を取る関数(のようなもの)ははじめから関数を返す関数だ。
+他の言語での「複数の引数をとる関数」は「タプルを引数にとる関数」に相当する。
+よって、Haskellでのカリー化を「タプルを引数に取る関数を
+複数の引数を取る関数(のようなもの)に変換すること」と定義する。
 </p>
 
-<h3>カリー化を試す</h3>
-
-<p>カリー化を対話環境で試してみよう。</p>
+<h3>試してみる</h3>
 
 <p><code>*Main&gt; :t introduction<br/>
 (String, Integer) -&gt; String<br/>
@@ -75,8 +65,6 @@ String -&gt; Integer -&gt; String<br/>
 <p><code>introductionYj :: Integer -&gt; String<br/>
 introductionYj = curry introduction "Yoshikuni Jujo"</code></p>
 
-<p>試してみよう。</p>
-
 <p><code>*Main&gt; :reload<br/>
 *Main&gt; introductionYj 34<br/>
 "My name is Yoshikuni Jujo. I'm 34 yeras old."<br/>
@@ -85,9 +73,7 @@ introductionYj = curry introduction "Yoshikuni Jujo"</code></p>
 
 <h2>関数curryの型と定義</h2>
 
-<p>
-関数curryは「引数としてタプルを期待する関数」の引数をばらばらにする。
-</p>
+<p>関数curryは「引数としてタプルを期待する関数」の引数をばらばらにする。</p>
 
 <h3>型</h3>
 
@@ -98,7 +84,7 @@ introductionYj = curry introduction "Yoshikuni Jujo"</code></p>
 
 <p><code>((String, Integer) -&gt; String) -&gt; (String -&gt; Integer -&gt; String)</code></p>
 
-<p>一般化すると以下のようになる。</p>
+<p>一般化する。</p>
 
 <p><code>((a, b) -&gt; c) -&gt; (a -&gt; b -&gt; c)</code></p>
 
@@ -112,7 +98,7 @@ introductionYj = curry introduction "Yoshikuni Jujo"</code></p>
 
 <p>
 このように右側の丸括弧を省略することで以下のように読める。
-「タプルを取る関数」とそのタプルの第1要素と第2要素を引数として取り
+「タプルを取る関数」とそのタプルの第1要素と第2要素を引数としてとり
 「第1引数の関数の返り値の型」の値を返す。
 </p>
 
@@ -127,25 +113,21 @@ src="/computer/haskell/web_lecture/for_programmer/images/curry.svg"
 />
 
 <p>
-関数curryの第2引数xと第3引数yというばらばらの引数を
-タプルにまとめて関数fに与えている。
+関数curryの第2引数xと第3引数yというばらばらの引数をタプルにまとめて関数fに与える。
 </p>
 
 <h2>課題</h2>
 
-<p>
-</p>
-
 <ol>
-<li>年齢と公開可能かどうかのブール値のタプルを取り適切に文字列化する関数を作成せよ
+<li>年齢と公開可能かどうかのブール値のタプルをとり適切に文字列化する関数を作成せよ
 	<ul>
 	<li>ブール値がTrueなら年齢を文字列化しFalseなら"secret"とする</li>
 	</ul></li>
 <li>上記関数を年齢(例えば39)だけに部分適用せよ
 	<ul>
-	<li>引数としてブール値を取り指定した年齢(39)または"secret"を表示する関数となる</li>
+	<li>ブール値をとり指定した年齢(39)または"secret"を表示する関数となる</li>
 	</ul></li>
-<li>3要素タプルを取り、含まれる3整数が三角形の3辺になることを確認する関数triangleを作成せよ
+<li>3整数タプルの要素が三角形の3辺になることを確認する関数triangleを作成せよ
 	<ul>
 	<li>全ての数が1以上であり</li>
 	<li>どの数も他の2数の和よりも小さければ良い</li>
@@ -154,10 +136,10 @@ src="/computer/haskell/web_lecture/for_programmer/images/curry.svg"
 	<li>(&amp;&amp;)は「かつ」という意味だ</li>
 	<li>triangle (3, 5, 7)はTrueとなりtriangle (5, 7, 12)はFalseとなる</li>
 	</ul></li>
-<li>3要素タプルを引数として取る関数を3引数関数に変換するcurry3を定義せよ
+<li>3要素タプルを引数としてとる関数を3引数関数に変換するcurry3を定義せよ
 	<ul>
 	<li>上記のtriangleで試してみる</li>
-	<li>curry3 triangle 3 5 7のようにしてみよう</li>
+	<li>curry3 triangle 3 5 7のようにする</li>
 	</ul></li>
 </ol>
 
