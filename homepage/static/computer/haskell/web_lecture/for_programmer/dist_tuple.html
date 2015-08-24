@@ -8,8 +8,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/distance_from_origin.sv
 />
 
 <p>
-点(x, y)から原点までの距離を求めたい。
-原点からの距離はxの2乗とyの2乗を足したものの平方根だ。
+点(x, y)から原点までの距離を求める。xの2乗とyの2乗の和の平方根だ。
 </p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/06_dist_tuple/distXY.hs"
@@ -18,7 +17,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/distance_from_origin.sv
 <pre><code>dist0 :: Double -&gt; Double -&gt; Double
 dist0 = sqrt $ x ^ 2 + y ^ 2</code></pre>
 
-<p>sqrtはsquare root、つまり平方根である。</p>
+<p>sqrtはsquare root、つまり平方根だ。</p>
 
 <pre><code>% ghci distXY.hs
 *Main&gt; dist0 7 9
@@ -46,6 +45,8 @@ py = 5</code></p>
 <p><code>p :: (Double, Double)<br/>
 p = (9, 5)</code></p>
 
+<h2>タプルの記法</h2>
+
 <p>x1 :: T1, x2 :: T2, x3 :: T3, ...を含むタプルtの定義を示す。</p>
 
 <p><code>t :: (T1, T2, T3, ...)<br/>
@@ -54,7 +55,7 @@ t = (x1, x2, x3, ...)</code></p>
 <h2>タプルに対するパターンマッチ</h2>
 
 <p>
-パターンマッチでタプルから要素を取り出せる。
+パターンマッチでタプルから要素を取り出す。
 パターン(x, y)に(9, 5)をマッチさせるとx, yはそれぞれ9, 5に束縛される。
 </p>
 

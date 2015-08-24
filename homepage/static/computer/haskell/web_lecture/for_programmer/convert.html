@@ -3,8 +3,8 @@
 <h2>はじめに</h2>
 
 <p>
-型変換を関数側で行うという例を示す。
-「タプルを扱う関数」と「2引数関数」との相互変換について学ぶ前の準備として、
+型変換を関数側で行うという例だ。
+「タプルを扱う関数」と「2引数関数」との相互変換について学ぶ前の準備だ。
 引数を変換するかわりに関数のほうを変換するという例を学ぶ。
 </p>
 
@@ -36,38 +36,31 @@ seven = 7</code></p>
     <span class="indent1">In an equation for `it' : it = half seven</span></code></p>
 
 <p>
-「halfの第1引数であるsevenで
-期待していたDoubleと実際のIntegerのあいだで型の不一致が起きた」。
-型を合わせなければならない。
-整数から実数に型を変換するのに関数fromIntegralが使える。
+「halfの第1引数のsevenに期待されるDoubleと実際のIntegerとのあいだで
+型の不一致が起きた」。
+関数fromIntegralで整数から実数への型変換ができる。
 </p>
 
-<pre><code>*Main&gt; half $ fromIntegral seven
-3.5</code></pre>
+<p><code>*Main&gt; half $ fromIntegral seven<br/>
+3.5</code></p>
 
-<p>
-IntegerからDoubleへの型変換ができた。
-実際にはfromIntegralは整数を取り実数を返す単なる関数だ。
-</p>
+<p>IntegerからDoubleへの型変換ができた。</p>
 
 <h2>関数を変換する関数</h2>
 
 <p>
-関数のほうを変換すれば値の型変換は必要ない。
+関数のほうを変換することを考える。。
 関数の型をDouble -&gt; DoubleからInt -&gt; Doubleに変換する。
-変換関数の型は以下のようになる。
+変換関数の型を示す。
 </p>
 
 <p><code>(Double -&gt; Double) -&gt; (Integer -&gt; Double)</code></p>
 
-<p>'-&gt;'は右結合なので右側の丸括弧は省略できる。</p>
+<p>-&gt;は右結合なので右側の丸括弧は省略できる。</p>
 
 <p><code>(Double -&gt; Double) -&gt; Integer -&gt; Double</code></p>
 
-<p>
-第2引数のIntegerをDoubleに変換して第1引数である関数に与える関数となるはずだ。
-以下をconvert.hsに追加しよう。
-</p>
+<p>第2引数のIntegerをDoubleに変換して第1引数である関数に与える関数となる。</p>
 
 <p><code>convert :: (Double -&gt; Double) -&gt; Integer -&gt; Double<br/>
 convert f n = f $ fromIntegral n</code></p>
@@ -87,19 +80,19 @@ f $ fromIntegral nはnにfromIntegralを適用した結果にfを適用する。
 
 <p>
 convert fをnに適用したものが(f . fromIntegral)をnに適用したものだ。
-つまりconvert fはf . fromIntegralと同じだ。
+つまりconvert fはf . fromIntegralだ。
 </p>
 
 <p><code>convert f = f . fromIntegral</code></p>
 
-<p>演算子の部分適用で仮引数fも省略できる。</p>
+<p>演算子の部分適用で仮引数fも消せる。</p>
 
 <pre><code>convert = (. fromIntegral)</code></pre>
 
 <p>
-こう見てくるとconvert halfがhalf . fromIntegralであることがわかる。
+convert halfがhalf . fromIntegralであることがわかる。
 関数halfの引数のDoubleからIntegerへの変換には
-値を逆にIntegerからDoubleに変換する関数が使える。
+値を逆にIntegerからDoubleに変換する関数を使う。
 </p>
 
 <p><code>half :: Double -&gt; Double<br/>
@@ -128,18 +121,19 @@ src="/computer/haskell/web_lecture/for_programmer/images/conversion_adapter2.svg
 
 <p>
 値を変換するかわりに関数を変換するという考えかたに注目する。
-次に学ぶ関数curryや関数uncurryは「タプルにしたりばらばらにしたりする」変換を
+同じように関数curryや関数uncurryは「タプルにしたりばらばらにしたりする」変換を
 値ではなく関数に対して行う。
 </p>
 
 <h2>課題</h2>
 
 <ol>
-<li>文字'c'を文字コードに変換してそれが偶数であるかどうかをチェックせよ
+<li>対話環境で文字'c'を文字コードに変換したものが偶数かどうかをチェックせよ
 	<ul>
-	<li>文字コードへの変換にはordを偶数であることの確認にはevenを使う</li>
+	<li>文字コードへの変換には関数ordを使う</li>
+	<li>偶数であることの確認には関数evenを使う</li>
 	</ul></li>
-<li>上記の変換を関数側に行うようにせよ</li>
+<li>文字コードへの変換を関数even側でするようにせよ</li>
 </ol>
 
 <p>
