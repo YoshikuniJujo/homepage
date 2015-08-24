@@ -3,47 +3,33 @@
 <h2>はじめに</h2>
 
 <p>
-標準ライブラリには様々な有用な関数がある。
-それらを使いこなすことが効率的な開発のコツだ。
+標準ライブラリから公開される有用な関数を使いこなすことが効率的な開発のコツだ。
 </p>
 
 <h2>Preludeモジュール</h2>
-
-<p>
-対話環境を立ち上げる。
-</p>
 
 <p><code>% ghci<br/>
 Prelude&gt;</code></p>
 
 <p>
-プロンプトに'Prelude'とある。
-何だろうか。
-何も指定しなくてもPreludeというモジュールが暗黙のうちに読み込まれる。
-'Prelude'とあるのは、
-Preludeというモジュールが読み込まれ
-公開している関数やその他の値が使用可能であるということだ。
+何も指定しなくてもPreludeというモジュールが暗黙に読み込まれる。
+プロンプトにPreludeとあるのは、
+Preludeモジュールが読み込まれ公開されている関数や値が使えるということだ。
 <p>
 
-<p>Preludeを読み込まないようにするオプションがある。</p>
+<p>Preludeを読み込まないためにはこうする。</p>
 
 <p><code>% ghci -XNoImplicitPrelude<br/>
 &gt;</code></p>
 
-<p>
-プロンプトの'Prelude'の文字が消えた。
-基本的な関数が未定義となる。
-</p>
+<p>プロンプトからPreludeが消えた。基本的な関数が未定義となる。</p>
 
 <p><code>&gt; 3<br/>
 3<br/>
 &gt; 3 + 8<br/>
 &lt;interactive&gt;:X:Y: Not in scope `+'</code></p>
 
-<p>
-演算子(+)はPreludeモジュールから公開されている。
-Preludeモジュールを読み込まないと使えない。
-</p>
+<p>演算子(+)はPreludeモジュールから公開されているのでここでは使えない。</p>
 
 <h2>Mainモジュール</h2>
 
@@ -53,28 +39,20 @@ Preludeモジュールを読み込まないと使えない。
 *Main&gt;</p>
 
 <p>
-プロンプトに'*Main'とある。
-ファイルに書かれたHaskellのコードはMainモジュールとなる。
-前についている'*'は何だろう。
-'*'はそのモジュールの「なか」にいるということだ。
-Mainモジュール内の公開されていない関数や値が使える。
+プロンプトに*Mainとある。ファイルに書かれたHaskellのコードはMainモジュールとなる。
+'*'はモジュールの「なか」ということだ。公開されていない関数や値も使える。
 </p>
 
 <h2>対話環境でのモジュールの読み込み</h2>
 
-<p>
-対話環境でのモジュールの読み込みは':m'または':module'だ。
-</p>
+<p>対話環境でのモジュールの読み込みは:mまたは:moduleだ。</p>
 
 <p><code>% ghci<br/>
 Prelude&gt; :m Data.Char<br/>
 Prelude Data.Char&gt; toLower 'L'<br/>
 'l'</code></p>
 
-<p>
-Data.Charモジュールから公開されているtoLower関数を使った。
-Data.MaybeモジュールのfromMaybe関数を使ってみよう。
-</p>
+<p>Data.MaybeモジュールのfromMaybe関数を使ってみよう。</p>
 
 <p><code>Prelude Data.Char&gt; :m Data.Maybe<br/>
 Prelude Data.Maybe&gt; fromMaybe 0 (Just 8)<br/>
@@ -88,7 +66,7 @@ Prelude Data.Maybe&gt; toLower 'L'<br/>
 
 <p>
 Data.Maybeモジュールを読み込んだらData.Charモジュールが消えた。
-「追加で」モジュールを読み込みたいときは':m +'または':module +'だ。
+「追加で」モジュールを読み込むには:m +または:module +だ。
 </p>
 
 <p><code>% ghci<br/>
@@ -99,18 +77,15 @@ Prelude Data.Char Data.Maybe&gt; toLower 'L'<br/>
 Prelude Data.Char Data.Maybe&gt; fromMaybe 0 (Just 8)<br/>
 8</code></p>
 
-<p>これで関数toLowerと関数fromMaybeの両方とも使える。</p>
-
 <h2>ソースファイルにおける読み込み</h2>
 
-<p>ソースファイルでモジュールを読み込むのはimport文だ。</p>
+<p>コード中でモジュールを読み込むのはimport文だ。</p>
 
 <p><code>import Data.Char</code></p>
 
 <p>
-Data.Charモジュールが公開している値をすべて使える。
-個人的な使い捨てのコードならこれで良い。
-しかし、この形での読み込みでは値がどのモジュール由来なのかわからない。
+使い捨てのコードならこれで良い。
+しかし、これでは名前がどのモジュール由来なのかわからない。
 コードを読みやすくするために以下の2つのどちらか、または両方の形にする。
 </p>
 
@@ -130,9 +105,8 @@ Ch.toLowerやCh.toUpperとする。
 <h2>まとめ</h2>
 
 <p>
-モジュールの読み込みの基本を学んだ。
-実験的だったり練習用のコード以外では
-読み込みリストまたは修飾名を指定するように心がける。
+モジュールの読み込みを学んだ。
+使い捨てのコード以外では読み込みリストまたは修飾名を指定する。
 </p>
 
 <p>
