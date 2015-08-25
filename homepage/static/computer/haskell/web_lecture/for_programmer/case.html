@@ -2,7 +2,7 @@
 
 <h2>はじめに</h2>
 
-<p>case式を使うことでより柔軟な形でのパターンマッチが可能となる。</p>
+<p>case式を使うとより柔軟な形でのパターンマッチが可能となる。</p>
 
 <h2>仮引数部でのパターンマッチ</h2>
 
@@ -16,9 +16,7 @@ case式はより広い範囲をカバーする。
 <h2>safeRecip</h2>
 
 <p>
-仮引数部でのパターンマッチは略記法だ。
-脱糖しcase式で表現するとどうなるだろう。
-safeRecipの例を見てみよう。
+仮引数部でのパターンマッチは略記法だ。脱糖し関数リテラルとcase式で表現する。
 </p>
 
 <p><code>safeRecip 0 = Nothing<br/>
@@ -30,7 +28,7 @@ safeRecip x = Just $ 1 / x</code></p>
 	<span style="padding-left: 2em">0 -&gt; Nothing<br/>
 	<span style="padding-left: 2em">_ -&gt; Just $ 1 / x</span></code></p>
 
-<p>上の表現は下の表現の構文糖による書き換えと考えられる。</p>
+<p>うえの表現はしたの表現の構文糖による書き換えと考えられる。</p>
 
 <h2>case式の構文</h2>
 
@@ -47,17 +45,15 @@ safeRecip x = Just $ 1 / x</code></p>
 <h2>レイアウトルール再び</h2>
 
 <p>
-Haskellではレイアウトルールによって明示的な{}や;を省略できる。
-兄弟要素の列挙はインデントをそろえることで表現する。
+Haskellではレイアウトルールにより明示的な{}や;を省略できる。
+兄弟要素の列挙はインデントをそろえる。
 [パターン1], [パターン2], ...は並列の要素なのでインデントをそろえる。
 並列の要素内で複数行に分けるときはインデントを深くする。
 </p>
 
 <h2>case式でないと書きにくい例</h2>
 
-<p>
-小文字に直したときに'y'か'n'かそれ以外かをチェックする関数を考える。
-</p>
+<p>小文字に直したときに'y'か'n'かそれ以外かをチェックする関数を考える。</p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/15_5_case/checkAnswer.hs"
 	>checkAnswer.hs</a></p>
@@ -78,7 +74,7 @@ checkAnswer c = case toLower c of<br/>
 <p>
 ガードは真偽値へのパターンマッチに対する構文糖だ。
 ガードは関数にだけでなくcase式にもつけられる。
-差の逆数を求める例だ。
+関数diffRecipは差の逆数を求める例だ。
 </p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/15_5_case/diffRecip.hs"
@@ -106,7 +102,6 @@ diffRecip x y = case x - y of<br/>
 <p>
 関数の仮引数部分でのパターンマッチは構文糖だ。
 case式はより広い範囲に適用できる。
-case式の構文は以下のようになる。
 </p>
 
 <p><code>case [式0] of<br/>
