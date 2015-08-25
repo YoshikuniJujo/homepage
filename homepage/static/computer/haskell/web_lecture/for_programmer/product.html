@@ -5,12 +5,9 @@
 <p>
 リストに含まれる値すべてをかけ算する関数を作成する。
 総和を求めるのと考えかたは同じだ。
-重要なところなので同じことをもう一度やってみよう。
 </p>
 
 <h2>関数product</h2>
-
-<p>関数productはリストの要素すべてをかけあわせる。</p>
 
 <p><code>% ghci<br/>
 Prelude&gt; product [3, 18, 9]<br/>
@@ -18,7 +15,7 @@ Prelude&gt; product [3, 18, 9]<br/>
 
 <h2>関数myProduct</h2>
 
-<p>Integer型の値のリストに対してproductと同じ動作をする関数を作る。</p>
+<p>関数myProductはInteger型の値のリストの要素すべての積を計算する。</p>
 
 <h3>型</h3>
 
@@ -43,7 +40,7 @@ myProduct (x : xs)はmyProduct xsのx倍となる。
 myProduct [3, 14, 9]はmyProduct [14, 9]の3倍であり、
 myProduct [14, 9]はmyProduct [9]の14倍である。
 同様にmyProduct [9]がmyProduct []の9倍となれば良い。
-つまりmyProduct []の値は1。
+myProduct []の値を1とする。
 </p>
 
 <p><code>myProduct [] = 1</code></p>
@@ -59,20 +56,15 @@ myProduct (x : xs) = x * myProduct xs</code></p>
 
 <h2>関数mySumとの比較</h2>
 
-<p>関数mySumの定義を示す。</p>
-
 <p><code>mySum :: [Integer] -&gt; Integer<br/>
 mySum [] = 0<br/>
 mySum (x : xs) = x + mySum xs</code></p>
 
 <p>
-mySumとmyProductを比較する。
-空リストのときの値がmySumでは0であるのに対してmyProductでは1だ。
-再帰部では先頭の要素と再帰的な関数適用とをつなぐ演算子が、
+空リストのときの値がmySumでは0でありmyProductでは1だ。
+先頭の要素と再帰的な部分とをつなぐ演算子が
 mySumでは(+)でありmyProductでは(*)だ。
-それ以外の全体としての枠組みは同じだ。
-Haskellではメタ的な関数によってこのような枠組みを抽象化できる。
-そのような抽象化について次に学ぶ。
+全体としての枠組みは同じだ。
 </p>
 
 <h2>まとめ</h2>
@@ -81,7 +73,7 @@ Haskellではメタ的な関数によってこのような枠組みを抽象化�
 
 <ul>
 <li>空リストに対する値を定義</li>
-<li>先頭の要素と「残りの要素のリストに関数を適用したもの」を作って値を定義</li>
+<li>先頭の要素と「残りの要素のリストに関数を適用したもの」を使って値を定義</li>
 </ul>
 
 <h2>課題</h2>
@@ -97,6 +89,14 @@ Haskellではメタ的な関数によってこのような枠組みを抽象化�
 	<li>型変数を使う</li>
 	</ul></li>
 </ol>
+
+<h2>自分用のメモ</h2>
+
+<p>
+関数lengthは課題にしないほうがいいかもしれない。
+foldrの型を決めるときの例としてこれ以上の例がないので。
+何か別の課題を考える必要がある。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/sum.html"
