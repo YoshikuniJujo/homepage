@@ -6,33 +6,37 @@ href="/computer/haskell/web_lecture/for_programmer/13_montecarlo/montecarlo.hs"
 
 <h2>正方形内のランダムな点</h2>
 
-<p>正方形内のランダムな点を生成する式。</p>
+<p>正方形内のランダムな点を生成する式をもう一度示す。</p>
 
-<code>uncurry zip . (randomRs (-1, 1) *** randomRs (-1, 1))
-	. split $ mkStdGen 8</code>
+<p><code>uncurry zip . (randomRs (-1, 1) *** randomRs (-1, 1))
+	. split $ mkStdGen 8</code></p>
 
 <p>
 乱数の種を決めるための整数を引数とし
 いろいろな系列のランダムな点の列を返す関数とする。
 </p>
 
-<code>points :: Int -&gt; [(Double, Double)]<br/>
+<p><code>points :: Int -&gt; [(Double, Double)]<br/>
 points = uncurry zip . (randomRs (-1, 1) *** randomRs (-1, 1))
-	. split . mkStdGen</code>
+	. split . mkStdGen</code></p>
 
 <h2>円内の点であることのチェック</h2>
 
-<p>円内の点ということは原点からの距離が1以下ということ。</p>
+<p>原点を中心とする半径1の円のなかとは原点からの距離が1以下ということだ。</p>
 
-<code>inCircle :: (Double, Double) -&gt; Bool<br/>
-inCircle (x, y) = x ^ 2 + y ^ 2 &lt;= 1</code>
+<p><code>inCircle :: (Double, Double) -&gt; Bool<br/>
+inCircle (x, y) = x ^ 2 + y ^ 2 &lt;= 1</code></p>
+
+<p>
+距離を求めるには平方根とする必要がある。ここでは距離の2乗が1以下と考えている。
+</p>
 
 <h2>円内の点のみを取り出す</h2>
 
 <p>全体の点の数を指定して円内の点のみを取り出す関数を作成する。</p>
 
-<code>inCirclePoints :: Int -&gt; Int -&gt; [(Double, Double)]<br/>
-inCirclePoints g n = filter inCircle . take n $ points g</code>
+<p><code>inCirclePoints :: Int -&gt; Int -&gt; [(Double, Double)]<br/>
+inCirclePoints g n = filter inCircle . take n $ points g</code></p>
 
 <h2>円周率の推測値を出す</h2>
 
@@ -64,8 +68,8 @@ guessPi g n = 4 * fromIntegral (length $ inCirclePoints g n) / fromIntegral n</c
 <h2>グラフ</h2>
 
 <p>
-横軸に点の数、縦軸に円周率の推測値を取ったグラフ。
-収束が遅いので横軸は対数。
+横軸に点の数、縦軸に円周率の推測値を取ったグラフを示す。
+収束が遅いので横軸は対数とした。
 gの値により異なる系列のランダム列を使っている。
 </p>
 
@@ -84,10 +88,10 @@ src="/computer/haskell/web_lecture/for_programmer/images/monteGraphLog.svg"/>
 
 <p>
 モンテカルロ法で円周率を求める例題を見た。
-ランダムな点を列挙した無限リストを作成。
+ランダムな点を列挙した無限リストを作成する。
 円内にあるものを数え全体の点の数で割った値から円周率の近似値を求める。
 関数型言語の魂である「再帰関数」についてまだ学んでいないが
-「リストを使うだけでここまでできる」。
+リストを使うだけでここまでできる。
 </p>
 
 <p>

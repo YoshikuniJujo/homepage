@@ -17,13 +17,11 @@ Haskell Platformに含まれるrandomパッケージとして使える。
 
 <h2>ライブラリの確認</h2>
 
-<p>
-システムにSystem.Randomライブラリがあることの確認。
-</p>
+<p>システムにSystem.Randomライブラリがあることを確認する。</p>
 
-<code>% ghci<br/>
+<p><code>% ghci<br/>
 Prelude&gt; :m System.Random<br/>
-Prelude System.Random&gt;</code>
+Prelude System.Random&gt;</code></p>
 
 <p>
 エラーメッセージが表示されずプロンプトにSystem.Randomが追加されれば
@@ -49,7 +47,7 @@ System.Randomライブラリにはrandoms関数がある。
 
 <p>
 StdGen型の値を与えるとDouble型の値のリストを返す。
-無限リストであり永遠に続くランダム列となる。
+ランダムな値から成る無限リストを生成する。
 </p>
 
 <h2>StdGen型</h2>
@@ -73,19 +71,18 @@ Prelude System.Random&gt; :t it<br/>
 it :: StdGen</code>
 
 <p>
-mkStdGen 8によって'9 1'というStdGen型の値が得られる。
+mkStdGen 8によって9 1というStdGen型の値が得られる。
 この値で疑似乱数列を作成する。
-takeを使っていくつかだけを表示する。
+takeで先頭のいくつかをとりだす。
 </p>
 
 <code>Prelude System.Random&gt; take 3 . randoms $ mkStdGen 8 :: [Double]<br/>
 [0.6022994713892826, 0.62331532360708, 0.9885723665310981]</code>
 
 <p>
-型注釈':: [Double]'が必要だ。
-randomsは多相関数でありさまざまな型のランダム値を生成することができる。
-学習ずみのパラメトリック多相ではなく型クラスのところで学習する
-アドホック多相なのでここでは深い話はしない。
+型注釈:: [Double]が必要だ。
+randomsは多相関数でありさまざまな型のランダム値を生成できる。
+学習ずみのパラメトリック多相ではなく型クラスのところで学習するアドホック多相だ。
 </p>
 
 <h2>関数randomRs</h2>
@@ -95,23 +92,20 @@ randomsは多相関数でありさまざまな型のランダム値を生成す�
 指定した範囲内の乱数列を生成するために関数randomRsがある。
 </p>
 
-<code>randomRs :: (Double, Double) -&gt; StdGen -&gt; [Double]</code>
+<p><code>randomRs :: (Double, Double) -&gt; StdGen -&gt; [Double]</code></p>
 
 <p>第1引数のタプルで乱数の範囲を指定する。</p>
 
-<code>Prelude System.Random&gt; take 3 . randomRs (2, 4) $ mkStdGen 8 :: [Double]<br/>
-[3.2045989427785653, 3.24663064721416, 3.9771447330621963]
-</code>
+<p><code>Prelude System.Random&gt; take 3 . randomRs (2, 4) $ mkStdGen 8 :: [Double]<br/>
+[3.2045989427785653, 3.24663064721416, 3.9771447330621963]</code></p>
 
-<p>
-2から4のあいだの乱数列が生成される。
-</p>
+<p>2から4のあいだの乱数列が生成される。</p>
 
 <h2>関数split</h2>
 
 <p>
-座標の指定のためにはx, yの2つのランダムな値の系列が必要だ。
-「ランダムの種」を2つに分けるために関数splitがある。
+座標の指定のためにはx, yに対応する2つのランダムな値の系列が必要だ。
+関数splitで「ランダムの種」を2つにわける。
 </p>
 
 <p><code>split :: StdGen -&gt; (StdGen, StdGen)</code></p>
@@ -139,14 +133,14 @@ Prelude System.Random Control.Arrow&gt; take 3 . uncurry zip .
 
 <p><code>split $ mkStdGen 8</code></p>
 
-<p>2つの乱数の種をタプルにして返す。</p>
+<p>2つの乱数の種のタプルを返す。</p>
 
 <h3>演算子(***)</h3>
 
 <h4>動作</h4>
 
 <p>
-演算子(***)は2要素タプルの1要素目と2要素目の両方に関数を適用する関数だ。
+演算子(***)は2要素タプルの両方の要素にそれぞれの関数を適用する関数だ。
 (* 2) *** (+ 3)は1要素目を2倍し2要素目に3を足す関数となる。
 </p>
 
@@ -167,9 +161,7 @@ Prelude System.Random Control.Arrow&gt; take 3 . uncurry zip .
 
 <h4>動作</h4>
 
-<p>
-zipは2つのリストをとりタプルのリストにする。
-</p>
+<p>zipは2つのリストをとりタプルのリストにする。</p>
 
 <p><code>zip :: [a] -&gt; [b] -&gt; [(a, b)]</code></p>
 
@@ -183,7 +175,11 @@ uncurry zipは「リストのタプルをタプルのリストにする」関数
 
 <p><code>uncurry zip :: ([a], [b]) -&gt; [(a, b)]</code></p>
 
-<p><code>Prelude System.Random Control.Arrow&gt; uncurry zip ([0 ..], "hello")<br/>
+<p><code>Prelude System.Random Control.Arrow&gt; :t zip<br/>
+zip :: [a] -&gt; [b] -&gt; [(a, b)]<br/>
+Prelude System.Random Control.Arrow&gt; :t uncurry zip<br/>
+uncurry zip :: ([a], [b]) -&gt; [(a, b)]<br/>
+Prelude System.Random Control.Arrow&gt; uncurry zip ([0 ..], "hello")<br/>
 [(0,'h'),(1,'e'),(2,'l'),(3,'l'),(4,'o')]</code></p>
 
 <h4>使用</h4>
@@ -197,16 +193,14 @@ x座標のリストとy座標のリストのタプルをx座標とy座標から�
 
 <h2>まとめ</h2>
 
-<p>
-原点を中心とする1辺2の正方形内のランダムな点の列を以下のように生成する。
-</p>
+<p>原点を中心とする1辺2の正方形内のランダムな点の列は以下のように生成される。</p>
 
-<code>uncurry zip . (randomRs (-1, 1) *** randomRs (-1, 1))
-	. split $ mkStdGen 8</code>
+<p><code>uncurry zip . (randomRs (-1, 1) *** randomRs (-1, 1))
+	. split $ mkStdGen 8</code></p>
 
 <p>
 乱数の種を作るために作った整数値8は適当な値だ。
-実際に使うときには仮引数としてパラメータ化する。
+実際に使用する関数を定義するときには仮引数としてパラメータ化する。
 </p>
 
 <p>
