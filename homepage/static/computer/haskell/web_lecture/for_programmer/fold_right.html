@@ -3,18 +3,18 @@
 <h2>はじめに</h2>
 
 <p>
-リストの総和、総積を求める関数を作成した。
+リストの総和、総積、長さを求める関数を作成した。
 これらの関数は同じ枠組みを共有している。
 2引数関数を使ってリストをひとつの値に変換するという枠組みだ。
 このような枠組みを「たたみこみ」と呼ぶ。
 共通の枠組みは関数によって抽出できる。
 「たたみこみ」には2種類ある。
-まずは「右からのたたみこみ」を見てみよう。
+「右からのたたみこみ」から学ぶ。
 </p>
 
 <h2>それぞれの関数</h2>
 
-<p>総和、総積を求める関数の定義を見てみよう。</p>
+<p>総和、総積、長さを求める関数の定義を見てみよう。</p>
 
 <p><code>mySum [] = 0<br/>
 mySum (x : xs) = x + mySum xs</code></p>
@@ -22,14 +22,13 @@ mySum (x : xs) = x + mySum xs</code></p>
 <p><code>myProduct [] = 1<br/>
 myProduct (x : xs) = x * myProduct xs</code></p>
 
-<!--
 <p><code>myLength [] = 0<br/>
 myLength (_ : xs) = 1 + myLength xs</code></p>
--->
 
 <p>
 これらの関数の定義はほとんど同じ形だ。
-mySumとmyProductのちがいは0が1になっていることと(+)が(*)になっていることだ。
+関数mySumとmyProductのちがいは0が1になっていることと(+)が(*)になっていることだ。
+関数mySumとmyLengthのちがいはxが1になっていることだけだ。
 </p>
 
 <h2>右たたみこみ</h2>
@@ -51,6 +50,10 @@ mySumとmyProductのちがいは0が1になっていることと(+)が(*)にな�
 
 <p><code>3 * (7 * (8 * (4 * 1)))</code></p>
 
+<p>myLength [3, 7, 8, 4]は以下のようになる。</p>
+
+<p><code>1 + (1 + (1 + (1 + 0)))</code></p>
+
 <p>
 mySumやmyProductはリストの要素に右結合で演算子を次々と適用していく。
 このような操作を「右たたみこみ」と呼ぶ。
@@ -66,6 +69,24 @@ mySumやmyProductはリストの要素に右結合で演算子を次々と適用
 mySumでは[]を0に(:)を(+)に置き換えている。
 myProductでも同様で[]を1に(:)を(*)に置き換えている。
 []と(:)を何に置き換えるかを変えれば様々な「右たたみこみ」関数が作れる。
+</p>
+
+<h3>関数myLength</h3>
+
+<p>
+関数myLengthでは(:)を置き換える演算子が自明ではない。
+以下のようなlen関数を考える。
+</p>
+
+<p><code>len :: a -&gt; Int -&gt; Int<br/>
+len _ l = 1 + l</code></p>
+
+<p>するとmyLength [3, 7, 8, 4]は以下のようになる。</p>
+
+<p><code>3 `len` (7 `len` (8 `len` (4 `len` 0)))</code></p>
+
+<p>
+このようにするとmyLength関数は[]を0に(:)をlenに置き換えた関数であることがわかる。
 </p>
 
 <h2>右たたみこみを抽象化する</h2>
@@ -84,11 +105,33 @@ myProductでも同様で[]を1に(:)を(*)に置き換えている。
 mySumではそれぞれ(+)と0だ。
 </p>
 
-<p>mySum = foldr (+) 0</p>
+<p><code>mySum = foldr (+) 0</code></p>
 
 <p>関数myProductでは同様にそれぞれ(*)と1を指定する。</p>
 
-<p>myProduct = foldr (*) 1</p>
+<p><code>myProduct = foldr (*) 1</code></p>
+
+<h3>関数myLength</h3>
+
+<p>関数myLengthでは関数lenを使って以下のように書ける。</p>
+
+<p><code>myLength = foldr len 0</code></p>
+
+<p>もっと直接的に定義してみよう。まずはlenを書き換えていく。</p>
+
+<p><code>len _ l = 1 + l</code></p>
+
+<p>演算子の部分適用で以下のようになる。</p>
+
+<p><code>len _ = (1 +)</code></p>
+
+<p>引数を問わずいつも(1 +)を返す関数なので関数constで書き直せる。</p>
+
+<p><code>len = const (1 +)</code></p>
+
+<p>これを使えばmyLengthは以下のように定義できる。</p>
+
+<p><code>myLength = foldr (const (1 +)) 0</code></p>
 
 <h2>関数foldrの定義</h2>
 
@@ -103,9 +146,7 @@ mySum (x : xs) = x + mySum xs</code></p>
 <p><code>myProduct [] = 1<br/>
 myProduct (x : xs) = x * mySum xs</code></p>
 
-<p>
-mySumの0や(+)、myProductの1や(*)を、myFoldrの第1引数と第2引数に置き換える。
-</p>
+<p>mySumの0や(+)、myProductの1や(*)を、myFoldrの第1引数と第2引数に置き換える。</p>
 
 <p><code>myFoldr _ v [] = v<br/>
 myFoldr op v (x : xs) = x `op` myFoldr op v xs</code></p>
@@ -122,17 +163,21 @@ myFoldrの定義のvを0にopを(+)にmyFoldr op vをmySumに置き換えるとm
 第2引数は1番右に来る値、初期値だ。
 第3引数はたたみこみの対象となるリストだ。
 返り値はたたみこみの結果得られる値である。
-mySumではそれぞれ以下のような型になる。
 </p>
+
+<h3>関数mySumからの一般化</h3>
+
+<p>mySumではそれぞれ以下のような型になる。</p>
 
 <p><code>(+) :: Integer -&gt; Integer -&gt; Integer<br/>
 0 :: Integer<br/>
 xs :: [Integer]<br/>
 返り値 :: Integer</code></p>
 
-<p>
-これを一般化して以下のような型が考えられる。
-</p>
+<p><code>foldr :: (Integer -&gt; Integer &gt; Integer) -&gt;
+	Integer -&gt; [Integer] -&gt; Integer</code></p>
+
+<p>これを一般化して以下のような型が考えられる。</p>
 
 <p>foldr :: (a -&gt; a -&gt; a) -&gt; a -&gt; [a] -&gt; a</p>
 
@@ -141,12 +186,45 @@ xs :: [Integer]<br/>
 型aの値のリストから型aの値を作る関数である。
 この型はまだ十分に一般的ではない。
 foldrはもっと広い範囲に使える。
-次はfoldrを第1引数と第2引数とで異なる型をとる関数に適用する例を見る。
+</p>
+
+<h3>関数myLengthからの一般化</h3>
+
+<p>myLengthではそれぞれ以下のような型になる。</p>
+
+<p><code>(const (1 +)) :: a -&gt; Int -&gt; Int<br/>
+0 :: Int<br/>
+xs :: [a]<br/>
+返り値 :: Int</code></p>
+
+<p><code>foldr :: (a -&gt; Int -&gt; Int) -&gt; Int -&gt; [a] -&gt; Int</code></p>
+
+<p>これを一般化する。</p>
+
+<p><code>foldr :: (a -&gt; b -&gt; b) -&gt; b -&gt; [a] -&gt; b</code></p>
+
+<p>
+foldr op v [x1, x2, x3]はx1 `op` (x2 `op` (x3 `op` v))と展開されることを考える。
+opの第1引数の型はx1の型と等しく、
+第2引数の型はopの返り値の型と等しく、
+さらにその型は値vの型と等しいことがわかる。
+また全体の返り値の型はopの返り値の型と等しい。
+よって上記の型となることがわかる。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+右たたみこみ関数foldrを学んだ。
+関数mySum, myProduct, myLengthなどの関数が持つ「たたみこみ」という枠組み
+そのものを表現した関数である。
+Haskellの持つ「抽象化」の力を理解してもらえただろうか。
+さらに学習を進めていくと抽象化の層について実感してもらえることと思う。
 </p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/length.html"
 	>「リストの長さ」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer/polish.html"
-	>「ポーランド記法電卓」へ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/right_left.html"
+	>「右結合と左結合」へ</a>
 </p>
