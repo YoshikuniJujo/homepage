@@ -2,50 +2,42 @@
 
 <h2>はじめに</h2>
 
-<p>
-リストに含まれる値すべてをかけ算する関数を作成する。
-総和を求めるのと考えかたは同じだ。
-</p>
+<p>関数productはリストに含まれる値すべてをかけ算する。</p>
 
-<h2>関数product</h2>
+<h2>動き</h2>
 
 <p><code>% ghci<br/>
 Prelude&gt; product [3, 18, 9]<br/>
 486</code></p>
 
-<h2>関数myProduct</h2>
+<h2>型</h2>
 
-<p>関数myProductはInteger型の値のリストの要素すべての積を計算する。</p>
-
-<h3>型</h3>
-
-<p>Integer型の値のリストを引数としInteger型の値を返す。</p>
+<p>関数myProductはInteger型の値のリストを引数としInteger型の値を返す。</p>
 
 <p><code>myProduct :: [Integer] -&gt; Integer</code></p>
 
-<h3>再帰部</h3>
+<h2>再帰部</h2>
 
 <p>
-リストに値を追加したら結果の値はどう変化するか。
-結果の値はもとの値に追加した値をかけた値となるはずだ。
+リストに値を追加したら結果の値は追加した値をかけた値となる。
 myProduct (x : xs)はmyProduct xsのx倍となる。
 </p>
 
 <p><code>myProduct (x : xs) = x * myProduct xs</code></p>
 
-<h3>基底部</h3>
+<h2>基底部</h2>
 
 <p>
 空リストを基底とする。
-myProduct [3, 14, 9]はmyProduct [14, 9]の3倍であり、
-myProduct [14, 9]はmyProduct [9]の14倍である。
+myProduct [3, 14, 9]はmyProduct [14, 9]の3倍だ。
+myProduct [14, 9]はmyProduct [9]の14倍だ。
 同様にmyProduct [9]がmyProduct []の9倍となれば良い。
 myProduct []の値を1とする。
 </p>
 
 <p><code>myProduct [] = 1</code></p>
 
-<h3>出来上がり</h3>
+<h2>出来上がり</h2>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/18_product/product.hs"
 	>product.hs</a></p>
@@ -63,13 +55,12 @@ mySum (x : xs) = x + mySum xs</code></p>
 <p>
 空リストのときの値がmySumでは0でありmyProductでは1だ。
 先頭の要素と再帰的な部分とをつなぐ演算子が
-mySumでは(+)でありmyProductでは(*)だ。
-全体としての枠組みは同じだ。
+mySumでは(+)でありmyProductでは(*)となっている。
 </p>
 
 <h2>まとめ</h2>
 
-<p>リストを引数に取る再帰関数の作りかたの基本を学んだ。</p>
+<p>リストを引数に取る再帰関数の作りかたのひとつを学んだ。</p>
 
 <ul>
 <li>空リストに対する値を定義</li>
@@ -85,9 +76,8 @@ mySumでは(+)でありmyProductでは(*)だ。
 	<li>リストに含まれるのは0以上の値のみとする</li>
 	<li>2つの値の大きいほうを返す関数maxを使う</li>
 	<li>空リストに対しては何を返せば良いか</li>
-	<li>要素をひとつ追加すると最小値はどうなるか</li>
+	<li>要素をひとつ追加すると最大値はどうなるか</li>
 	</ul></li>
-<li>関数myMaximumに型宣言を追加せよ</li>
 </ol>
 
 <p>
