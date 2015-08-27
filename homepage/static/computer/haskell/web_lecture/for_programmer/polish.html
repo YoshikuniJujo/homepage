@@ -1,12 +1,13 @@
 ポーランド記法電卓
 
-<p>(工事中 0%)</p>
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/polish.hs"
+	>polish.hs</a></p>
 
 <h2>ポーランド記法とは</h2>
 
 <p>
-演算子を被演算子の前に記述する数式の書きかただ。前置記法とも呼ぶ。
-2項演算子のみならば優先順位や丸括弧なしで演算が一意に定まる。
+演算子を被演算子の前に書く記法だ。前置記法とも呼ぶ。
+2項演算子のみなら優先順位や丸括弧なしで演算が一意に定まる。
 </p>
 
 <p>
@@ -16,7 +17,7 @@
 
 <h3>例</h3>
 
-<p>中置記法と同じ式のポーランド記法の例である。</p>
+<p>同じ意味の中置記法の式とポーランド記法の式だ。</p>
 
 <p><code>(1 + 5) * (2 + 3)</code></p>
 
@@ -25,25 +26,20 @@
 <h2>仕様</h2>
 
 <p>
-整数の四則演算のみを実装する。
+整数の四則演算のみとする。
 数値や演算子を文字列のリストとしてわたす。
-返り値は整数のリストのMaybe値とする。
+返り値は整数のリストのMaybe値だ。
 計算が完全に終われば1要素のみのリストとなる。
 演算子が足りず計算の途中ならば複数の整数がリストに残る。
 数値が足りず演算が実行できないときや
-演算子としても数値としても解釈できないときはNothing値を返す。
+文字列が演算子でも数値でもないときはNothing値を返す。
 </p>
 
-<h2>関数polish</h2>
+<h2>考えかた</h2>
 
-<p><a href="/computer/haskell/web_lecture/for_programmer/codes/polish.hs"
-	>polish.hs</a></p>
+<h3>例</h3>
 
-<h3>考えかた</h3>
-
-<h4>例</h4>
-
-<p>演算子や数値を前に追加していくことを考える。</p>
+<p>演算子や数値を前に追加していったときの変化を示す。</p>
 
 <ul>
 <li>: []</li>
@@ -56,19 +52,22 @@
 <li>* + 1 5 + 2 3: [30]</li>
 </ul>
 
-<h4>演算の追加</h4>
+<h3>演算子の追加</h3>
 
-<p>先頭に演算子を追加すると数値リストの先頭2つに演算を適用し数値リストにもどす。</p>
+<p>
+演算子の追加は数値リストの先頭2つへの演算の適用となる。
+結果は数値リストの先頭に追加される。
+</p>
 
-<h4>数値の追加</h4>
+<h3>数値の追加</h3>
 
-<p>先頭に数値を追加すると数値リストの先頭に数値を追加することになる。</p>
+<p>数値の追加は数値リストの先頭への数値の追加となる。</p>
 
-<h3>演算子の表</h3>
+<h2>演算子の表</h2>
 
 <p>演算子の文字列表現と動作とを対応させる表を作る。</p>
 
-<h4>型</h4>
+<h3>型</h3>
 
 <p>整数の2項演算なので動作はInteger型の値を2つとりInteger型を返す関数だ。</p>
 
@@ -81,7 +80,7 @@
 
 <p><code>operators :: [(String, Integer -&gt; Integer -&gt; Integer)]</code></p>
 
-<h4>定義</h4>
+<h3>定義</h3>
 
 <p>加減乗除のそれぞれについて文字列と動作とを対応させる。</p>
 
@@ -89,13 +88,13 @@
 
 <p>整数同士の演算なので除算には(/)ではなくdivを使用する。</p>
 
-<h3>関数polishの再帰的な定義</h3>
+<h2>関数polishの定義</h2>
 
-<h4>型</h4>
+<h3>型</h3>
 
 <p><code>polish :: [String] -&gt; Maybe [Integer]</code></p>
 
-<h4>基底部</h4>
+<h3>基底部</h3>
 
 <p>
 基底として第1引数の文字列のリストが空である状態を考える。
@@ -104,7 +103,7 @@
 
 <p><code>polish [] = Just []</code></p>
 
-<h4>再帰部</h4>
+<h3>再帰部</h3>
 
 <p>まずは命令のリストをはじめの命令とそれ以外とにわける。</p>
 
@@ -121,9 +120,11 @@
 	<span class="indent1">_ -&gt; ...</span>
 	</code></p>
 
+<h4>数値</h4>
+
 <p>
 演算子リストに値が存在しなければ値sは数値と考える。
-readMaybeによって数値として解釈できればJust値をそうでなければNothingとする。
+関数readMaybeは文字列が数値として読めればJust値をそうでなければNothingを返す。
 文字列sを数値に変換し数値リストの先頭に追加する。
 </p>
 
@@ -133,15 +134,75 @@ readMaybeによって数値として解釈できればJust値をそうでなけ�
 		<span class="indent2">_ -&gt; Nothing</span></code></p>
 
 <p>
+maybe Nothing (Just . (n :)) $ polish ssがわかりにくいが
+これはpolish ssの値がJust値ならnを追加しJust値として返し、
+NothingならばNothingを返す。
+ファンクターを学ぶともっときれいに書ける。
+Haskellにはコードをきれいにするためのギミックがたくさんある。
+それは単に構文論的な美しさではなく意味論的な(ry
+</p>
+
+<h4>演算子</h4>
+
+<p>
 演算子リストに値が存在したときは数値リストの先頭の2つに対して
 演算子の動作を適用する。
 </p>
 
-<h3>動かしてみる</h3>
+<p><code><span class="indent1">Just o -&gt; case polish ss of</span><br/>
+		<span class="indent2">Just (x : y : ns) -&gt; Just $ x `o` y : ns</span><br/>
+		<span class="indent2">_ -&gt; Nothing</span></code></p>
+
+<h2>出来上がり</h2>
+
+<p><code>
+operators :: [(String, Integer -&gt; Integer -&gt; Integer)]<br/>
+operators = [("+", (+)), ("-", (-)), ("*", (*)), ("/", div)]<br/>
+</code></p>
+
+<p><code>polish :: [String] -&gt; Maybe [Integer]<br/>
+polish [] = Just []<br/>
+polish (s : ss) = case lookup s operators of<br/>
+	<span class="indent1">Just o -&gt; case polish ss of</span><br/>
+		<span class="indent2">Just (x : y : ns) -&gt; Just $ x `o` y : ns</span><br/>
+		<span class="indent2">_ -&gt; Nothing</span><br/>
+	<span class="indent1">_ -&gt; case readMaybe s of</span><br/>
+		<span class="indent2">Just n -&gt; maybe Nothing (Just . (n :)) $ polish ss</span><br/>
+		<span class="indent2">_ -&gt; Nothing</span></code></p>
+
+<h2>動かしてみる</h2>
+
+<p><code>% ghci polish.hs<br/>
+*Main&gt; polish ["+", "3", "8"]<br/>
+11<br/>
+*Main&gt; polish ["*", "+", "1", "5", "+", "2", "3"]<br/>
+30</code></p>
+
+<h2>コードの本質</h2>
 
 <p>
-<a href="/computer/haskell/web_lecture/for_programmer/fold_right.html"
-	>「たたみこみ(右)」へもどる</a>
+エラー処理や複数の演算子への対応等の枝葉を除いたコードの本質は以下のようになる。
+足し算のみなら動くのでここまでのコードを理解するのが難しければ、
+以下のコードをまずは理解してみよう。
+</p>
+
+<p><code>polish [] = []<br/>
+polish ('+' : ss) = x + y : ns<br/>
+	<span class="indent1">where x : y : ns = polish ss</span><br/>
+polish (s : ss) = read s : polish ss</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+本質的な部分は単純だ。
+僕の性格上「複数演算子の使用」や「エラー処理」を入れないと気持ちが悪かったため、
+いろいろと複雑になってしまった。
+さらに学習が進むと同じコードをずっと簡潔に書ける。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/fold_left.html"
+	>「たたみこみ(左)」へもどる</a>
 <a href="/computer/haskell/web_lecture/for_programmer/polish_fold_right.html"
 	>「ポーランド記法電卓とたたみこみ(右)」へ</a>
 </p>
