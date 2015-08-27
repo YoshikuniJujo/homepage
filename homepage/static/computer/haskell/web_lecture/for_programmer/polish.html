@@ -90,6 +90,12 @@
 
 <h2>関数polishの定義</h2>
 
+<h3>準備</h3>
+
+<p>関数readMaybeを使うためにText.Readが必要だ。コードの先頭に置く。</p>
+
+<p><code>import Text.Read</code></p>
+
 <h3>型</h3>
 
 <p><code>polish :: [String] -&gt; Maybe [Integer]</code></p>
@@ -155,8 +161,9 @@ Haskellにはコードをきれいにするためのギミックがたくさん�
 
 <h2>出来上がり</h2>
 
-<p><code>
-operators :: [(String, Integer -&gt; Integer -&gt; Integer)]<br/>
+<p><code>import Text.Read</code></p>
+
+<p><code>operators :: [(String, Integer -&gt; Integer -&gt; Integer)]<br/>
 operators = [("+", (+)), ("-", (-)), ("*", (*)), ("/", div)]<br/>
 </code></p>
 
