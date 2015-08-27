@@ -5,6 +5,25 @@
 <a href="/computer/haskell/web_lecture/for_programmer/codes/polish_foldr.hs"
 	>polish_foldr.hs</a>
 
+<h2>はじめに</h2>
+
+<p>
+ポーランド記法電卓関数polishはfoldrで記述することができる。
+foldrを使って記述することで再帰(くりかえし)の部分を考えずにすむ。
+新しく追加された値と今まで計算してきた値とから新たな値を作成することに集中できる。
+</p>
+
+<h2>準備</h2>
+
+<p><code>import Text.Read</code></p>
+
+<h2>演算子の表</h2>
+
+<p>演算子の表は前回と同じだ。</p>
+
+<p><code>operators :: [(String, Integer -&gt; Integer -&gt; Integer)]<br/>
+operators = [("+", (+)), ("-", (-)), ("*", (*)), ("/", div)]</code></p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/polish.html"
 	>「ポーランド記法電卓」へもどる</a>
