@@ -1,340 +1,202 @@
-import Control.Applicative
-import Data.List
-import System.Random
-import System.IO.Unsafe
+第8回 リストを作成する再帰関数
 
-import Lecture
+はじめに
+* 前回はリストを引数に取る再帰関数について学んだ
+* 今回はリストを返す再帰関数について学ぶ
+* 「リスト」の回でやった3段階は
+	1. enumerate
+	2. map/filter
+	3. accumulate
+* そのうちの1. enumerateにあたる部分となる
 
-subtitle :: String
-subtitle = "第8回 リストを作成する再帰関数"
+[m .. n]
+* まずは「リスト」の回で見た[m .. n]という構文を見よう
+* これは構文糖であり以下の関数に変換される
+	enumFromTo m n
+* この関数を正しく理解するには型クラスの知識が必要なので
+* ここではこの関数の型を以下のように考える
+	enumFromTo :: Int -> Int -> [Int]
 
-main :: IO ()
-main = runLecture [
-	[flip writeTitle subtitle], prelude,
-	enumerate, aboutEnumFromTo, aboutEnumFromTo2, aboutEnumFromTo3,
-	aboutEnumFromToSummary,
-	collatz1, collatz2, collatz3, collatz4, collatz5, collatz6, collatz7,
-	collatz8, collatz9, collatz10, collatz11, collatz12, collatz13,
-	collatz14, collatz15, collatz16, collatz17, collatz18, collatz19,
-	collatz20, collatzSummary,
-	factorization1, factorization2, factorization3, factorization4,
-	factorization5, factorization6, factorization7, factorization8,
-	factorization9, factorization10, factorization11, factorization12,
-	factorization13, factorization14, factorizationSummary,
-	summary
- ]
+enumFromTo
+* enumFromTo m nはmから1刻みでnまでのリストを返す関数
+* 以下のように定義することができる
+	enumFromTo m n
+		| m > n = []
+		| otherwise = m : enumFromTo (m + 1) n
 
-prelude :: Page
-prelude = [\t -> do
-	writeTopTitle t "はじめに"
-	text t "", \t -> do
-	text t "* 前回はリストを引数に取る再帰関数について学んだ", \t -> do
-	text t "* 今回はリストを返す再帰関数について学ぶ", \t -> do
-	text t "* 「リスト」の回でやった3段階は", \t -> do
-	itext t 1 "1. enumerate", \t -> do
-	itext t 1 "2. map/filter", \t -> do
-	itext t 1 "3. accumulate", \t -> do
-	text t "* そのうちの1. enumerateにあたる部分となる"
- ]
+試してみよう
+* コマンドプロンプトを2こ立ち上げて
+* lectures/lecture08ディレクトリを作成しそこに移動
+* myList.hsを作成し以下を書き込もう
+	myEnumFromTo :: Int -> Int -> [Int]
+	myEnumFromTo m n
+		| m > n = []
+		| otherwise = m : myEnumFromTo (m + 1) n
+* 試してみよう
+	% ghci myList.hs
+	*Main> myEnumFromTo 3 8
 
-enumerate :: Page
-enumerate = [\t -> do
-	writeTopTitle t "[m .. n]"
-	text t "", \t -> do
-	text t "* まずは「リスト」の回で見た[m .. n]という構文を見よう", \t -> do
-	text t "* これは構文糖であり以下の関数に変換される", \t -> do
-	itext t 1 "enumFromTo m n", \t -> do
-	text t "* この関数を正しく理解するには型クラスの知識が必要なので", \t -> do
-	text t "* ここではこの関数の型を以下のように考える", \t -> do
-	itext t 1 "enumFromTo :: Int -> Int -> [Int]"
- ]
+myEnumFromToの説明
+* 定義を再掲する
+	myEnumFromTo m n
+		| m > n = []
+		| otherwise = m : enumFromTo (m + 1) n
+* これはこう読める
+	1. 開始の値が終了の値より大きければ空リスト
+	2. mからnまでの値のリストは
+		(m + 1)からnまでの値のリストにmを追加したもの
 
-aboutEnumFromTo :: Page
-aboutEnumFromTo = [\t -> do
-	writeTopTitle t "enumFromTo"
-	text t "", \t -> do
-	text t "* enumFromTo m nはmから1刻みでnまでのリストを返す関数", \t -> do
-	text t "* 以下のように定義することができる", \t -> do
-	itext t 1 "enumFromTo m n", \t -> do
-	itext t 2 "| m > n = []", \t -> do
-	itext t 2 "| otherwise = m : enumFromTo (m + 1) n"
- ]
+enumFromTo(まとめ)
+* [m .. n]という構文は構文糖であり
+	-> enumFromTo m n
+* enumFromTo m nは以下のように定義される
+	1. m > nならば空リスト
+	2. それ以外でm + 1からnのリストにmを追加したもの
+* リストを作成する関数の多くが同様の枠組みで作られる
+	- その関数自体の返り値に値を追加するという枠組み
 
-myEnumFromTo :: Int -> Int -> [Int]
-myEnumFromTo m n
-	| m > n = []
-	| otherwise = m : myEnumFromTo (m + 1) n
+コラッツの予想
+* 正の整数nについて
+	- nが偶数ならば2で割り
+	- nが奇数ならば3をかけて1を足す
+* これをくりかえし行うと、
+* いつかは4 -> 2 -> 1 -> 4 -> 2 -> 1のループになる
+* という予想
+* まだ証明されていない
+* 数学における未解決問題のひとつ
+* 現在では3 * 2 ^ 53までのnで成り立つことが確認ずみ
+	3 * 2 ^ 53 = 
+	二京七千二十一兆五千九百七十七億六千四百二十二万二千九百七十六
 
-aboutEnumFromTo2 :: Page
-aboutEnumFromTo2 = [\t -> do
-	writeTopTitle t "試してみよう"
-	text t "", \t -> do
-	text t "* コマンドプロンプトを2こ立ち上げて", \t -> do
-	text t "* lectures/lecture08ディレクトリを作成しそこに移動", \t -> do
-	text t "* myList.hsを作成し以下を書き込もう", \t -> do
-	itext t 1 "myEnumFromTo :: Int -> Int -> [Int]", \t -> do
-	itext t 1 "myEnumFromTo m n", \t -> do
-	itext t 2 "| m > n = []", \t -> do
-	itext t 2 "| otherwise = m : myEnumFromTo (m + 1) n", \t -> do
-	text t "* 試してみよう", \t -> do
-	itext t 1 "% ghci myList.hs", \t -> do
-	itext t 1 "*Main> myEnumFromTo 3 8", \t -> do
-	itext t 1 $ show $ myEnumFromTo 3 8
- ]
+コラッツの予想
+* コラッツ数列というものを考える
+	- 数nから始めて既述のルールで次を求めていき
+	- 1が来たら終了とする数列
+* コラッツ数列を求める関数を書いていこう
+* この関数は2つの部分に分けることができる
+	1. 既述のルールを適用し続ける無限リストを作る
+	2. 上記のリストのうち最初に1が出るところまでとる
+* 「くりかえし」の部分と終了条件とを分けた
 
-aboutEnumFromTo3 :: Page
-aboutEnumFromTo3 = [\t -> do
-	writeTopTitle t "myEnumFromToの説明"
-	text t "", \t -> do
-	text t "* 定義を再掲する", \t -> do
-	itext t 1 "myEnumFromTo m n"
-	itext t 2 "| m > n = []"
-	itext t 2 "| otherwise = m : enumFromTo (m + 1) n", \t -> do
-	text t "* これはこう読める", \t -> do
-	itext t 1 "1. 開始の値が終了の値より大きければ空リスト", \t -> do
-	itext t 1 "2. mからnまでの値のリストは", \t -> do
-	itext t 2 "(m + 1)からnまでの値のリストにmを追加したもの"
- ]
+最初の1までをとる
+* 引数で指定された条件を満たすまでをとる関数
+* この関数をtakeToとしよう
+* この関数の入出力の型は
+	- 入力1: a -> Bool
+	- 入力2: [a]
+	- 出力: [a]
+	-> takeTo :: (a -> Bool) -> [a] -> [a]
+* 中身について考えていこう
 
-aboutEnumFromToSummary :: Page
-aboutEnumFromToSummary = [\t -> do
-	writeTopTitle t "enumFromTo(まとめ)"
-	text t "", \t -> do
-	text t "* [m .. n]という構文は構文糖であり", \t -> do
-	arrowIText t 1 "enumFromTo m n", \t -> do
-	text t "* enumFromTo m nは以下のように定義される", \t -> do
-	itext t 1 "1. m > nならば空リスト", \t -> do
-	itext t 1 "2. それ以外でm + 1からnのリストにmを追加したもの", \t -> do
-	text t "* リストを作成する関数の多くが同様の枠組みで作られる", \t -> do
-	itext t 1 "- その関数自体の返り値に値を追加するという枠組み"
- ]
+takeTo
+* 空リストの場合は結果も空リストとなるので
+	takeTo _ [] = []
+* 残りのケースは
+	リストの先頭が条件を満たす場合と満たさない場合
+* 条件を満たした場合、その要素の後ろは捨てるので
+	takeTo p (x : xs)
+		| p x = [x]
+* pを満たさない場合は
+	- xsからpを満たす要素までを取り
+	- そのリストにxを追加するので
+		| otherwise = x : takeTo p xs
 
-collatz1 :: Page
-collatz1 = [\t -> do
-	writeTopTitle t "コラッツの予想"
-	text t "", \t -> do
-	text t "* 正の整数nについて", \t -> do
-	itext t 1 "- nが偶数ならば2で割り", \t -> do
-	itext t 1 "- nが奇数ならば3をかけて1を足す", \t -> do
-	text t "* これをくりかえし行うと、", \t -> do
-	text t "* いつかは4 -> 2 -> 1 -> 4 -> 2 -> 1のループになる", \t -> do
-	text t "* という予想", \t -> do
-	text t "* まだ証明されていない", \t -> do
-	text t "* 数学における未解決問題のひとつ", \t -> do
-	text t "* 現在では3 * 2 ^ 53までのnで成り立つことが確認ずみ", \t -> do
-	itext t 1 $ "3 * 2 ^ 53 = " ++ show (3 * 2 ^ (53 :: Int) :: Integer)
---	itext t (-1) $ "二京七千二十一兆五千九百七十七億六千四百二十二万二千九百七十六"
- ]
+takeTo
+* collatz.hsに書き込もう
+	takeTo :: (a -> Bool) -> [a] -> [a]
+	takeTo _ [] = []
+	takeTo p (x : xs)
+		| p x = [x]
+		| otherwise = x : takeTo p xs
+* 試してみよう
+	*Main> :load collatz.hs
+	*Main> takeTo even
 
-collatz2 :: Page
-collatz2 = [\t -> do
-	writeTopTitle t "コラッツの予想"
-	text t "", \t -> do
-	text t "* コラッツ数列というものを考える", \t -> do
-	itext t 1 "- 数nから始めて既述のルールで次を求めていき", \t -> do
-	itext t 1 "- 1が来たら終了とする数列", \t -> do
-	text t "* コラッツ数列を求める関数を書いていこう", \t -> do
-	text t "* この関数は2つの部分に分けることができる", \t -> do
-	itext t 1 "1. 既述のルールを適用し続ける無限リストを作る", \t -> do
-	itext t 1 "2. 上記のリストのうち最初に1が出るところまでとる", \t -> do
-	text t "* 「くりかえし」の部分と終了条件とを分けた"
- ]
+前回の復習
+* 定義をもう一度見てみよう
+	takeTo _ [] = []
+	takeTo p (x : xs)
+		| p x = [x]
+		| otherwise = x : takeTo p xs
+* 以下のような関数を考える
+	fun x lst = if p x then [x] else x : lst
+* すると
+	takeTo p (x : xs) = fun x (takeTo p xs)
+	-> takeTo p (x : xs) = x `fun` takeTo p xs
 
-collatz3 :: Page
-collatz3 = [\t -> do
-	writeTopTitle t "最初の1までをとる"
-	text t "", \t -> do
-	text t "* 引数で指定された条件を満たすまでをとる関数", \t -> do
-	text t "* この関数をtakeToとしよう", \t -> do
-	text t "* この関数の入出力の型は", \t -> do
-	itext t 1 "- 入力1: a -> Bool", \t -> do
-	itext t 1 "- 入力2: [a]", \t -> do
-	itext t 1 "- 出力: [a]", \t -> do
-	arrowIText t 1 "takeTo :: (a -> Bool) -> [a] -> [a]", \t -> do
-	text t "* 中身について考えていこう"
- ]
+前回の復習
+* つまり以下のようになる
+	(takeTo p) [] = []
+	(takeTo p) (x : xs) = x `fun` (takeTo p) xs
+* (takeTo p)は以下の変換を行う関数と見ることができる
+	- []は[]にする
+	- (:)をfunに置き換える
+* このパターンはfoldrそのものなので
+	takeTo p = foldr fun []
+* fun x lst = if p x then [x] else x : lstなので
+	takeTo p = foldr
+		(\\x lst -> if p x then [x] else x : lst) []
 
-collatz4 :: Page
-collatz4 = [\t -> do
-	writeTopTitle t "takeTo"
-	text t "", \t -> do
-	text t "* 空リストの場合は結果も空リストとなるので", \t -> do
-	itext t 1 "takeTo _ [] = []", \t -> do
-	text t "* 残りのケースは", \t -> do
-	itext t 1 "リストの先頭が条件を満たす場合と満たさない場合", \t -> do
-	text t "* 条件を満たした場合、その要素の後ろは捨てるので", \t -> do
-	itext t 1 "takeTo p (x : xs)"
-	itext t 2 "| p x = [x]", \t -> do
-	text t "* pを満たさない場合は", \t -> do
-	itext t 1 "- xsからpを満たす要素までを取り", \t -> do
-	itext t 1 "- そのリストにxを追加するので", \t -> do
-	itext t 2 "| otherwise = x : takeTo p xs"
- ]
+蛇足
+* ちなみにfunを以下のように書き換えることができる
+	\\x lst -> if p x then [x] else x : lst
+	-> \\x -> if p x then \\_ -> [x] else (x :)
+* (\\_ -> c)は引数に関わらず一定の値を返す関数
+* そのような関数を作る関数constがある
+	const c = \\_ -> c
+* それを使って書き換えると
+	-> \\x -> if p x then const [x] else (x :)
 
-takeTo :: (a -> Bool) -> [a] -> [a]
-takeTo _ [] = []
-takeTo p (x : xs)
-	| p x = [x]
-	| otherwise = x : takeTo p xs
+蛇足の説明
+* 見くらべてみる
+	\\x lst -> if p x then [x] else x : lst
+	\\x -> if p x then const [x] else (x :)
+* Haskellに慣れてくると後者のほうが「美しく」感じる
+* lstという変数はfooでもbarでも何でも良い
+* lstという名前を選んだのは恣意的な選択である
+* よってそのような「恣意性」が減少する後者のほうが美しい
+* 仮引数を使わないスタイルをポイントフリースタイルと呼ぶ
+* ポイントフリースタイルを適度に使うとコードが引きしまる
 
-cl5lst1 :: [Int]
-cl5lst1 = unsafePerformIO $ do
-	sg <- newStdGen
-	let	rs = randomRs (0, 10) sg
-		(xs, y : ys) = splitAt 3 rs
-	return $ map ((+ 1) . (* 2)) xs ++ [2 * y] ++ take 3 ys
+重複をなくす
+* さっきの定義をもう一度見てみよう
+	\\x -> if p x then const [x] else (x :)
+* [x]は(x : [])なので(x :)が重複している
+* 以下のようにすると重複をなくすことができる
+	\\x -> (x :) . if p x then const [] else id
+* idは入力をそのまま出力とする関数
+	id x = x
 
--- [3, 7, 9, 4, 5, 2, 8]
+試してみよう
+* collatz.hsに書き込もう
+	takeTo' :: (a -> Bool) -> [a] -> [a]
+	takeTo' p = flip foldr [] $
+		\\x -> (x :) . if p x then const [] else id
+		-- flipは引数の順番を入れ換える関数
+		-- それと($)を使うことで()を減らしてみた
+* 試してみる
+	*Main> :reload
+	*Main> takeTo' even
 
-collatz5 :: Page
-collatz5 = [\t -> do
-	writeTopTitle t "takeTo"
-	text t "", \t -> do
-	text t "* collatz.hsに書き込もう", \t -> do
-	itext t 1 "takeTo :: (a -> Bool) -> [a] -> [a]"
-	itext t 1 "takeTo _ [] = []"
-	itext t 1 "takeTo p (x : xs)"
-	itext t 2 "| p x = [x]"
-	itext t 2 "| otherwise = x : takeTo p xs", \t -> do
-	text t "* 試してみよう", \t -> do
-	itext t 1 "*Main> :load collatz.hs", \t -> do
-	itext t 1 $ "*Main> takeTo even " ++ show cl5lst1, \t -> do
-	itext t 1 $ show $ takeTo even cl5lst1
- ]
+ポイントフリー狂
+* takeToを完全にポイントフリースタイルで書くとこうなる
+	takeTo = flip foldr [] .
+		((.) <$> (:) <*>) .
+		((([id, const []] !!) . fromEnum) .)
+* ポイントフリースタイルを「適度に」使うとわかりやすく
+* 「適度に」使うとわかりやすく
+* 「適度に」使おう
 
-collatz6 :: Page
-collatz6 = [\t -> do
-	writeTopTitle t "前回の復習"
-	text t "", \t -> do
-	text t "* 定義をもう一度見てみよう", \t -> do
-	itext t 1 "takeTo _ [] = []"
-	itext t 1 "takeTo p (x : xs)"
-	itext t 2 "| p x = [x]"
-	itext t 2 "| otherwise = x : takeTo p xs", \t -> do
-	text t "* 以下のような関数を考える", \t -> do
-	itext t 1 "fun x lst = if p x then [x] else x : lst", \t -> do
-	text t "* すると", \t -> do
-	itext t 1 "takeTo p (x : xs) = fun x (takeTo p xs)", \t -> do
-	arrowIText t 1 "takeTo p (x : xs) = x `fun` takeTo p xs"
- ]
-
-collatz7 :: Page
-collatz7 = [\t -> do
-	writeTopTitle t "前回の復習"
-	text t "", \t -> do
-	text t "* つまり以下のようになる", \t -> do
-	itext t 1 "(takeTo p) [] = []", \t -> do
-	itext t 1 "(takeTo p) (x : xs) = x `fun` (takeTo p) xs", \t -> do
-	text t "* (takeTo p)は以下の変換を行う関数と見ることができる", \t -> do
-	itext t 1 "- []は[]にする", \t -> do
-	itext t 1 "- (:)をfunに置き換える", \t -> do
-	text t "* このパターンはfoldrそのものなので", \t -> do
-	itext t 1 "takeTo p = foldr fun []", \t -> do
-	text t "* fun x lst = if p x then [x] else x : lstなので", \t -> do
-	itext t 1 "takeTo p = foldr"
-	itext t 2 "(\\x lst -> if p x then [x] else x : lst) []"
- ]
-
-collatz8 :: Page
-collatz8 = [\t -> do
-	writeTopTitle t "蛇足"
-	text t "", \t -> do
-	text t "* ちなみにfunを以下のように書き換えることができる", \t -> do
-	itext t 1 "\\x lst -> if p x then [x] else x : lst", \t -> do
-	arrowIText t 1 "\\x -> if p x then \\_ -> [x] else (x :)", \t -> do
-	text t "* (\\_ -> c)は引数に関わらず一定の値を返す関数", \t -> do
-	text t "* そのような関数を作る関数constがある", \t -> do
-	itext t 1 "const c = \\_ -> c", \t -> do
-	text t "* それを使って書き換えると", \t -> do
-	arrowIText t 1 "\\x -> if p x then const [x] else (x :)"
- ]
-
-collatz9 :: Page
-collatz9 = [\t -> do
-	writeTopTitle t "蛇足の説明"
-	text t "", \t -> do
-	text t "* 見くらべてみる", \t -> do
-	itext t 1 "\\x lst -> if p x then [x] else x : lst", \t -> do
-	itext t 1 "\\x -> if p x then const [x] else (x :)", \t -> do
-	text t "* Haskellに慣れてくると後者のほうが「美しく」感じる", \t -> do
-	text t "* lstという変数はfooでもbarでも何でも良い", \t -> do
-	text t "* lstという名前を選んだのは恣意的な選択である", \t -> do
-	text t "* よってそのような「恣意性」が減少する後者のほうが美しい", \t -> do
-	text t "* 仮引数を使わないスタイルをポイントフリースタイルと呼ぶ", \t -> do
-	text t "* ポイントフリースタイルを適度に使うとコードが引きしまる"
- ]
-
-collatz10 :: Page
-collatz10 = [\t -> do
-	writeTopTitle t "重複をなくす"
-	text t "", \t -> do
-	text t "* さっきの定義をもう一度見てみよう", \t -> do
-	itext t 1 "\\x -> if p x then const [x] else (x :)", \t -> do
-	text t "* [x]は(x : [])なので(x :)が重複している", \t -> do
-	text t "* 以下のようにすると重複をなくすことができる", \t -> do
-	itext t 1 "\\x -> (x :) . if p x then const [] else id", \t -> do
-	text t "* idは入力をそのまま出力とする関数", \t -> do
-	itext t 1 "id x = x"
- ]
-
-takeTo' :: (a -> Bool) -> [a] -> [a]
--- takeTo' p = flip foldr [] $ \x -> if p x then const [x] else (x :)
--- takeTo' p = flip foldr [] $ \x -> (x :) . if p x then const [] else id
--- takeTo' p = flip foldr [] $ \x -> ((:) x) . ((ifThenElse (const []) id) . p $ x)
--- takeTo' p = flip foldr [] $ \x -> (.) ((:) x) ((ifThenElse (const []) id) . p $ x)
--- takeTo' p = flip foldr [] $ (.) <$> (:) <*> ifThenElse (const []) id . p
--- takeTo' p = flip foldr [] $ ((.) <$> (:) <*>) $ ifThenElse (const []) id . p
--- takeTo' p = flip foldr [] $ ((.) <$> (:) <*>) $ ([id, const []] !!) . fromEnum . p
--- takeTo' p = flip foldr [] $ ((.) <$> (:) <*>) $ (.) (([id, const []] !!) . fromEnum) p
--- takeTo' = flip foldr [] . ((.) <$> (:) <*>) . (.) (([id, const []] !!) . fromEnum)
-takeTo' = flip foldr [] . ((.) <$> (:) <*>) . ((([id, const []] !!) . fromEnum) .)
-
-ifThenElse :: a -> a -> Bool -> a
-ifThenElse t e b = if b then t else e
-
-collatz11 :: Page
-collatz11 = [\t -> do
-	writeTopTitle t "試してみよう"
-	text t "", \t -> do
-	text t "* collatz.hsに書き込もう", \t -> do
-	itext t 1 "takeTo' :: (a -> Bool) -> [a] -> [a]", \t -> do
-	itext t 1 "takeTo' p = flip foldr [] $", \t -> do
-	itext t 2 "\\x -> (x :) . if p x then const [] else id", \t -> do
-	itext t 2 "-- flipは引数の順番を入れ換える関数", \t -> do
-	itext t 2 "-- それと($)を使うことで()を減らしてみた", \t -> do
-	text t "* 試してみる", \t -> do
-	itext t 1 "*Main> :reload", \t -> do
-	itext t 1 $ "*Main> takeTo' even " ++ show cl5lst1, \t -> do
-	itext t 1 $ show $ takeTo' even cl5lst1
- ]
-
-collatz12 :: Page
-collatz12 = [\t -> do
-	writeTopTitle t "ポイントフリー狂"
-	text t "", \t -> do
-	text t "* takeToを完全にポイントフリースタイルで書くとこうなる", \t -> do
-	itext t 1 "takeTo = flip foldr [] ."
-	itext t 2 "((.) <$> (:) <*>) ."
-	itext t 2 "((([id, const []] !!) . fromEnum) .)", \t -> do
-	text t "* ポイントフリースタイルを「適度に」使うとわかりやすく", \t -> do
-	text t "* 「適度に」使うとわかりやすく", \t -> do
-	text t "* 「適度に」使おう"
- ]
-
-collatz13 :: Page
-collatz13 = [\t -> do
-	writeTopTitle t "最初の1までをとる(まとめ)"
-	text t "", \t -> do
-	text t "* 条件を満たす最初の要素までをとる関数takeToを作った", \t -> do
-	text t "* まずは再帰的な定義で書いてみた", \t -> do
-	text t "* (:)を置き換える関数を考えることで", \t -> do
-	itext t 1 "- foldrを使った定義に書き換えてみた", \t -> do
-	text t "* ポイントフリースタイルについて触れた", \t -> do
-	itext t 1 "- ポイントフリースタイルはコードから贅肉をおとす", \t -> do
-	itext t 1 "- やりすぎるとパズルになる", \t -> do
-	text t "* takeToを使うとリストから最初の1までをとる処理は", \t -> do
-	itext t 1 "takeTo (== 1) [...]"
- ]
+最初の1までをとる(まとめ)
+* 条件を満たす最初の要素までをとる関数takeToを作った
+* まずは再帰的な定義で書いてみた
+* (:)を置き換える関数を考えることで
+	- foldrを使った定義に書き換えてみた
+* ポイントフリースタイルについて触れた
+	- ポイントフリースタイルはコードから贅肉をおとす
+	- やりすぎるとパズルになる
+* takeToを使うとリストから最初の1までをとる処理は
+	takeTo (== 1) [...]
 
 collatz14 :: Page
 collatz14 = [\t -> do
