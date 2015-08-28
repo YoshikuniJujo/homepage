@@ -1,10 +1,80 @@
 整数の列挙
 
-<p>(工事中 0%)</p>
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/enumFromTo.hs"
+	>enumFromTo.hs</a></p>
+
+<h2>はじめに</h2>
+
+<p>
+列挙-蓄積の枠組みを学んだときに整数の列挙のしかたとして以下の書きかたを学んだ。
+</p>
+
+<p><code>[m .. n]</code></p>
+
+<p>
+これはmから1ずつ増やしていきnに達するまでの整数の列挙である。
+実はこれはenumFromTo m nの構文糖だ。
+</p>
+
+<h2>関数enumFromTo</h2>
+
+<h3>動作</h3>
+
+<p><code>% ghci<br/>
+Prelude&gt; [10 .. 15]<br/>
+[10,11,12,13,14,15]<br/>
+Prelude&gt; enumFromTo 10 15<br/>
+[10,11,12,13,14,15]</code></p>
+
+<h2>関数myEnumFromTo</h2>
+
+<p>
+整数(Integer)型の値に対して関数enumFromToと同じように動く関数myEnumFromToを
+作成する。
+始めの値と最後の値を引数としてとり始めの値から1ずつ増やしていき
+最後の値に達するまでのリストを返す関数だ。
+</p>
+
+<h3>型</h3>
+
+<p><code>myEnumFromTo :: Integer -&gt; Integer -&gt; [Integer]</code></p>
+
+<p>整数値をふたつとり整数のリストを返す。</p>
+
+<h3>基底部</h3>
+
+<p>
+基底部としては始点が終点の値よりも大きい場合を考える。
+結果は空リストとなるはずだ。
+</p>
+
+<p><code>myEnumFromTo m n | m &gt; n = []</code></p>
+
+<h3>再帰部</h3>
+
+<p>
+始点mから終点nまでの値の列挙は
+始点m + 1から終点nまでの値の列挙の先頭にmを追加したものだ。
+</p>
+
+<p><code>myEnumFromTo m n = m : myEnumFromTo (m + 1) n</code></p>
+
+<h2>試してみる</h2>
+
+<p><code>Prelude&gt; :l enumFromTo.hs<br/>
+*Main&gt; myEnumFromTo 10 15<br/>
+[10,11,12,13,14,15]</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+[m .. n]という構文は構文糖でありenumFromTo m nと同じことだ。
+myEnumFromToをその関数自体の返り値に値を追加するというやりかたで作成した。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/rev_polish_fold_left.html"
 	>「逆ポーランド記法電卓とたたみこみ(左)」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/collatz.html"
+	>「コラッツ数列」へ</a>
 </p>
