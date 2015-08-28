@@ -98,9 +98,68 @@ takeTo p (x : xs)<br/>
 
 <h3>関数foldrを使う</h3>
 
+<p>次のような関数を考えてみよう。</p>
+
+<p><code>fun x lst = if p x then [x] else x : lst</code></p>
+
+<p>そうすると上記の再帰部は次のように書き換えられる。</p>
+
+<p><code>takeTo p (x : xs) = fun x (takeTo p xs)</code></p>
+
+<p>演算子的な表記にする。</p>
+
+<p><code>takeTo p (x : xs) = x `fun` takeTo p xs</code></p>
+
+<p>すると関数takeToは以下のように書ける。</p>
+
+<p><code>(takeTo p) [] = []<br/>
+(takeTo p) (x : xs) = x `fun` (takeTo p) xs</code></p>
+
+<p>takeTo pは[]を[]に置き換え、(:)をfunに置き換えている。</p>
+
+<p><code>1 : 2 : 3 : 4 : []<br/>
+-&gt; 1 `fun` 2 `fun` 3 `fun` 4 `fun` []</code></p>
+
+<p>これはfoldrの枠組みだ。</p>
+
+<p><code>takeTo p = foldr (\x lst -&gt; if p x then [x] else x : lst) []</code></p>
+
 <h3>ポイントフリースタイル</h3>
 
+<p>
+\x lst -&gt; if p x then [x] else x : lstは
+\x -&gt; \lst -&gt; if p x then [x] else x : lstだ。
+\lst -&gt; ...の部分はもしxがpを満たせばlstの値を問わず[x]を返し、
+そうでないならlstの先頭にxを追加した値を返す。
+よって以下のようにできる。
+</p>
+
+<p><code>\x -&gt; if p x then const [x] else (x :)</code></p>
+
+<p>
+[x]はx : []ということだ。(x :)の部分が重複している。ひとつにまとめよう。
+</p>
+
+<p><code>\x -&gt; (x :) . if p x then const [] else id</code></p>
+
+<p>これを使ってtakeToを書くと以下のようになる。</p>
+
+<p><code>takeTo p = foldr (\x -&gt; (x :) . if p x then const [] else id) []</code></p>
+
+<p>無駄な仮引数や重複がなくなった。</p>
+
 <h3>ポイントフリー狂</h3>
+
+<p>
+ここから先は禁断の地だ。
+ポイントフリーにこだわると以下のようになる。
+Control.Applicativeモジュールを使う。
+</p>
+
+<p><code>takeTo = (`foldr` []) . ((.) &lt;$&gt; (:) &lt;*&gt;)
+	. ((([id, const []] !!) . fromEnum) .)</code></p>
+
+<p>ポイントフリーはほどほどにしよう。</p>
 
 <h2>無限数列を作る</h2>
 
