@@ -1,6 +1,6 @@
 import Control.Applicative
-import Text.Read
 import Data.List
+import Text.Read
 
 example1, example2, example3, example4 :: [String]
 example1 = ["3", "4", "+"]

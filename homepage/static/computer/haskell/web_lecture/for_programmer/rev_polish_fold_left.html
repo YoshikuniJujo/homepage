@@ -1,9 +1,96 @@
 逆ポーランド記法電卓とたたみこみ(左)
 
-<p>(工事中 0%)</p>
-
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/rev_polish_foldl.hs"
 	>rev_polish_foldl.hs</a></p>
+
+<h2>はじめに</h2>
+
+<p>
+逆ポーランド記法電卓関数rpolishはfoldl'で書ける。
+foldl'を使って書くことで再帰(くりかえし)の部分を考えずにすむ。
+新しく追加された値と今まで計算してきた値とから新たな値を作成することに集中できる。
+</p>
+
+<h2>準備</h2>
+
+<p><code>import Data.List<br/>
+import Text.Read</code></p>
+
+<h2>演算子表</h2>
+
+<p><code>operators :: [(String, Integer -&gt; Integer -&gt; Integer)]<br/>
+operators = [("+", (+)), ("-", (-)), ("*", (*)), ("/", div)]</code></p>
+
+<h2>関数rpolish1</h2>
+
+<p>命令によって数値リストを更新する関数を作成する。</p>
+
+<h3>型</h3>
+
+<p><code>rpolish1 :: Maybe [Integer] -&gt; String -&gt; Maybe [Integer]</code></p>
+
+<p>第1引数に数値リストを第2引数に命令をとり数値リストを返す。</p>
+
+<h3>数値リストがJustかNothingかでわける</h3>
+
+<p><code>rpolish1 (Just ns) s = ...<br/>
+rpolish1 _ _ = Nothing</code></p>
+
+<p>数値リストがNothingならばNothingを返す。</p>
+
+<h3>演算子リストからの検索</h3>
+
+<p><code>rpolish1 (Just ns) s = case lookup s operators of<br/>
+	<span class="indent1">Just o -&gt; ...</span><br/>
+	<span class="indent1">_ -&gt; ...</span></code></p>
+
+<p>演算子リストを検索して演算子だった場合とそうでなかった場合に処理をわける。</p>
+
+<h3>数値</h3>
+
+<p>演算子として解釈できない場合には数値としての解釈を試す。</p>
+
+<p><code><span class="indent1">_ -&gt; maybe Nothing (Just . (: ns)) $ readMaybe s</span></code></p>
+
+<p>数値として解釈できるなら数値リストの先頭に追加する。</p>
+
+<h3>演算子</h3>
+
+<p><code><span class="indent1">Just o -&gt; case ns of</span><br/>
+		<span class="indent2">y : x : ns' -&gt; Just $ x `o` y : ns'</span><br/>
+		<span class="indent2">_ -&gt; Nothing</span></code></p>
+
+<p>
+数値リストに値がふたつ以上あればそれら2つに演算子を適用しリストにもどす。
+このとき数値の順序を入れ替える必要がある。
+</p>
+
+<h2>関数rpolish</h2>
+
+<p>foldl'にrpolish1を引数として与える。</p>
+
+<p><code>rpolish :: [String] -&gt; Maybe [Integer]<br/>
+rpolish = foldl' rpolish1 $ Just []</code></p>
+
+<h2>出来上がり</h2>
+
+<p><code>rpolish1 :: Maybe [Integer] -&gt; String -&gt; Maybe [Integer]<br/>
+rpolish1 (Just ns) s = case lookup s operators of<br/>
+	<span class="indent1">Just o -&gt; case ns of</span><br/>
+		<span class="indent2">y : x : ns' -&gt; Just $ x `o` y : ns'</span><br/>
+		<span class="indent2">_ -&gt; Nothing</span><br/>
+	<span class="indent1">_ -&gt; maybe Nothing (Just . (: ns)) $ readMaybe s</span><br/>
+rpolish1 _ _ = Nothing</code></p>
+
+<p><code>rpolish :: [String] -&gt; Maybe [Integer]<br/>
+rpolish = foldl' rpolish1 $ Just []</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+命令によって数値リストを更新するだけの関数をfoldl'で逆ポーランド記法電卓関数に
+することができる。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/rev_polish.html"
