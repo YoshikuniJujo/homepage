@@ -2,6 +2,9 @@
 
 <p>(工事中 0%)</p>
 
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/collatz.hs"
+	>collatz.hs</a></p>
+
 <h2>コラッツの予想</h2>
 
 <p>
@@ -35,13 +38,73 @@
 
 <h2>最初の1までをとりだす</h2>
 
+<p>
+最初の1までをとりだすために関数takeToを作成する。
+関数takeToは条件を表す関数とリストをとり
+リストのはじめに条件を満たす値までをとりだす。
+</p>
+
+<h3>型</h3>
+
+<p><code>takeTo :: (a -&gt; Bool) -&gt; [a] -&gt; [a]</code></p>
+
+<p>
+第1引数は「条件」なのでa型の値をとりBool値を返す関数だ。
+第2引数はとりだし前のリストなので[a]だ。
+返り値はとりだされた値から成るリストなのでやはり[a]となる。
+</p>
+
 <h3>基底部</h3>
+
+<p>基底となるのは</p>
+
+<ul>
+<li>第2引数が空リスト、または</li>
+<li>リストの先頭の要素が条件を満たす</li>
+</ul>
+
+<p>のどちらかだ。空リストのときは結果も空リストとする。</p>
+
+<p><code>takeTo _ [] = []</code></p>
+
+<p>
+こうすると「もし条件を満たすものがなかったらリストの全体を返す」ということになる。
+リストの先頭の要素が条件を満たすときはそれ以降の要素は不要なので、
+先頭要素ひとつから成るリストを返す。
+</p>
+
+<p><code>takeTo p (x : xs)<br/>
+	<span class="indent1">| p x = [x]</span></code></p>
 
 <h3>再帰部</h3>
 
+<p>
+リストの先頭要素が条件を満たさないときは
+残りのリストから条件を満たすものをとりだしてそれに先頭の要素を追加すれば良い。
+</p>
+
+<p><code><span class="indent1">| otherwise = x : takeTo p xs</span></code></p>
+
+<h3>出来上がり</h3>
+
+<p><code>takeTo _ [] = []<br/>
+takeTo p (x : xs)<br/>
+	<span class="indent1">| p x = [x]</span><br/>
+	<span class="indent1">| otherwise = x : takeTo p xs</span></code></p>
+
+<p><code>% ghci collatz.hs<br/>
+*Main&gt; takeTo even [3, 7, 9, 8, 5, 4, 2]<br/>
+[3,7,9,8]</code></p>
+
 <h3>関数foldrを使う</h3>
 
+<h3>ポイントフリースタイル</h3>
+
+<h3>ポイントフリー狂</h3>
+
 <h2>無限数列を作る</h2>
+
+<h3>型</h3>
 
 <h3>基底部</h3>
 
