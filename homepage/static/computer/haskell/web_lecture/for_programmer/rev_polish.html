@@ -1,10 +1,193 @@
 逆ポーランド記法電卓
 
-<p>(工事中 0%)</p>
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/rev_polish.hs"
+	>rev_polish.hs</a></p>
+
+<h2>はじめに</h2>
+
+<p>
+演算子を後に書く記法が逆ポーランド記法だ。後置記法とも呼ぶ。
+スタックマシンとの相性が良いためポーランド記法よりもむしろ有名だ。
+</p>
+
+<p>
+<a href="https://ja.wikipedia.org/wiki/逆ポーランド記法"
+	>ウィキペディア: 逆ポーランド記法</a>
+</p>
+
+<h2>例</h2>
+
+<p>同じ意味の中置記法の式と逆ポーランド記法の式だ。</p>
+
+<p><code>(1 + 5) * (2 + 3)</code></p>
+
+<p><code>1 5 + 2 3 + *</code></p>
+
+<h2>仕様</h2>
+
+<p>
+整数の四則演算のみとする。
+数値や演算子を文字列のリストとしてわたす。
+返り値は整数のリストのMaybe値だ。
+計算が完全に終われば1要素のみのリストとなる。
+演算子が足りず計算の途中ならば複数の整数がリストに残る。
+数値が足りず演算が実行できないときや文字列が演算子でも数値でもないときは
+Nothing値を返す。
+</p>
+
+<h2>考えかた</h2>
+
+<p>
+命令リストを先頭から読みながら状態を変化させていくことを考える。
+</p>
+
+<h3>例</h3>
+
+<ul>
+<li>1 -&gt; [1]</li>
+<li>5 -&gt; [5, 1]</li>
+<li>+ -&gt; [6]</li>
+<li>2 -&gt; [2, 6]</li>
+<li>3 -&gt; [3, 2, 6]</li>
+<li>+ -&gt; [5, 6]</li>
+<li>* -&gt; [30]</li>
+</ul>
+
+<h3>数値</h3>
+
+<p>数値を読み込んだらスタックに読み込んだ値を追加する。</p>
+
+<h3>演算子</h3>
+
+<p>
+演算子を読み込んだら
+スタックのうえふたつの数値に演算を適用しスタックにもどす。
+数値はさきにはいったものがスタックの下にあることに注意する。
+演算の第1引数にするのは下のほうの値で第2引数が上の値となる。
+</p>
+
+<h2>コード</h2>
+
+<h3>準備</h3>
+
+<p><code>import Text.Read</code></p>
+
+<h3>演算子表</h3>
+
+<p><code>operators :: [(String, Integer -&gt; Integer -&gt; Integer)]<br/>
+operators = [("+", (+)), ("-", (-)), ("*", (*)), ("/", div)]</code></p>
+
+<h3>関数rpolishIter</h3>
+
+<p>
+関数rplishIterは第1引数に蓄積変数として数値リストをとる。これをスタックとして使う。
+</p>
+
+<h4>型</h4>
+
+<p>
+第1引数に数値リストをとり第2引数に命令のリストをとる。
+返り値は数値リストとなる。
+数値リストはエラーに対応するためにMaybe値とする。
+</p>
+
+<p><code>rpolishIter :: Maybe [Integer] -&gt; [String] -&gt; Maybe [Integer]</code></p>
+
+<h4>命令リストが空のとき</h4>
+
+<p>
+命令リストが空ならばそれ以上の命令がないということなので
+そのときの蓄積変数(スタック)の値が結果の値となる。
+</p>
+
+<p><code>rpolishIter mns [] = mns</code></p>
+
+<h4>数値リストのJust, Nothingによる分岐</h4>
+
+<p>
+数値リストがNothingのときは計算に失敗したということなので全体の値もNothingとなる。
+数値リストがJust値のときは数値リストでnsを束縛し命令列の先頭sと残りssとにわける。
+</p>
+
+<p><code>rpolishIter (Just ns) (s : ss) = ...<br/>
+rpolishIter _ _ = Nothing</code></p>
+
+<h4>演算子か数値か</h4>
+
+<p>
+命令sで演算子リストを検索して演算動作を探す。
+演算子リストの検索に失敗したら数値としての読み込みを試す。
+</p>
+
+<p><code>rpolishIter (Just ns) (s : ss) = case lookup s operators of<br/>
+	<span class="indent1">Just o -&gt; ...</span><br/>
+	<span class="indent1">_ -&gt; ...</span><br/></code></p>
+
+<h4>数値</h4>
+
+<p>
+数値として読み込めるならば数値リストに値を追加する。
+そうでないならNothing値を返す。
+</p>
+
+<p><code><span class="indent1">_ -&gt; rpolishIter (maybe Nothing (Just . (: ns)) $ readMaybe s) ss</span></code></p>
+
+<p>
+その結果を新しいスタックの値として関数rpolishIterに第1引数として与える。
+蓄積変数の値を変化させ命令リストから先頭を削って同じ関数に与えている。
+これは変数の値を変化させながらループするのと同じことだ。
+</p>
+
+<h4>演算子</h4>
+
+<p>
+命令が演算子として解釈されるならば
+まずは数値リストが2つ以上の整数を含んでいることを確認し、
+先頭の2整数を逆順で演算子に与える。
+そうでないなら全体の値はNothingとなる。
+</p>
+
+<p><code><span class="indent1">Just o -&gt; case ns of</span><br/>
+		<span class="indent2">y : x : ns' -&gt; rpolishIter (Just $ x `o` y ns') ss</span><br/>
+		<span class="indent2">_ -&gt; Nothing</span></code></p>
+
+<p>
+くりかえしになるが、
+結果はスタックの新しい値として関数rpolishIterに第1引数として与えられる。
+蓄積変数と命令列を更新したループとなる。
+</p>
+
+<h3>関数rpolish</h3>
+
+<p>第1引数に数値リストの初期値を与える。</p>
+
+<p><code>rpolish :: [String] -&gt; Maybe [Integer]<br/>
+rpolish = rpolishIter $ Just []</code></p>
+
+<h2>出来上がり</h2>
+
+<p><code>rpolishIter :: Maybe [Integer] -&gt; [String] -&gt; Maybe [Integer]<br/>
+rpolishIter mns [] = mns<br/>
+rpolishIter (Just ns) (s : ss) = case lookup s operators of<br/>
+	<span class="indent1">Just o -&gt; case ns of</span><br/>
+		<span class="indent2">y : x : ns' -&gt; rpolishIter (Just $ x `o` y : ns') ss</span><br/>
+		<span class="indent2">_ -&gt; Nothing</span><br/>
+	<span class="indent1">_ -&gt; rpolishIter (maybe Nothing (Just . (: ns)) $ readMaybe s) ss</span><br/>
+rpolishIter _ _ = Nothing</code></p>
+
+<p><code>rpolish :: [String] -&gt; Maybe [Integer]<br/>
+rpolish = rpolishIter $ Just []</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+蓄積変数を使った反復的処理の例を見た。
+2変数を使ったループとして考えることができる。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/polish_fold_right.html"
 	>「ポーランド記法電卓とたたみこみ(右)」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/rev_polish_fold_left.html"
+	>「逆ポーランド記法電卓とたたみこみ(左)」へ</a>
 </p>
