@@ -198,129 +198,84 @@ takeTo
 * takeToを使うとリストから最初の1までをとる処理は
 	takeTo (== 1) [...]
 
-collatz14 :: Page
-collatz14 = [\t -> do
-	writeTopTitle t "前の値から次の値を作る"
-	text t "", \t -> do
-	text t "* ここからが本題", \t -> do
-	text t "* コラッツ数列の作りかたを再掲する", \t -> do
-	itext t 1 "- nが偶数ならば2で割り", \t -> do
-	itext t 1 "- nが奇数ならば3をかけて1を足す", \t -> do
-	text t "* 前の値から次の値を求める関数", \t -> do
-	itext t 1 "collatzNext :: Int -> Int", \t -> do
-	itext t 1 "collatzNext n", \t -> do
-	itext t 2 "| even n = n `div` 2", \t -> do
-	itext t 2 "| otherwise = n * 3 + 1"
- ]
+前の値から次の値を作る
+* ここからが本題
+* コラッツ数列の作りかたを再掲する
+	- nが偶数ならば2で割り
+	- nが奇数ならば3をかけて1を足す
+* 前の値から次の値を求める関数
+	collatzNext :: Int -> Int
+	collatzNext n
+		| even n = n `div` 2
+		| otherwise = n * 3 + 1
 
-collatz15 :: Page
-collatz15 = [\t -> do
-	writeTopTitle t "無限数列を作る"
-	text t "", \t -> do
-	text t "* 以下のようにして無限数列を作る", \t -> do
-	itext t 1 "collatzInf :: Int -> [Int]", \t -> do
-	itext t 1 "collatzInf n = n : collatzInf (collatzNext n)", \t -> do
-	text t "* nから始まる数列はnの次から始まる数列にnを追加したもの", \t -> do
-	text t "* 結果は以下のような数列になる", \t -> do
-	itext t 0.5 "[n, collatzNext n, collatzNext (collatzNext n) ...]", \t -> do
-	text t "* これを一般化すると", \t -> do
-	itext t 0.5 "[x, f x, f (f x), f (f (f x)), f (f (f (f x))) ...]", \t -> do
-	text t "* このような列はしばしば使われるので関数が用意されている", \t -> do
-	text t "* 上の[x, f x, ...]はiterate f xで表すことができる"
- ]
+無限数列を作る
+* 以下のようにして無限数列を作る
+	collatzInf :: Int -> [Int]
+	collatzInf n = n : collatzInf (collatzNext n)
+* nから始まる数列はnの次から始まる数列にnを追加したもの
+* 結果は以下のような数列になる
+	[n, collatzNext n, collatzNext (collatzNext n) ...]
+* これを一般化すると
+	[x, f x, f (f x), f (f (f x)), f (f (f (f x))) ...]
+* このような列はしばしば使われるので関数が用意されている
+* 上の[x, f x, ...]はiterate f xで表すことができる
 
-collatz16 :: Page
-collatz16 = [\t -> do
-	writeTopTitle t "無限数列を作る"
-	text t "", \t -> do
-	text t "* iterateを使うと以下のようにできる", \t -> do
-	itext t 1 "collatzInf = iterate collatzNext", \t -> do
-	text t "* collatzNextを展開すると", \t -> do
-	itext t 1 "collatzInf = iterate $ \\n -> if even n"
-	itext t 2 "then n `div` 2"
-	itext t 2 "else n * 3 + 1"
- ]
+無限数列を作る
+* iterateを使うと以下のようにできる
+	collatzInf = iterate collatzNext
+* collatzNextを展開すると
+	collatzInf = iterate $ \\n -> if even n
+		then n `div` 2
+		else n * 3 + 1
 
-collatzInf :: Int -> [Int]
-collatzInf = iterate $ \n -> if even n
-	then n `div` 2
-	else n * 3 + 1
+試してみる
+* collatz.hsに書き込もう
+	collatzInf :: Int -> [Int]
+	collatzInf = iterate $ \\n -> if even n
+		then n `div` 2
+		else n * 3 + 1
+* 試してみよう
+	*Main> :reload
+	*Main> take 10 $ collatzInf
 
-cl17int1 :: Int
-cl17int1 = unsafePerformIO $ randomRIO (5, 30)
+iterate
+* ここでiterateの定義を見てみよう
+* 型は以下のようになる
+	iterate :: (a -> a) -> a -> [a]
+* 定義は以下のようになる
+	iterate f x = x : iterate f (f x)
+* xに次々とfを適用していってできるリストは
+	- (f x)に次々とfを適用していってできるリストに
+	- xを追加したもの
 
-collatz17 :: Page
-collatz17 = [\t -> do
-	writeTopTitle t "試してみる"
-	text t "", \t -> do
-	text t "* collatz.hsに書き込もう", \t -> do
-	itext t 1 "collatzInf :: Int -> [Int]"
-	itext t 1 "collatzInf = iterate $ \\n -> if even n"
-	itext t 2 "then n `div` 2"
-	itext t 2 "else n * 3 + 1", \t -> do
-	text t "* 試してみよう", \t -> do
-	itext t 1 "*Main> :reload", \t -> do
-	itext t 1 $ "*Main> take 10 $ collatzInf " ++ show cl17int1, \t -> do
-	itext t 1 $ show $ take 10 $ collatzInf cl17int1
- ]
+無限数列(まとめ)
+* 次の値が前の値に関数fを適用したものであるようなリスト
+* そのようなリストは以下のようにして作ることができる
+	mkSomeList x = x : mkSomeList (f x)
+* この枠組みを関数として取り出したものがiterate関数
+	iterate f x
+	-> [x, f x, f (f x), f (f (f x)) ...]
 
-collatz18 :: Page
-collatz18 = [\t -> do
-	writeTopTitle t "iterate"
-	text t "", \t -> do
-	text t "* ここでiterateの定義を見てみよう", \t -> do
-	text t "* 型は以下のようになる", \t -> do
-	itext t 1 "iterate :: (a -> a) -> a -> [a]", \t -> do
-	text t "* 定義は以下のようになる", \t -> do
-	itext t 1 "iterate f x = x : iterate f (f x)", \t -> do
-	text t "* xに次々とfを適用していってできるリストは", \t -> do
-	itext t 1 "- (f x)に次々とfを適用していってできるリストに", \t -> do
-	itext t 1 "- xを追加したもの"
- ]
+コラッツ数列
+* 1で終了するようにしよう
+	collatz :: Int -> [Int]
+	collatz = takeTo (== 1) . collatzInf
+* これをcollatz.hsに書き込もう
+* 試してみる
+	*Main> :reload
+	*Main> collatz 11
 
-collatz19 :: Page
-collatz19 = [\t -> do
-	writeTopTitle t "無限数列(まとめ)"
-	text t "", \t -> do
-	text t "* 次の値が前の値に関数fを適用したものであるようなリスト", \t -> do
-	text t "* そのようなリストは以下のようにして作ることができる", \t -> do
-	itext t 1 "mkSomeList x = x : mkSomeList (f x)", \t -> do
-	text t "* この枠組みを関数として取り出したものがiterate関数", \t -> do
-	itext t 1 "iterate f x", \t -> do
-	arrowIText t 1 "[x, f x, f (f x), f (f (f x)) ...]"
- ]
-
-collatz :: Int -> [Int]
-collatz = takeTo (== 1) . collatzInf
-
-collatz20 :: Page
-collatz20 = [\t -> do
-	writeTopTitle t "コラッツ数列"
-	text t "", \t -> do
-	text t "* 1で終了するようにしよう", \t -> do
-	itext t 1 "collatz :: Int -> [Int]", \t -> do
-	itext t 1 "collatz = takeTo (== 1) . collatzInf", \t -> do
-	text t "* これをcollatz.hsに書き込もう", \t -> do
-	text t "* 試してみる", \t -> do
-	itext t 1 "*Main> :reload", \t -> do
-	itext t 1 "*Main> collatz 11", \t -> do
-	itext t 1 $ show $ collatz 11
- ]
-
-collatzSummary :: Page
-collatzSummary = [\t -> do
-	writeTopTitle t "コラッツ数列(まとめ)"
-	text t "", \t -> do
-	text t "* コラッツ数列を返す関数を作った", \t -> do
-	text t "* 無限数列を作ってから必要な部分を取り出した", \t -> do
-	itext t 1 "- 「次々に値を生成する」部分と", \t -> do
-	itext t 1 "- 「終了条件」とを分けることができた", \t -> do
-	text t "* 条件を満たすまでを取り出す関数を作った", \t -> do
-	itext t 1 "- 復習のためにfoldrで書き直した", \t -> do
-	itext t 1 "- ポイントフリースタイルの深渕をのぞいた", \t -> do
-	text t "* 「値に次々と関数を適用する」という枠組みについて学んだ", \t -> do
-	itext t 1 "- その枠組みは関数iterateによって抽象化されている"
- ]
+コラッツ数列(まとめ)
+* コラッツ数列を返す関数を作った
+* 無限数列を作ってから必要な部分を取り出した
+	- 「次々に値を生成する」部分と
+	- 「終了条件」とを分けることができた
+* 条件を満たすまでを取り出す関数を作った
+	- 復習のためにfoldrで書き直した
+	- ポイントフリースタイルの深渕をのぞいた
+* 「値に次々と関数を適用する」という枠組みについて学んだ
+	- その枠組みは関数iterateによって抽象化されている
 
 factorization1 :: Page
 factorization1 = [\t -> do
