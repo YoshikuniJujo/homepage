@@ -1,7 +1,5 @@
 ポーランド記法とたたみこみ(右)
 
-<p>(工事中 0%)</p>
-
 <a href="/computer/haskell/web_lecture/for_programmer/codes/polish_foldr.hs"
 	>polish_foldr.hs</a>
 
@@ -35,11 +33,72 @@ operators = [("+", (+)), ("-", (-)), ("*", (*)), ("/", div)]</code></p>
 
 <p>polish1 :: String -&gt; Maybe [Integer] -&gt; Maybe [Integer]</p>
 
-<p>(工事中)</p>
+<p>命令ひとつとそのときの数値リストとをとり新たな数値リストを返す。</p>
+
+<h3>Maybe値による場合わけ</h3>
+
+<p>第2引数の数値リストがJustの場合とNothingの場合とで場合わけをする。</p>
+
+<p><code>polish1 s (Just ns) = ...<br/>
+polish1 _ _ = Nothing</code></p>
+
+<p>数値リストがNothingならば新しい数値リストもNothingとなる。</p>
+
+<h3>演算子の検索</h3>
+
+<p>関数lookupで演算子リストのなかから演算子名を鍵として演算動作を検索する。</p>
+
+<p><code>polish1 s (Just ns) = case lookup s operators of<br/>
+	<span class="indent1">Just o -&gt; ...</span><br/>
+	<span class="indent1">_ -&gt; ...</span></code></p>
+
+<h3>数値</h3>
+
+<p>
+演算子リストのなかに一致する文字列がなかったとき数値としての解釈を試す。
+</p>
+
+<p><code><span class="indent1">_ -&gt; maybe Nothing (Just . (: ns)) $ readMaybe s</span></code></p>
+
+<p>
+数値として解釈できるならば数値リストnsの先頭に解釈した値を追加しJust値として返す。
+そうでなければNothingを返す。
+</p>
+
+<h3>演算子</h3>
+
+<p>
+演算子リストから演算動作が取り出せたなら数値リストにすくなくとも2要素の数値が
+存在することを確認しその2要素に演算を適用し数値リストにもどす。
+</p>
+
+<p><code><span class="indent1">Just o -&gt; case ns of</span><br/>
+		<span class="indent2">x : y : ns' -&gt; Just $ x `o` y : ns'</span><br/>
+		<span class="indent2">_ -&gt; Nothing</span></code></p>
+
+<p>2要素以上の数値がなければNothingを返す。</p>
+
+<h2>関数polish</h2>
+
+<p>
+関数polish1はひとつの命令と残りの命令を実行した結果をとり新しい結果を返す関数だ。
+これをfoldrに与えることで関数polishができる。
+</p>
+
+<p><code>polish :: [String] -&gt; Maybe [Integer]<br/>
+polish = foldr polish1 (Just [])</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+古い値から新しい値を作ることだけに集中し再帰の部分をfoldrにまかせることで、
+一度に考えることをすくなくすることができる。
+実装が簡単になりバグも減らせる。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/polish.html"
 	>「ポーランド記法電卓」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/rev_polish.html"
+	>「逆ポーランド記法電卓」へ</a>
 </p>
