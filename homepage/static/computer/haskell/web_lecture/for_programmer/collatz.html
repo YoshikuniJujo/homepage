@@ -1,7 +1,5 @@
 コラッツ数列
 
-<p>(工事中 0%)</p>
-
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/collatz.hs"
 	>collatz.hs</a></p>
 
@@ -21,7 +19,7 @@
 
 <h2>例</h2>
 
-<p><code>24 12 6 3 10 5 16 8 4 2 1 4 2 1 4 2 1 ...</code></p>
+<p><code>24, 12, 6, 3, 10, 5, 16, 8, 4, 2, 1, 4, 2, 1, 4, 2, 1, ...</code></p>
 
 <h2>コラッツ数列</h2>
 
@@ -163,25 +161,109 @@ Control.Applicativeモジュールを使う。
 
 <h2>無限数列を作る</h2>
 
+<h3>仕様</h3>
+
+<p>
+与えられた自然数から始まりコラッツ数列のルールにしたがって
+次の数を生成することで無限数列を作成する。
+</p>
+
 <h3>型</h3>
+
+<p>整数をとって整数のリストを返す。</p>
+
+<p><code>collatsInf :: Integer -&gt; [Integer]</code></p>
+
+<h3>次を求める</h3>
+
+<p>関数collatsNextは与えられた値から次の値を求める。</p>
+
+<p><code>collatsNext :: Integer -&gt; Integer<br/>
+collatsNext n<br/>
+	<span class="indent1">| even n = n `div` 2</span><br/>
+	<span class="indent1">| otherwise = n * 3 + 1</span></code></p>
 
 <h3>基底部</h3>
 
+<p>
+無限数列を求めるときには基底部は存在しない。
+基底部は終了条件だ。
+これが必要ないということは終了条件を分離できるということだ。
+</p>
+
 <h3>再帰部</h3>
+
+<p><code>collatsInf n = n : collatsInf (collatzNext n)</code></p>
+
+<p>
+nから始まるコラッツ数列はnの次の値から始まるコラッツ数列の先頭にnを追加したものだ。
+</p>
+
+<h3>出来上がり</h3>
+
+<p><code>collatsNext :: Integer -&gt; Integer<br/>
+collatsNext n<br/>
+	<span class="indent1">| even n = n `div` 2</span><br/>
+	<span class="indent1">| otherwise = n * 3 + 1</span></code></p>
+
+<p><code>collatsInf :: Integer -&gt; [Integer]<br/>
+collatsInf n = n : collatsInf (collatsNext n)</code></p>
 
 <h3>関数iterate</h3>
 
+<p>collatsInf nによって作られるリストは以下のようになる。</p>
+
+<p><code>[n, collatsNext n, collatsNext (collatsNext n), ...]</code></p>
+
+<p>
+関数iterateはこのような形のリストを作成する関数だ。
+iterate f nは以下のようなリストを作成する。
+</p>
+
+<p><code>[n, f n, f (f n), f (f (f n)), f (f (f (f n))), ...]</code></p>
+
+<p>これを使うと関数collatsInfは次のように書き直せる。</p>
+
+<p><code>collatsInf = iterate collatsNext</code></p>
+
+<h3>展開する</h3>
+
+<p>collatsNextを展開しておく。</p>
+
+<p><code>collatsInf = iterate $ \n -&gt; if even n then n `div` 2 else n * 3 + 1</code></p>
+
 <h2>無限数列からコラッツ数列をとりだす</h2>
+
+<p><code>collats :: Integer -&gt; [Integer]<br/>
+collats = takeTo (== 1) . collatsInf</code></p>
+
+<p>関数collatsInfで作成した無限数列から値1までをとりだしている。</p>
 
 <h2>出来上がり</h2>
 
+<p><code>takeTo :: (a -&gt; Bool) -&gt; [a] -&gt; [a]<br/>
+takeTo p = foldr (\x -&gt; (x :) . if p x then const [] else id) []</code></p>
+
+<p><code>collatsInf :: Integer -&gt; [Integer]<br/>
+collatsInf = iterate $ \n -&gt; if even n then n `div` 2 else n * 3 + 1</code></p>
+
+<p><code>collats :: Integer -&gt; [Integer]<br/>
+collats = takeTo (== 1) . collatsInf</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; collats 11<br/>
+[11,34,17,52,26,13,40,20,10,5,16,8,4,2,1]</code></p>
+
 <h2>まとめ</h2>
 
-<p>(工事中)</p>
+<p>
+無限リストを利用することで値を生成する部分と終了条件とを分離した。
+関数foldrや関数iterateを使うことで直接的な再帰を使わずに定義した。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/enum_integer.html"
 	>「整数の列挙」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/iterate.html"
+	>「関数iterateの定義」へ</a>
 </p>
