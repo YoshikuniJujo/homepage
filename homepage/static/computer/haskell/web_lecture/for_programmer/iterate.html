@@ -1,10 +1,66 @@
 関数iterateの定義
 
-<p>(工事中 0%)</p>
+<h2>はじめに</h2>
+
+<p>コラッツ数列の例で使った関数iterateの定義を見ていこう。</p>
+
+<h2>動作</h2>
+
+<p>コラッツ数列のもととなる無限リストの定義を以下に示す。</p>
+
+<p><code>collatsInf :: Integer -&gt; [Integer]<br/>
+collatsInf n = n : collatsInf (collatsNext n)</code></p>
+
+<p>関数iterateで以下のように書き換えた。</p>
+
+<p><code>collatsInf = iterate collatsNext</code></p>
+
+<p>iterate f xは以下のような無限リストを生成する。</p>
+
+<p><code>[x, f x, f (f x), f (f (f x)), f (f (f (f x))), ...]</code></p>
+
+<p><code>% ghci<br/>
+Prelude&gt; take 10 $ iterate (+ 1) 0<br/>
+[0,1,2,3,4,5,6,7,8,9]</code></p>
+
+<p>次の値が前の値のみに依存するような数列を生成するのに使える。</p>
+
+<h2>型</h2>
+
+<p>次を求める関数と初期値をとり初期値から次々に生成した値のリストを返す。</p>
+
+<p><code>myIterate :: (a -&gt; a) -&gt; a -&gt; [a]</code></p>
+
+<h2>定義</h2>
+
+<p>
+初期値に関数fを次々に適用していってできるリストは
+初期値に関数fを適用したものを初期値として同じことをしたリストの
+先頭に初期値を追加したものだ。
+</p>
+
+<p><code>myIterate f x = x : myIterate f (f x)</code></p>
+
+<h2>展開</h2>
+
+<p>展開してみるとうえの定義でうまくいくことがわかる。</p>
+
+<p><code>myIterate f x<br/>
+-&gt; x : myIterate f (f x)<br/>
+-&gt; x : f x : myIterate f (f (f x))<br/>
+-&gt; x : f x : f (f x) : myIterate f (f (f (f x)))<br/>
+...</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+初期値に次々と関数を適用していくことで無限リストを生成する関数iterateの定義を
+学んだ。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/collatz.html"
 	>「コラッツ数列」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/factorization.html"
+	>「素因数分解」へ</a>
 </p>
