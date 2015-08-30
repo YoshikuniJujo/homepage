@@ -1,15 +1,18 @@
 構文: レイアウトルール
 
-<p>(工事中 0%)</p>
-
 <h2>はじめに</h2>
 
 <p>
 case式やlet式、where節はインデントで構文を表現している。
-インデントによって{}や;を追加する場所を決めている。
 Haskell 2010 reportの2.7節で概要が説明されている。
 10.3節では正確な仕様が規定されている。
 インデントルールを使わないで明示的に{}や;を記述することもできる。
+</p>
+
+<p>
+概要と仕様について学ぶが細かい話は雰囲気がわかる程度で良い。
+再帰関数と代数的データ型と入出力を学んだあとに仕様からレイアウトルールを
+解釈する関数をHaskellで実装する予定だ。
 </p>
 
 <p><a href="https://www.haskell.org/onlinereport/haskell2010/haskellch2.html#x7-210002.7"
@@ -69,7 +72,7 @@ Haskellではレイアウトルールを使うことも明示的に{}と;を使�
 
 <p>
 インデントルールがネストしたときに内側のルール開始後すぐに終了することがある。
-インデントルールを開始するキーワードのあとにすぐ外側のルールのインデントと
+インデントルールを開始するキーワードのあとの語がすぐ外側のルールのインデントと
 同じかまたはより浅いインデントだったときは内側のルールはすぐに終了することになる。
 このとき{}が追加される。
 </p>
@@ -88,6 +91,12 @@ Haskellではレイアウトルールを使うことも明示的に{}と;を使�
 </p>
 
 <h2>仕様</h2>
+
+<p>
+以下に正確な仕様を記述する。
+仕様書に厳密な記述があるということがわかれば良い。
+なんとなくの理解で十分だ。
+</p>
 
 <h3>前処理</h3>
 
@@ -120,6 +129,89 @@ Haskellではレイアウトルールを使うことも明示的に{}と;を使�
 <h3>関数L</h3>
 
 <p>前処理後のトークン列に対して以下のような関数Lを適用する。</p>
+
+<p><code>L (&lt;n&gt; : ts) (m : ms) = ; : (L ts (m : ms)) <span style="padding-left: 2em">if n = m</span><br/>
+		<span style="padding-left: 11em">= } : (L (&lt;n&gt; : ts) ms) <span style="padding-left: 1em">if n &lt; m</span></span></br/>
+L (&lt;n&gt; : ts) ms <span style="padding-left: 3em">= L ts ms</span><br/>
+L ({n} : ts) (m : ms) = { : (L ts (n : m : ms)) if n &gt; m<br/>
+L ({n} : ts) [] <span style="padding-left: 3em">= { : (L ts [n]) <span style="padding-left: 4.5em">if n &gt; 0</span></span><br/>
+L ({n} : ts) ms <span style="padding-left: 3em">= { : } : (L (&lt;n&gt; : ts) ms)</span><br/>
+L (} : ts) (0 : ms) <span style="padding-left: 1em">= } : (L ts ms)</span><br/>
+L (} : ts) ms <span style="padding-left: 4em">= parse-error</span><br/>
+L ({ : ts) ms <span style="padding-left: 4em">= { : (L ts (0 : ms))</span><br/>
+L (t : ts) (m : ms) <span style="padding-left: 1em">= } : (L (t : ts) ms)</span><br/>
+		<span class="indent4">if m /= 0 and parse-error(t)</span><br/>
+L (t : ts) ms <span style="padding-left: 4em">= t : (L ts ms)</span><br/>
+L [] [] <span style="padding-left: 7em">= []</span><br/>
+L [] (m : ms) <span style="padding-left: 4em">= } : L [] ms <span style="padding-left: 5em">if m /= 0</span></span></code></p>
+
+<h4>&lt;n&gt;</h4>
+
+<p>
+&lt;n&gt;は次のトークンのインデントを表す。
+mは現在のインデントルールのインデント値だ。
+nとmが等しければ(if n = m)、次の要素が始まるので;を追加する(; : ...)。
+nがmより小さければ(if n &lt; m)、インデントルールのスコープが終了する。
+}を追加しmをひとつ削る(} : (L (&lt;n&gt; : ts) ms))。
+&lt;n&gt;が次のスコープのインデントより小さいあいだそれをくりかえす。
+それ以外、つまりnがmsの先頭の値より大きいかまたはmsが空のときは
+&lt;n&gt;は無視される(L ts ms)。
+これはより深いインデントによって要素が継続することを表している。
+</p>
+
+<h4>{n}</h4>
+
+<p>
+{n}はインデントルールの始まるときのインデントを示す。
+現在のスコープよりも深いとき(if n &gt; m)または現在インデントルールのスコープ外に
+あるとき(L ({n} : ts) [])、{を追加しnを現在のインデント値とする(n : m : ms)。
+現在のスコープよりも浅いとき{}を追加してから現在のスコープの動作を行う。
+</p>
+
+<h4>}</h4>
+
+<p>
+トークン}があったら現在のインデント値が0ならばそのまま}を残す。
+「現在のインデント値が0」ということは明示的な{}のなかにいることを示している。
+インデント値がそれ以外の値であれば暗黙の{に対する明示的な}ということになり、
+パースエラーとなる。
+</p>
+
+<h4>{</h4>
+
+<p>
+明示的なトークン{が入力されたなら現在のインデント値を0とする。
+</p>
+
+<h4>パースエラー</h4>
+
+<p>
+インデントが0でないスコープ、つまり暗黙の{}のなかにいるときに
+次のトークンでパースエラーとなるような場合には}を追加する。
+</p>
+
+<h4>そのまま</h4>
+
+<p>
+それ以外のトークン(L (t : ts) ns)に対してはそのまま(t : (L ts ms))
+</p>
+
+<h4>入力の終了</h4>
+
+<p>
+明示的、暗黙のどちらのスコープよりも外(L [] [])にあれば終了する。
+また暗黙のスコープ(if m /= 0)にあればそのスコープについては問題ない。
+明示的なスコープ(m = 0)のときはパースエラーとなる。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+Haskellではレイアウトルールを使うことも使わないこともできる。
+レイアウトルールは{}と;の追加という形で定義される。
+厳密な定義があるが感覚的に理解しやすいルールとなっている。
+実際にいろいろと試してみて体で覚えるのが良いだろう。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/ifthenelse.html"
