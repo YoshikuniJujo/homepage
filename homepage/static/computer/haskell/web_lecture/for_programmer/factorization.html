@@ -2,6 +2,86 @@
 
 <p>(工事中 0%)</p>
 
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/factorization.hs"
+	>factorization.hs</a></p>
+
+<h2>素因数分解とは</h2>
+
+<p>素因数分解とは数を素数積で表現することだ。</p>
+
+<p><code>420 = 2 * 2 * 3 * 5 * 7</code></p>
+
+<p>大きな数の素因数分解を効率的に行うアルゴリズムはない。</p>
+
+<h2>考えかた</h2>
+
+<p>素因数分解するには以下のようにすれば良い。</p>
+
+<ol>
+<li>整数を2以上の最小の約数と残りの数に分ける</li>
+<li>残りの数についてそれをくりかえす</li>
+</ol>
+
+<h2>最小の約数</h2>
+
+<p>
+整数nの最小の約数を求める。
+最小の約数は2以上の整数のリストの各要素でnを割り0になるものだけを集め
+その先頭をとれば良い。
+</p>
+
+<p><code>head $ filter ((== 0) . (n `mod`)) [2 ..]</code></p>
+
+<h2>最小の約数と残りの数</h2>
+
+<p>
+最小の約数でもとの数をわれば残りの数となる。
+1はそれ以上わけられないと考えてNothingとする。
+</p>
+
+<p><code>popFactor :: Integer -&gt; Maybe (Integer, Integer)<br/>
+popFactor 1 = Nothing<br/>
+popFactor n = Just (f, n `div` f)<br/>
+	<span class="indent1">where f = head $ filter ((== 0) . (n `mod`)) [2 ..]</span></code></p>
+
+<p><code>% ghci factorization.hs<br/>
+*Main&gt; popFactor 95<br/>
+Just (5,19)<br/>
+*Main&gt; popFactor 11183<br/>
+Just (53,211)</code></p>
+
+<h2>素因数分解</h2>
+
+<p>popFactor nの結果によって以下のような値を返せば良い。</p>
+
+<ul>
+<li>Nothingならば空リスト</li>
+<li>Just (f, n')ならばn'の素因数分解の結果にfを追加</li>
+</ul>
+
+<p><code>factorization :: Integer -&gt; [Integer]<br/>
+factorization n = case popFactor n of<br/>
+	<span class="indent1">Nothing -&gt; []</span><br/>
+	<span class="indent1">Just (f, n') -&gt; f : factorization n'</span></code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; factorization 163761<br/>
+[3,13,13,17,19]<br/>
+*Main&gt; factorization 30566863<br/>
+[30566863]<br/>
+*Main&gt; factorization 45598842<br/>
+[2,3,3,3,61,109,127]</code></p>
+
+<p>
+桁数の多い素数を引数とするとプロンプトが返ってこなくなるので気をつけよう。
+</p>
+
+<h2>関数iterateの枠組みとの比較</h2>
+
+<h2>関数unfoldrの使用</h2>
+
+<h2>まとめ</h2>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/iterate.html"
 	>「関数iterate」へもどる</a>
