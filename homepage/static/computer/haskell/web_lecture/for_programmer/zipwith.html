@@ -1,7 +1,5 @@
 関数zipWithの紹介
 
-<p>(工事中 0%)</p>
-
 <h2>はじめに</h2>
 
 <p>
@@ -10,13 +8,39 @@
 ここでは使いかたのみを扱う。
 </p>
 
-<h2>一言で言うと</h2>
+<h2>動作</h2>
 
 <p>関数mapの扱うリストをふたつにしたものだ。</p>
+
+<p><code>map :: (a -&gt; b) -&gt; [a] -&gt; [b]</code></p>
+
+<p><code>zipWith :: (a -&gt; b -&gt; c) -&gt; [a] -&gt; [b] -&gt; [c]</code></p>
+
+<p>
+2引数関数とふたつのリストをとり、リストから1つずつ値をとりだして関数に与え結果を
+リストにまとめる。
+</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; zipWith (+) [3, 4, 5] [6, 7, 8, 9]<br/>
+[9,11,13]</code></p>
+
+<p>
+それぞれのリストから0番目、1番目、2番目、...と値をとりだして関数に与えていく。
+短いほうのリストの要素がなくなったところで終了する。
+長いほうのリストの残りの要素は無視される。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+関数zipWithの動作を見た。
+関数mapのリストがふたつになったものだ。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/atpattern.html"
 	>「構文: @パターン」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/fibonacci.html"
+	>「フィボナッチ数列」へ</a>
 </p>
