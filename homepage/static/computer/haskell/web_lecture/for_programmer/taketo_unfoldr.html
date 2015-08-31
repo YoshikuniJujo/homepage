@@ -1,6 +1,71 @@
 関数takeToの関数unfoldrによる定義
 
-<p>(工事中 0%)</p>
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/takeTo_unfoldr.hs"
+	>takeTo_unfoldr.hs</a></p>
+
+<h2>はじめに</h2>
+
+<p>
+抽象化のしかたはひとつではない。
+それが面白いところだ。
+関数takeToは以下のような型だ。
+</p>
+
+<p><code>takeTo :: (a -&gt; Bool) -&gt; [a] -&gt; [a]</code></p>
+
+<p>
+「リストを引数にとる関数」でもあり「リストを返す関数」でもある。
+前者としてfoldrを使って定義したが後者としてunfoldrを使って定義することもできる。
+</p>
+
+<h2>生の再帰</h2>
+
+<p><code>takeTo p [] = []<br/>
+takeTo p (x : xs)<br/>
+	<span class="indent1">| p x = [x]</span><br/>
+	<span class="indent1">| otherwise = x : takeTo p xs</span></code></p>
+
+<p>
+xが条件を満たすならそれ以降の要素は不要なのでxだけから成るリストを返す。
+満たさないならば再帰的にtakeTo pを残りのリストに適用した結果にxを追加する。
+</p>
+
+<h2>関数foldrによる定義</h2>
+
+<p><code>takeTo p = foldr (\x -&gt; (x :) . if p x then const [] else id) []</code></p>
+
+<p>
+xが条件を満たしたときは続く値を問わず空リスト(const [])に、
+満たさないならば続く値に再帰的に関数を適用した結果(id)に、
+xを追加した値を返す。
+引数であるリストの先頭に次々と値を追加していき値を変化させていくイメージだ。
+</p>
+
+<h2>関数unfoldrによる定義</h2>
+
+<p>モジュールData.Listが必要だ。</p>
+
+<p><code>import Data.List</code></p>
+
+<p><code>takeTo = unfoldr $ \s -&gt; case s of<br/>
+	<span class="indent1">[] -&gt; Nothing</span><br/>
+	<span class="indent1">x : xs</span>
+		<span style="padding-left: 0.5em">| p x -&gt; Just (x, [])</span><br/>
+		<span class="indent2">| otherwise -&gt; Just (x, xs)</span>
+	</code></p>
+
+<p>
+リストの先頭を結果として返しながら要素を先頭から削っていくイメージだ。
+xが条件pを満たしたときは次にわたすリストは空リストとする。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+関数takeToを「リストをとる関数」として、あるいは「リストを返す関数」として、
+の2通りで抽象化できることを学んだ。
+暗記するのではなくたくさんの例を見ていくことで体で覚えることが大切だ。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/unfoldr.html"
