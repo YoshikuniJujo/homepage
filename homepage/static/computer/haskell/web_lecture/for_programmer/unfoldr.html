@@ -1,0 +1,43 @@
+関数unfoldrの定義
+
+<h2>はじめに</h2>
+
+<p>素因数分解に使用した関数unfoldrの定義を学ぶ。</p>
+
+<h2>素因数分解</h2>
+
+<p><code>factorization :: Integer -&gt; [Integer]<br/>
+factorization n = case popFactor n of<br/>
+	<span class="indent1">Nothing -&gt; []</span><br/>
+	<span class="indent1">Just (f, n') -&gt; f : factorization n'</span></code></p>
+
+<h2>型</h2>
+
+<p><code>myUnfoldr :: (b -&gt; Maybe (a, b)) -&gt; b -&gt; [a]</code></p>
+
+<p>型bの値を変化させながら型aの値をリストに集めるということだ。</p>
+
+<h2>定義</h2>
+
+<p><code>myUnfoldr f s = case f s of<br/>
+	<span class="indent1">Nothing -&gt; []</span><br/>
+	<span class="indent1">Just (x, s') -&gt; x : myUnfoldr f s'</span></code></p>
+
+<p>
+現在の状態から結果の値と次の状態を求める関数を適用し、
+次の状態からのリストを求めてそれに結果の値を追加する。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+関数iterateでは結果と状態が同じ値である必要があった。
+それら2つを別々の値とし、さらに終了状件も含めた枠組みが関数unfoldrだ。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/factorization.html"
+	>「素因数分解」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/taketo_unfoldr.html"
+	>「関数takeToの関数unfoldrによる定義」へ</a>
+</p>

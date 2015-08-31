@@ -78,13 +78,62 @@ factorization n = case popFactor n of<br/>
 
 <h2>関数iterateの枠組みとの比較</h2>
 
+<p>
+関数iterateでは次々にわたしていく値と結果としてリストに入る値は同じだ。
+たとえばコラッツ数列の例では5の次の値は16であるが、
+この16は結果のリストに入りかつ残りの値を求めるのに使われる。
+しかし素因数分解の例では
+</p>
+
+<ul>
+<li>結果のリストに入るのは最小の約数であり</li>
+<li>次の値に必要なのは残りの数</li>
+</ul>
+
+<p>
+だ。
+素因数分解する関数は関数iterateの枠組みをそのまま使うことはできない。
+</p>
+
 <h2>関数unfoldrの使用</h2>
+
+<p>
+結果のリストに入る値と次を求める値とが異なるときは関数unfoldrが使える。
+この関数では終了条件も指定することができる。
+以下のような関数と初期値をとり生成されるリストを返す。
+</p>
+
+<p><code>値 -&gt; Maybe (結果, 次の値)</code></p>
+
+<p>
+関数popFactorがこの形だ。
+よってfactorizationは以下のように書き換えられる。
+</p>
+
+<p><code>factorization = unfoldr popFactor</code></p>
+
+<p>
+unfoldrを使うにはData.Listモジュールが必要だ。
+以下をファイルの先頭に追加する。
+</p>
+
+<p><code>import Data.List</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; factorization 45598842<br/>
+[2,3,3,3,61,109,127]</code></p>
 
 <h2>まとめ</h2>
 
 <p>
+素因数分解の例を学んだ。
+関数iterateの枠組みではできない結果と途中の値とが別である例だ。
+このような関数は関数unfoldrを使って書ける。
+</p>
+
+<p>
 <a href="/computer/haskell/web_lecture/for_programmer/iterate.html"
-	>「関数iterate」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+	>「関数iterateの定義」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/unfoldr.html"
+	>「関数unfoldrの定義」へ</a>
 </p>
