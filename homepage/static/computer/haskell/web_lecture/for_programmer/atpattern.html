@@ -1,0 +1,47 @@
+構文: @パターン
+
+<p>(工事中 0%)</p>
+
+<h2>先頭の要素を2つにする</h2>
+
+<p>先頭の要素を2つにする関数を考えよう。</p>
+
+<h2>できた</h2>
+
+<p><code>dupHead :: [a] -&gt; [a]<br/>
+dupHead (x : xs) = x : x : xs<br/>
+dupHead _ = []</code></p>
+
+<p>いいね。できた。でも... </p>
+
+<h2>二重化</h2>
+
+<p>
+気にいらない。
+パターンマッチ(x : xs)でxとxsに分けたものを再びリストにまとめている。
+わけたものをまたまとめるなんて無駄なことは書きたくない。
+</p>
+
+<h2>そこで@パターンですよ</h2>
+
+<p>
+@パターンを使えば変数を束縛したうえでさらにパターンマッチを続けることができる。
+</p>
+
+<p><code>dupHead xa@(x : _) = x : xa</code></p>
+
+<p>引数のリストで変数xaを束縛したうえでさらに(x : _)でマッチしている。</p>
+
+<h2>いいね</h2>
+
+<p>
+美しく書けました。
+Haskellは理論的な美しさだけではなく表記を美しくする仕組みがたくさんある。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/taketo_unfoldr.html"
+	>「関数takeToの関数unfoldrによる定義」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/zipwith.html"
+	>「関数zipWithの紹介」へ</a>
+</p>
