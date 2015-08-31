@@ -1,6 +1,7 @@
 関数map
 
-<p>(工事中 0%)</p>
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/maps.hs"
+	>maps.hs</a></p>
 
 <h2>はじめに</h2>
 
@@ -24,7 +25,7 @@ Prelude Data.Char&gt; map toUpper "Hello"<br/>
 
 <h2>型</h2>
 
-<p><code>myMap :: (a -&gt; b) -&gt; [a] -&gt; [b]</code></p>
+<p><code>mapRaw, mapF, mapU :: (a -&gt; b) -&gt; [a] -&gt; [b]</code></p>
 
 <p>
 関数とリストをとりリストの全要素に関数を適用する。
@@ -33,13 +34,63 @@ Prelude Data.Char&gt; map toUpper "Hello"<br/>
 
 <h2>生の再帰</h2>
 
+<p><code>mapRaw f (x : xs) = f x : mapRaw f xs<br/>
+mapRaw _ _ = []</code></p>
+
+<p>
+要素すべてに関数fを適用した結果は、先頭の値に関数fを適用した結果を
+残りの要素すべてに関数fを適用した結果に追加したものだ。
+リストがx : xsにマッチしない、つまり空リストに対しては空リストを返す。
+</p>
+
 <h2>関数foldr</h2>
 
-<h2>関数foldl</h2>
+<p>リストをとる関数としてたたみこみによって定義する。</p>
+
+<p><code>mapF f = foldr ((:) . f) []</code></p>
+
+<p>(:) . fの部分は以下のような段階を踏めばわかるだろう。</p>
+
+<p><code>\x xs -&gt; f x : xs</code></p>
+
+<p><code>\x xs -&gt; (:) (f x) xs</code></p>
+
+<p><code>\x -&gt; (:) $ f x</code></p>
+
+<p><code>(:) . f</code></p>
+
+<p>
+一番うえの式を見ればわかるがxに関数fを適用したものをxsに追加している。
+関数foldrが第1引数にとる関数の第2引数は再帰的に関数を適用した結果であることを
+思い出そう。
+mapRaw関数の定義におけるmapRaw f xsの部分が関数の第2引数となっているということだ。
+</p>
 
 <h2>関数unfoldr</h2>
 
-<h2>良くない定義</h2>
+<p>リストを返す関数として関数unfoldrで定義する。</p>
+
+<p><code>mapU f = unfoldr $ \l -&gt; case l of<br/>
+	<span class="indent1">x : xs -&gt; Just (f x, xs)</span><br/>
+	<span class="indent1">_ -&gt; Nothing</span></code></p>
+
+<p>
+先頭の要素に関数fを適用した値を結果としながらリストを削っていく。
+x : xsにマッチさせたうえでxsとすることによってリストの先頭の値を落とすことが
+できる。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+関数型言語といえばmapと言われるくらいに関数mapは有名で親しみやすい。
+この一番人気とも言える高階関数についてその定義を学んだ。
+生の再帰を使う方法、関数foldr、関数unfoldrを使う方法と見た。
+抽象化の層構造をイメージしよう。
+層構造の途中で関数foldrとunfoldrに分岐して、そのうえの関数mapで合流する感じだ。
+もちろん関数map自体もさらにうえの層のより具体的な関数から使われるための
+抽象的な関数である。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/fibonacci.html"
