@@ -1,0 +1,49 @@
+関数map
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>関数のすべての要素に同じ関数を適用する関数mapの定義を学ぶ。</p>
+
+<h2>動作</h2>
+
+<p>すでに何度も見ているがもう一度おさらいしてみよう。</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; map (* 3) [5, 3, 4, 9, 1]<br/>
+[15,9,12,27,3]<br/>
+Prelude&gt; :m Data.Char<br/>
+Prelude Data.Char&gt; map toUpper "Hello"<br/>
+"HELLO"</code></p>
+
+<p>どっちでもいいが2項演算子として表記することもある。</p>
+
+<p><code>Prelude Data.Char&gt; toUpper `map` "Hello"<br/>
+"HELLO"</code></p>
+
+<h2>型</h2>
+
+<p><code>myMap :: (a -&gt; b) -&gt; [a] -&gt; [b]</code></p>
+
+<p>
+関数とリストをとりリストの全要素に関数を適用する。
+あるいは、関数の引数と返り値の両方をリストにする関数とも考えられる。
+</p>
+
+<h2>生の再帰</h2>
+
+<h2>関数foldr</h2>
+
+<h2>関数foldl</h2>
+
+<h2>関数unfoldr</h2>
+
+<h2>良くない定義</h2>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/fibonacci.html"
+	>「フィボナッチ数列」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer"
+	>「1から学ぶHaskell」トップへ</a>
+</p>
