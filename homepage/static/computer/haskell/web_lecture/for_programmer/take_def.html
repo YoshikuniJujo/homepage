@@ -2,6 +2,63 @@
 
 <p>(工事中 0%)</p>
 
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/takes.hs"
+	>takes.hs</a></p>
+
+<h2>関数take</h2>
+
+<h3>動作</h3>
+
+<p>リストから指定した数の要素をとりだす。</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; take 4 "monkey"<br/>
+"monk"</code></p>
+
+<h3>型</h3>
+
+<p><code>takeRaw, takeU :: Int -&gt; [a] -&gt; [a]</code></p>
+
+<h3>生の再帰</h3>
+
+<p><code>takeRaw n (x : xs) | n &gt; 0 = x : takeRaw (n - 1) xs<br/>
+takeRaw _ _ = []</code></p>
+
+<p>x : xsからn個とるのは値xをxsからn - 1個とったリストに追加することだ。</p>
+
+<h3>関数unfoldr</h3>
+
+<p><code>takeU = curry . unfoldr $ \nl -&gt; case nl of<br/>
+	<span class="indent1">(n, x : xs) | n &gt; 0 -&gt; Just (x, (n - 1, xs))</span><br/>
+	<span class="indent1">_ -&gt; Nothing</span></code></p>
+
+<p>結果としてxを出し、nを1減らしもとのリスト(x : xs)から要素をひとつ削る。</p>
+
+<h2>関数drop</h2>
+
+<h3>動作</h3>
+
+<p>指定された数だけ頭から要素を落とす。</p>
+
+<p><code>Prelude&gt; drop 3 "monkey"<br/>
+"key"</code></p>
+
+<h3>生の再帰</h3>
+
+<h3>関数foldr</h3>
+
+<h3>関数unfoldr</h3>
+
+<h2>関数splitAt</h2>
+
+<h3>動作</h3>
+
+<h3>生の再帰</h3>
+
+<h3>関数foldr</h3>
+
+<h3>関数unfoldr</h3>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/filter_def.html"
 	>「関数filter, partition」へもどる</a>
