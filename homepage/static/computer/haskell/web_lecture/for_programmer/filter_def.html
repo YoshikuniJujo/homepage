@@ -1,7 +1,5 @@
 関数filter, partition
 
-<p>(工事中 0%)</p>
-
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/filters.hs"
 	>filters.hs</a></p>
 
@@ -71,18 +69,34 @@ Prelude Data.Char Data.List&gt; partition isUpper "He And She Know Everyone Like
 <p><code>partitionRaw p (x : xs)<br/>
 	<span class="indent1">| p x = (x : ts, es)</span><br/>
 	<span class="indent1">| otherwise = (ts, x : es)</span><br/>
-	<span class="indent1">where (ts, es) = partitionRaw p xs</span>
+	<span class="indent1">where (ts, es) = partitionRaw p xs</span><br/>
 partitionRaw _ _ = ([], [])</code></p>
 
-<p>ほげ</p>
+<p>
+残りのリストを2つにわけてそれぞれでts, esを束縛する。
+もしもxが条件を満たすならtsに追加し、そうでないならesに追加する。
+</p>
 
 <h3>関数foldr</h3>
+
+<p><code>partitionF p = foldr<br/>
+	<span class="indent1">(\x (ts, es) -&gt; if p x then (x : ts, es) else (ts, x : es)</span><br/>
+	<span class="indent1">([], [])</span></code></p>
+
+<p>
+xが条件を満たすならひとつめのリストに、そうでないならふたつめのリストに、
+それぞれ追加する関数をfoldrに与えている。
+</p>
 
 <h2>まとめ</h2>
 
 <p>
+関数filter, partitionをそれぞれ生の再帰と関数foldrで定義した。
+</p>
+
+<p>
 <a href="/computer/haskell/web_lecture/for_programmer/map_def.html"
 	>「関数map」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/take_def.html"
+	>「関数take, drop, splitAt」へ</a>
 </p>
