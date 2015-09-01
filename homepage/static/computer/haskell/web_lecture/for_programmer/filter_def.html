@@ -4,15 +4,58 @@
 
 <h2>関数filter</h2>
 
+<h3>動作</h3>
+
+<p>リストから条件を満たすものだけをとりだす。</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; filter even [3, 8, 2, 4, 5, 9, 6, 7]<br/>
+[8,2,4,6]<br/>
+Prelude&gt; :m Data.Char<br/>
+Prelude Data.Char&gt; filter isUpper "He And She Know Everyone Likes Lisp.\n"<br/>
+"HASKELL"</code></p>
+
+<h3>型</h3>
+
+<p><code>filterRaw, filterF :: (a -&gt; Bool) -&gt; [a] -&gt; [a]</code></p>
+
+<p>
+条件とリストをとり条件を満たす要素から成るリストを返す。
+条件は真偽値を返す関数だ。
+</p>
+
 <h3>生の再帰</h3>
 
+<p><code>filterRaw p (x : xs)<br/>
+	<span class="indent1">| p x = x : filterRaw p xs</span><br/>
+	<span class="indent1">| otherwise = filterRaw p xs</span><br/>
+filterRaw _ _ = []</code></p>
+
+<p>
+xが条件を満たすとき残りの要素をろ過したリストにxを追加する。
+そうでないなら残りの要素をろ過したリストをそのまま返す。
+</p>
+
 <h3>関数foldr</h3>
+
+<p><code>filterF p = foldr (\x -&gt; if p x then (x :) else id) []</code></p>
+
+<p>
+xが条件を満たすなら第2引数にxを追加しそうでないならそのまま返す関数をfoldrに
+与えている。
+</p>
 
 <h2>関数partition</h2>
 
+<h3>動作</h3>
+
+<h3>型</h3>
+
 <h3>生の再帰</h3>
 
 <h3>関数foldr</h3>
+
+<h2>まとめ</h2>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/map_def.html"
