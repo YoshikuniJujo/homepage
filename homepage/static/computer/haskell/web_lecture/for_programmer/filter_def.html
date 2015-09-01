@@ -2,6 +2,9 @@
 
 <p>(工事中 0%)</p>
 
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/filters.hs"
+	>filters.hs</a></p>
+
 <h2>関数filter</h2>
 
 <h3>動作</h3>
@@ -49,9 +52,29 @@ xが条件を満たすなら第2引数にxを追加しそうでないならそ�
 
 <h3>動作</h3>
 
+<p>リストを条件を満たすものと満たさないものにわける。</p>
+
+<p><code>Prelude Data.Char&gt; :m + Data.List
+Prelude Data.Char Data.List&gt; partition even [3, 8, 2, 4, 5, 9, 6, 7]<br/>
+([8,2,4,6],[3,5,9,7])<br/>
+Prelude Data.Char Data.List&gt; partition isUpper "He And She Know Everyone Likes Lisp.\n"<br/>
+("HASKELL","e nd he now veryone ikes isp.\n")</code></p>
+
 <h3>型</h3>
 
+<p><code>partitionRaw, partitionF :: (a -&gt; Bool) -&gt; [a] -&gt; ([a], [a])</code></p>
+
+<p>返り値は条件を満たすもののリストと満たさないもののリストのタプルとなる。</p>
+
 <h3>生の再帰</h3>
+
+<p><code>partitionRaw p (x : xs)<br/>
+	<span class="indent1">| p x = (x : ts, es)</span><br/>
+	<span class="indent1">| otherwise = (ts, x : es)</span><br/>
+	<span class="indent1">where (ts, es) = partitionRaw p xs</span>
+partitionRaw _ _ = ([], [])</code></p>
+
+<p>ほげ</p>
 
 <h3>関数foldr</h3>
 
