@@ -1,10 +1,40 @@
 関数unfoldrとdropWhileによる関数filterの定義
 
-<p>(工事中 0%)</p>
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/filter_unfoldr.hs"
+	>filter_unfoldr.hs</a></p>
+
+<h2>はじめに</h2>
 
 <p>
+暗記するのではなくなれることが大切だ。
+正解はひとつではない。
+関数filterを関数unfoldrとdropWhileで定義してみよう。
+</p>
+
+<h2>考えかた</h2>
+
+<p>
+うけとったリストから条件を満たさないものを落としたうえで、
+リストの第1要素を結果のリストに入れ残りを状態として次にわたす。
+</p>
+
+<h2>コード</h2>
+
+<p><code>filterU p = unfoldr $ \l -&gt; case dropWhile (not . p) l of<br/>
+	<span class="indent1">x : xs -&gt; Just (x, xs)</span><br/>
+	<span class="indent1">_ -&gt; Nothing</span></code><p>
+
+<h2>まとめ</h2>
+
+<p>
+物事の正解はひとつではない。
+だからこそ「これ以外にない」というくらいに美しい解が見つかったときは
+気持ちが良いものだ。
+フィボナッチ数列の「リストの再帰的定義」による定義など。
+</p>
+
 <a href="/computer/haskell/web_lecture/for_programmer/takewhile_def.html"
 	>「関数takeWhile, dropWhile, span」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/zip_def.html"
+	>「関数zip, zipWith, unzip」へ</a>
 </p>
