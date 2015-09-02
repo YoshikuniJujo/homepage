@@ -17,7 +17,7 @@ Prelude&gt; take 4 "monkey"<br/>
 
 <h3>型</h3>
 
-<p><code>takeRaw, takeU :: Int -&gt; [a] -&gt; [a]</code></p>
+<p><code>takeRaw, takeF, takeU :: Int -&gt; [a] -&gt; [a]</code></p>
 
 <h3>生の再帰</h3>
 
@@ -182,11 +182,57 @@ step x fは整数nをとりxと(n - 1)個の値を返す関数となる。
 <p><code>Prelude&gt; drop 3 "monkey"<br/>
 "key"</code></p>
 
+<h3>型</h3>
+
+<p><code>dropRaw, dropF :: Int -&gt; [a] -&gt; [a]</code></p>
+
 <h3>生の再帰</h3>
+
+<p><code>dropRaw n (x : xs) | n &gt; 0 = dropRaw (n - 1) xs<br/>
+dropRaw _ xs = xs</code></p>
+
+<p>
+nが0より大きいときリスト(x : xs)からn個落としたリストは
+リストxsからn - 1個落としたリストに等しい。
+もとのリストが空リストまたはnが0以下ならば空リストとなる。
+</p>
 
 <h3>関数foldr</h3>
 
-<h3>関数unfoldr</h3>
+<p><code>step _ f n | n &gt; 0 = f $ n - 1<br/>
+step x f _ = x : f 0</code></p>
+
+<p><code>fdrop :: [a] -&gt; Int -&gt; [a]<br/>
+fdrop (x : xs) n = step x (fdrop xs) n<br/>
+fdrop _ _ = []</code></p>
+
+<p>これも同じようにstep x (fdrop xs) nを展開してみよう。</p>
+
+<p><code>fdrop (x : xs) n | n &gt; 0 = fdrop xs (n - 1)<br/>
+fdrop (x : xs) _ = x : fdrop xs 0<br/>
+fdrop _ _ = []</code></p>
+
+<p>仮引数nを消す。</p>
+
+<p><code>fdrop (x : xs) = step x (fdrop xs)<br/>
+fdrop _ _ = const []</code></p>
+
+<p>関数foldrで表現する。</p>
+
+<p><code>dropF = flip $ foldr s (const [])<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">s _ f n | n &gt; 0 = f $ n - 1</span><br/>
+	<span class="indent1">s x f _ = x : f 0</span></code></p>
+
+<h4>何が起きたのか</h4>
+
+<p>
+関数(step x)はnが1以上では「リスト[x1, x2, ...]からnだけ落とした関数」を
+「リスト[x, x1, x2, ...]からnだけ落とした関数」に変換する。
+nが0以下のときは「リスト[x1, x2, ...]から0だけ落とした関数」を
+「リスト[x, x1, x2, ...]から0だけ落とした関数」に変換している。
+後者の変換は返り値に(x :)することで行っている。
+</p>
 
 <h2>関数splitAt</h2>
 
