@@ -1,7 +1,5 @@
 関数takeWhile, dropWhile, span
 
-<p>(工事中 0%)</p>
-
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/takewhiles.hs"
 	>takewhiles.hs</a></p>
 
@@ -127,15 +125,76 @@ dropWhileB _ _ = const []</code></p>
 
 <h3>動作</h3>
 
+<p>リストを条件を満たさなくなるまでと残りとにわける。</p>
+
+<p><code>Prelude&gt; span even [4, 10, 8, 2, 5, 4, 1, 3, 2, 9]<br/>
+([4,10,8,2],[5,4,1,3,2,9])</code></p>
+
 <h3>型</h3>
 
+<p><code>spanRaw, spanF :: (a -&gt; Bool) -&gt; [a] -&gt; ([a], [a])</code></p>
+
 <h3>生の再帰</h3>
+
+<p><code>spanRaw p (x : xs) | p x = (x : t, d) where (t, d) = spanRaw p xs<br/>
+spanRaw _ xs = ([], xs)</code></p>
+
+<p>
+先頭の値が条件を満たすうちはタプルの第1要素に値を追加する。
+そうでなければ第1要素は空リストで第2要素は与えられたリストとするタプルを返す。
+</p>
+
+<h3>関数foldr</h3>
+
+<p><code>step p x f True | p x = (x : t, d) where (t, d) = f True<br/>
+step _ x f _ = ([], x : d) where (_, d) = f False</code></p>
+
+<p><code>spanB :: (a -&gt; Bool) -&gt; [a] -&gt; Bool -&gt; ([a], [a])<br/>
+spanB p (x : xs) b = step p x (spanB p xs) b<br/>
+spanB _ _ _ = ([], [])</code></p>
+
+<p>step p x (spanB p xs) bを展開する。</p>
+
+<p><code>spanB p (x : xs) True | p x = (x : t, d) where (t, d) = spanB p xs True<br/>
+spanB p xs _ = ([], x : d) where (_, d) = spanB p xs False</code></p>
+
+<p>
+うえの式としたの式が等しいことを確認する。
+そのうえでしたの式の動きを見てみよう。
+p xを満たすうちはタプルの第1要素に値が追加しれていくが、
+p xを満たさなかった時点からはBool値はずっとFalseのままとなり、
+第2要素に値が追加されていくということだ。
+仮引数bを消す。
+</p>
+
+<p><code>spanB p (x : xs) = step p x (spanB p xs)<br/>
+spanB _ _ = const ([], [])</code></p>
+
+<p>関数foldrで表せる。</p>
+
+<p><code>spanB p = foldr (step p) (const ([], []))</code></p>
+
+<p>ブール値の初期値としてTrueを与える。</p>
+
+<p><code>spanF p = foldr (step p) (const ([], [])) True</code></p>
+
+<p>ローカル関数を使う。</p>
+
+<p><code>spanF p xs = foldr s (const ([], [])) xs True
+	<span class="indent1">where</span><br/>
+	<span class="indent1">s x f True | p x = (x : t, d) where (t, d) = f True</span><br/>
+	<span class="indent1">s x f _ = ([], x : d) where (_, d) = f False</span></code></p>
 
 <h2>まとめ</h2>
 
 <p>
+関数takeWhile, dropWhile, spanを生の再帰と関数foldrで定義した。
+関数dropWhileやspanには補助的にブール値が必要になる。
+</p>
+
+<p>
 <a href="/computer/haskell/web_lecture/for_programmer/take_def.html"
 	>「関数take, drop, splitAt」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/filter_unfoldr.html"
+	>「関数unfoldrとdropWhileによるfilterの定義」へ</a>
 </p>

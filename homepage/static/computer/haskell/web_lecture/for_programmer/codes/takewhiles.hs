@@ -19,3 +19,16 @@ dropWhileF p xs = foldr s (const []) xs True where
 		| p x = f True
 		| otherwise = x : f False
 	s x f False = x : f False
+
+spanRaw, spanF :: (a -> Bool) -> [a] -> ([a], [a])
+spanRaw p (x : xs) | p x = (x : t, d) where (t, d) = spanRaw p xs
+spanRaw _ xs = ([], xs)
+
+spanF p xs = foldr s (const ([], [])) xs True
+	where
+	s x f True | p x = (x : t, d) where (t, d) = f True
+	s x f _ = ([], x : d) where (_, d) = f False
+
+step :: (a -> Bool) -> a -> (Bool -> ([a], [a])) -> Bool -> ([a], [a])
+step p x f True | p x = (x : t, d) where (t, d) = f True
+step _ x f _ = ([], x : d) where (_, d) = f False
