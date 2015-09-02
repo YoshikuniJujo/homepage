@@ -26,6 +26,145 @@ takeRaw _ _ = []</code></p>
 
 <p>x : xsからn個とるのは値xをxsからn - 1個とったリストに追加することだ。</p>
 
+<h3>関数foldr</h3>
+
+<!--
+
+<p>リスト[5, 3, 4, 1, 8]からn個とりだす関数fがあったとする。</p>
+
+<p><code>f 2 =&gt; [5, 3]<br/>
+f 4 =&gt; [5, 3, 4, 1]</code></p>
+
+<p>これを使ってリスト[10, 5, 3, 4, 1, 8]からn個とりだす関数gを作ろう。</p>
+
+<p><code>g n | n &gt; 0 = 10 : f (n - 1)<br/>
+g _ = []</code></p>
+
+<p>
+たとえば[10, 5, 3, 4, 1, 8]から3個とりだすのは、
+[5, 3, 4, 1, 8]から2個とりだした結果の先頭に10を追加すれば良い。
+より一般化してリスト[x1, x2, x3, ...]からn個とりだす関数fを使って
+リスト[x, x1, x2, x3, ...]からn個とりだす関数gを作る。
+</p>
+
+<p><code>g n | n &gt; 0 = x : f (n - 1)<br/>
+g _ = []</code></p>
+
+<p>
+このような関係になるように、値xと関数fから関数gを作成する関数stepを作成する。
+</p>
+
+<p><code>step x f n | n &gt; 0 = x : f (n - 1)<br/>
+step _ _ _ = []</code></p>
+
+<p>gの部分をstep x fに置き換えた。つまり</p>
+
+<p><code>g == step x f</code></p>
+
+<p>
+step xはリスト[x1, x2, x3, ...]からn個とりだす関数を
+リスト[x, x1, x2, x3, ...]からn個とりだす関数に変換する関数となる。
+これを使って関数ftakeを作成する。
+関数ftakeはtakeの第1引数と第2引数とを入れかえたものとする。
+</p>
+
+-->
+
+<p>
+以下の定義を見てみよう。
+ftakeはtakeの第1引数と第2引数とを入れかえたものだ。
+</p>
+
+<p><code>step x f n | n &gt; 0 = x : f (n - 1)<br/>
+step _ _ _ = []</code></p>
+
+<p><code>ftake :: [a] -&gt; Int -&gt; [a]<br/>
+ftake (x : xs) n = step x (ftake xs) n<br/>
+ftake _ _ = []</code></p>
+
+<p>
+順を追って見ていけばわかるはずだ。
+step x (ftake xs) nはnが1以上ではx : ftake xs (n - 1)に展開される。
+nが0以下ならば[]だ。
+つまりうえの定義は以下と同じことだ。
+よく見くらべてみよう。
+</p>
+
+<p><code>ftake (x : xs) | n &gt; 0 = x : ftake xs (n - 1)<br/>
+ftake _ _ = []</code></p>
+
+<p>ひとつめの関数ftakeの定義から不要な仮引数nを消す。</p>
+
+<p><code>ftake (x : xs) = step x (ftake xs)<br/>
+ftake _ = const []</code></p>
+
+<p>この形はfoldrの枠組みになっている。</p>
+
+<p><code>ftake = foldr s (const [])<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">s x f n | n &gt; 0 = x : f (n - 1)</span><br/>
+	<span class="indent1">s _ _ _ = []</span></code></p>
+
+<p>第1引数と第2引数を入れかえる必要がある。</p>
+
+<p><code>takeF = flip $ foldr s (const [])<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">s x f n | n &gt; 0 = x : f (n - 1)</span><br/>
+	<span class="indent1">s _ _ _ = []</span></code></p>
+
+<!--
+<p>まずは第1引数と第2引数をとりかえたftakeを考えてみる。</p>
+
+<p><code>ftake :: [a] -&gt; Int -&gt; [a]<br/>
+ftake (x : xs) n | n &gt; 0 = x : ftake xs (n - 1)<br/>
+ftake _ _ = []</code></p>
+
+<p>これを以下のように書き換える。</p>
+
+<p><code>ftake (x : xs) =<br/>
+	<span class="indent1">\n -&gt; if n &gt; 0 then x : ftake xs (n - 1) else []</span><br/>
+ftake _ = const []</code></p>
+
+<p>
+関数foldrの枠組みに合わせるにはftake (x : xs)をxとftake xsで表現すれば良い。
+うえの式のxとftake xsを引1引数と第2引数に置き換える。
+</p>
+
+<p><code>step x f = \n -&gt; if n &gt; 0 then x : f (n - 1) else []</code></p>
+
+<p>
+関数stepの第2引数は整数値をとってリストを返す関数だ。
+関数fを関数\n -&gt; ...に変換している。
+終了条件を消して見てみよう。
+n &gt; 0のときに行われる処理のみを示すということだ。
+</p>
+
+<p><code>step x f = \n -&gt; x : f (n - 1)</code></p>
+
+<p>
+これはこう読める。
+新たな要素xが追加されると関数fは
+「整数nをとりxをf (n - 1)の先頭に追加した値を返す関数」に変換される。
+関数fが整数nをとりn個の値を返す関数だとすると、
+step x fは整数nをとりxと(n - 1)個の値を返す関数となる。
+</p>
+
+<p><code>ftake = foldr s (const [])<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">s x f n | n &gt; 0 = x : f (n - 1)</span><br/>
+	<span class="indent1">s x f n = []</span></code></p>
+	-->
+
+<h4>何が起きたのか</h4>
+
+<p>
+関数foldrを使って関数takeが定義できた。
+ここで使われている関数stepについて考えてみよう。
+関数(step x)は「リスト[x1, x2, x3, ...]からn個とる関数」を
+「リスト[x, x1, x2, x3, ...]からn個とる関数」に変換している。
+全体としては関数(const [])を初期値としてリストを関数へとたたみこんでいる。
+</p>
+
 <h3>関数unfoldr</h3>
 
 <p><code>takeU = curry . unfoldr $ \nl -&gt; case nl of<br/>
