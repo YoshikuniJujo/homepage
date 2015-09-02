@@ -77,15 +77,40 @@ zipS _ = const []</code></p>
 
 <h3>動作</h3>
 
+<p>2つのリストの各要素を指定した関数で結びつける。</p>
+
+<p><code>Prelude&gt; zipWith (*) [5, 8, 2, 1] [3 ..]<br/>
+[15,32,10,6]</code></p>
+
 <h3>型</h3>
+
+<p><code>zipWithRaw, zipWithF, zipWithU :: (a -&gt; b -&gt; c) -&gt; [a] -&gt; [b] -&gt; [c]</code></p>
 
 <h3>生の再帰</h3>
 
+<p><code>zipWithRaw op (x : xs) (y : ys) = x `op` y : zipWithRaw op xs ys<br/>
+zipWithRaw _ _ _ = []</code></p>
+
 <h3>関数foldr</h3>
+
+<p><code>zipWithF op = foldr s (const [])<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">s x f (y :ys) = x `op` y : f ys</span><br/>
+	<span class="indent1">s _ _ _ = []</span></code></p>
 
 <h3>関数unfoldr</h3>
 
+<p><code>zipWithU op = curry . unfoldr $ \l -&gt; case l of<br/>
+	<span class="indent1">(x : xs, y : ys) -&gt; Just (x `op` y, (xs, ys))</span><br/>
+	<span class="indent1">_ -&gt; Nothing</span></code></p>
+
 <h3>関数zipWithによる関数zipの定義</h3>
+
+<p>関数zipは関数zipWithを使って次のように定義できる。</p>
+
+<p><code>zipZW = zipWith (,)</code></p>
+
+<p>zipWithの第1引数にタプル作成演算子を指定したものがzipである。</p>
 
 <h2>関数unzip</h2>
 
