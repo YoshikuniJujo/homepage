@@ -2,6 +2,71 @@
 
 <p>(工事中 0%)</p>
 
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/takewhiles.hs"
+	>takewhiles.hs</a></p>
+
+<h2>関数takeWhile</h2>
+
+<h3>動作</h3>
+
+<p>条件を満たすかぎりリストから値をとりだし続ける。</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; takeWhile even [4, 10, 8, 2, 5, 4, 1, 3, 2, 9]<br/>
+[4,10,8,2]</code></p>
+
+<h3>型</h3>
+
+<p><code>takeWhileRaw, takeWhileF, takwWhileU :: (a -&gt; Bool) -&gt; [a] -&gt; [a]</code></p>
+
+<h3>生の再帰</h3>
+
+<p><code>takeWhileRaw p (x : xs) | p x = x : takeWhileRaw p xs<br/>
+takeWhileRaw _ _ = []</code></p>
+
+<p>
+先頭の値が条件を満たせば残りのリストに同じ関数を適用した結果の先頭に
+その値を追加したものが返り値となる。
+</p>
+
+<h3>関数foldr</h3>
+
+<p><code>takeWhileF p = foldr (\x -&gt; if p x then (x :) else const []) []</code></p>
+
+<p>
+xが条件を満たせばそれを追加しそうでないならつねに空リストを返す関数で
+たたみこみを行っている。
+</p>
+
+<h3>関数unfoldr</h3>
+
+<p><code>takeWhileU p = unfoldr $ \l -&gt; case l of<br/>
+	<span class="indent1">x : xs | p x -&gt; Just (x, xs)</span><br/>
+	<span class="indent1">_ -&gt; Nothing</span></code></p>
+
+<p>
+リストが空リストではなく先頭の値xが条件を満たすならば結果のリストにxを追加し、
+残りのリストを次の処理にわたす。
+</p>
+
+<h2>関数dropWhile</h2>
+
+<h3>動作</h3>
+
+<h3>型</h3>
+
+<h3>生の再帰</h3>
+
+<h2>関数span</h2>
+
+<h3>動作</h3>
+
+<h3>型</h3>
+
+<h3>生の再帰</h3>
+
+<h2>まとめ</h2>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/take_def.html"
 	>「関数take, drop, splitAt」へもどる</a>
