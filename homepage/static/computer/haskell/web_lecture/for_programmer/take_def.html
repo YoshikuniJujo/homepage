@@ -1,7 +1,5 @@
 関数take, drop, splitAt
 
-<p>(工事中 0%)</p>
-
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/takes.hs"
 	>takes.hs</a></p>
 
@@ -238,15 +236,60 @@ nが0以下のときは「リスト[x1, x2, ...]から0だけ落とした関数�
 
 <h3>動作</h3>
 
+<p>リストの先頭n個をとりだし、その残りとともにタプルとして返す。</p>
+
+<p><code>Prelude&gt; splitAt 3 "monkey"<br/>
+("mon", "key")</code></p>
+
+<h3>型</h3>
+
+<p><code>splitAtRaw, splitAtF :: Int -&gt; [a] -&gt; ([a], [a])</code></p>
+
 <h3>生の再帰</h3>
+
+<p><code>splitAtRaw n (x : xs) | n &gt; 0 = (x : t, d)<br/>
+	<span class="indent1">where (t, d) = splitAtRaw (n - 1) xs<br/>
+splitAtRaw _ xs = ([], xs)</span></code></p>
 
 <h3>関数foldr</h3>
 
-<h3>関数unfoldr</h3>
+<p><code>step x f n | n &gt; 0 = (x : t, d) where (t, d) = f (n - 1)<br/>
+step x f _ = ([], x : d) where (_, d) = f 0</code></p>
+
+<p><code>fsplitAt :: [a] -&gt; Int -&gt; ([a], [a])<br/>
+fsplitAt (x : xs) n = step x (splitAt xs) n<br/>
+fsplitAt _ _ = ([], [])</code></p>
+
+<p>同様に展開する。</p>
+
+<p><code>fsplitAt (x : xs) n | n &gt; 0 = (x : t, d)<br/>
+	<span class="indent1">where (t, d) = fsplitAt xs (n - 1)</span><br/>
+fsplitAt (x : xs) _ = ([], x : d)<br/>
+	<span class="indent1">where (_, d) = fsplitAt xs 0</span><br/>
+fsplitAt _ _ = ([], [])</code></p>
+
+<p>仮引数nを消す。</p>
+
+<p><code>fsplitAt (x : xs) = step x (splitAt xs)<br/>
+fsplitAt _ = const ([], [])</code></p>
+
+<p>関数foldrで定義する。</p>
+
+<p><code>splitAtF = flip $ foldr s (const ([], []))<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">s x f n | n &gt; 0 = (x : t, d) where (t, d) = f (n - 1)</span><br/>
+	<span class="indent1">s x f _ = ([], x : d) where (_, d) = f 0</span></code></p>
+
+<h2>まとめ</h2>
+
+<p>
+関数take, drop, partitionをそれぞれ生の再帰とたたみこみで定義した。
+リストを関数にたたみこむという考えたかに注意する。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/filter_def.html"
 	>「関数filter, partition」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/takewhile_def.html"
+	>「関数takeWhile, dropWhile, span」へ</a>
 </p>
