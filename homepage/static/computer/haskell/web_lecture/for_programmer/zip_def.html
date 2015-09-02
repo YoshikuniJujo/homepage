@@ -2,6 +2,103 @@
 
 <p>(工事中 0%)</p>
 
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/zips.hs"
+	>zips.hs</a></p>
+
+<h2>関数zip</h2>
+
+<h3>動作</h3>
+
+<p>2つのリストをとってタプルのリストに変換する。</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; zip [0 ..] "hello"<br/>
+[(0, 'h'), (1, 'e'), (2, 'l'), (3, 'l'), (4, 'o')]</code></p>
+
+<h3>型</h3>
+
+<p><code>zipRaw, zipF, zipU :: [a] -&gt; [b] -&gt; [(a, b)]</code></p>
+
+<h3>生の再帰</h3>
+
+<p><code>zipRaw (x : xs) (y : ys) = (x, y) : zipRaw xs ys<br/>
+zipRaw _ _ = []</code></p>
+
+<p>
+それぞれのリストの先頭の要素から成るタプルを
+ひとつめのリストの残りとふたつめのリストの残りをzipしたものに
+追加すれば良い。
+</p>
+
+<h3>関数foldr</h3>
+
+<p><code>step x f (y : ys) = (x, y) : f ys<br/>
+step _ _ _ = []</code></p>
+
+<p><code>zipS (x : xs) ya = step x (zipS xs) ya<br/>
+zipS _ _ = []</code></p>
+
+<p>
+step x (zipS xs) yaを展開してみよう。
+zipRawの定義と同じになることがわかる。
+仮引数yaを消す。
+</p>
+
+<p><code>zipS (x : xs) = step x (zipS xs)<br/>
+zipS _ = const []</code></p>
+
+<p>これで関数foldrで表現できる。</p>
+
+<p><code>zipF = foldr s (const [])<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">s x f (y : ys) = (x, y) : f ys</span><br/>
+	<span class="indent1">s _ _ _ = []</span></code></p>
+
+<h4>何が起きたのか</h4>
+
+<p>
+関数(step x)は「リストysをとってリストxsとのzipを返す関数」をとって
+「リストysをとってリスト(x : xs)とのzipを返す関数」を返す関数だ。
+リストxsをysで表現されるリストを扱う関数としてたたみこんでいる。
+</p>
+
+<h3>関数unfoldr</h3>
+
+<p><code>zipU = curry . unfoldr $ \l -&gt; case l of<br/>
+	<span class="indent1">(x : xs, y : ys) -&gt; Just ((x, y), (xs, ys))</span><br/>
+	<span class="indent1">_ -&gt; Nothing</span></code></p>
+
+<p>
+リストのタプルを状態とする。
+それぞれのリストから先頭をけずってそれらをタプルにしたものを結果のリストとする。
+</p>
+
+<h2>関数zipWith</h2>
+
+<h3>動作</h3>
+
+<h3>型</h3>
+
+<h3>生の再帰</h3>
+
+<h3>関数foldr</h3>
+
+<h3>関数unfoldr</h3>
+
+<h3>関数zipWithによる関数zipの定義</h3>
+
+<h2>関数unzip</h2>
+
+<h3>動作</h3>
+
+<h3>型</h3>
+
+<h3>生の再帰</h3>
+
+<h3>関数foldr</h3>
+
+<h3>関数unfoldr</h3>
+
 <a href="/computer/haskell/web_lecture/for_programmer/filter_unfoldr.html"
 	>「関数unfoldr, dropWhileによる関数filterの定義」へもどる</a>
 <a href="/computer/haskell/web_lecture/for_programmer"
