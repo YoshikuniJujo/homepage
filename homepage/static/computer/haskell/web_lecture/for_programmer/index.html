@@ -1,41 +1,31 @@
-1から学ぶHaskell: プログラマ向けの入門
+1から学ぶHaskell: プログラマ向けのHaskell入門
 
 <p>(工事中 20%)</p>
 
 <h2>はじめに</h2>
 
 <p>
-「Haskellを学ぶ」のは「新たな言語を学ぶ」ということ以上である。
-海の向こうの国を知ったときの<a
-href="/computer/haskell/web_lecture/for_programmer/prelude.html">...</a>
+Haskellを学ぶのは海の向こうの国を知ることだ。
+ただの関数型言語ではなく「純粋関数型言語」だ。
+</p>
+
+<a href="/computer/haskell/web_lecture/for_programmer/images/the_functional_language.svg"
+><img
+width="350"
+alt="[ザ・関数型言語のロゴ]"
+src="/computer/haskell/web_lecture/for_programmer/images/the_functional_language.svg"/></a>
+
+<p>
+第一級関数、参照透過性、遅延性、静的型付けなどの特徴がある。
+そこにあるのはデザインの美しさと機能性の有機的な結合だ。
 </p>
 
 <h2>対象</h2>
 
 <p>
-プロ、アマチュアを問わず、何らかの言語でプログラムを組んだことのある人。
-「変数」「引数」「返り値」「関数」という言葉の
-だいたいの意味がわかりHaskell入門を希望する人。
+プログラムを組んだことがあり
+「関数」「変数」「引数」「返り値」の意味がわかる人を対象とする。
 </p>
-
-<h2>必要な環境</h2>
-
-<p>
-GHC。
-GHCはHaskellのコンパイラ、インタプリタ、対話環境。
-その他のツールやパッケージも含めて<a href="https://www.haskell.org/platform/"
->Haskell Platform</a>としてまとまっている。
-Windows, Mac, Linuxのそれぞれのソース、バイナリがある。
-</p>
-
-<h2>はじめに</h2>
-
-<ul>
-<li><a href="/computer/haskell/web_lecture/for_programmer/paradigm_history.html"
-	>プログラミングパラダイムの歴史</a></li>
-<li><a href="/computer/haskell/web_lecture/for_programmer/motivation.html"
-	>Haskellを学ぶ動機</a></li>
-</ul>
 
 <h2>関数</h2>
 
@@ -55,9 +45,9 @@ Windows, Mac, Linuxのそれぞれのソース、バイナリがある。
 <li><a href="/computer/haskell/web_lecture/for_programmer/operator.html"
 	>演算子</a></li>
 <li><a href="/computer/haskell/web_lecture/for_programmer/bool.html"
-	>Bool型</a></li>
+	>Bool値</a></li>
 <li><a href="/computer/haskell/web_lecture/for_programmer/maybe.html"
-	>Maybe型</a></li>
+	>Maybe値</a></li>
 <li><a href="/computer/haskell/web_lecture/for_programmer/pattern_match.html"
 	>パターンマッチ</a></li>
 <li><a href="/computer/haskell/web_lecture/for_programmer/guard0.html"
@@ -263,7 +253,18 @@ Windows, Mac, Linuxのそれぞれのソース、バイナリがある。
 	>関数repeat, replicate, cycle</a></li>
 </ul>
 
-<h3>関数fix</h3>
+<h2>確認のための例題: 単純なパーサ</h2>
+
+<ul>
+<li>パーサ: はじめに</li>
+<li>構文: 型シノニム</li>
+<li>構文: リスト内包表記</li>
+<li>数のパース</li>
+<li>数の並びのパース</li>
+<li>四則演算のパース</li>
+</ul>
+
+<h2>関数fix</h2>
 
 <ul>
 <li><a href="/computer/haskell/web_lecture/for_programmer/fix.html"
