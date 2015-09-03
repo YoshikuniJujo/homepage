@@ -1,6 +1,145 @@
-関数(++), reverse
+関数(++), concat, reverse
 
 <p>(工事中 0%)</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/pluspluses.hs"
+	>pluspluses.hs</a></p>
+
+<h2>関数(++)</h2>
+
+<h3>動作</h3>
+
+<p>ふたつのリストを結合する。</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; "monk" ++ "ey"<br/>
+"monkey"</code></p>
+
+<h3>型</h3>
+
+<p><code>(.++), (.++.), (.++..) :: [a] -&gt; [a] -&gt; [a]</code></p>
+
+<h3>生の再帰</h3>
+
+<p><code>(x : xs) .++ ys = x : (xs .++ ys)<br/>
+[] .++ ys = ys</code></p>
+
+<p>
+リストXの残りのリストとリストYを結合したものに
+リストXの先頭の値を追加するとリストXとリストYを結合したものになる。
+</p>
+
+<h3>関数foldr</h3>
+
+<p><code>xs .++. ys = foldr (:) ys xs</code></p>
+
+<p>
+foldrが(:)と[]を置き換える関数であることを思い出そう。
+ここでは(:)はそのまま(:)に[]はysに置き換えている。
+</p>
+
+<p><code>x1 : x2 : x3 : ... : []<br/>
+<span class="indent1">-&gt; x1 : x2 : x3 : ... : ys</span></code></p>
+
+<p>関数flipを使えば仮引数を消すことができる。</p>
+
+<p><code>(.++.) = flip $ foldr (:)</code></p>
+
+<h3>関数unfoldr</h3>
+
+<p><code>(.++..) = curry . unfoldr $ \xys -&gt; case xys of<br/>
+	<span class="indent1">(x : xs, ys) -&gt; Just (x, (xs, ys))</span><br/>
+	<span class="indent1">(_, y : ys) -&gt; Just (y, [], ys))</span><br/>
+	<span class="indent1">_ -&gt; Nothing</span></code></p>
+
+<p>
+リストのタプルを状態として次々にわたしていく関数を作り
+それをカリー化している。
+ひとつめのリストが空でなければそれを削っていき、
+空ならばふたつめのリストを削っていく。
+</p>
+
+<h2>関数concat</h2>
+
+<h3>動作</h3>
+
+<p>リストのリストの全要素を結合してリストにする。</p>
+
+<p><code>Prelude&gt; concat ["He", "And", "She", "Know", "Everyone", "Likes", "Lisp"]<br/>
+"HeAndSheKnowEveryoneLikesLisp"</code></p>
+
+<h3>型</h3>
+
+<p><code>concatRaw, concatF :: [[a]] -&gt; [a]</code></p>
+
+<h3>生の再帰</h3>
+
+<p><code>concatRaw (xs : xss) = xs ++ concatRaw xss<br/>
+concatRaw _ = []</code></p>
+
+<h3>関数foldr</h3>
+
+<p><code>concatF = foldr (++) []</code></p>
+
+<h2>関数reverse</h2>
+
+<h3>動作</h3>
+
+<p>リストを逆順にする。</p>
+
+<p><code>Prelude&gt; reverse "gateman"<br/>
+"nametag"</code></p>
+
+<h3>型</h3>
+
+<p><code>reverseRaw, reverseF :: [a] -&gt; [a]</code></p>
+
+<h3>生の再帰</h3>
+
+<p><code>reverseRaw = rv []<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">rv rs (x : xs) = rv (x : rs) xs</span><br/>
+	<span class="indent1">rv rs _ = rs</span></code></p>
+
+<p>
+補助関数rvを作ってそれに空リストを与えている。
+関数rvは状態としてリストを持ちそのリストの先頭に
+もともとのリストの要素を追加していく。
+トランプの山を右から左に1枚ずつ動かしていくのを想像してみよう。
+カードの並びは逆順になるはずだ。
+</p>
+
+<h3>関数foldl</h3>
+
+<p><code>reverseF = foldl (flip (:)) []</code></p>
+
+<p>
+foldlは左結合でリストの要素を結合する。
+ここでflip (:)を(!:)とすると以下のようになる。
+</p>
+
+<p><code>((([] !: x1) !: x2) !: x3) !: ...</code></p>
+
+<p>
+xs !: xでカードの山xsにカードxをのせるということだ。
+よってうえの式は空の山にx1をのせそのうえにx2をのせ...といった処理になる。
+</p>
+
+<h3>関数unfoldrでは定義しない理由</h3>
+
+<p>
+リストを後ろから削っていくという形でunfoldrによる定義は可能だ。
+しかし、リストはn番目の要素に到達するのにO(n)時間かかる。
+よってこのようなやりかただとO(n^2)時間かかってしまい非効率である。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+関数(++), concat, reverseの定義を学んだ。
+関数(++)はfoldrの、関数reverseはfoldlの性質をよく示す例だ。
+とくにreverseはリストに対する反復的処理の性質をよく表している。
+</p>
 
 <a href="/computer/haskell/web_lecture/for_programmer/zip_def.html"
 	>「関数zip, zipWith, unzip」へもどる</a>
