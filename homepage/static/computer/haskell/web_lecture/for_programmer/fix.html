@@ -1,0 +1,116 @@
+関数fix
+
+<p>(工事中 50%)</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/fix.hs"
+	>fix.hs</a></p>
+
+<h2>はじめに</h2>
+
+<p>
+リストを扱うさまざまな関数の定義を見ていくことで
+関数による抽象の層構造または網目構造を学んだ。
+「たたみこみ」を抽象化したり、その抽象を利用して、転写やろ過を定義したりした。
+これらはほとんどが再帰関数である。
+さらにその抽象化の層を根本までたどって「再帰」という考えかた自体を関数で
+表現してみよう。
+</p>
+
+<h2>関数fix</h2>
+
+<p>関数fixはData.Functionモジュールから公開されている。</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; :m Data.Function<br/>
+Prelude Data.Function&gt; :t fix<br/>
+fix :: (a -&gt; a) -&gt; a<br/>
+Prelude Data.Function&gt; take 10 $ fix (1 :)<br/>
+[1,1,1,1,1,1,1,1,1,1]</code></p>
+
+<p>定義を見てみよう。</p>
+
+<p><code>myFix :: (a -&gt; a) -&gt; a<br/>
+myFix f = f (myFix f)</code></p>
+
+<p>これを展開すると以下のようになる。</p>
+
+<p><code>f (f (f (f (f (f ...</code></p>
+
+<p>fix (1 :)であれば以下のようになるだろう。</p>
+
+<p><code>1 : 1 : 1 : 1 : ...</code></p>
+
+<h2>再帰関数の定義</h2>
+
+<p>
+この関数fixをつかえばすべての再帰関数が明示的な再帰なしに書ける。
+階乗を求める関数を定義してみよう。
+</p>
+
+<p><code>fact' :: (Integer -&gt; Integer) -&gt; Integer -&gt; Integer<br/>
+fact' _ n | n &lt; 1 = 1<br/>
+fact' f n = n * f (n - 1)</code></p>
+
+<p><code>fact :: Integer -&gt; Integer<br/>
+fact = fix fact'</code></p>
+
+<p>これでうまくいく。</p>
+
+<p><code>Prelude&gt; :l fix.hs<br/>
+*Main&gt; fact 10<br/>
+3628800</code></p>
+
+<p>
+にわかには信じがたい。いったい何が起きているのだろうか。
+fact'の定義を見ると関数と値をとって値が1未満ならば1を返し、
+そうでないなら関数にn - 1を与えて得た値にnをかけている。
+</p>
+
+<p><code>*Main&gt; fact' (+ 10) 3<br/>
+36</code></p>
+
+<p>
+2に(+ 10)を適用した結果に3をかけている。
+こう見るとfact'はごくふつうの高階関数だ。
+fact 3を展開してみよう。
+</p>
+
+<p><code>fact 3<br/>
+-&gt; fix fact' 3<br/>
+-&gt; fact' (fix fact') 3<br/>
+-&gt; 3 * fix fact' 2<br/>
+-&gt; 3 * fact' (fix fact') 2<br/>
+-&gt; 3 * 2 * fix fact' 1<br/>
+-&gt; 3 * 2 * fact' (fix fact') 0<br/>
+-&gt; 3 * 2 * 1<br/>
+-&gt; 6</code></p>
+
+<p>嘘みたいだが確かにそうなる。</p>
+
+<p>
+<code>fun f = [fを利用した定義]</code>の形を考えてみよう。
+このfunにfixを適用すると以下のようになるだろう。
+</p>
+
+<p><code>fix fun = fun (fix fun)<br/>
+-&gt; fix fun = [fix funを利用した定義]</code></p>
+
+<p>fact'をこれを考慮した疑似コードにすると以下のようになる。</p>
+
+<p><code>fix fact' n | n &lt; 1 = 1<br/>
+fix fact' n = n * fix fact' (n - 1)</code></p>
+
+<p>
+fix fact'のかたまりをひとつの変数として考えると
+これが階乗の定義になっていることがわかる。
+</p>
+
+<h2>まとめ</h2>
+
+<p>「再帰」という概念そのものを関数として表現することができる。</p>
+
+<a href="/computer/haskell/web_lecture/for_programmer/repeat_def.html"
+	>「関数repeat, replicate, cycle」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/mut_rec_fix.html"
+	>「相互再帰と関数fix」へ</a>
+</p>
