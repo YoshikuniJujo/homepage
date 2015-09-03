@@ -1,6 +1,89 @@
 関数repeat, replicate, cycle
 
-<p>(工事中 0%)</p>
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/repeats.hs"
+	>repeats.hs</a></p>
+
+<h2>関数repeat</h2>
+
+<h3>動作</h3>
+
+<p>
+「"I love you!"って百回言って」と言われたらどうする。
+エンジニアなら効率的にやろう。
+"I love you!"の無限リストを作ってそこから100とりだす。
+</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; take 100 $ repeat "I love you!"<br/>
+["I love you!","I love you!",...,"I love you!"]</code></p>
+
+<h3>型</h3>
+
+<p><code>repeatRaw, repeatI :: a -&gt; [a]</code></p>
+
+<h3>生の再帰</h3>
+
+<p><code>repeatRaw x = x : repeatRaw x</code></p>
+
+<h3>関数iterate</h3>
+
+<p>関数iterateを使って定義することもできる。</p>
+
+<p><code>repeatI = iterate id</code></p>
+
+<h2>関数replicate</h2>
+
+<h3>動作</h3>
+
+<p>
+「"I love you!"って百回言って」と(ry
+回数を指定してくりかえす。
+</p>
+
+<p><code>Prelude&gt; replicate 100 "I love you!"<br/>
+["I love you!","I love you!",...,"I love you!"]</code></p>
+
+<h3>型</h3>
+
+<p><code>replicateRaw, replicateT :: Int -&gt; a -&gt; [a]</code></p>
+
+<h3>生の再帰</h3>
+
+<p><code>replicateRaw x n | n &gt; 0 = x : replicateRaw (n - 1) x<br/>
+replicateRaw _ _ = []</code></p>
+
+<h3>関数take</h3>
+
+<p>関数takeとrepeatを使って書いても良い。</p>
+
+<p><code>replicateT n = take n . repeat</code></p>
+
+<h2>関数cycle</h2>
+
+<h3>動作</h3>
+
+<p>指定された並びをくりかえすリストを作る。</p>
+
+<p><code>Prelude&gt; take 100 $ cycle "I love you!"<br/>
+"I love you!I love you!I love you!...I love you!I"</code></p>
+
+<h3>型</h3>
+
+<p><code>cycleRaw, cycleC :: [a] -&gt; [a]</code></p>
+
+<h3>生の再帰</h3>
+
+<p><code>cycleRaw xs = xs ++ cycleRaw xs</code></p>
+
+<h3>関数concat</h3>
+
+<p>repeatしてからconcatする。</p>
+
+<p><code>cycleC = concat . repeat</code></p>
+
+<h2>まとめ</h2>
+
+<p>要素をくりかえす関数repeat, replicate, cycleを学んだ。</p>
 
 <a href="/computer/haskell/web_lecture/for_programmer/plusplus_def.html"
 	>「関数(++), concat, reverse」へもどる</a>
