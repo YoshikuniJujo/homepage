@@ -3,20 +3,14 @@
 <h2>はじめに</h2>
 
 <p>
-整数値の型について学ぶ。
-ここまでは整数値の型としてIntegerのみを見てきた。
-Integer型の値を使う場合にはメモリの使用量以外に値の範囲について
-考える必要がない。
-しかし、実効効率の関係上Haskellではデフォルトで別の整数型を使うようになっている
-標準的な関数がいくつかある。
+整数としてIntegerのみを見てきた。
+Integer型の値ではメモリの使用量以外に値の範囲を考えなくてすむ。
+しかし、実効効率などの関係でもうひとつの整数型を使う標準的な関数がいくつかある。
 </p>
 
 <h2>多倍長整数</h2>
 
-<p>
-Integer型の値は
-使用可能なメモリ以外に制限のない整数で理論的には-∞から∞の範囲を表現可能だ。
-</p>
+<p>Integer型の値は理論的には-∞から∞の範囲を表現できる。</p>
 
 <p><code>% ghci<br/>
 Prelude&gt; 3<br/>
@@ -26,15 +20,10 @@ it :: Integer<br/>
 Prelude&gt; 12345678901234567890123467890<br/>
 123456789012345678901234567890</code></p>
 
-<p>
-これはとても便利だ。
-</p>
-
 <h2>固定長整数</h2>
 
 <p>
-標準的な関数のうちのいくつかはInteger型の値ではなく
-固定長整数であるInt型の値を使用する。
+いくつかの標準的な関数はInteger型の値ではなく固定長整数であるInt型の値を使う。
 リストの長さを計算する関数lengthなどだ。
 </p>
 
@@ -46,22 +35,20 @@ Prelude&gt; length
 ["Clean", "FP", "Gofer", "Hope", "Hope+", "Id", "ISWIM", "KRC", "Lisp", "Miranda",
 "ML", "Standard ML", "Orwell", "SASL", "SISAL", "Scheme"]<br/>
 16<br/>
-</code></p>
+Prelude&gt; :t it <br/>
+... :: Int</code></p>
 
 <h3>範囲</h3>
 
-<p>
-Haskell 2010によれば、
-Int型の値はすくなくとも-2^29から2^29-1までの範囲を含む整数型である。
-</p>
+<p>Haskell 2010ではInt型の値は-2^29から2^29-1までの範囲を含む整数型だ。</p>
 
 <p><a href="https://www.haskell.org/onlinereport/haskell2010/haskellch18.html#x26-22400018.1"
 	>Haskell 2010 language report: 18.1 Signed integer types</a></p>
 
 <p>
-GHCではInt型の値を処理系以存の範囲を持つ型としている。
-つまり32ビットマシンでは-2^31から2^31-1までの範囲となり、
-64ビットマシンでは-2^63から2^63-1までの範囲となる。
+GHCではInt型の値の範囲を処理系以存としている。
+値の範囲は32ビットマシンでは-2^31から2^31-1までで、
+64ビットマシンでは-2^63から2^63-1までだ。
 </p>
 
 <p><a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/bugs-and-infelicities.html#haskell-98-2010-undefined"
