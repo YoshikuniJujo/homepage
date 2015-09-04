@@ -15,7 +15,7 @@
 
 <p>
 <a href="https://ja.wikipedia.org/wiki/ボディマス指数">BMI</a>とは
-体重と身長から計算される肥満度を表す指数。
+体重と身長から計算される肥満度を表す指数だ。
 </p>
 
 <p><code>BMI = [体重(kg)] / [身長(m)] ^ 2</code></p>
@@ -25,20 +25,16 @@ alt="[BMIの人達の図]"
 src="/computer/haskell/web_lecture/for_programmer/images/bmi_men.svg"
 />
 
-<p>日本の基準では25以上が肥満となる。</p>
+<p>日本の基準では25以上が肥満だ。</p>
 
 <h2>仕様</h2>
 
-<p>
-身長と体重を引き数とする。身長はcm単位とする。
-肥満かどうかを返り値とする。
-</p>
+<p>身長と体重が引き数だ。身長はcm単位とする。肥満かどうかを返り値とする。</p>
 
 <h2>型</h2>
 
 <p>
-BMIは少数点以下も意味があるので実数とする。
-代表的な実数型としてDouble型がある。
+BMIは少数点以下も意味があるので実数だ。代表的な実数型はDouble型だ。
 体重、身長、BMIをDouble型の値とする。
 肥満かどうかはFalse値とTrue値から成るBool型とする。
 </p>
@@ -68,8 +64,7 @@ isObeseは身長(Double)と体重(Double)をとって肥満かどうか(Bool)を
 <p><code>bmi :: Double -&gt; Double -&gt; Double<br/>
 bmi = undefined</code></p>
 
-<p><code>
-isObese :: Double -&gt; Double -&gt; Bool<br/>
+<p><code>isObese :: Double -&gt; Double -&gt; Bool<br/>
 isObese = undefined</code></p>
 
 <p><code>% ghci bmi.hs<br/>
@@ -117,9 +112,7 @@ isObeseをさきに作るときは「bmiが適切に定義されているなら�
 
 <h2>関数isObeseの定義</h2>
 
-<p>
-「関数bmiがBMI値を返すならば」関数isObeseはそれが25以上かどうかを返す。
-</p>
+<p>「関数bmiがBMI値を返すならば」関数isObeseはそれが25以上かどうかを返す。</p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/04_type_driven/bmi_v1.hs"
 	>bmi.hs</a></p>
@@ -139,8 +132,6 @@ isObeseをさきに作るときは「bmiが適切に定義されているなら�
 <p><code>bmi h w = w / (h / 100) ^ 2</code></p>
 
 <h2>試してみる</h2>
-
-<p>172cmは日本人男性の平均身長。</p>
 
 <p><code>*Main&gt; :reload<br/>
 *Main&gt; isObese 172 70<br/>
