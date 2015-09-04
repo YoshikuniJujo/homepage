@@ -51,7 +51,7 @@ href="/computer/haskell/web_lecture/for_programmer/05_polymorphic/id.hs"
 devide 0 = id<br/>
 devide a = (/ a)</code></p>
 
-<p>仮引数を減らすことでより直接的な表現になる。</p>
+<p>仮引数を減らすことでより直接的に表現できる。</p>
 
 <p><code>% ghci id.hs<br/>
 *Main&gt; devide 6 9<br/>
@@ -71,7 +71,7 @@ devide a = (/ a)</code></p>
 
 <p>
 [型X] -&gt; [型X]の形だ。引数と返り値の型が同じであれば良い。
-「型変数」で表現する。型変数は小文字で始まる識別子で多くは小文字1文字だ。
+型変数で表現する。型変数は小文字で始まる識別子で多くは小文字1文字だ。
 </p>
 
 <p><code>id :: a -&gt; a</code></p>
@@ -91,13 +91,11 @@ id :: a -&gt; a</code></p>
 
 <h2>課題</h2>
 
-<ol>
-<li>関数fromMaybeを関数maybeと関数idで定義せよ</li>
-</ol>
+<ol><li>関数fromMaybeを関数maybeと関数idで定義せよ</li></ol>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/fromMaybe.html"
-	>「Maybe型からの値の取り出し」へもどる</a>
+	>「Maybe値からの値の取り出し」へもどる</a>
 <a href="/computer/haskell/web_lecture/for_programmer/const.html"
 	>「値を無視する関数」へ</a>
 </p>
