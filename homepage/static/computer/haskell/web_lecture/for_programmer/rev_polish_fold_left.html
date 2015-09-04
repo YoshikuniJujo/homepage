@@ -92,6 +92,19 @@ rpolish = foldl' rpolish1 $ Just []</code></p>
 することができる。
 </p>
 
+<h2>課題</h2>
+
+<ol>
+<li>Bool値と整数のタプルのリストをとってしたのルールで計算する関数を作成せよ
+	<ul>
+	<li>左結合</li>
+	<li>一番左の値つまり初期値は0</li>
+	<li>Bool値がTrueならかけ算としFalseなら足し算とする</li>
+	<li>[(False, 3), (True, 8), (False, 7)]ならば((0 + 3) * 8) + 7で31となる</li>
+	</ul></li>
+<li>1を生の再帰で解答したなら関数foldl'を使って、関数foldl'で解答したなら生の再帰を使って書き直せ</li>
+</ol>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/rev_polish.html"
 	>「逆ポーランド記法電卓」へもどる</a>
