@@ -1,0 +1,64 @@
+タプルにおける構文糖
+
+<h2>タプル関数</h2>
+
+<p>
+タプル(x, y)はふたつの引数x, yにタプル関数を適用していると考えられる。
+「考えられる」だけではなく実際にそう書くことができる。
+</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; (8, 15)<br/>
+(8,15)<br/>
+Prelude&gt; (,) 8 15<br/>
+(8,15)</code></p>
+
+<p>この形で書くと部分適用が可能になる。</p>
+
+<p><code>Prelude&gt; let put8 = (,) 8<br/>
+Prelude&gt; put8 15<br/>
+(8,15)<br/>
+Prelude&gt; let put15 = flip (,) 15<br/>
+Prelude&gt; put15 8<br/>
+(8,15)</code></p>
+
+<p>(x, y)という形は(,) x yの構文糖と考えられる。</p>
+
+<h2>型</h2>
+
+<p>型に関しても同じことだ。</p>
+
+<p><code>Prelude&gt; (8, 15) :: (,) Integer Integer<br/>
+(8,15)</code></p>
+
+<p>
+Maybe値の型がMaybe Integerのような表記であったことを思い出そう。
+これらは複合型だ。
+複合型については代数的データ型について学んだあとに説明する。
+</p>
+
+<h2>タプルの部分適用</h2>
+
+<p>
+<code>flip (,) 15</code>のような形は演算子でならよりきれいに表現できていた。
+たとえば<code>flip (+) 15</code>は<code>(+ 15)</code>のように書ける。
+残念ながらHaskellの標準では<code>(, 15)</code>のような形は許されていない。
+個人的にはこの形が好きなのでGHCの拡張機能TupleSectionsを使う。
+</p>
+
+<p><code>Prelude&gt; :set -XTupleSections<br/>
+Prelude&gt; (, 15) 8<br/>
+(8,15)<br/>
+Prelude&gt; (8 ,) 15<br/>
+(8,15)</code></p>
+
+<p>ファイル内で使うときは先頭に以下を書いておくと良い。</p>
+
+<p><code>{-# LANGUAGE TupleSections #-}</code></p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/uncurry.html"
+	>「非カリー化」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/enum_accum.html"
+	>「リスト: 列挙と蓄積」へ</a>
+</p>
