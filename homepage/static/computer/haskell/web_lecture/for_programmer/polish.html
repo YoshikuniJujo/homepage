@@ -55,7 +55,7 @@
 <h3>演算子の追加</h3>
 
 <p>
-演算子の追加は数値リストの先頭2つへの演算の適用となる。
+演算子の追加は数値リストの先頭ふたつへの演算の適用となる。
 結果は数値リストの先頭に追加される。
 </p>
 
@@ -69,13 +69,13 @@
 
 <h3>型</h3>
 
-<p>整数の2項演算なので動作はInteger型の値を2つとりInteger型を返す関数だ。</p>
+<p>整数の2項演算なので動作はInteger型の値をふたつとりInteger型を返す関数だ。</p>
 
 <p><code>Integer -&gt; Integer -&gt; Integer</code></p>
 
 <p>
 文字列を鍵としこれを値とする辞書とする。
-演算子の数は4つとすくないのでリストによる辞書で十分だ。
+演算子の数は4つとすくないのでリストによる辞書で良い。
 </p>
 
 <p><code>operators :: [(String, Integer -&gt; Integer -&gt; Integer)]</code></p>
@@ -151,8 +151,9 @@ Haskellにはコードをきれいにするためのギミックがたくさん�
 <h4>演算子</h4>
 
 <p>
-演算子リストに値が存在したときは数値リストの先頭の2つに対して
-演算子の動作を適用する。
+演算子リストに値が存在したときは後続の命令の実行結果である
+数値リストの先頭のふたつに対して演算子の動作を適用する。
+後続の命令の実行が失敗していれば失敗(Nothing)を返す。
 </p>
 
 <p><code><span class="indent1">Just o -&gt; case polish ss of</span><br/>
@@ -194,7 +195,7 @@ polish (s : ss) = case lookup s operators of<br/>
 </p>
 
 <p><code>polish [] = []<br/>
-polish ('+' : ss) = x + y : ns<br/>
+polish ("+" : ss) = x + y : ns<br/>
 	<span class="indent1">where x : y : ns = polish ss</span><br/>
 polish (s : ss) = read s : polish ss</code></p>
 

@@ -1,10 +1,8 @@
-リストの要素の総積
+リストの要素の総積: 関数product
 
-<h2>はじめに</h2>
+<h2>動作</h2>
 
 <p>関数productはリストに含まれる値すべてをかけ算する。</p>
-
-<h2>動き</h2>
 
 <p><code>% ghci<br/>
 Prelude&gt; product [3, 18, 9]<br/>
@@ -20,7 +18,7 @@ Prelude&gt; product [3, 18, 9]<br/>
 
 <p>
 リストに値を追加したら結果の値は追加した値をかけた値となる。
-myProduct (x : xs)はmyProduct xsのx倍となる。
+<code>myProduct (x : xs)</code>は<code>myProduct xs</code>のx倍となる。
 </p>
 
 <p><code>myProduct (x : xs) = x * myProduct xs</code></p>
@@ -70,7 +68,7 @@ mySumでは(+)でありmyProductでは(*)となっている。
 <h2>課題</h2>
 
 <ol>
-<li>リストの要素の最小値を返す関数myMaximumを作成せよ
+<li>リストの要素の最大値を返す関数myMaximumを作成せよ
 	<ul>
 	<li>Integer型の値を要素とするリストを対象とする</li>
 	<li>リストに含まれるのは0以上の値のみとする</li>
