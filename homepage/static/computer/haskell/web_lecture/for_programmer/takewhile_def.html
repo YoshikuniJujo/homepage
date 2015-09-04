@@ -180,7 +180,7 @@ spanB _ _ = const ([], [])</code></p>
 
 <p>ローカル関数を使う。</p>
 
-<p><code>spanF p xs = foldr s (const ([], [])) xs True
+<p><code>spanF p xs = foldr s (const ([], [])) xs True<br/>
 	<span class="indent1">where</span><br/>
 	<span class="indent1">s x f True | p x = (x : t, d) where (t, d) = f True</span><br/>
 	<span class="indent1">s x f _ = ([], x : d) where (_, d) = f False</span></code></p>

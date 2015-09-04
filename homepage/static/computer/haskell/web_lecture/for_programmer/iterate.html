@@ -2,16 +2,16 @@
 
 <h2>はじめに</h2>
 
-<p>コラッツ数列の例で使った関数iterateの定義を見ていこう。</p>
+<p>コラッツ数列の例で使った関数iterateの定義を学ぶ。</p>
 
 <h2>動作</h2>
 
-<p>コラッツ数列のもととなる無限リストの定義を以下に示す。</p>
+<p>コラッツ数列のもととなる無限リストの定義だ。</p>
 
 <p><code>collatsInf :: Integer -&gt; [Integer]<br/>
 collatsInf n = n : collatsInf (collatsNext n)</code></p>
 
-<p>関数iterateで以下のように書き換えた。</p>
+<p>関数iterateが使える。</p>
 
 <p><code>collatsInf = iterate collatsNext</code></p>
 
@@ -23,7 +23,7 @@ collatsInf n = n : collatsInf (collatsNext n)</code></p>
 Prelude&gt; take 10 $ iterate (+ 1) 0<br/>
 [0,1,2,3,4,5,6,7,8,9]</code></p>
 
-<p>次の値が前の値のみに依存するような数列を生成するのに使える。</p>
+<p>次の値が前の値のみに依存するような数列を作るのに使える。</p>
 
 <h2>型</h2>
 
@@ -35,7 +35,7 @@ Prelude&gt; take 10 $ iterate (+ 1) 0<br/>
 
 <p>
 初期値に関数fを次々に適用していってできるリストは
-初期値に関数fを適用したものを初期値として同じことをしたリストの
+「初期値に関数fを適用したもの」を初期値として同じことをしたリストの
 先頭に初期値を追加したものだ。
 </p>
 
