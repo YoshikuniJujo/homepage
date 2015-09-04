@@ -10,13 +10,13 @@ GHCi: 対話環境に触れる
 
 <p>
 ターミナルから以下のように入力する。
-先頭の'%'はターミナルに対する入力であることを示すためなので入力しない。
+先頭の%はターミナルへの入力であることを示す。
 </p>
 
 <code>% ghc --version<br/>
 The Glorious Glasgow Haskell Compilation System, version X.Y.Z</code>
 
-<p>X.Y.Zはバージョン番号。</p>
+<p>X.Y.Zはバージョン番号だ。</p>
 
 <h2>対話環境の開始と終了</h2>
 
@@ -26,8 +26,8 @@ The Glorious Glasgow Haskell Compilation System, version X.Y.Z</code>
 Prelude&gt;</code></pre>
 
 <p>
-Prelude&gt;はプロンプトだ。まずは終わらせかたを知ろう。
-プロンプトに':quit'を入力しリターンキーを入力する。
+Prelude&gt;はプロンプトだ。終わらせかたを知ろう。
+プロンプトに':quit'とリターンキーを入力する。
 ':q'でも良い。
 </p>
 
@@ -85,19 +85,19 @@ piは定義済みの変数だ。円周率の値に束縛されている。
 
 <h3>リンゴが好き</h3>
 
-<p>ファイルの読み込みの練習だ。fruits.hsを作成する。</p>
+<p>練習してみよう。fruits.hsを作成する。</p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/00_touch_ghci/fruits_1.hs"
 	>fruits.hs</a></p>
 
 <p><code>myFavoriteFruit = "apple"</code></p>
 
-<p>引数としてファイル名を指定しghciを立ち上げる。</p>
+<p>ファイル名を引数に指定しghciを立ち上げる。</p>
 
 <p><code>ghci fruits.hs<br/>
 *Main&gt; </code></p>
 
-<p>myFavoriteFruitと入力しリターンキーを入力する。</p>
+<p>myFavoriteFruitとリターンキーを入力する。</p>
 
 <p><code>*Main&gt; myFavoriteFruit<br/>
 "apple"</code></p>
@@ -129,8 +129,8 @@ piは定義済みの変数だ。円周率の値に束縛されている。
 Haskell Platformには、コンパイラ、インタプリタ、対話環境だけでなく、
 パッケージ管理ソフトやドキュメントの自動生成ソフト、標準的なライブラリが入っている。
 入出力について学ぶまでは対話環境で学習を進める。
-対話環境はghciコマンドで開始し':q'で終了する。
-定義ファイルを読み込むにはそのファイル名を引数にしてghciを立ち上げる。
+対話環境はghciコマンドで開始し:qで終了する。
+定義ファイルを読み込むにはファイル名を引数にしてghciを立ち上げる。
 ファイルを編集したら:reloadで再読み込みする。
 </p>
 
