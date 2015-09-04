@@ -26,7 +26,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/binaryTree.svg"/>
 
 <p>
 図に書いた例ではbからfには行けるがcからfには行けない。
-樹を上にはたどれないのでcからaにもどれないからだ。
+樹をうえにはたどれないのでcからaにもどれないからだ。
 </p>
 
 <h2>樹の表現</h2>
@@ -41,8 +41,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/binaryTree.svg"/>
 <p><code>[('a', ('b', 'c')), ('b', ('d', 'e')), ('e', ('f', 'g'))]</code></p>
 
 <p>
-型は<code>[(Char, (Char, Char))]</code>だ。
-これに別名をつける。
+型は<code>[(Char, (Char, Char))]</code>だ。これに別名をつける。
 型の別名には以下の構文を使う。
 </p>
 
@@ -62,8 +61,7 @@ sampleTree = [('a', ('b', 'c')), ('b', ('d', 'e')), ('e', ('f', 'g'))]</code>
 <p>
 樹を下にたどっていくために、あるノードから出る枝の先にあるノードを求める。
 例示した樹では引数'b'に対して'd'と'e'を返してほしい。
-Tree型の値を辞書として考える。
-辞書から鍵に対応する値をとりだせれば良い。
+Tree型の値を辞書として考える。辞書から鍵に対応する値をとりだせれば良い。
 タプルのリストを辞書と考えたときに値を引き出す関数lookupがある。
 </p>
 
@@ -113,7 +111,7 @@ Nothing</code>
 <p>始点からの枝が存在しない場合をcase式のなかに書く。</p>
 
 <p><code>reachable t s e = case lookup s t of<br/>
-	<span style="padding-left: 2em">Nothing -&gt; False</span></code></p>
+	<span class="indent1">Nothing -&gt; False</span></code></p>
 
 <h2>再帰部</h2>
 
@@ -144,8 +142,7 @@ False</code></p>
 <h2>まとめ</h2>
 
 <p>
-処理の流れが樹構造となる再帰関数の例を学んだ。
-「生の再帰」が威力を発揮する。
+処理の流れが樹構造となる再帰関数の例を学んだ。「生の再帰」が威力を発揮する。
 </p>
 
 <p>
