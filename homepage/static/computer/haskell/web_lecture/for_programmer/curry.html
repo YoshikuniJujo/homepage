@@ -15,8 +15,8 @@ introduction (n, a) =<br/>
 <p>関数showは値を表示用の文字列に変換する。</p>
 
 <p><code>% ghci introduction.hs<br/>
-*Main&gt; introduction ("Yoshikuni Jujo", 34)<br/>
-"My name is Yoshikuni Jujo. I'm 34 years old."</code></p>
+*Main&gt; introduction ("Yoshikuni Jujo", 35)<br/>
+"My name is Yoshikuni Jujo. I'm 35 years old."</code></p>
 
 <h2>年齢は変わる</h2>
 
@@ -27,8 +27,8 @@ introduction (n, a) =<br/>
 
 <p>「僕はまだ小4だよ」。バレたら本当のことを言おう。</p>
 
-<p><code>*Main&gt; introduction ("Yoshikuni Jujo", 34)<br/>
-"My name is Yoshikuni Jujo. I'm 34 years old."</code></p>
+<p><code>*Main&gt; introduction ("Yoshikuni Jujo", 35)<br/>
+"My name is Yoshikuni Jujo. I'm 35 years old."</code></p>
 
 <p>
 サバ読むときやバレたときのことを考えて"Yoshikuni Jujo"専用の自己紹介関数を作る。
@@ -40,8 +40,7 @@ introduction (n, a) =<br/>
 <h3>Haskellにおけるカリー化とは</h3>
 
 <p>
-カリー化で複数の引数をとる関数は関数を返す関数になる。
-これで部分適用が可能になる。
+カリー化で複数の引数をとる関数は関数を返す関数になる。これで部分適用が可能になる。
 Haskellでは複数の引数を取る関数(のようなもの)ははじめから関数を返す関数だ。
 他の言語での「複数の引数をとる関数」は「タプルを引数にとる関数」に相当する。
 よって、Haskellでのカリー化を「タプルを引数に取る関数を
@@ -54,8 +53,8 @@ Haskellでは複数の引数を取る関数(のようなもの)ははじめか�
 (String, Integer) -&gt; String<br/>
 *Main&gt; :t curry introduction<br/>
 String -&gt; Integer -&gt; String<br/>
-*Main&gt; curry introduction "Yoshikuni Jujo" 34<br/>
-"My name is Yoshikuni Jujo. I'm 34 years old."</code></p>
+*Main&gt; curry introduction "Yoshikuni Jujo" 35<br/>
+"My name is Yoshikuni Jujo. I'm 35 years old."</code></p>
 
 <p>
 タプルとして与えるべき引数をばらばらに与えられる。
@@ -66,8 +65,8 @@ String -&gt; Integer -&gt; String<br/>
 introductionYj = curry introduction "Yoshikuni Jujo"</code></p>
 
 <p><code>*Main&gt; :reload<br/>
-*Main&gt; introductionYj 34<br/>
-"My name is Yoshikuni Jujo. I'm 34 yeras old."<br/>
+*Main&gt; introductionYj 35<br/>
+"My name is Yoshikuni Jujo. I'm 35 yeras old."<br/>
 *Main&gt; introductionYj 10<br/>
 "My name is Yoshikuni Jujo. I'm 10 years old."</code></p>
 
@@ -97,7 +96,7 @@ introductionYj = curry introduction "Yoshikuni Jujo"</code></p>
 <p><code>((a, b) -&gt; c) -&gt; a -&gt; b -&gt; c</code></p>
 
 <p>
-このように右側の丸括弧を省略することで以下のように読める。
+右側の丸括弧を省略することで以下のように読める。
 「タプルを取る関数」とそのタプルの第1要素と第2要素を引数としてとり
 「第1引数の関数の返り値の型」の値を返す。
 </p>
