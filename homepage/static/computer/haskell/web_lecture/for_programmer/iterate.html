@@ -54,9 +54,20 @@ Prelude&gt; take 10 $ iterate (+ 1) 0<br/>
 <h2>まとめ</h2>
 
 <p>
-初期値に次々と関数を適用していくことで無限リストを生成する関数iterateの定義を
-学んだ。
+初期値に次々と関数を適用していくことで無限リストを作る関数iterateの定義を学んだ。
 </p>
+
+<h2>課題</h2>
+
+<ol>
+<li>したのルールで値nから次の値を求めることで作られる無限リストを返す関数を書け
+	<ul>
+	<li>値nが3の倍数ならば3で割る</li>
+	<li>値nを3で割った余りが1ならば2倍して1足す</li>
+	<li>値nを3で割った余りが2ならば2倍して2足す</li>
+	</ul></li>
+<li>1で関数iterateを使ったなら生の再帰で、生の再帰を使ったなら関数iterateで書き直せ</li>
+</ol>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/collatz.html"
