@@ -9,7 +9,7 @@
 
 <p>
 関数が高階関数だ。
-「くりかえし」などの構造を特別な構文ではなく関数で書ける。
+「くりかえし」などの制御構造を特別な構文ではなく関数で書ける。
 </p>
 
 <h2>関数を返す関数</h2>
@@ -21,7 +21,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/return_fun_machine.svg"
 
 <p>
 すでに高階関数を学んでいた。
-複数の引数をとる関数のように見える関数は「関数を返す関数」だ。
+複数の引数をとる関数のような関数は「関数を返す関数」だ。
 </p>
 
 <h2>引数として関数を取る関数</h2>
@@ -48,7 +48,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/fun_arg_machine.svg"
 *Main&gt; twice succ 8
 10</code></pre>
 
-<p>pred, succはそれぞれ1つ前の値、1つ後の値を返す関数である。</p>
+<p>関数pred, succはそれぞれ1つ前の値、1つ後の値を返す。</p>
 
 <h2>まとめ</h2>
 
@@ -61,9 +61,8 @@ src="/computer/haskell/web_lecture/for_programmer/images/fun_arg_machine.svg"
 
 <p>
 関数だ。
-返り値が関数である関数は複数の引数をとる関数と考えられる。
-「くりかえし」などの制御構造を
-「特別な構文」ではなく「関数を引数としてとる関数」で書ける。
+返り値が関数である関数は複数の引数をとる関数として扱える。
+制御構造を特別な構文ではなく「関数を引数としてとる関数」で書ける。
 </p>
 
 <h2>課題</h2>

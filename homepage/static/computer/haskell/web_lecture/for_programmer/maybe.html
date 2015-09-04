@@ -1,23 +1,13 @@
-Maybe型
+Maybe値
 
-<h2>ここでMaybe型を学ぶ理由</h2>
-
-<p>
-Maybe型はもっとあとで学ぶべきだ。
-型、代数的データ型、多相型をさきに学ばなければならない。
-しかし「パターンマッチ」を学ぶときに構成的な値の例がほしい。
-ここではMaybe型の深い部分は説明せずMaybe型の意義と使いかたのみを説明する。
-</p>
-
-<h2>Maybe型とは</h2>
+<h2>Maybe値とは</h2>
 
 <p>
-Maybe型の値はJust [値]またはNothingだ。
-値が存在しないかもしれない型だ。
+Maybe値はJust [値]またはNothingだ。
 値が存在する場合にはJust [値]で存在しない場合にはNothingとなる。
 </p>
 
-<h2>Maybe型の存在意義</h2>
+<h2>Maybe値の存在意義</h2>
 
 <h3>全域関数と部分関数</h3>
 
@@ -31,7 +21,7 @@ f(x) = 1 / xという関数は引数0に対して値を返さないので全域�
 <h3>例外やNull値では</h3>
 
 <p>
-引数に対する値が存在しないとき例外を投げるかNull値を返す。
+多くの言語で引数に対する値が存在しないとき例外を投げるかNull値を返す。
 例外やNullは補足されずに放置されても気がつかない。
 </p>
 
@@ -42,7 +32,7 @@ Maybe型ではJust [値]から[値]を取り出すことになる。
 取り出しのときに「失敗の可能性がある」ということを意識しその処理を書くことになる。
 </p>
 
-<h2>対話環境で表示</h2>
+<h2>表示してみる</h2>
 
 <pre><code>% ghci
 Prelude&gt; Just 8
@@ -51,15 +41,15 @@ Prelude&gt; Nothing
 Nothing</code></pre>
 
 <p>
-Just 8は計算が成功し結果の値が8であることを意味する。
-Nothingは計算が失敗したということだ。
+Just 8は計算が成功し結果の値が8ということだ。
+Nothingは計算の失敗を表す。
 これらの値を返す関数を想像してみよう。
 引数xが0のときはNothingを、そうでないときはJust (1 / x)を返す関数などだ。
 </p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/bool.html"
-	>「Bool型」へもどる</a>
+	>「Bool値」へもどる</a>
 <a href="/computer/haskell/web_lecture/for_programmer/pattern_match.html"
 	>「パターンマッチ」へ</a>
 </p>

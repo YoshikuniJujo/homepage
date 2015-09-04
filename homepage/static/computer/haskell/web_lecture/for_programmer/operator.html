@@ -4,7 +4,7 @@
 
 <p>
 演算子は2引数関数だ。
-普通の関数は前置記法だが演算子は中置記法だ。
+ふつうの関数は前置記法だが演算子は中置記法だ。
 </p>
 
 <img
@@ -35,7 +35,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/operator_is_function.sv
 
 <h2>関数は演算子だ</h2>
 
-<p>関数modは剰余を計算する。これは普通の関数だ。</p>
+<p>関数modは剰余を計算する。ふつうの関数だ。</p>
 
 <pre><code>Prelude&gt; mod 15 4
 3
@@ -79,7 +79,7 @@ Prelude&gt; (15 `mod`) 4<br/>
 
 <p><code>(+++) a b = ...</code></p>
 
-<p>中置記法でも良い。</p>
+<p>中置記法も使える。</p>
 
 <p><code>a +++ b = ...</code></p>
 
@@ -89,7 +89,7 @@ Prelude&gt; (15 `mod`) 4<br/>
 
 <p><code>!#$%&amp;*+./&lt;=&gt;?@\^|-~:</code></p>
 
-<p>:ではじまる記号列は別の用途で使われるため普通の演算子としては使えない。</p>
+<p>:ではじまる記号列は別の用途で使われるためふつうの演算子としては使えない。</p>
 
 <h3>コードの短縮</h3>
 
@@ -107,7 +107,7 @@ Prelude&gt; (15 `mod`) 4<br/>
 f x y=l x+l y</code></p>
 
 <p>
-別名の定義に必要な改行を入れて32文字だ。11文字減らせた。
+定義に必要な改行をいれて32文字だ。11文字減らせた。
 減らせる文字数は関数の長さと使われている回数から計算できる。
 </p>
 
@@ -121,8 +121,7 @@ f x y=l x+l y</code></p>
 <p><code>(len - 1) * tms - (len + 3)</code></p>
 
 <p>
-演算子の名前を考える。
-この演算は掛け算に似ている。
+演算子の名前を考える。この演算は掛け算に似ている。
 「減らす」イメージを加味して\*\とする。
 </p>
 
@@ -151,13 +150,11 @@ f x y=l x+l y</code></p>
 
 <h2>関数の演算子的な定義</h2>
 
+<p>関数は演算子的に定義できる。以下のように書き換えられる。</p>
+
 <p><code>op a b = ...</code></p>
 
-<p>上記の定義を以下のように書ける。</p>
-
 <p><code>a `op` b = ...</code></p>
-
-<p>このように関数も演算子的に定義できる。</p>
 
 <h2>まとめ</h2>
 
@@ -182,5 +179,5 @@ f x y=l x+l y</code></p>
 <a href="/computer/haskell/web_lecture/for_programmer/higher_order.html"
 	>「高階関数」へもどる</a>
 <a href="/computer/haskell/web_lecture/for_programmer/bool.html"
-	>「Bool型」へ</a>
+	>「Bool値」へ</a>
 </p>

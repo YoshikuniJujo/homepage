@@ -26,10 +26,9 @@ Prelude&gt; 123<br/>
 
 <p>
 x = 3と定義されているとき変数xを3で置き換えられる。
-では、fun x = x ^ xのように定義されているとき
-変数funを何で置き換えられるだろうか。
-funを置き換えられるような表現、
-関数自体をそのまま書いたもの、が関数リテラルだ。
+では、fun x = x ^ xのように定義されているとき変数funを何で置き換えられるだろう。
+funを置き換えられるような表現が関数リテラルだ。
+関数自体をそのまま書いたものが関数リテラルだ。
 </p>
 
 <h2>関数リテラルの例</h2>
@@ -41,7 +40,7 @@ Prelude&gt; fun 3<br/>
 
 <p>
 funの部分を関数リテラルで置き換える。
-関数リテラルは\[仮引数] -&gt; [表現]という形になる。
+関数リテラルは\[仮引数] -&gt; [表現]という形だ。
 </p>
 
 <p><code>Prelude&gt; (\x -&gt; x ^ x) 3<br/>
@@ -49,21 +48,19 @@ funの部分を関数リテラルで置き換える。
 
 <h2>関数定義は構文糖だ</h2>
 
-<p>今まで見てきた関数定義は2つのことを行う構文糖だ。</p>
+<p>今まで見てきた関数定義は以下のように書き換えられる。</p>
 
 <p><code>fun x = x ^ x</code></p>
 
-<p>以下のように書き直せる。</p>
-
 <code>fun = \x -&gt; x ^ x</code>
 
-<p>関数定義は関数の作成とその関数での変数の束縛という2つのことを行う。</p>
+<p>
+関数定義は関数の作成とその関数での変数の束縛という2つのことをする構文糖だ。
+</p>
 
 <h2>xxcryptの例</h2>
 
-<code>xxcrypt n ed mc = mc ^ ed `mod` n</code>
-
-<p>関数リテラルで書く。</p>
+<p><code>xxcrypt n ed mc = mc ^ ed `mod` n</code></p>
 
 <p><code>xxcrypt = \n -&gt; (\ed -&gt; (\mc -&gt;  mc ^ ed `mod` n))</code></p>
 
@@ -74,8 +71,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/three_arg_fun.svg"
 />
 
 <p>
-数値を返す関数を返す関数を返す関数だ。
-結合性を考慮して丸括弧を省略する。
+数値を返す関数を返す関数を返す関数だ。(-&gt;)は右結合なので丸括弧が省略できる。
 </p>
 
 <code>xxcrypt = \n -&gt; \ed -&gt; \mc -&gt;  mc ^ ed `mod` n</code>
@@ -95,7 +91,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/three_arg_fun.svg"
 	<ul>
 	<li>税率は8%とする</li>
 	<li>整数の除算には演算子`div`が使える</li>
-	<li>20 `div` 3は6となる</li>
+	<li>20 `div` 3は6だ</li>
 	</ul></li>
 <li>関数taxを関数リテラルで変数を束縛する形に書き換えよ</li>
 <li>時間、分、秒を引数としてとり秒数に変換する関数secを作成せよ</li>
