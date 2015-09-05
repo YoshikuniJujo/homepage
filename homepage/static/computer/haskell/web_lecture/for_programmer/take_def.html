@@ -118,7 +118,7 @@ nが0以下ならば[]だ。
 よく見くらべてみよう。
 </p>
 
-<p><code>ftake (x : xs) | n &gt; 0 = x : ftake xs (n - 1)<br/>
+<p><code>ftake (x : xs) n | n &gt; 0 = x : ftake xs (n - 1)<br/>
 ftake _ _ = []</code></p>
 
 <p>ひとつめの関数ftakeの定義から不要な仮引数nを消す。</p>
