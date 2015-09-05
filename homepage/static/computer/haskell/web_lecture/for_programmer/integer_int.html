@@ -4,7 +4,7 @@
 
 <p>
 整数としてIntegerのみを見てきた。
-Integer型の値ではメモリの使用量以外に値の範囲を考えなくてすむ。
+Integer型の値ではメモリの使用量以外に値の範囲を考えなくて良い。
 しかし、実効効率などの関係でもうひとつの整数型を使う標準的な関数がいくつかある。
 </p>
 
@@ -23,8 +23,8 @@ Prelude&gt; 12345678901234567890123467890<br/>
 <h2>固定長整数</h2>
 
 <p>
+リストの長さを計算する関数lengthなどの
 いくつかの標準的な関数はInteger型の値ではなく固定長整数であるInt型の値を使う。
-リストの長さを計算する関数lengthなどだ。
 </p>
 
 <p><code>Prelude&gt; length "Hello"<br/>
@@ -36,11 +36,11 @@ Prelude&gt; length
 "ML", "Standard ML", "Orwell", "SASL", "SISAL", "Scheme"]<br/>
 16<br/>
 Prelude&gt; :t it <br/>
-... :: Int</code></p>
+it :: Int</code></p>
 
 <h3>範囲</h3>
 
-<p>Haskell 2010ではInt型の値は-2^29から2^29-1までの範囲を含む整数型だ。</p>
+<p>Haskell 2010ではInt型の値はすくなくとも-2^29から2^29-1を含む範囲の整数型だ。</p>
 
 <p><a href="https://www.haskell.org/onlinereport/haskell2010/haskellch18.html#x26-22400018.1"
 	>Haskell 2010 language report: 18.1 Signed integer types</a></p>
@@ -54,14 +54,12 @@ GHCではInt型の値の範囲を処理系以存としている。
 <p><a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/bugs-and-infelicities.html#haskell-98-2010-undefined"
 	>The Glorious Glasgow Haskell Compilation System User's Guide: GHC's interpretation of undefined behaviour in Haskell 98 and Haskell 2010</a>
 
-<p>minBound, maxBoundという値を使うことで確認できる。</p>
+<p>minBound, maxBoundという値で確認できる。</p>
 
 <p><code>Prelude&gt; minBound :: Int<br/>
 -2147483648<br/>
 Prelude&gt; maxBound :: Int<br/>
-2147483647<br/>
-Prelude&gt; 2 ^ 31<br/>
-2147483648</code></p>
+2147483647</code></p>
 
 <h2>嫌なバグ</h2>
 
@@ -72,8 +70,6 @@ Prelude&gt; n<br/>
 2147483647<br/>
 Prelude&gt; n + 1<br/>
 -2147483648</code></p>
-
-<p>注意が必要だ。</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/about_montecarlo.html"
