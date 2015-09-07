@@ -25,17 +25,17 @@ safeRecip x = Just $ 1 / x</code></p>
 <p>関数リテラルとcase式によって書き直す。</p>
 
 <p><code>safeRecip = \x -&gt; case x of<br/>
-	<span style="padding-left: 2em">0 -&gt; Nothing<br/>
-	<span style="padding-left: 2em">_ -&gt; Just $ 1 / x</span></code></p>
+	<span class="indent1">0 -&gt; Nothing<br/>
+	<span class="indent1">_ -&gt; Just $ 1 / x</span></code></p>
 
 <p>うえの表現はしたの表現の構文糖による書き換えと考えられる。</p>
 
 <h2>case式の構文</h2>
 
 <p><code>case [式0] of<br/>
-	<span style="padding-left: 2em">[パターン1] -&gt; [式1]</span><br/>
-	<span style="padding-left: 2em">[パターン2] -&gt; [式2]</span><br/>
-	<span style="padding-left: 2em">...</span></code></p>
+	<span class="indent1">[パターン1] -&gt; [式1]</span><br/>
+	<span class="indent1">[パターン2] -&gt; [式2]</span><br/>
+	<span class="indent1">...</span></code></p>
 
 <p>
 式0のところには単純な変数だけでなく複雑な式も置ける。
@@ -60,9 +60,9 @@ Haskellではレイアウトルールにより明示的な{}や;を省略でき�
 
 <p><code>checkAnswer :: Char -&gt; Maybe Bool<br/>
 checkAnswer c = case toLower c of<br/>
-	<span style="padding-left: 2em">'y' -&gt; Just True</span><br/>
-	<span style="padding-left: 2em">'n' -&gt; Just False</span><br/>
-	<span style="padding-left: 2em">_ -&gt; Nothing</span></code></p>
+	<span class="indent1">'y' -&gt; Just True</span><br/>
+	<span class="indent1">'n' -&gt; Just False</span><br/>
+	<span class="indent1">_ -&gt; Nothing</span></code></p>
 
 <p>
 引数に対して関数を適用したうえでのパターンマッチは
@@ -104,9 +104,9 @@ diffRecip x y = case x - y of<br/>
 </p>
 
 <p><code>case [式0] of<br/>
-	<span style="padding-left: 2em">[パターン1] -&gt; [式1]</span><br/>
-	<span style="padding-left: 2em">[パターン2] -&gt; [式2]</span><br/>
-	<span style="padding-left: 2em">...</span>
+	<span class="indent1">[パターン1] -&gt; [式1]</span><br/>
+	<span class="indent1">[パターン2] -&gt; [式2]</span><br/>
+	<span class="indent1">...</span>
 	</code></p>
 
 <p>
