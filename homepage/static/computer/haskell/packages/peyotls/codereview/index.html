@@ -10,4 +10,30 @@ peyotls: コードレビュー
 <p><a href="https://hackage.haskell.org/package/peyotls"
 	>hackage: peyotls</a></p>
 
-<h2>全体の構成</h2>
+<h2>公開モジュール</h2>
+
+<ul>
+<li>Network.PeyoTls
+	<ul>
+	<li>Client</li>
+	<li>Server</li>
+	<li>ReadFile</li>
+	<li>TChan
+		<ul>
+		<li>Client</li>
+		<li>Server</li>
+		</ul></li>
+	</ul></li>
+</ul>
+
+<h3>TChanモジュールに関係する問題点</h3>
+
+<p>
+PeyoTLSの全体的な設計に問題がある。
+TLSは上りと下りとで並行処理が可能なように作られている。
+しかしPeyoTLSの基本的な設計ではそれが不可能だ。
+それに対するad-hocな解決としてTChanモジュールが作られた。
+行く々々は根本から解決したい。
+</p>
+
+<h2>参照するRFC</h2>
