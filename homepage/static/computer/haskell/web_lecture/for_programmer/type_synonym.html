@@ -1,8 +1,206 @@
 型シノニム
 
-<p>(工事中 0%)</p>
+<h2>原点からの距離再び</h2>
 
-<p>構文について説明し例題を挙げて課題を作成する。</p>
+<h3>コーディング</h3>
+
+<p>
+原点からの距離を求めよう。
+型宣言書いて関数定義書いて...
+</p>
+
+<p><code>dist0 :: (Double, Double) -&gt; Double<br/>
+dist0 (x, y) = sqrt $ x ^ 2 + y ^ 2</code></p>
+
+<p><code>ghci points.hs<br/>
+*Main&gt; dist0 (3, 4)<br/>
+5.0</code></p>
+
+<p>
+ある点(x, y)が中心(x0, y0)の半径rの円内にあるかどうかをチェックする関数を書こう。
+</p>
+
+<p><code>inCircle :: (Double, Double) -&gt; Double -&gt;
+	(Double, Double) -&gt; Bool<br/>
+inCircle (x0, y0) r (x, y) = (x - x0) ^ 2 + (y - y0) ^ 2 &lt;= r ^ 2</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; inCircle (3, 8) 5 (5, 7)<br/>
+True<br/>
+*Main&gt; inCircle (4, 5) 3 (10, -8)<br/>
+False</code></p>
+
+<p>
+(Double, Double)は点の表現なので今後も何度も書くよね。
+めんどくさい。
+</p>
+
+<h3>そこで型シノニムですよ</h3>
+
+<p>型の別名が定義できる。</p>
+
+<p><code>type Point = (Double, Double)</code></p>
+
+<p>すると上記の2つの型宣言は以下のように書ける。</p>
+
+<p><code>dist0 :: Point -&gt; Double</code></p>
+
+<p><code>inCircle :: Point -&gt; Double -&gt; Point -&gt; Bool</code></p>
+
+<p>すっきりした。</p>
+
+<h2>構文</h2>
+
+<p>type [型の別名] = [型]</p>
+
+<p>[型]の部分は例のように複合的な型でも良い。</p>
+
+<h2>アンケートの結果</h2>
+
+<h3>問題定義</h3>
+
+<p>
+2つのうちのどちらかを選ぶアンケートを実施した。
+「象とキリンなら象が好きだ(Yes/No)」のようなアンケートだ。
+質問のリストと答えのリストがある。
+結果を保存し必要に応じて好きなものリストと
+嫌いなものリストを抽出できるようにしよう。
+</p>
+
+<h3>質問の型</h3>
+
+<p>
+質問のリストは文字列のペアのリストで良さそうだ。
+</p>
+
+<p><code>type Questions = [(String, String)]</code></p>
+
+<p>
+同じアンケートを番号つきの商品について行うとする。
+オフィス用品を扱う会社で椅子の商品番号は112でソファは113だとする。
+そして以下のようなアンケートをするとする。
+「椅子(No. 112)とソファ(No. 113)では椅子のほうが望ましい(Yes/No)」。
+この場合以下のような型シノニムとなるだろう。
+</p>
+
+<p><code>type Questions = [((Int, String), (Int, String))]</code></p>
+
+<p>
+アンケートの結果を選ぶ場合、選択肢の型は何であっても良い。
+よってこれらの型は以下のようにしてまとめることができる。
+</p>
+
+<p><code>type Questions a = [(a, a)]</code></p>
+
+<p>
+こうしておけばただの文字列に対してはQuestions Stringとすれば良いし、
+商品番号つきの質問のリストに対してはQuestions (Int, String)とすれば良い。
+</p>
+
+<h3>解答の型と保存される結果の型</h3>
+
+<p>解答はYesとNoのリストなので以下のようになる。</p>
+
+<p><code>type Answers = [Bool]</code></p>
+
+<p>保存される結果の型は解答と質問を結合したものなので以下のようにする。</p>
+
+<p><code>type Result a = [(Bool, (a, a))]</code></p>
+
+<h3>質問と答えの例1</h3>
+
+<p><code>questions1 :: Questions String<br/>
+questions1 = [<br/>
+	<span class="indent1">("Elephant", "Giraffe"),</span><br/>
+	<span class="indent1">("Apple", "Banana"),</span><br/>
+	<span class="indent1">("TV", "Radio"),</span><br/>
+	<span class="indent1">("Plane", "Ship"),</span><br/>
+	<span class="indent1">("Tennis", "Ski") ]</span></code></p>
+
+<p><code>answers1 :: Answers<br/>
+answers1 = [True, False, True, True, False]</code></p>
+
+<h3>質問と答えから結果を作成する</h3>
+
+<p><code>result :: Quentions a -&gt; Answers -&gt; Results a<br/>
+result = flip zip</code></p>
+
+<h3>好きなものリスト、嫌いなものリスト</h3>
+
+<p><code>likes, hates :: Results a -&gt; [a]<br/>
+likes = map $ \(a, s) -&gt; (if a then fst else snd) s</code></p>
+
+<p><code>hates = map $ \(a, s) -&gt; (if a then snd else fst) s</code></p>
+
+<h3>例1で試す</h3>
+
+<p><code>ghci survey.hs<br/>
+*Main&gt; result question1 answer1<br/>
+[(True, ("Elephant", "Giraffe"), ...]<br/>
+*Main&gt; let r = it<br/>
+*Main&gt; likes r<br/>
+["Elephant", "Banana", "TV", "Plane", "Ski"]<br/>
+*Main&gt; hates r<br/>
+["Giraffe", "Apple", "Radio", "Ship", "Tennis"]</code></p>
+
+<h3>質問と答えの例2</h3>
+
+<p><code>questions2 :: Question (Int, String)<br/>
+questions2 = [<br/>
+	<span class="indent1">((112, "Chair"), (113, "Sofa")),</span><br/>
+	<span class="indent1">((343, "Telephone"), (344, "Fax")),</span><br/>
+	<span class="indent1">((522, "Projector"), (523, "Monitor")) ]</span></code></p>
+
+<p><code>answers2 :: Answers<br/>
+answers2 = [False, True, True]</code></p>
+
+<h3>例2を試す</h3>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; result questions2 answers2<br/>
+[(False, ((112, "Chair"), (113, "Sofa"))), ...]<br/>
+*Main&gt; let r = it<br/>
+*Main&gt; likes r<br/>
+[(113, "Sofa"), (343, "Telephone"), (522, "Projector")]<br/>
+*Main&gt; hates r<br/>
+[(112, "Chair"), (344, "Fax"), (523, "Monitor")]</code></p>
+
+<h3>メモ</h3>
+
+<small>
+
+<ul>
+<li>象とキリン</li>
+<li>りんごとバナナ</li>
+<li>テレビとラジオ</li>
+<li>飛行機と船</li>
+<li>テニスとスキー</li>
+</ul>
+
+<ul>
+<li>椅子とソファ</li>
+<li>電話とファックス</li>
+<li>プロジェクタとモニタ</li>
+</ul>
+</small>
+
+<h2>構文</h2>
+
+<p>
+型シノニムは型引数をとることができる。
+型引数は複数あっても良い。
+</p>
+
+<p><code>type [型名] [型変数1] [型変数2] ... = [型]</code></p>
+
+<p>[型]のなかでは[型変数1], [型変数2] ... が使える。</p>
+
+<h2>まとめ</h2>
+
+<p>
+型には別名(シノニム)がつけられる。
+型シノニムは型引数をとることができる。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/ifthenelse.html"
