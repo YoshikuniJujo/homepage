@@ -1,0 +1,50 @@
+関数fst, snd
+
+<h2>2要素タプル</h2>
+
+<p>
+Haskell 2010の6.1.4ではすくなくとも15要素タプルまでは保証されている。
+</p>
+
+<p><a href="https://www.haskell.org/onlinereport/haskell2010/haskellch6.html"
+	>Haskell 2010: Predefined Types and Classes</a></p>
+
+<p>GHCでは100要素タプルまで使える。</p>
+
+<p><a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/bugs-and-infelicities.html#infelicities-Prelude"
+	>GHC User's Guide: 13.1.1.7.</a></p>
+
+<p>
+よく使われるのは2要素タプルだ。
+よって2要素タプルには特別な関数が用意されている。
+</p>
+
+<h2>要素の取り出し</h2>
+
+<p>タプルの要素はパターンマッチによってとりだせる。</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; (\(f, _) -&gt; f) (28, "hello")<br/>
+28<br/>
+Prelude&gt; (\(_, s) -&gt; s) (28, "hello")<br/>
+"hello"</code></p>
+
+<p>より簡単にとりだせる関数fst, sndが定義されている。</p>
+
+<p><code>Prelude&gt; fst (28, "hello")<br/>
+28<br/>
+Prelude&gt; snd (28, "hello")<br/>
+"hello"</code></p>
+
+<h2>課題</h2>
+
+<ol>
+<li>タプルの第1要素、第2要素をとりだすmyFst, mySndを定義せよ</li>
+</ol>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/ifthenelse.html"
+	>「構文: if式」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/type_synonym.html"
+	>「構文: 型シノニム」へ</a>
+</p>

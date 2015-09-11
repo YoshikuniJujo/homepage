@@ -2,7 +2,7 @@
 
 <h2>動作</h2>
 
-<p>関数productはリストに含まれる値すべてをかけ算する。</p>
+<p>関数productはリストの値をかけあわせる。</p>
 
 <p><code>% ghci<br/>
 Prelude&gt; product [3, 18, 9]<br/>
@@ -10,16 +10,13 @@ Prelude&gt; product [3, 18, 9]<br/>
 
 <h2>型</h2>
 
-<p>関数myProductはInteger型の値のリストを引数としInteger型の値を返す。</p>
+<p>関数myProductはInteger型の値のリストをとりInteger型の値を返す。</p>
 
 <p><code>myProduct :: [Integer] -&gt; Integer</code></p>
 
 <h2>再帰部</h2>
 
-<p>
-リストに値を追加したら結果の値は追加した値をかけた値となる。
-<code>myProduct (x : xs)</code>は<code>myProduct xs</code>のx倍となる。
-</p>
+<p>リストに値xを追加すると結果の値はx倍になる。</p>
 
 <p><code>myProduct (x : xs) = x * myProduct xs</code></p>
 
@@ -53,7 +50,7 @@ mySum (x : xs) = x + mySum xs</code></p>
 <p>
 空リストのときの値がmySumでは0でありmyProductでは1だ。
 先頭の要素と再帰的な部分とをつなぐ演算子が
-mySumでは(+)でありmyProductでは(*)となっている。
+mySumでは(+)でありmyProductでは(*)である。
 </p>
 
 <h2>まとめ</h2>
@@ -70,8 +67,8 @@ mySumでは(+)でありmyProductでは(*)となっている。
 <ol>
 <li>リストの要素の最大値を返す関数myMaximumを作成せよ
 	<ul>
-	<li>Integer型の値を要素とするリストを対象とする</li>
-	<li>リストに含まれるのは0以上の値のみとする</li>
+	<li>Integer型の値のリストを対象とする</li>
+	<li>リストの値はすべて0以上とする</li>
 	<li>2つの値の大きいほうを返す関数maxを使う</li>
 	<li>空リストに対しては何を返せば良いか</li>
 	<li>要素をひとつ追加すると最大値はどうなるか</li>

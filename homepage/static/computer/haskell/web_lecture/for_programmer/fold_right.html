@@ -23,6 +23,7 @@ myLength (_ : xs) = 1 + myLength xs</code></p>
 <p>
 関数mySumとmyProductのちがいは0が1に(+)が(*)になっていることだ。
 関数mySumとmyLengthのちがいはxが1になっていることだ。
+どれも同じ枠組みを共有している。
 </p>
 
 <h2>右たたみこみ</h2>
@@ -50,26 +51,27 @@ myLength (_ : xs) = 1 + myLength xs</code></p>
 
 <p>
 関数mySumやmyProductはリストの要素に右結合で演算子を次々と適用している。
-この操作を「右たたみこみ」と呼ぶ。
+この枠組みが「右たたみこみ」だ。
 </p>
 
-<h2>置き換え</h2>
+<h2>おきかえ</h2>
 
-<p>リスト[3, 7, 8, 4]の本当の姿を示す。</p>
+<p>リスト[3, 7, 8, 4]の本当の姿は</p>
 
 <p><code>3 : (7 : (8 : (4 : [])))</code></p>
 
 <p>
-mySumでは[]を0に(:)を(+)に置き換えている。
-myProductでは[]を1に(:)を(*)に置き換えている。
-[]と(:)を何に置き換えるかを変えることでそれぞれの「右たたみこみ」関数になる。
+だ。
+mySumでは[]を0に(:)を(+)におきかえている。
+myProductでは[]を1に(:)を(*)におきかえている。
+[]と(:)のおきかえでそれぞれの「右たたみこみ」関数になる。
 </p>
 
 <h3>関数myLength</h3>
 
 <p>
-関数myLengthでは(:)を置き換える演算子が自明ではない。
-2引数関数lenを考えよう。
+関数myLengthでは(:)をおきかえる演算子が自明ではない。
+関数lenを考える。
 </p>
 
 <p><code>len :: a -&gt; Int -&gt; Int<br/>
@@ -79,51 +81,56 @@ len _ l = 1 + l</code></p>
 
 <p><code>3 `len` (7 `len` (8 `len` (4 `len` 0)))</code></p>
 
-<p>myLength関数は[]を0に(:)をlenに置き換えた関数だ。</p>
+<p>myLength関数は[]を0に(:)をlenにおきかえる。</p>
 
 <h2>右たたみこみを抽象化する</h2>
 
-<p>関数foldrは[]と(:)を置き換える値と関数を引数として右たたみこみ関数を作る。</p>
+<p>
+関数foldrは[]をおきかえる値と(:)を
+おきかえる関数とを引数として右たたみこみ関数を作る。
+</p>
 
 <h2>関数foldrの使いかた</h2>
 
 <p>
-関数mySumをfoldrで書き直す。
-関数foldrの第1引数は(:)を置き換える演算子であり第2引数は[]を置き換える値である。
-mySumではそれぞれ(+)と0だ。
+関数mySumをfoldrで書きなおす。
+関数foldrの第1引数は(:)をおきかえる関数であり第2引数は[]をおきかえる値だ。
+mySumでは(+)と0だ。
 </p>
 
 <p><code>mySum = foldr (+) 0</code></p>
 
-<p>関数myProductではそれぞれ(*)と1を指定する。</p>
+<p>関数myProductでは(*)と1を指定する。</p>
 
 <p><code>myProduct = foldr (*) 1</code></p>
 
 <h3>関数myLength</h3>
 
-<p>関数myLengthは関数lenを使って以下のように書ける。</p>
+<p>関数myLengthは関数lenを使って</p>
 
 <p><code>myLength = foldr len 0</code></p>
 
-<p>もっと直接的に定義してみよう。まずはlenを書き換えていく。</p>
+<p>のように書ける。lenを書きかえていく。</p>
 
 <p><code>len _ l = 1 + l</code></p>
 
-<p>演算子の部分適用で以下のようになる。</p>
+<p>演算子の部分適用で</p>
 
 <p><code>len _ = (1 +)</code></p>
 
-<p>引数を問わずいつも(1 +)を返す関数なので関数constで書ける。</p>
+<p>となる。引数をとわずいつも(1 +)を返す関数だ。</p>
 
 <p><code>len = const (1 +)</code></p>
 
-<p>myLengthは以下のようになる。</p>
+<p>関数myLengthは</p>
 
 <p><code>myLength = foldr (const (1 +)) 0</code></p>
 
+<p>と書きなおせる。</p>
+
 <h2>関数foldrの定義</h2>
 
-<p>mySumやmyProductの定義を参考にする。</p>
+<p>mySumやmyProductの定義を見る。</p>
 
 <p><code>mySum [] = 0<br/>
 mySum (x : xs) = x + mySum xs</code></p>
@@ -131,7 +138,7 @@ mySum (x : xs) = x + mySum xs</code></p>
 <p><code>myProduct [] = 1<br/>
 myProduct (x : xs) = x * mySum xs</code></p>
 
-<p>mySumの0や(+)、myProductの1や(*)を、myFoldrの第1引数と第2引数に置き換える。</p>
+<p>mySumの0や(+)、myProductの1や(*)をmyFoldrの第1引数と第2引数におきかえる。</p>
 
 <p><code>myFoldr _ v [] = v<br/>
 myFoldr op v (x : xs) = x `op` myFoldr op v xs</code></p>
@@ -157,13 +164,14 @@ xs :: [Integer]<br/>
 <p><code>foldr :: (Integer -&gt; Integer &gt; Integer) -&gt;
 	Integer -&gt; [Integer] -&gt; Integer</code></p>
 
-<p>一般化すると以下のような型になる。</p>
+<p>一般化すると</p>
 
 <p>foldr :: (a -&gt; a -&gt; a) -&gt; a -&gt; [a] -&gt; a</p>
 
 <p>
-「2つの型aから型aを作る演算子」と型aの値と型aの値のリストをとり
-型aの値を作る関数だ。
+となる。
+「2つのa型の値からa型の値を作る演算子」とa型の値と「a型の値のリスト」をとり
+a型の値を作る関数だ。
 この型はまだ十分に一般的ではない。
 foldrはもっと広い範囲に使える。
 </p>
@@ -195,10 +203,9 @@ opの第1引数の型はx1の型と等しく、
 
 <p>
 関数foldrは
-関数mySum, myProduct, myLengthなどの関数が持つ「たたみこみ」という枠組み
-そのものを表現している。
-Haskellの持つ「抽象化」の力が感じられる。
-さらに学習を進めると抽象化の層構造あるいは網目構造について実感してもらえるだろう。
+関数mySum、myProduct、myLengthの「たたみこみ」という枠組みを表現している。
+Haskellの「抽象化」の力だ。
+学習を進めると抽象化の層構造あるいは網目構造について実感できる。
 </p>
 
 <p>
