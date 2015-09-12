@@ -3,14 +3,12 @@
 <h2>はじめに</h2>
 
 <p>
-「リストの再帰的定義」で使う関数zipWithの紹介をする。
-定義について学ぶのはあとにする。
-ここでは使いかたのみを扱う。
+「リストの再帰的定義」で使う関数zipWithの紹介をする。ここでは使いかたのみとする。
 </p>
 
 <h2>動作</h2>
 
-<p>関数mapの扱うリストをふたつにしたものだ。</p>
+<p>関数mapをリストふたつへと拡張したものだ。</p>
 
 <p><code>map :: (a -&gt; b) -&gt; [a] -&gt; [b]</code></p>
 
@@ -23,19 +21,16 @@
 
 <p><code>% ghci<br/>
 Prelude&gt; zipWith (+) [3, 4, 5] [6, 7, 8, 9]<br/>
-[9,11,13]</code></p>
+[9,11,13]<br/>
+Prelude&gt; :m Data.Char<br/>
+Prelude Data.Char&gt; zipWith filter [isDigit, isUpper, not . isUpper]
+	["1st Floor, 2nd Floor, 3rd Floor", "Haskell Brooks Curry",
+		"There are many Capes.", "I will be ignored."]<br/>
+["123", "HBC", "here are many apes."]</code></p>
 
 <p>
-それぞれのリストから0番目、1番目、2番目、...と値をとりだして関数に与えていく。
-短いほうのリストの要素がなくなったところで終了する。
-長いほうのリストの残りの要素は無視される。
-</p>
-
-<h2>まとめ</h2>
-
-<p>
-関数zipWithの動作を見た。
-関数mapのリストがふたつになったものだ。
+それぞれのリストから0番目、1番目、2番目、...と値をとりだして関数に与える。
+短いほうのリストの要素がなくなったら終了だ。
 </p>
 
 <p>
