@@ -7,7 +7,7 @@
 
 <p>
 コラッツの問題という未解決問題がある。
-「偶数のときは2で割り奇数のときは3倍して1足す。これをくりかえすと必ず1になる。」
+「偶数のときは2で割り奇数のときは3倍して1を足す。これをくりかえすと必ず1になる。」
 これがコラッツの予想だ。
 証明も反証もされていない。
 現在のところ5 * 2 ^ 60(5,764,607,523,034,234,880)までの初期値で
@@ -63,6 +63,10 @@
 
 <p>
 これは「もし条件を満たすものがなかったらリストの全体を返す」ということだ。
+「条件を満たすものがなかったらエラー」としたければここでエラー値を返すことになる。
+</p>
+
+<p>
 リストの先頭の要素が条件を満たすときはそれ以降の要素は不要なので
 先頭要素ひとつから成るリストを返す。
 </p>
@@ -100,11 +104,19 @@ takeTo p (x : xs)<br/>
 
 <p><code>takeTo p (x : xs) = fun x (takeTo p xs)</code></p>
 
+<p>
+わかるだろうか。
+わかりにくければ一度展開してみると良い。
+</p>
+
 <p>演算子的な表記にする。</p>
 
 <p><code>takeTo p (x : xs) = x `fun` takeTo p xs</code></p>
 
-<p>すると関数takeToは以下のように書ける。</p>
+<p>
+すると関数takeToは以下のように書ける。
+関数の枠組みがわかりやすいようにあえて丸括弧を明示してある。
+</p>
 
 <p><code>(takeTo p) [] = []<br/>
 (takeTo p) (x : xs) = x `fun` (takeTo p) xs</code></p>
@@ -114,7 +126,10 @@ takeTo p (x : xs)<br/>
 <p><code>1 : 2 : 3 : 4 : []<br/>
 -&gt; 1 `fun` 2 `fun` 3 `fun` 4 `fun` []</code></p>
 
-<p>これはfoldrの枠組みだ。</p>
+<p>
+これはfoldrの枠組みだ。
+関数funを展開してfoldrに与える。
+</p>
 
 <p><code>takeTo p = foldr (\x lst -&gt; if p x then [x] else x : lst) []</code></p>
 
@@ -122,8 +137,8 @@ takeTo p (x : xs)<br/>
 
 <p>
 \x lst -&gt; if p x then [x] else x : lstは
-\x -&gt; \lst -&gt; if p x then [x] else x : lstだ。
-\lst -&gt; ...の部分はもしxがpを満たせばlstの値を問わず[x]を返し、
+\x -&gt; (\lst -&gt; if p x then [x] else x : lst)だ。
+(\lst -&gt; ...)の部分はもしxがpを満たせばlstの値を問わず[x]を返し、
 そうでないならlstの先頭にxを追加した値を返す。
 よって以下のようにできる。
 </p>
@@ -153,7 +168,10 @@ Control.Applicativeモジュールを使う。
 <p><code>takeTo = (`foldr` []) . ((.) &lt;$&gt; (:) &lt;*&gt;)
 	. ((([id, const []] !!) . fromEnum) .)</code></p>
 
-<p>ポイントフリーはほどほどにしよう。</p>
+<p>
+うわぁ、Haskell恐い。
+ポイントフリーはほどほどにしないと嫌われてしまう。
+</p>
 
 <h2>無限数列を作る</h2>
 
