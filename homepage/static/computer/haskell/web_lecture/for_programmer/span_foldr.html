@@ -1,8 +1,53 @@
 関数foldrで関数spanを定義
 
+<h2>型</h2>
+
+<p><code>spanF :: (a -&gt; Bool) -&gt; [a] -&gt; ([a], [a])</code></p>
+
+<h2>定義</h2>
+
+<p><code>step p x f True | p x = (x : t, d) where (t, d) = f True<br/>
+step _ x f _ = ([], x : d) where (_, d) = f False</code></p>
+
+<p><code>spanB :: (a -&gt; Bool) -&gt; [a] -&gt; Bool -&gt; ([a], [a])<br/>
+spanB p (x : xs) b = step p x (spanB p xs) b<br/>
+spanB _ _ _ = ([], [])</code></p>
+
+<p>step p x (spanB p xs) bを展開する。</p>
+
+<p><code>spanB p (x : xs) True | p x = (x : t, d) where (t, d) = spanB p xs True<br/>
+spanB p xs _ = ([], x : d) where (_, d) = spanB p xs False</code></p>
+
+<p>
+うえの式としたの式が等しいことを確認する。
+そのうえでしたの式の動きを見てみよう。
+p xを満たすうちはタプルの第1要素に値が追加しれていくが、
+p xを満たさなかった時点からはBool値はずっとFalseのままとなり、
+第2要素に値が追加されていくということだ。
+仮引数bを消す。
+</p>
+
+<p><code>spanB p (x : xs) = step p x (spanB p xs)<br/>
+spanB _ _ = const ([], [])</code></p>
+
+<p>関数foldrで表せる。</p>
+
+<p><code>spanB p = foldr (step p) (const ([], []))</code></p>
+
+<p>ブール値の初期値としてTrueを与える。</p>
+
+<p><code>spanF p = foldr (step p) (const ([], [])) True</code></p>
+
+<p>ローカル関数を使う。</p>
+
+<p><code>spanF p xs = foldr s (const ([], [])) xs True<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">s x f True | p x = (x : t, d) where (t, d) = f True</span><br/>
+	<span class="indent1">s x f _ = ([], x : d) where (_, d) = f False</span></code></p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/dropwhile_foldr.html"
 	>「関数foldrで関数dropWhileを定義」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/zip_foldr.html"
+	>「関数foldrで関数zipを定義」へ</a>
 </p>
