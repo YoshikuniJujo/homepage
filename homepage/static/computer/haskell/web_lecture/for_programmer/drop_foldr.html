@@ -1,0 +1,49 @@
+関数foldrで関数dropを定義
+
+<h2>型</h2>
+
+<p><code>dropF :: Int -&gt; [a] -&gt; [a]</code></p>
+
+<h2>定義</h2>
+
+<p><code>step _ f n | n &gt; 0 = f $ n - 1<br/>
+step x f _ = x : f 0</code></p>
+
+<p><code>fdrop :: [a] -&gt; Int -&gt; [a]<br/>
+fdrop (x : xs) n = step x (fdrop xs) n<br/>
+fdrop _ _ = []</code></p>
+
+<p>これも同じようにstep x (fdrop xs) nを展開してみよう。</p>
+
+<p><code>fdrop (x : xs) n | n &gt; 0 = fdrop xs (n - 1)<br/>
+fdrop (x : xs) _ = x : fdrop xs 0<br/>
+fdrop _ _ = []</code></p>
+
+<p>仮引数nを消す。</p>
+
+<p><code>fdrop (x : xs) = step x (fdrop xs)<br/>
+fdrop _ _ = const []</code></p>
+
+<p>関数foldrで表現する。</p>
+
+<p><code>dropF = flip $ foldr s (const [])<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">s _ f n | n &gt; 0 = f $ n - 1</span><br/>
+	<span class="indent1">s x f _ = x : f 0</span></code></p>
+
+<h3>何が起きたのか</h3>
+
+<p>
+関数(step x)はnが1以上では「リスト[x1, x2, ...]からnだけ落とした関数」を
+「リスト[x, x1, x2, ...]からnだけ落とした関数」に変換する。
+nが0以下のときは「リスト[x1, x2, ...]から0だけ落とした関数」を
+「リスト[x, x1, x2, ...]から0だけ落とした関数」に変換している。
+後者の変換は返り値に(x :)することで行っている。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/take_foldr.html"
+	>「関数foldrで関数takeを定義」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/splitat_foldr.html"
+	>「関数foldrで関数splitAtを定義」へ</a>
+</p>
