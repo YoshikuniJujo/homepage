@@ -1,8 +1,41 @@
 関数foldrで関数splitAtを定義
 
+<h2>型</h2>
+
+<p><code>splitAtF :: Int -&gt; [a] -&gt; ([a], [a])</code></p>
+
+<h2>定義</h2>
+
+<p><code>step x f n | n &gt; 0 = (x : t, d) where (t, d) = f (n - 1)<br/>
+step x f _ = ([], x : d) where (_, d) = f 0</code></p>
+
+<p><code>fsplitAt :: [a] -&gt; Int -&gt; ([a], [a])<br/>
+fsplitAt (x : xs) n = step x (splitAt xs) n<br/>
+fsplitAt _ _ = ([], [])</code></p>
+
+<p>同様に展開する。</p>
+
+<p><code>fsplitAt (x : xs) n | n &gt; 0 = (x : t, d)<br/>
+	<span class="indent1">where (t, d) = fsplitAt xs (n - 1)</span><br/>
+fsplitAt (x : xs) _ = ([], x : d)<br/>
+	<span class="indent1">where (_, d) = fsplitAt xs 0</span><br/>
+fsplitAt _ _ = ([], [])</code></p>
+
+<p>仮引数nを消す。</p>
+
+<p><code>fsplitAt (x : xs) = step x (splitAt xs)<br/>
+fsplitAt _ = const ([], [])</code></p>
+
+<p>関数foldrで定義する。</p>
+
+<p><code>splitAtF = flip $ foldr s (const ([], []))<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">s x f n | n &gt; 0 = (x : t, d) where (t, d) = f (n - 1)</span><br/>
+	<span class="indent1">s x f _ = ([], x : d) where (_, d) = f 0</span></code></p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/drop_foldr.html"
 	>「関数foldrで関数dropを定義」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/dropwhile_foldr.html"
+	>「関数foldrで関数dropWhileを定義」へ</a>
 </p>
