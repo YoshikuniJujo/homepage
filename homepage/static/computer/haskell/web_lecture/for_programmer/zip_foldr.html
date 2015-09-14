@@ -1,8 +1,61 @@
 関数foldrで関数zipを定義
 
+<h2>ウォームアップ</h2>
+
+<p>
+「リストをとってそのリストと[x1, x2, x3, ...]とをタプルのリストにする関数」で
+「リストをとってそのリストと[x, x1, x2, x3, ...]とをタプルのリストにする関数」を
+定義することを考えよう。
+</p>
+
+<p>
+まずは具体的な値で考える。
+fun1は[1, 2, 3, 4, 5]と何らかのリストとをタプルのリストにする関数だ。
+fun2は[10, 1, 2, 3, 4, 5]と何らかなリストとをタプルのリストにする関数だ。
+fun1を使ってfun2を定義せよ。
+let fun1 [y1, y2, y3, y4, y5] = [(1, y1), (2, y2), (3, y3), (4, y4), (5, y5)]と
+してから解答せよ。
+</p>
+
+<h2>型</h2>
+
+<p><code>zipF :: [a] -&gt; [b] -&gt; [(a, b)]</code></p>
+
+<h2>定義</h2>
+
+<p><code>step x f (y : ys) = (x, y) : f ys<br/>
+step _ _ _ = []</code></p>
+
+<p><code>zipS (x : xs) ya = step x (zipS xs) ya<br/>
+zipS _ _ = []</code></p>
+
+<p>
+step x (zipS xs) yaを展開してみよう。
+zipRawの定義と同じになることがわかる。
+仮引数yaを消す。
+</p>
+
+<p><code>zipS (x : xs) = step x (zipS xs)<br/>
+zipS _ = const []</code></p>
+
+<p>これで関数foldrで表現できる。</p>
+
+<p><code>zipF = foldr s (const [])<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">s x f (y : ys) = (x, y) : f ys</span><br/>
+	<span class="indent1">s _ _ _ = []</span></code></p>
+
+<h4>何が起きたのか</h4>
+
+<p>
+関数(step x)は「リストysをとってリストxsとのzipを返す関数」をとって
+「リストysをとってリスト(x : xs)とのzipを返す関数」を返す関数だ。
+リストxsをysで表現されるリストを扱う関数としてたたみこんでいる。
+</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/span_foldr.html"
 	>「関数foldrで関数spanを定義」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/zipwith_foldr.html"
+	>「関数foldrで関数zipWithを定義」へ</a>
 </p>
