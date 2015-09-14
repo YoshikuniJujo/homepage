@@ -1,9 +1,40 @@
 パーサ: はじめに
 
-<p>(工事中: 0%)</p>
+<h2>再帰下降構文解析</h2>
 
-<a href="/computer/haskell/web_lecture/for_programmer/repeat_def.html"
-	>「関数repeat, replicate, cycle」へもどる</a>
+<p>
+構文解析の複数の候補をリストとして表現する再帰的な構文解析器を実装する。
+これはバックトラックするタイプの再帰下降構文解析器ということになる。
+</p>
+
+<p><a href="https://ja.wikipedia.org/wiki/再帰下降構文解析"
+	>Wikipedia: 再帰下降構文解析</a></p>
+
+<h2>実行効率の問題</h2>
+
+<p>
+単純な実装とするので実行効率は非常に悪くO(2^n)となる。
+構文解析については様々なアルゴリズムが研究されている。
+解析できる範囲をある程度制限することで線形時間での解析が可能となる。
+</p>
+
+<h2>練習なので</h2>
+
+<p>
+今回は実用性は気にせずにO(2^n)の実装のままとする。
+興味のある人は構文解析やオートマトンのディープな世界をのぞいてみると良い。
+お勧めの本は
+</p>
+
+<p><a href="https://www.amazon.co.jp/白と黒のとびら-オートマトンと形式言語をめぐる冒険-川添-愛/dp/4130633570"
+	>Amazon: 川添愛「白と黒のとびら」</a></p>
+
+<p>
+だ。
+</p>
+
+<a href="/computer/haskell/web_lecture/for_programmer/list_comprehensions.html"
+	>「構文: リスト内包表記」へもどる</a>
 <a href="/computer/haskell/web_lecture/for_programmer"
 	>「1から学ぶHaskell」トップへ</a>
 </p>
