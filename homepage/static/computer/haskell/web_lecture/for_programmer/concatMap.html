@@ -1,0 +1,48 @@
+関数concatMap
+
+<p>(工事中 0%)</p>
+
+<h2>動作</h2>
+
+<p>mapした結果をconcatする。</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; concatMap (replicate 3) "hello"<br/>
+"hhheeellllllooo"</code></p>
+
+<h2>定義</h2>
+
+<p><code>concatMap' :: (a -&gt; [b]) -&gt; [a] -&gt; [b]</code></p>
+
+<p>関数concatと関数map fとを合成する。</p>
+
+<p><code>concatMap' f = concat . map f</code></p>
+
+<p>引数fは消せる。</p>
+
+<p><code>concatMap' f = (concat .) $ map f</code></p>
+
+<p><code>concatMap' f = (concat .) . map $ f</code></p>
+
+<p><code>concatMap' = (concat .) . map</code></p>
+
+<h2>課題</h2>
+
+<ol>
+<li>以下のような関数concatMapRawを生の再帰で定義せよ
+	<ul>
+	<li>関数concatMapと同じ動作</li>
+	<li>関数mapRawの定義が参考になる</li>
+	</ul></li>
+<li>以下のような関数concatMapFを関数foldrで定義せよ
+	<ul>
+	<li>関数concatMapと同じ動作</li>
+	<li>関数mapFの定義が参考になる</li>
+	</ul></li>
+</ol>
+
+<a href="/computer/haskell/web_lecture/for_programmer/repeat_def.html"
+	>「関数repeat, replicate, cycle」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/list_comprehensions.html"
+	>「構文: リスト内包表記」へ</a>
+</p>
