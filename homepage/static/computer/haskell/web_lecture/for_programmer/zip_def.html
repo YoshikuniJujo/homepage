@@ -50,19 +50,12 @@ zipRaw _ _ = []</code></p>
 
 <h3>型</h3>
 
-<p><code>zipWithRaw, zipWithF, zipWithU :: (a -&gt; b -&gt; c) -&gt; [a] -&gt; [b] -&gt; [c]</code></p>
+<p><code>zipWithRaw, zipWithU :: (a -&gt; b -&gt; c) -&gt; [a] -&gt; [b] -&gt; [c]</code></p>
 
 <h3>生の再帰</h3>
 
 <p><code>zipWithRaw op (x : xs) (y : ys) = x `op` y : zipWithRaw op xs ys<br/>
 zipWithRaw _ _ _ = []</code></p>
-
-<h3>関数foldr</h3>
-
-<p><code>zipWithF op = foldr s (const [])<br/>
-	<span class="indent1">where</span><br/>
-	<span class="indent1">s x f (y :ys) = x `op` y : f ys</span><br/>
-	<span class="indent1">s _ _ _ = []</span></code></p>
 
 <h3>関数unfoldr</h3>
 

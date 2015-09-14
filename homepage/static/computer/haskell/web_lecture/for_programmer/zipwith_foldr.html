@@ -1,5 +1,16 @@
 関数foldrで関数zipWithを定義
 
+<h2>型</h2>
+
+<p><code>zipWithF :: (a -&gt; b -&gt; c) -&gt; [a] -&gt; [b] -&gt; [c]</code></p>
+
+<h2>定義</h2>
+
+<p><code>zipWithF op = foldr s (const [])<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">s x f (y :ys) = x `op` y : f ys</span><br/>
+	<span class="indent1">s _ _ _ = []</span></code></p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/zip_foldr.html"
 	>「関数foldrで関数zipを定義」へもどる</a>
