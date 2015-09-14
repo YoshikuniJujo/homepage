@@ -62,7 +62,7 @@ Prelude Data.Char Data.List&gt; partition isUpper "He And She Know Everyone Like
 
 <p><code>partitionRaw, partitionF :: (a -&gt; Bool) -&gt; [a] -&gt; ([a], [a])</code></p>
 
-<p>返り値は条件を満たすもののリストと満たさないもののリストのタプルとなる。</p>
+<p>返り値は条件を満たすもののリストと満たさないもののリストのタプルだ。</p>
 
 <h3>生の再帰</h3>
 
@@ -74,7 +74,7 @@ partitionRaw _ _ = ([], [])</code></p>
 
 <p>
 残りのリストを2つにわけてそれぞれでts, esを束縛する。
-もしもxが条件を満たすならtsに追加し、そうでないならesに追加する。
+xが条件を満たすならtsに追加しそうでないならesに追加する。
 </p>
 
 <h3>関数foldr</h3>

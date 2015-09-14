@@ -8,8 +8,7 @@
 <h3>動作</h3>
 
 <p>
-「"I love you!"って百回言って」と言われたらどうする。
-エンジニアなら効率的にやろう。
+"I love you!"を百回言ってみよう。
 "I love you!"の無限リストを作ってそこから100とりだす。
 </p>
 
@@ -25,20 +24,23 @@ Prelude&gt; take 100 $ repeat "I love you!"<br/>
 
 <p><code>repeatRaw x = x : repeatRaw x</code></p>
 
+<p>
+xを無限にくりかえすにはxを無限にくりかえしたリストにxを追加すれば良い。
+</p>
+
 <h3>関数iterate</h3>
 
-<p>関数iterateを使って定義することもできる。</p>
+<p>関数iterateを使って定義すると</p>
 
 <p><code>repeatI = iterate id</code></p>
+
+<p>となる。</p>
 
 <h2>関数replicate</h2>
 
 <h3>動作</h3>
 
-<p>
-「"I love you!"って百回言って」と(ry
-回数を指定してくりかえす。
-</p>
+<p>"I love you!"と百回言ってみよう。回数を指定してくりかえす。</p>
 
 <p><code>Prelude&gt; replicate 100 "I love you!"<br/>
 ["I love you!","I love you!",...,"I love you!"]</code></p>
@@ -52,11 +54,15 @@ Prelude&gt; take 100 $ repeat "I love you!"<br/>
 <p><code>replicateRaw x n | n &gt; 0 = x : replicateRaw (n - 1) x<br/>
 replicateRaw _ _ = []</code></p>
 
+<p>xをn回くりかえすにはxをn - 1回くりかえしたリストの先頭にxを追加する。</p>
+
 <h3>関数take</h3>
 
-<p>関数takeとrepeatを使って書いても良い。</p>
+<p>関数takeとrepeatを使うと</p>
 
 <p><code>replicateT n = take n . repeat</code></p>
+
+<p>となる。</p>
 
 <h2>関数cycle</h2>
 
@@ -75,11 +81,13 @@ replicateRaw _ _ = []</code></p>
 
 <p><code>cycleRaw xs = xs ++ cycleRaw xs</code></p>
 
+<p>xsを無限にくりかえすリストにxsを結合する。</p>
+
 <h3>関数concat</h3>
 
-<p>repeatしてからconcatする。</p>
-
 <p><code>cycleC = concat . repeat</code></p>
+
+<p>repeatしてからconcatする。</p>
 
 <h2>まとめ</h2>
 

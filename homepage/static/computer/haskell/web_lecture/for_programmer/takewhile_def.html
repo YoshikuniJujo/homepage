@@ -7,7 +7,7 @@
 
 <h3>動作</h3>
 
-<p>条件を満たすかぎりリストから値をとりだし続ける。</p>
+<p>条件を満たすあいだ値をとりだす。</p>
 
 <p><code>% ghci<br/>
 Prelude&gt; takeWhile even [4, 10, 8, 2, 5, 4, 1, 3, 2, 9]<br/>
@@ -25,6 +25,7 @@ takeWhileRaw _ _ = []</code></p>
 <p>
 先頭の値が条件を満たせば残りのリストに同じ関数を適用した結果の先頭に
 その値を追加したものが返り値となる。
+先頭の値が条件を満たさないか空リストならば空リストだ。
 </p>
 
 <h3>関数foldr</h3>
@@ -51,7 +52,7 @@ xが条件を満たせばそれを追加しそうでないならつねに空リ�
 
 <h3>動作</h3>
 
-<p>条件を満たすあいだリストから値を落とす。</p>
+<p>条件を満たすあいだ値を落とす。</p>
 
 <p><code>Prelude&gt; dropWhile even [4, 10, 8, 2, 5, 4, 1, 3, 2, 9]<br/>
 [5,4,1,3,2,9]</code></p>
@@ -74,7 +75,7 @@ dropWhileRaw _ xs = xs</code></p>
 
 <h3>動作</h3>
 
-<p>リストを条件を満たさなくなるまでと残りとにわける。</p>
+<p>条件を満たすまでと残りとにわける。</p>
 
 <p><code>Prelude&gt; span even [4, 10, 8, 2, 5, 4, 1, 3, 2, 9]<br/>
 ([4,10,8,2],[5,4,1,3,2,9])</code></p>
@@ -85,7 +86,8 @@ dropWhileRaw _ xs = xs</code></p>
 
 <h3>生の再帰</h3>
 
-<p><code>spanRaw p (x : xs) | p x = (x : t, d) where (t, d) = spanRaw p xs<br/>
+<p><code>spanRaw p (x : xs) | p x = (x : t, d)<br/>
+	<span class="indent1">where (t, d) = spanRaw p xs</span><br/>
 spanRaw _ xs = ([], xs)</code></p>
 
 <p>
@@ -95,10 +97,7 @@ spanRaw _ xs = ([], xs)</code></p>
 
 <h2>まとめ</h2>
 
-<p>
-関数takeWhile, dropWhile, spanを生の再帰と関数foldrで定義した。
-関数dropWhileやspanには補助的にブール値が必要になる。
-</p>
+<p>関数takeWhile, dropWhile, spanを定義した。</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/take_def.html"

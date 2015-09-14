@@ -7,7 +7,7 @@
 
 <h3>動作</h3>
 
-<p>2つのリストをとってタプルのリストに変換する。</p>
+<p>ふたつのリストをとってタプルのリストにする。</p>
 
 <p><code>% ghci<br/>
 Prelude&gt; zip [0 ..] "hello"<br/>
@@ -36,7 +36,8 @@ zipRaw _ _ = []</code></p>
 
 <p>
 リストのタプルを状態とする。
-それぞれのリストから先頭をけずってそれらをタプルにしたものを結果のリストとする。
+それぞれのリストの先頭を結果とし、
+それぞれのリストから先頭をけずったものを新しい状態とする。
 </p>
 
 <h2>関数zipWith</h2>
@@ -57,11 +58,20 @@ zipRaw _ _ = []</code></p>
 <p><code>zipWithRaw op (x : xs) (y : ys) = x `op` y : zipWithRaw op xs ys<br/>
 zipWithRaw _ _ _ = []</code></p>
 
+<p>
+関数zipとほぼ同じだ。
+違いはタプルにまとめるのではなく2引数関数を適用していることだ。
+</p>
+
 <h3>関数unfoldr</h3>
 
 <p><code>zipWithU op = curry . unfoldr $ \l -&gt; case l of<br/>
 	<span class="indent1">(x : xs, y : ys) -&gt; Just (x `op` y, (xs, ys))</span><br/>
 	<span class="indent1">_ -&gt; Nothing</span></code></p>
+
+<p>
+タプルにまとめるのではなく2引数関数を適用している。
+</p>
 
 <h3>関数zipWithによる関数zipの定義</h3>
 
@@ -69,15 +79,14 @@ zipWithRaw _ _ _ = []</code></p>
 
 <p><code>zipZW = zipWith (,)</code></p>
 
-<p>zipWithの第1引数にタプル作成演算子を指定したものがzipである。</p>
+<p>zipWithの第1引数にタプル作成演算子を指定したものがzipだ。</p>
 
 <h2>関数unzip</h2>
 
 <h3>動作</h3>
 
 <p>
-タプルのリストを2つのリストにわける。
-わけられたリストはタプリにまとめられて返される。
+タプルのリストを2つのリストにわける。わけられたリストはタプルにまとめられる。
 </p>
 
 <p><code>Prelude&gt; unzip [(3, 8), (9, 5), (4, 2)]<br/>
@@ -93,9 +102,21 @@ zipWithRaw _ _ _ = []</code></p>
 	<span class="indent1">where (xs, ys) = unzipRaw xys</span><br/>
 unzipRaw _ = ([], [])</code></p>
 
+<p>
+リストの残りをunzipしたふたつのリストに先頭の要素をxとyに分けたものを
+それぞれ追加する。
+</p>
+
 <h3>関数foldr</h3>
 
 <p><code>unzipF = foldr (\(x, y) (xs, ys) -&gt; (x : xs, y : ys)) ([], [])</code></p>
+
+<p>
+関数foldrの第1引数である関数fについて考える。
+関数fの第1引数はもとのリストの先頭の要素であり第2引数は
+残りのリストを分けた結果であるふたつのリストである。
+それぞれの先頭にもとのリストをふたつに分けた結果であるx, yを追加する。
+</p>
 
 <h2>まとめ</h2>
 

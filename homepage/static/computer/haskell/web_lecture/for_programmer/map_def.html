@@ -3,11 +3,9 @@
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/maps.hs"
 	>maps.hs</a></p>
 
-<h2>はじめに</h2>
-
-<p>リストのすべての要素に同じ関数を適用する関数mapの定義を学ぶ。</p>
-
 <h2>動作</h2>
+
+<p>リストの要素すべてに関数を適用する。</p>
 
 <p><code>% ghci<br/>
 Prelude&gt; map (* 3) [5, 3, 4, 9, 1]<br/>
@@ -16,22 +14,19 @@ Prelude&gt; :m Data.Char<br/>
 Prelude Data.Char&gt; map toUpper "Hello"<br/>
 "HELLO"</code></p>
 
-<p>2項演算子として表記することもある。</p>
+<p>2項演算子として</p>
 
 <p><code>Prelude Data.Char&gt; toUpper `map` "Hello"<br/>
 "HELLO"</code></p>
 
-<p>
+<p>のようにしても良い。
 関数toUpperを文字列"Hello"にmapという形で適用していると見ることができる。
+($)をmapにおきかえることで引数を単一の要素からリストにすることができる。
 </p>
 
 <p><code>toUpper $ 'e'</code></p>
 
 <p><code>toUpper `map` "Hello"</code></p>
-
-<p>
-($)をmapにおきかえることで引数を単一の要素からリストにすることができる。
-</p>
 
 <h2>型</h2>
 
@@ -40,9 +35,8 @@ Prelude Data.Char&gt; map toUpper "Hello"<br/>
 </p>
 
 <p><code>mapRaw, mapF, mapU :: (a -&gt; b) -&gt; [a] -&gt; [b]</code></p>
-<p>
-あるいは、関数の引数と返り値をリストにするとも考えられる。
-</p>
+
+<p>関数の引数と返り値をリストにする。</p>
 
 <p><code>mapRaw, mapF, mapU :: (a -&gt; b) -&gt; ([a] -&gt; [b])</code></p>
 
@@ -98,9 +92,8 @@ x : xsにマッチさせたうえでxsとすることによってリストの先
 <p>
 関数型言語といえばmapだ。
 生の再帰で、関数foldrで、関数unfoldrで、それぞれ定義した。
-抽象化の層構造をイメージしよう。
+抽象化の層構造をイメージする。
 層構造の途中で関数foldrとunfoldrに分岐し、そのうえの関数mapで合流する。
-関数mapもさらにうえの層のより具体的な関数から使われる。
 </p>
 
 <p>

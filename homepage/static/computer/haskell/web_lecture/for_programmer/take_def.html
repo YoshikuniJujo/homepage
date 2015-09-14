@@ -7,7 +7,7 @@
 
 <h3>動作</h3>
 
-<p>リストから指定した数の要素をとりだす。</p>
+<p>指定した数の要素をとりだす。</p>
 
 <p><code>% ghci<br/>
 Prelude&gt; take 4 "monkey"<br/>
@@ -31,13 +31,13 @@ takeRaw _ _ = []</code></p>
 	<span class="indent1">(n, x : xs) | n &gt; 0 -&gt; Just (x, (n - 1, xs))</span><br/>
 	<span class="indent1">_ -&gt; Nothing</span></code></p>
 
-<p>結果としてxを出し、nを1減らしもとのリスト(x : xs)から要素をひとつ削る。</p>
+<p>結果としてxを出しnを1減らしもとのリスト(x : xs)から要素をひとつ削る。</p>
 
 <h2>関数drop</h2>
 
 <h3>動作</h3>
 
-<p>指定された数だけ頭から要素を落とす。</p>
+<p>指定された数だけ要素を落とす。</p>
 
 <p><code>Prelude&gt; drop 3 "monkey"<br/>
 "key"</code></p>
@@ -54,14 +54,14 @@ dropRaw _ xs = xs</code></p>
 <p>
 nが0より大きいときリスト(x : xs)からn個落としたリストは
 リストxsからn - 1個落としたリストに等しい。
-もとのリストが空リストまたはnが0以下ならば空リストとなる。
+もとのリストが空リストまたはnが0以下ならばリストはそのままだ。
 </p>
 
 <h2>関数splitAt</h2>
 
 <h3>動作</h3>
 
-<p>リストの先頭n個をとりだし、その残りとともにタプルとして返す。</p>
+<p>リストの先頭n個をとりだし、残りとともにタプルとして返す。</p>
 
 <p><code>Prelude&gt; splitAt 3 "monkey"<br/>
 ("mon", "key")</code></p>
@@ -76,12 +76,14 @@ nが0より大きいときリスト(x : xs)からn個落としたリストは
 	<span class="indent1">where (t, d) = splitAtRaw (n - 1) xs<br/>
 splitAtRaw _ xs = ([], xs)</span></code></p>
 
+<p>
+nが0より大であればxsをn - 1の場所で2つに分けた前半のリストにxを追加する。
+そうでないなら返り値は空リストともとのリストだ。
+</p>
+
 <h2>まとめ</h2>
 
-<p>
-関数takeを生の再帰とたたみこみで、
-drop, partitionをそれぞれ生の再帰とたたみこみで、それぞれ定義した。
-</p>
+<p>関数take、drop、partitionを定義した。</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/filter_def.html"
