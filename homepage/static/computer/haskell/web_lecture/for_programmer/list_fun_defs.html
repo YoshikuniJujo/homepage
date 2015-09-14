@@ -1,14 +1,73 @@
 リストを扱う関数の定義について
 
-<p>(工事中 0%)</p>
-
 <h2>はじめに</h2>
 
 <p>
-これからリストを扱う標準的な関数の定義を見ていく。
-生の再帰による定義と、可能ならば関数foldr, foldl, unfoldrを
-使った定義を見る。
+リストを扱う標準的な関数の定義を見ていく。
+生の再帰による定義と、いくつかは関数foldr、foldl、unfoldrを使った定義を見る。
 </p>
+
+<ul>
+<li>map</li>
+<li>filter</li>
+<li>partition</li>
+<li>take</li>
+<li>drop</li>
+<li>splitAt</li>
+<li>takeWhile</li>
+<li>dropWhile</li>
+<li>span</li>
+<li>zip</li>
+<li>zipWith</li>
+<li>unzip</li>
+<li>(++)</li>
+<li>concat</li>
+<li>reverse</li>
+<li>repeat</li>
+<li>replicate</li>
+<li>cycle</li>
+</ul>
+
+<h2>動作</h2>
+
+<p><code>% ghci<br/>
+Prelude&gt; :m Data.Char<br/>
+Prelude Data.Char&gt; toUpper `map` "Haskell"<br/>
+"HASKELL"<br/>
+Prelude Data.Char&gt; filter isLower "Capes"<br/>
+"apes"<br/>
+Prelude Data.Char&gt; partition isLower "Capes"<br/>
+("C", "apes")<br/>
+Prelude Data.Char&gt; take 4 "monkey"<br/>
+"monk"<br/>
+Prelude Data.Char&gt; drop 3 "monkey"<br/>
+"key"<br/>
+Prelude Data.Char&gt; splitAt 3 "monkey"<br/>
+("mon", "key")<br/>
+Prelude Data.Char&gt; takeWhile isLower "takeWhile"<br/>
+"take"<br/>
+Prelude Data.Char&gt; dropWhile isLower "takeWhile"<br/>
+"While"<br/>
+Prelude Data.Char&gt; span isLower "takeWhile"<br/>
+("take", "While")<br/>
+Prelude Data.Char&gt; zip [0 ..] "hello"<br/>
+[(0,'h'),(1,'e'),(2,'l'),(3,'l'),(4,'o')]<br/>
+Prelude Data.Char&gt; zipWith (+) [2, 5, 10] [5, 9, 7, 8]<br/>
+[7,14,17]<br/>
+Prelude Data.Char&gt; unzip [(4, 'a'), (4, 'b'), (9, 'c'), (2, 'd')]<br/>
+([4,4,9,2],"abcd")<br/>
+Prelude Data.Char&gt; "Yoshikuni" ++ "Jujo"<br/>
+"YoshikuniJujo"<br/>
+Prelude Data.Char&gt; concat ["Haskell", "Brooks", "Curry"]<br/>
+"HaskellBrooksCurry"<br/>
+Prelude Data.Char&gt; reverse "gateman"<br/>
+"nametag"<br/>
+Prelude Data.Char&gt; take 32 $ repeat 'a'<br/>
+"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"<br/>
+Prelude Data.Char&gt; replicate 32 'a'<br/>
+"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"<br/>
+Prelude Data.Char&gt; take 32 $ cycle "Happy"<br/>
+"HappyHappyHappyHappyHappyHappyHa"</code></p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/fibonacci.html"
