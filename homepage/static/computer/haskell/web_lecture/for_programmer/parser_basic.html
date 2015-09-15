@@ -1,9 +1,157 @@
 パーサ: 基本的な関数
 
-<p>(工事中 0%)</p>
+<h2>用意</h2>
+
+<p>Data.Charモジュールの関数を使うのでファイルの先頭に</p>
+
+<p><code>import Data.Char</code></p>
+
+<p>としておこう。</p>
+
+<h2>型</h2>
+
+<p>
+パーサの型を考えてみよう。
+字句解析は行わず直接構文解析してしまうことにする。
+すると引き数はStringで良いだろう。
+返り値は何になるかは用途次第なので
+</p>
+
+<p><code>String -&gt; a</code></p>
+
+<p>
+がまず考えられる。
+これから考えていく例ではパーサ同士を結合して新たなパーサを作れるようにする。
+そのためには「パースした残りの文字列」が必要になる。
+</p>
+
+<p><code>String -&gt; (a, String)</code></p>
+
+<p>複数のパース候補が必要になるので結果はリストにする。</p>
+
+<p><code>String -&gt; [(a, String)]</code></p>
+
+<p>これをParse型として名前をつけておく。</p>
+
+<p><code>type Parse a = String -&gt; [(a, String)]</code></p>
+
+<h2>いつも成功</h2>
+
+<p>
+文字列を消費せずにいつも成功し指定した値を返す関数を作る。
+何に必要なのかはすぐにわかる。
+</p>
+
+<p><code>succeed :: a -&gt; Parse a<br/>
+succeed v i = [(v, i)]</code></p>
+
+<p>
+第1引数で指定した値vが返り文字列はそのまま次のパーサに渡す。
+この場合、ただひとつのパースの結果のみなので単一要素のリストとなる。
+</p>
+
+<p><code>% ghci parse.hs<br/>
+*Main&gt; succeed 123 "hello"<br/>
+[(123,"hello")]</code></p>
+
+<h2>1文字読み込む</h2>
+
+<p>条件を満たす1文字を読み込むパーサを作る関数だ。</p>
+
+<p><code>check :: (Char -&gt; Bool) -&gt; Parse Char<br/>
+check p (c : cs) | p c = [(c, cs)]<br/>
+check _ _ = []</code></p>
+
+<p>文字列が空かまたは先頭の文字が条件を満たさなければパースは失敗する。</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; check isDigit "123"<br/>
+[('1', "23")]<br/>
+*Main&gt; check isDigit "abc"<br/>
+[]</code></p>
+
+<p>直接指定した1文字を読み込む関数も作っておく。</p>
+
+<p><code>char :: Char -&gt; Parse Char<br/>
+char = check . (==)</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; char 'a' "abc"<br/>
+[('a', "bs")]<br/>
+*Main&gt; char 'a' "bcd"<br/>
+[]</code></p>
+
+<h2>または</h2>
+
+<p>ふたつのパーサをとりそのどちらでも読み込めるようなパーサを作る。</p>
+
+<p><code>alt :: Parse a -&gt; Parse a -&gt; Parse a<br/>
+(p1 `alt` p2) i = p1 i ++ p2 i</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; (char 'a' `alt` check isDigit) "123"<br/>
+[('1', "23")]<br/>
+*Main&gt; (char 'a' `alt` check isDigit) "abc"<br/>
+[('a', "bc")]</code></p>
+
+<h2>加工</h2>
+
+<p>パーサが返した値を加工する。</p>
+
+<p><code>build :: Parser a -&gt; (a -&gt; b) -&gt; Parser b<br/>
+build p f i = [ (f x, r) | (x, r) &lt;- p i ]</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; (check isDigit `build` (read . (: ""))) "123" :: [(Integer, String)]<br/>
+[(1, "23")]</code></p>
+
+<h2>つなげる</h2>
+
+<p>ふたつのパーサをつなげる。</p>
+
+<p><code>(&gt;*&gt;) :: Parser a -&gt; Parser b -&gt; Parser (a, b)<br/>
+(p1 &gt;*&gt; p2) i = [ ((x, y), r') | (x, r) &lt;- p1 i, (y, r') &lt;- p2 r ]</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; (char 'a' &gt;*&gt; check isDigit) "a123"<br/>
+[(('a','1'),"23")]</code></p>
+
+<p>前後どちらかの返り値をそれぞれ無視する関数も作成する。</p>
+
+<p><code>(&gt;*) :: Parser a -&gt; Parser b -&gt; Parser a<br/>
+p1 &gt;* p2 = (p1 &gt;*&gt; p2) `build` fst</code></p>
+
+<p><code>(*&gt;) :: Parser a -&gt; Parser b -&gt; Parser b<br/>
+p1 *&gt; p2 = (p1 &gt;*&gt; p2) `build` snd</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; (char 'a' &gt;* check isDigit) "a123"<br/>
+[('a', "23")]<br/>
+*Main&gt; (char 'a' *&gt; check isDigit) "a123"<br/>
+[('1', "23")]</code></p>
+
+<h2>文字列の終わり</h2>
+
+<p>文字列の終わりを調べる。</p>
+
+<p><code>eof :: Parse ()<br/>
+eof "" = [((), "")]<br/>
+eof _ = []</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; (char 'a' &gt;* eof) "a123"<br/>
+[]<br/>
+*Main&gt; (char 'a' &gt;* eof) "a"<br/>
+[('a',"")]</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+パーサを扱う基本的な関数を定義した。
+</p>
 
 <a href="/computer/haskell/web_lecture/for_programmer/parser_prelude.html"
 	>「パーサ: はじめに」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/parser_list.html"
+	>「リストのパーサ」へ</a>
 </p>
