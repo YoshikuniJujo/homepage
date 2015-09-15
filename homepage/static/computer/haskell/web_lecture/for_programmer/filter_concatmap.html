@@ -1,0 +1,36 @@
+関数concatMapによる関数filterの定義
+
+<h2>はじめに</h2>
+
+<p>関数concatMapで関数filterが定義できる。</p>
+
+<h2>型</h2>
+
+<p><code>filterC :: (a -&gt; Bool) -&gt; [a] -&gt; [a]</code></p>
+
+<h2>定義</h2>
+
+<p><code>filterC p = concatMap $ \x -&gt; if p x then [x] else []</code></p>
+
+<p>
+mapの段階とconcatの段階をわけて考えるとわかりやすい。
+「引数xが条件pを満たすならば[x]にそうでないならば[]に」という変換を
+リストのすべての要素に対して行う。
+たとえば条件が「偶数である」ならば以下のようになるだろう。
+</p>
+
+<p><code>[3, 8, 9, 4, 2, 5]</code></p>
+
+<p>が</p>
+
+<p><code>[[], [8], [], [4], [2], []]</code></p>
+
+<p>となる。これを関数concatでつなげてやる。</p>
+
+<p><code>[8, 4, 2]</code></p>
+
+<a href="/computer/haskell/web_lecture/for_programmer/concatMap.html"
+	>「関数concatMap」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/list_comprehensions.html"
+	>「構文: リスト内包表記」へ</a>
+</p>
