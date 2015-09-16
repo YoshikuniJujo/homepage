@@ -1,9 +1,90 @@
 数の並びのパース
 
-<p>(工事中 0%)</p>
+<h2>数のパース</h2>
+
+<p><code>number :: Parse Integer<br/>
+number = list1 (check isDigit) `build` read</code></p>
+
+<p>
+check isDigitは数字の1文字をパースする。
+list1で数字1文字以上のリストつまり数字のみを含む文字列をパースし
+結果をreadで数に変換する。
+関数readは部分関数であり使うのに注意が必要だが、
+今回は引数となる文字列は数字のみを含むことが保証されているので問題なく使える。
+</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; number "4492"<br/>
+[(4,"492"),(44,"92"),(449,"2"),(4492,"")]<br/>
+*Main&gt; number &gt;* eof $ "4492"<br/>
+[(4492,"")]<br/>
+*Main&gt; map fst . (number &gt;* eof) $ "4492"<br/>
+[4492]<br/>
+*Main&gt; listToMaybe . map fst . (number &gt;* eof) $ "4492"<br/>
+Just 4492</code></p>
+
+<p>
+すべての文字を読み込んで(&gt;* eof)結果のみ(map fst)を
+Maybe値として(listToMaybe)表示した。
+</p>
+
+<h2>関数parse</h2>
+
+<p>
+最終的な結果をMaybe値として返す。
+対話環境で行った変換を関数としてとりだせば良い。
+</p>
+
+<p><code>parse :: Parse a -&gt; String -&gt; Maybe a<br/>
+parse p = listToMaybe . map fst . (p &gt;* eof)</code></p>
+
+<p>このままでも良いのだが仮引数pは消せる。</p>
+
+<p><code>parse p = ((listToMaybe . map fst) .) $ p &gt;* eof</code></p>
+
+<p><code>parse p = ((listToMaybe . map fst) .) $ (&gt;* eof) p</code></p>
+
+<p><code>parse = ((listToMaybe . map fst) .) . (&gt;* eof)</code></p>
+
+<p><code>*Main&gt; parse number "4492"<br/>
+Just 4492</code></p>
+
+<h2>空白区切りの数値のリスト</h2>
+
+<p><code>spaces1 :: Parse ()<br/>
+spaces1 = list1 (check isSpace) `build` const ()</code></p>
+
+<p><code>numbers :: Parse [Integer]<br/>
+numbers = (number &gt;*&gt; list (spaces1 *&gt; number)) `build` uncurry (:)</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; parse numbers "123 456 789"<br/>
+Just [123,456,789]</code></p>
+
+<h2>コンマ区切りの数値のリスト</h2>
+
+<p><code>spaces :: Parse ()<br/>
+spaces = list (check isSpace) `build` const ()</code></p>
+
+<p><code>comma :: Parse ()<br/>
+comma = (spaces &gt;*&gt; char ',' &gt;*&gt; spaces) `build` const ()</code></p>
+
+<p><code>cnumbers :: Parse [Integer]<br/>
+cnumbers = (number &gt;*&gt; list (comma *&gt; number)) `build` uncurry (:)</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; parse cnumbers "89, 95, 21, 3"<br/>
+Just [89,95,21,3]</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+数のリストのパースを見た。
+基本的な部品をうまく作ることでわかりやすく表現することができる。
+</p>
 
 <a href="/computer/haskell/web_lecture/for_programmer/parser_list.html"
 	>「リストのパーサ」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/parser_calculator.html"
+	>「パーサ: 計算機」へ</a>
 </p>
