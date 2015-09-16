@@ -1,9 +1,71 @@
 パーサ: 計算機
 
-<p>(工事中 0%)</p>
+<h2>仕様</h2>
 
+<p>
+整数の四則演算のみを扱う。
+演算子の優先順位は考慮せず必ず丸括弧を使うことにする。
+</p>
+
+<h2>演算子のパース</h2>
+
+<p><code>type Op = Integer -&gt; Integer -&gt; Integer</code></p>
+
+<p><code>op, ad, sb, ml, dv :: Parse Op<br/>
+op = ad `alt` sb `alt` ml `alt` dv<br/>
+ad = char '+' `build` const (+)<br/>
+sb = char '-' `build` const (-)<br/>
+ml = char '*' `build` const (*)<br/>
+dv = char '/' `build` const div</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; fromJust (parse op "+") 9 4<br/>
+13<br/>
+*Main&gt; fromJust (parse op "-") 9 4<br/>
+5<br/>
+*Main&gt; fromJust (parse op "*") 9 4<br/>
+36<br/>
+*Main&gt; fromJust (parse op "/") 9 4<br/>
+2</code></p>
+
+<h2>式のパース</h2>
+
+<p><code>expr :: Parse Integer<br/>
+expr = (term &gt;*&gt; op &gt;*&gt; term) `build` (\((x, o), y) -&gt; x `o` y)</code></p>
+
+<h2>項のパース</h2>
+
+<p><code>term :: Parse Integer<br/>
+term = number `alt` (char '(' *&gt; expr &gt;* char ')')</code></p>
+
+<h2>計算機</h2>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; expr "3*(5-2)"<br/>
+[(9,"")]<br/>
+*Main&gt; parse expr "3*(5-2)"<br/>
+Just 9</code></p>
+
+<p>計算機として使いやすい関数calcを定義しておく。</p>
+
+<p><code>calc :: String -&gt; Maybe Integer<br/>
+calc = parse expr</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; calc "3*(5-2)"<br/>
+Just 9</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+簡単なパーサコンビネータを定義した。
+実行効率の問題で実用的ではないがプロトタイプ的なものならば簡単にきれいに書ける。
+関数listとlist1は相互再帰の美しい例だ。
+</p>
+
+<p>
 <a href="/computer/haskell/web_lecture/for_programmer/parser_numbers.html"
 	>「数の並びのパーサ」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/adt_enum.html"
+	>「列挙型」へ</a>
 </p>
