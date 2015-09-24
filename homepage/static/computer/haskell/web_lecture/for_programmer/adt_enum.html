@@ -1,7 +1,5 @@
 列挙型: トランプのスートと色
 
-<p>(工事中 0%)</p>
-
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/suit.hs"
 	>suit.hs</a></p>
 
@@ -98,11 +96,57 @@
 
 <h2>関数の実装</h2>
 
-<p>rgbはcolorとtoRGBを合成すれば良い。</p>
+<p>関数rgbはcolorとtoRGBを合成すれば良い。</p>
 
 <p><code>rgb = toRGB . color</code></p>
 
-<p></p>
+<p>関数colorはスートと色を関連づける。</p>
+
+<p><code>color Spade = Black<br/>
+color Heart = Red<br/>
+color Diamond = Red<br/>
+color Club = Black</code></p>
+
+<p>関数toRGBは色を3整数のタプルに変換する。</p>
+
+<p><code>toRGB Black = (0, 0, 0)<br/>
+toRGB Red = (0xff, 0, 0)</code></p>
+
+<p>0x...のようにすることで数値を16進数で表記することができる。</p>
+
+<h2>試してみる</h2>
+
+<p><code>% ghci suit.hs<br/>
+*Main&gt; rgb Heart<br/>
+(255,0,0)<br/>
+*Main&gt; rgb Club<br/>
+(0,0,0)</code></p>
+
+<h2>構文</h2>
+
+<p>
+予約語dataに型名を、さらに等号に値の名前を|で区切ったものを続ける。
+型名や値の名前は大文字ではじまる識別子だ。
+型名と値の名前とでは名前空間が異なるので同じ名前を使っても良い。
+</p>
+
+<p>data [型] = [値1] | [値2] | ...</p>
+
+<h2>まとめ</h2>
+
+<p>
+値の列挙によって新しい型を作成する方法を学んだ。
+新しく作成された型の値はリテラルとしてコード内に直接書ける。
+またパターンとしてパターンマッチに使うこともできる。
+</p>
+
+<h2>課題</h2>
+
+<ol>
+<li>性別を表現する型を定義せよ</li>
+<li>上記の型と名前(文字列)のタプルを引数として
+とり"Mrs. ..."または"Mr. ..."といった文字列を返す関数を定義せよ</li>
+</ol>
 
 <!--
 <h2>TODO</h2>
@@ -130,6 +174,6 @@
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/parser_calculator.html"
 	>「パーサ: 計算機」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/deriving_show.html"
+	>「deriving Show」へ</a>
 </p>
