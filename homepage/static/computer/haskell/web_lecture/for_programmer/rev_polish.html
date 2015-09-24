@@ -148,7 +148,7 @@ rpolishIter _ _ = Nothing</code></p>
 </p>
 
 <p><code><span class="indent1">Just o -&gt; case ns of</span><br/>
-		<span class="indent2">y : x : ns' -&gt; rpolishIter (Just $ x `o` y ns') ss</span><br/>
+		<span class="indent2">y : x : ns' -&gt; rpolishIter (Just $ x `o` y : ns') ss</span><br/>
 		<span class="indent2">_ -&gt; Nothing</span></code></p>
 
 <p>

@@ -105,7 +105,7 @@ False</code></p>
 
 <p>保存される結果の型は解答と質問を結合したものなので以下のようにする。</p>
 
-<p><code>type Result a = [(Bool, (a, a))]</code></p>
+<p><code>type Results a = [(Bool, (a, a))]</code></p>
 
 <h3>質問と答えの例1</h3>
 
@@ -135,7 +135,7 @@ likes = map $ \(a, s) -&gt; (if a then fst else snd) s</code></p>
 <h3>例1で試す</h3>
 
 <p><code>ghci survey.hs<br/>
-*Main&gt; result question1 answer1<br/>
+*Main&gt; result questions1 answers1<br/>
 [(True, ("Elephant", "Giraffe"), ...]<br/>
 *Main&gt; let r = it<br/>
 *Main&gt; likes r<br/>
