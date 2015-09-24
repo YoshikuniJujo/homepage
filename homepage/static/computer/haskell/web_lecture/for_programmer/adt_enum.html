@@ -1,6 +1,131 @@
-列挙型
+列挙型: トランプのスートと色
 
 <p>(工事中 0%)</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/suit.hs"
+	>suit.hs</a></p>
+
+<h2>はじめに</h2>
+
+<p>トランプには</p>
+
+<ul>
+<li>スペード</li>
+<li>ハート</li>
+<li>ダイヤ</li>
+<li>クラブ</li>
+</ul>
+
+<p>
+の4種類のスートがある。
+一般的にスペードとクラブは黒でありハートとダイヤは赤となっている。
+スートを指定すると色を三原色(赤、緑、青)の3つの整数で返す関数を作る。
+</p>
+
+<p><a href="https://ja.wikipedia.org/wiki/スート#.E3.82.B9.E3.83.BC.E3.83.88.E3.81.AE.E8.89.B2"
+	>Wikipedia: スートと色</a></p>
+
+<h2>扱う値の型</h2>
+
+<h3>三原色の組</h3>
+
+<p>
+今回は3つの整数の組とする。
+あまり大きな値にはならないのでここではInt型の整数を使う。
+型シノニムを定義しておく。
+</p>
+
+<p><code>type RGB = (Int, Int, Int)</code></p>
+
+<h3>スート</h3>
+
+<h4>文字列や整数値で表現</h4>
+
+<p>
+スートをどう表現しようか。
+文字列で"spade"、"heart"、"diamond"、"club"のように表すか、
+あるいはスペードを0、ハートを1、ダイヤを2、クラブを3のようにするか。
+</p>
+
+<p>
+「美しくない」。
+</p>
+
+<p>
+スートには4種類の値のみしか存在しない。
+文字列や整数値で表現したとき「正しくない」スートが指定されるかもしれない。
+文字列ならばたとえば"kidney"とか"sapphire"とかを指定されたり、
+整数値ならば289とか98765を指定されたりするかもしれない。
+</p>
+
+<h4>型とその型の値を作る</h4>
+
+<p>
+ないものは作れば良い。
+たとえば真偽値に対しては型Boolがありその型の値はFalse、Trueの2つだ。
+同じように4種類のスートを表現する型Suitを作れば良い。
+</p>
+
+<p><code>data Suit = Spade | Heart | Diamond | Club</code></p>
+
+<p>
+これで4種類の値Spade、Heart、Diamond、Clubを持つ型Suitが定義される。
+</p>
+
+<h3>色</h3>
+
+<p>
+今回は色は黒と赤の二色だけ使う。
+同じように型Colorを定義する。
+</p>
+
+<p><code>data Color = Black | Red</code></p>
+
+<h2>関数の型</h2>
+
+<p>スートからRGBの3整数の組を求めたい。</p>
+
+<p><code>rgb :: Suit -&gt; RGB</code></p>
+
+<p>
+関数rgbを定義するための部品となる2つの関数を定義する。
+スートから色を求める関数と色からRGB値を求める関数だ。
+</p>
+
+<p><code>color :: Suit -&gt; Color</code></p>
+
+<p><code>toRGB :: Color -&gt; RGB</code></p>
+
+<h2>関数の実装</h2>
+
+<p>rgbはcolorとtoRGBを合成すれば良い。</p>
+
+<p><code>rgb = toRGB . color</code></p>
+
+<p></p>
+
+<!--
+<h2>TODO</h2>
+
+<ul>
+<li>列挙型の例を考える</li>
+<li>deriving Showが必要ないものが良い</li>
+<li>2つの列挙型を対応づける関数を作成する</li>
+<li>スライドでは「友達」と「性別」とを関連づけたが...</li>
+<li>トランプのスーツあたりか</li>
+<li>3から5要素程度が調度良いように思う</li>
+<li>季節とか</li>
+<li>曜日とか</li>
+<li>男女とか</li>
+<li>色とか</li>
+<li>トランプのスートと色あたりがわかりやすい例かな
+	<ul>
+	<li>トランプのスートから色への関数</li>
+	<li>色から整数値の組(RGB)への関数</li>
+	<li>整数値の組から文字列への関数(#FF0000といった)</li>
+	</ul></li>
+</ul>
+-->
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/parser_calculator.html"
