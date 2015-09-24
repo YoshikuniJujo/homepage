@@ -1,10 +1,64 @@
 deriving Show
 
-<p>(工事中 0%)</p>
+<h2>はじめに</h2>
+
+<p>
+さてトランプのスートを扱った前回、好奇心旺盛なあなたは対話環境で怒られたはずだ。
+手順をきちんと守るかただともしかしたら怒られずにすんだかもしれない。
+怒られなかった人も一度怒られてみよう。
+</p>
+
+<p><code>% ghci suit.hs<br/>
+*Main&gt; Spade</code></p>
+
+<p><code>&lt;interactive&gt;:X:Y:<br/>
+<span style="padding-left: 2em">No instance for (Show Suit) arising from a use of
+`print'</span><br/>
+<span style="padding-left: 2em">Possible fix: add an instance declaration for (Show Suit)</span><br/>
+<span style="padding-left: 2em">In a stmt of an interactive GHCi command: print it</span>
+</code></p>
+
+<p>
+「型Suitは型クラスShowのインスタンスじゃないよ」と言われた。
+型クラスについてはあとで学ぶ。
+そのときにきちんと説明するがとりあえず対話環境で表示できないのは不便だ。
+簡易的に型を型クラスShowのインスタンスにする方法を教えておく。
+</p>
+
+<h2>型Suitを型クラスShowのインスタンスに</h2>
+
+<p>deriving Showを追加する。</p>
+
+<p><code>data Suit = Spade | Heart | Diamond | Club deriving Show</code></p>
+
+<p>
+deriving Showの意味は型クラスについて学んでから説明する。
+</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; Spade<br/>
+Spade<br/>
+*Main&gt; show Spade<br/>
+"Spade"</code></p>
+
+<p>
+deriving Showを使うと関数showによって文字列化することができるようになる。
+対話環境はこの関数showを使って値を表示している。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+本来なら型クラスの説明のあとに学ぶべき内容だ。
+しかし自分で定義した型の値が対話環境で表示できないのは不便なので
+簡単に型クラスShowのインスタンスにする方法を教えた。
+型の定義の最後にderiving Showをつければ良い。
+あとでちゃんと説明する。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/adt_enum.html"
 	>「列挙: トランプのスートと色」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/men_and_items.html"
+	>「人間と商品」へ</a>
 </p>
