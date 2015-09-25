@@ -1,10 +1,239 @@
 人間と商品
 
-<p>(工事中 0%)</p>
+<h2>型シノニム</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/hpt.hs"
+	>hpt.hs</a></p>
+
+<h3>人間</h3>
+
+<h4>型</h4>
+
+<p>
+名前と年齢で人間を表現する。
+型シノニムを定義する。
+</p>
+
+<p><code>type Human = (String, Int)</code></p>
+
+<h4>年齢</h4>
+
+<p>年齢を教える文字列を生成する関数を定義する。</p>
+
+<p><code>age :: Human -&gt; String<br/>
+age (n, a) = n ++ " is " ++ show a ++ " years old."</code></p>
+
+<h4>例</h4>
+
+<p><code>masuo :: Human<br/>
+masuo = ("Masuo", 32)</code></p>
+
+<p><code>% ghci hpt.hs<br/>
+*Main&gt; age masuo<br/>
+"Masuo is 32 years old."</code></p>
+
+<h3>商品</h3>
+
+<h4>型</h4>
+
+<p>
+商品名と値段で商品を表現する。
+型シノニムを定義する。
+</p>
+
+<p><code>type Product = (String, Int)</code></p>
+
+<h4>値段</h4>
+
+<p>値段を教える文字列を生成する関数を定義する。</p>
+
+<p><code>price :: Product -&gt; String<br/>
+price (n, p) = n ++ " is " ++ show p ++ " yen."</code></p>
+
+<h4>例</h4>
+
+<p><code>iphone6s :: Product<br/>
+iphone6s = ("iPhone 6s", 99000)</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; price iphone6s<br/>
+"iPhone 6s is 99000 yen."</code></p>
+
+<h3>人間なのか商品なのか</h3>
+
+<p><code>*Main&gt; price masuo<br/>
+"Masuo is 32 yen."<br/>
+*Main&gt; age iphone6s<br/>
+"iPhone 6s is 99000 years old."</code></p>
+
+<p>
+マスオさんの価値は32円で
+iPhone 6sは人類がアフリカを出たころには存在していた。
+</p>
+
+<p><a href="https://ja.wikipedia.org/wiki/地球史年表#10.E4.B8.87.E5.B9.B4.E5.89.8D_.E3.80.9C_1.E4.B8.87.E5.B9.B4.E5.89.8D"
+	>Wikipedia: 地球史年表(10万年前 〜 1万年前</a></p>
+
+<h2>代数的データ型</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/hpd.hs"
+	>hpd.hs</a></p>
+
+<h3>はじめに</h3>
+
+<p>
+型シノニムは単なる型の別名だ。
+型シノニムHumanとProductとはどちらも単に(String, Int)である。
+しかし、関数ageは人間にだけ使いたいし、関数priceは商品にだけ使いたい。
+「代数的データ型」によって型の別名ではなく、新しい型を定義してみよう。
+</p>
+
+<h3>人間</h3>
+
+<h4>型</h4>
+
+<p>
+名前(String)と年齢(Int)から成る型Humanを定義する。
+</p>
+
+<p><code>data Human = Human String Int</code></p>
+
+<p>
+左側のHumanは型の名前であり右側のHumanは値構築子だ。
+型の名前も値構築子も大文字で始める必要がある。
+これらは別々の名前空間に属するので同じ名前が使える。
+識別子を考える手間を減らすために同じHumanにした。
+別の識別子にしても良い。
+</p>
+
+<p><code>data Human = Hito String Int</code></p>
+
+<p>値構築子Humanのほうを使う。</p>
+
+<p><code>*Main&gt; :load hpd.hs<br/>
+*Main&gt; Human "Masuo" 32</code></p>
+
+<p><code>&lt;interactive&gt;:X:Y:<br/>
+<span style="padding-left: 2em">No instance for (Show Human) arising from a use of
+`print'</span><br/>
+<span style="padding-left: 2em">Possible fix: add an instance declaration for (Show Human)</span><br/>
+<span style="padding-left: 2em">In a stmt of an interactive GHCi command: print it</span>
+</code></p>
+
+<p>
+怒られてしまった。
+対話環境で表示するにはderiving Showをつけておけば良い。
+</p>
+
+<p><code>data Human = Human String Int deriving Show</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; Human "Masuo" 32<br/>
+Human "Masuo" 32</code></p>
+
+<h4>年齢</h4>
+
+<p>
+年齢を教える関数を定義する。
+値構築子を使ってパターンマッチする。
+Maybe型の値を(Just x)でパターンマッチしたことを思い出そう。
+</p>
+
+<p><code>age :: Human -&gt; String<br/>
+age (Human n a) = n ++ " is " ++ show a ++ " years old."</code></p>
+
+<h4>例</h4>
+
+<p><code>masuo :: Human<br/>
+masuo = Human "Masuo" 32</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; age masuo<br/>
+"Masuo is 32 years old."</code></p>
+
+<h3>商品</h3>
+
+<h4>型</h4>
+
+<p>同様に</p>
+
+<p><code>data Product = Product String Int</code></p>
+
+<p>
+とする。
+対話環境で表示するためにderiving Showをつけておこう。
+</p>
+
+<p><code>data Product = Product String Int deriving Show</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; Product "iPhone 6s" 99000<br/>
+Product "iPhone 6s" 99000</code></p>
+
+<h4>値段</h4>
+
+<p>値構築子Productを使ってパターンマッチする。</p>
+
+<p><code>price :: Product -&gt; String<br/>
+price (Product n p) = n ++ " is " ++ show p ++ "yen."</code></p>
+
+<h4>例</h4>
+
+<p><code>iphone6s :: Product<br/>
+iphone6s = Product "iPhone 6s" 99000</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; price iphone6s<br/>
+"iPhone 6s is 99000 yen."</code></p>
+
+<h3>人間なのか商品なのか</h3>
+
+<p><code>*Main&gt; price masuo</code></p>
+
+<p><code>&lt;interactive&gt;:X:Y:<br/>
+<span style="padding-left: 2em"
+	>Couldn't match expected type `Production' with actual type `Human'</span><br/>
+<span style="padding-left: 2em">In the first argument of `price', namely `masuo'</span><br/>
+<span style="padding-left: 2em">In the expression: price masuo</span><br/>
+*Main&gt; age iphone6s</code></p>
+
+<p><code>&lt;interactive&gt;:X:Y:<br/>
+<span style="padding-left: 2em"
+	>Couldn't match expected type `Human' with actual type `Product'</span><br/>
+<span style="padding-left: 2em">In the first argument of `age', namely `iphone6s'</span><br/>
+<span style="padding-left: 2em">In the expression: age iphone6s</span>
+</code></p>
+
+<p>
+不適切なデータを使うとちゃんとエラーとなる。
+適切に型を定義して使うことで多くのバグをふせぐことができる。
+</p>
+
+<h2>構文</h2>
+
+<p>既存の型をいくつかまとめて新しい型を作成できる。</p>
+
+<p><code>data [型名] = [値構築子] [型1] [型2] ...</code></p>
+
+<p>
+型名と値構築子はともに大文字から始まる識別子だ。
+これらは名前空間が異なるので同じ識別子が使える。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+ここで紹介した使いかたは実質的にはタプルと同じことだ。
+保存したり引き出したりできる値はたとえばStringやIntである。
+しかしタプルとの違いは定義された型は「新しい型」となることだ。
+その型専用の関数によって扱われる。
+実質的に同じデータから成る型でも違う型として扱われる。
+型によってコードの安全性がある程度保証されるということだ。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/deriving_show.html"
 	>「deriving Show」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/cartesian_polar.html"
+	>「直交座標と極座標」へ</a>
 </p>
