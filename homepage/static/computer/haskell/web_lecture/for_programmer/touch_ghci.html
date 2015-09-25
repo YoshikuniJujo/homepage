@@ -10,7 +10,7 @@ GHCi: 対話環境に触れる
 
 <p>
 ターミナルから以下のように入力する。
-先頭の%はターミナルへの入力であることを示す。
+先頭の%はターミナルへの入力であることを示す印なので入力しない。
 </p>
 
 <code>% ghc --version<br/>
@@ -26,16 +26,15 @@ The Glorious Glasgow Haskell Compilation System, version X.Y.Z</code>
 Prelude&gt;</code></pre>
 
 <p>
-Prelude&gt;はプロンプトだ。終わらせかたを知ろう。
-プロンプトに':quit'とリターンキーを入力する。
-':q'でも良い。
+Prelude&gt;はプロンプトだ。
+終わらせるにはプロンプトに:quitまたは:qとリターンキーを入力する。
 </p>
 
 <pre><code>Prelude&gt; :quit</code></pre>
 
 <h2>値の入力</h2>
 
-<p>値を入力してみよう。</p>
+<p>値を入力する。</p>
 
 <pre><code>% ghci
 Prelude&gt; 4492
@@ -47,22 +46,18 @@ Prelude&gt; pi
 
 <p>
 対話環境は入力した式を評価し結果を表示する。
-4492や'c'はリテラルでそのまま出力される。
+4492や'c'はリテラルでそのまま表示される。
 piは定義済みの変数だ。円周率の値に束縛されている。
 </p>
 
 <h3>変数it</h3>
 
-<p>
-対話環境で評価した値は自動的に変数itを束縛する。
-</p>
+<p>対話環境で評価した値は自動的に変数itを束縛する。</p>
 
 <p><code>Prelude&gt; 344925345991 * 36251192382<br/>
 12503955074947653440562</code></p>
 
-<p>
-演算子(*)は乗算だ。返された結果に15をかける。
-</p>
+<p>演算子(*)は乗算だ。返された結果に15をかける。</p>
 
 <p><code>Prelude&gt; it * 15<br/>
 187559326124214801608430</code></p>
@@ -71,10 +66,8 @@ piは定義済みの変数だ。円周率の値に束縛されている。
 
 <h3>学習の流れ</h3>
 
-<p>入出力を学ぶまでは以下の流れで進める。</p>
-
 <ol>
-<li>関数を定義したファイルを作成</li>
+<li>関数定義のファイルを作成</li>
 <li>対話環境(GHCi)に読み込む</li>
 <li>値を評価し結果を表示</li>
 <li>ファイルを編集</li>
@@ -85,7 +78,7 @@ piは定義済みの変数だ。円周率の値に束縛されている。
 
 <h3>リンゴが好き</h3>
 
-<p>練習してみよう。fruits.hsを作成する。</p>
+<p>練習だ。まずfruits.hsを作成する。</p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/00_touch_ghci/fruits_1.hs"
 	>fruits.hs</a></p>
@@ -117,7 +110,7 @@ piは定義済みの変数だ。円周率の値に束縛されている。
 <p><code>*Main&gt; myFavoriteFruit<br/>
 "apple"</code></p>
 
-<p>「変更が反映されない!」。再読み込みする。':reload'か':r'を入力する。</p>
+<p>変更が反映されない!再読み込みが必要だ。:reloadか:rを入力する。</p>
 
 <p><code>*Main&gt; :reload<br/>
 *Main&gt; myFavoriteFruit<br/>
@@ -142,12 +135,12 @@ Haskell Platformには、コンパイラ、インタプリタ、対話環境だ�
 	<ul>
 	<li>文字は前後を'で囲んで入力する</li>
 	</ul></li>
-<li>myFavoriteColor変数を定義したファイルを作成せよ
+<li>ファイルを作成しmyFavoriteColor変数を定義せよ
 	<ul>
-	<li>2番目に好きな色で定義する</li>
-	<li>対話環境に読み込み表示する</li>
-	<li>1番好きな色に変更する</li>
-	<li>再読み込みして表示する</li>
+	<li>2番目に好きな色で定義</li>
+	<li>対話環境に読み込み表示</li>
+	<li>1番好きな色に変更</li>
+	<li>再読み込みして表示</li>
 	</ul></li>
 </ol>
 

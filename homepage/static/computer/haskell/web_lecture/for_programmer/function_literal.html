@@ -22,13 +22,11 @@ Prelude&gt; 123<br/>
 関数リテラルなら関数に名前をつけずに使える。
 </p>
 
-<h3>変数とリテラル</h3>
-
 <p>
-x = 3と定義されているとき変数xを3で置き換えられる。
-では、fun x = x ^ xのように定義されているとき変数funを何で置き換えられるだろう。
-funを置き換えられるような表現が関数リテラルだ。
-関数自体をそのまま書いたものが関数リテラルだ。
+var = 3と定義されているとき変数varを3でおきかえられる。
+では、fun x = x ^ xのように定義されているとき変数funを何でおきかえられるだろう。
+funをおきかえられるような表現が関数リテラルだ。
+関数自体をそのまま書いたものだ。
 </p>
 
 <h2>関数リテラルの例</h2>
@@ -38,31 +36,37 @@ Prelude&gt; let fun x = x ^ x<br/>
 Prelude&gt; fun 3<br/>
 27</code></p>
 
-<p>
-funの部分を関数リテラルで置き換える。
-関数リテラルは\[仮引数] -&gt; [表現]という形だ。
-</p>
+<p>funの部分を関数リテラルで置き換える。関数リテラルは</p>
+
+<p><code>\[仮引数] -&gt; [表現]</code></p>
+
+<p>という形だ。</p>
 
 <p><code>Prelude&gt; (\x -&gt; x ^ x) 3<br/>
 27</code></p>
 
 <h2>関数定義は構文糖だ</h2>
 
-<p>今まで見てきた関数定義は以下のように書き換えられる。</p>
-
 <p><code>fun x = x ^ x</code></p>
+
+<p>は</p>
 
 <code>fun = \x -&gt; x ^ x</code>
 
 <p>
-関数定義は関数の作成とその関数での変数の束縛という2つのことをする構文糖だ。
+に書きかえられる。
+関数定義は関数の作成とその関数での変数の束縛の2つのことをする構文糖だ。
 </p>
 
 <h2>xxcryptの例</h2>
 
 <p><code>xxcrypt n ed mc = mc ^ ed `mod` n</code></p>
 
+<p>は</p>
+
 <p><code>xxcrypt = \n -&gt; (\ed -&gt; (\mc -&gt;  mc ^ ed `mod` n))</code></p>
+
+<p>となる。</p>
 
 <img
 width="330"
@@ -78,6 +82,8 @@ src="/computer/haskell/web_lecture/for_programmer/images/three_arg_fun.svg"
 
 <h2>複数引数の略記法</h2>
 
+<p>関数を返す関数は複数の引数をとる関数のように書ける。</p>
+
 <code>xxcrypt = \n ed mc -&gt; mc ^ ed `mod` n</code>
 
 <h2>まとめ</h2>
@@ -87,15 +93,15 @@ src="/computer/haskell/web_lecture/for_programmer/images/three_arg_fun.svg"
 <h2>課題</h2>
 
 <ol>
-<li>金額を引数とし消費税込みの価格を返す関数taxを作成せよ
+<li>金額を引数とし消費税込みの価格を返す関数taxを定義せよ
 	<ul>
 	<li>税率は8%とする</li>
 	<li>整数の除算には演算子`div`が使える</li>
 	<li>20 `div` 3は6だ</li>
 	</ul></li>
-<li>関数taxを関数リテラルで変数を束縛する形に書き換えよ</li>
+<li>関数taxを関数リテラルで変数を束縛する形に書きかえよ</li>
 <li>時間、分、秒を引数としてとり秒数に変換する関数secを作成せよ</li>
-<li>関数secを関数リテラルで変数束縛する形に書き換えよ</li>
+<li>関数secを関数リテラルで変数束縛する形に書きかえよ</li>
 </ol>
 
 <p>

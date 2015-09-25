@@ -2,13 +2,15 @@
 
 <h2>高階関数とは</h2>
 
+<p>高階関数とは</p>
+
 <ul>
 <li>関数を引数に取る、または</li>
 <li>関数を返す</li>
 </ul>
 
 <p>
-関数が高階関数だ。
+関数だ。
 「くりかえし」などの制御構造を特別な構文ではなく関数で書ける。
 </p>
 
@@ -19,10 +21,7 @@ alt="[関数を返す関数の図]"
 src="/computer/haskell/web_lecture/for_programmer/images/return_fun_machine.svg"
 />
 
-<p>
-すでに高階関数を学んでいた。
-複数の引数をとる関数のような関数は「関数を返す関数」だ。
-</p>
+<p>複数の引数をとる関数のように見える関数は「関数を返す関数」だ。</p>
 
 <h2>引数として関数を取る関数</h2>
 
@@ -38,6 +37,8 @@ src="/computer/haskell/web_lecture/for_programmer/images/fun_arg_machine.svg"
 
 <p><code>twice f x = f (f x)</code></p>
 
+<p>1つ前、1つ後の値を返す関数pred、succで試す。</p>
+
 <pre><code>% ghci higher.hs
 *Main&gt; pred 8
 7
@@ -47,8 +48,6 @@ src="/computer/haskell/web_lecture/for_programmer/images/fun_arg_machine.svg"
 9
 *Main&gt; twice succ 8
 10</code></pre>
-
-<p>関数pred, succはそれぞれ1つ前の値、1つ後の値を返す。</p>
 
 <h2>まとめ</h2>
 
@@ -61,7 +60,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/fun_arg_machine.svg"
 
 <p>
 関数だ。
-返り値が関数である関数は複数の引数をとる関数として扱える。
+「返り値が関数である関数」は複数の引数をとる関数のように見える。
 制御構造を特別な構文ではなく「関数を引数としてとる関数」で書ける。
 </p>
 

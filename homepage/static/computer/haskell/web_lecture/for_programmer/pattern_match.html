@@ -8,7 +8,7 @@ Haskellの条件分岐の基本はパターンマッチだ。if文もパター�
 
 <h2>パターンマッチとは</h2>
 
-<p>パターンマッチはHaskellの中核を構成する要素のひとつだ。</p>
+<p>パターンマッチはHaskellの中心的な要素のひとつだ。</p>
 
 <img
 width="350"
@@ -17,14 +17,14 @@ src="/computer/haskell/web_lecture/for_programmer/images/pattern_match.svg"
 />
 
 <p>
-値がパターンに適合するかどうかで処理を分岐させ構成的なデータから値をとりだす。
+値がパターンにマッチするかで処理を分岐させ構成的なデータから値をとりだす。
 </p>
 
 <h2>仮引数はパターンだ</h2>
 
 <p><code>xxcrypt n ed mc = mc ^ ed `mod` n</code></p>
 
-<p>'='の左側にあるn, ed, mcのような仮引数は「パターン」である。</p>
+<p>=の左側のn, ed, mcのような仮引数は「パターン」だ。</p>
 
 <ul>
 <li>すべての値にマッチ</li>
@@ -34,10 +34,9 @@ src="/computer/haskell/web_lecture/for_programmer/images/pattern_match.svg"
 <h2>もっとパターンらしく</h2>
 
 <p>
-よりパターンマッチらしいMaybe値の例だ。
-Just 8という値がある。こう考える。
-「失敗する可能性のある関数が適用された。結果は成功で値は8だった」と。
-値8を使うためにMaybe値からとりだす。
+よりパターンマッチらしいのはMaybe値だ。
+Just 8は「失敗の可能性のある関数が適用され、結果は成功で値は8だった」という意味だ。
+値8を使うにはMaybe値からとりだす。
 </p>
 
 <p><code>fun (Just x) = [xを使った演算]</code></p>
@@ -45,13 +44,13 @@ Just 8という値がある。こう考える。
 <p>Just xというパターンは</p>
 
 <ul>
-<li>Just値だけにマッチ(Nothingにはマッチしない)し</li>
+<li>Just値だけにマッチし</li>
 <li>Just [値]からとりだした値で変数xを束縛</li>
 </ul>
 
 <p>
 する。
-Just xはNothingにマッチしないのでfun Nothingのときにエラーとなる。
+Just xはNothingにマッチしないのでfun Nothingはエラーとなる。
 Nothingの定義を追加する。
 </p>
 
@@ -63,15 +62,13 @@ fun Nothing = [Nothingだった場合に返す値]</code>
 <p>
 Just xにマッチしない値はNothingだけだ。
 パターンNothingでは束縛される変数もない。
-何にでもマッチし変数束縛を行わないワイルドカードを使うときれいだ。
+何にでもマッチし変数束縛を行わないワイルドカードを使おう。
 </p>
 
 <code>fun (Just x) = ...<br/>
 fun _ = ...</code>
 
-<p>
-ワイルドカードは_(アンダースコア)だ。変数束縛のない変数パターンだ。
-</p>
+<p>ワイルドカードは_(アンダースコア)だ。変数束縛のない変数パターンだ。</p>
 
 <h2>数や文字もパターン</h2>
 
@@ -101,7 +98,7 @@ Nothing</code></pre>
 
 <p>
 文字列リテラルもパターンだ。"Yoshikuni"だけに丁寧に挨拶させる。
-自分の名前に置き換えて楽しもう。(++)は文字列連結演算子と考えておく。
+自分の名前におきかえて楽しもう。(++)は文字列連結演算子と考えておく。
 </p>
 
 <p><a
@@ -117,9 +114,7 @@ helloTo n = "Hello, " ++ n ++ "!"</code></p>
 *Main&gt; helloTo "Ichiro"<br/>
 "Hello, Ichiro!"</code></p>
 
-<p>
-文字リテラルもパターンだ。引数が数字ならその数を、そうでなかったら-1を返す。
-</p>
+<p>文字リテラルもパターンだ。引数が数字ならその数を、そうでなかったら-1を返す。</p>
 
 <p><a
 href="/computer/haskell/web_lecture/for_programmer/03_5_pattern_match/digit.hs"
@@ -147,14 +142,14 @@ digit _ = -1</code></p>
 	<li>マッチした値がその変数を束縛する</li>
 	</ul></li>
 <li>パターンマッチで構成的な値からなかの値をとりだせる</li>
-<li>関数定義を並べると順にマッチを試していく</li>
+<li>関数定義をならべると順にマッチを試していく</li>
 </ul>
 
 <h2>課題</h2>
 
 <ol>
-<li>Just [名前]ならば"[名前] is my friend."を、Nothingなら"I'm alone."を返す関数friendを作成せよ</li>
-<li>引数が0ならばNothingをそうでなければJust [引数]を返す関数notZeroを作成せよ</li>
+<li>Just [名前]ならば"[名前] is my friend."を、Nothingなら"I'm alone."を返す関数friendを定義せよ</li>
+<li>引数が0ならばNothingをそうでなければJust [引数]を返す関数notZeroを定義せよ</li>
 </ol>
 
 <p>
