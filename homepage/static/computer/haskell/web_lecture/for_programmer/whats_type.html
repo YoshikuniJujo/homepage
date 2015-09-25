@@ -7,7 +7,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/type.svg"
 
 <h2>型とは「何ができるか」だ</h2>
 
-<p>値には型がある。型は</p>
+<p>型は</p>
 
 <ul>
 <li>値にどの関数が適用できるか</li>
@@ -16,7 +16,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/type.svg"
 
 <p>を示す。値で何ができるかということだ。</p>
 
-<h2>Char型の値は小文字にできる</h2>
+<h2>Char型の値は小文字になる</h2>
 
 <p>文字を表す値はChar型だ。Char型の値は関数toLowerで小文字にできる。</p>
 
@@ -36,9 +36,9 @@ toLowerはData.Charモジュールが公開している。
 
 <p>Char型の値は関数toLowerで小文字になる。</p>
 
-<h2>Bool型の値は小文字にできない</h2>
+<h2>Bool型の値は小文字にならない</h2>
 
-<p>FalseやTrueという値の型はBool型だ。Char型ではない。小文字にはできない。</p>
+<p>FalseやTrueという値はBool型だ。Char型ではない。小文字にはならない。</p>
 
 <p><code>Prelude Data.Char&gt; :t False<br/>
 False :: Bool<br/>
@@ -50,7 +50,7 @@ Prelude Data.Char&gt; toLower False</code></p>
 <span style="margin-left: 2em">In the expression: toLower False</span><br/>
 <span style="margin-left: 2em">In an equation for `it': it = toLower False</span></code></p>
 
-<p>怒られた。「型が一致してないよ」だって。</p>
+<p>「型が一致してないよ」と怒られる。</p>
 
 <h2>課題</h2>
 

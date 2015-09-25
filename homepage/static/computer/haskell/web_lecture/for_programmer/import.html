@@ -2,9 +2,7 @@
 
 <h2>はじめに</h2>
 
-<p>
-標準ライブラリが公開している関数を使いこなすことが効率的な開発のコツだ。
-</p>
+<p>ライブラリを使いこなすことが効率的な開発のコツだ。</p>
 
 <h2>Preludeモジュール</h2>
 
@@ -12,33 +10,38 @@
 Prelude&gt;</code></p>
 
 <p>
-何も指定しなくてもPreludeというモジュールが暗黙に読み込まれる。
-プロンプトにPreludeとあるのは、
+何も指定しなくてもPreludeというモジュールが暗黙に読みこまれる。
+プロンプトにPreludeとあるのは
 Preludeモジュールが読み込まれ公開されている関数や値が使えるということだ。
-Preludeを読み込まないためには以下のようにする。</p>
+Preludeを読み込まないためには
+</p>
 
 <p><code>% ghci -XNoImplicitPrelude<br/>
 &gt;</code></p>
 
-<p>プロンプトからPreludeが消えた。基本的な関数が未定義となる。</p>
+<p>
+のようにする。
+プロンプトからPreludeが消えた。基本的な関数が未定義となる。
+</p>
 
 <p><code>&gt; 3<br/>
 3<br/>
 &gt; 3 + 8<br/>
 &lt;interactive&gt;:X:Y: Not in scope `+'</code></p>
 
-<p>演算子(+)はPreludeモジュールから公開されているので使えない。</p>
+<p>演算子(+)はPreludeモジュールから公開されていたようだ。</p>
 
 <h2>Mainモジュール</h2>
 
-<p>空のファイルを作成しそれにempty.hsという名前をつける。</p>
+<p>空のファイルempty.hsを作成する。</p>
 
 <p>% ghci empty.hs<br/>
 *Main&gt;</p>
 
 <p>
 プロンプトに*Mainとある。ファイルに書かれたHaskellのコードはMainモジュールとなる。
-*はモジュールの「なか」ということだ。公開されていない関数や値も使える。
+*はモジュールの「なか」ということだ。
+モジュールの外に公開されていない関数や値も使える。
 </p>
 
 <h2>対話環境でのモジュールの読み込み</h2>
@@ -75,7 +78,7 @@ Prelude Data.Char Data.Maybe&gt; toLower 'L'<br/>
 Prelude Data.Char Data.Maybe&gt; fromMaybe 0 (Just 8)<br/>
 8</code></p>
 
-<h2>ソースファイルにおける読み込み</h2>
+<h2>ファイルでのモジュールの読み込み</h2>
 
 <p>コード中でモジュールを読み込むのはimport文だ。</p>
 
@@ -83,7 +86,7 @@ Prelude Data.Char Data.Maybe&gt; fromMaybe 0 (Just 8)<br/>
 
 <p>
 使い捨てのコードならこれで良い。
-しかし、これでは名前がどのモジュール由来なのかわからない。
+しかし、これでは関数や値がどのモジュール由来なのかわからない。
 コードを読みやすくするために以下の2つのどちらか、または両方の形にする。
 </p>
 
@@ -96,14 +99,13 @@ Prelude Data.Char Data.Maybe&gt; fromMaybe 0 (Just 8)<br/>
 <p><code>import qualified Data.Char as Ch</code></p>
 
 <p>
-Data.Charモジュールが公開している値を使うときは修飾名を使う。
-Ch.toLowerやCh.toUpperとする。
+Data.Charモジュールが公開している値を使うには修飾名でCh.toLowerやCh.toUpperとする。
 </p>
 
 <h2>まとめ</h2>
 
 <p>
-モジュールの読み込みを学んだ。
+モジュールの読みこみを学んだ。
 使い捨てのコード以外では読み込みリストまたは修飾名を指定する。
 </p>
 

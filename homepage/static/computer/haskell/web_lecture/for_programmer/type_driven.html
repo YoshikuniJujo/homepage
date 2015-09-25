@@ -3,7 +3,7 @@
 <h2>型駆動開発とは</h2>
 
 <p>
-コードを書く前に型を考えると開発効率が改善する。
+コードを書く前に型を考える。
 「型から考える」コーディングを「型駆動開発」と呼ぼう。
 </p>
 
@@ -34,14 +34,14 @@ src="/computer/haskell/web_lecture/for_programmer/images/bmi_men.svg"
 <h2>型</h2>
 
 <p>
-BMIは少数点以下も意味があるので実数だ。代表的な実数型はDouble型だ。
+BMIは少数点以下も意味があるので実数だ。代表的な実数はDouble型の値だ。
 体重、身長、BMIをDouble型の値とする。
-肥満かどうかはFalse値とTrue値から成るBool型とする。
+肥満かどうかはFalse値とTrue値から成るBool型の値とする。
 </p>
 
 <h2>定義する関数</h2>
 
-<p>BMIを求める関数bmiと結果を25と比較する関数isObeseを作成する。</p>
+<p>BMIを求める関数bmiと結果を25と比較する関数isObeseを定義する。</p>
 
 <p><code>bmi :: Double -&gt; Double -&gt; Double<br/>
 isObese :: Double -&gt; Double -&gt; Bool</code></p>
@@ -54,8 +54,8 @@ isObeseは身長(Double)と体重(Double)をとって肥満かどうか(Bool)を
 <h2>型をさきに定義</h2>
 
 <p>
-型駆動開発なので型をさきに定義する。型の情報をGHCiでチェックする。
-型宣言のみでは読み込みエラーとなる。エラー値undefinedをスタブとする。
+型をさきに定義する。型の情報をGHCiでチェックする。
+型宣言のみでは読み込みエラーとなるのでエラー値undefinedをスタブとする。
 </p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/04_type_driven/bmi_v0.hs"
@@ -83,7 +83,7 @@ isObese :: Double -&gt; Double -&gt; Bool</code></p>
 <h2>トップダウンかボトムアップか</h2>
 
 <p>
-トップダウンとボトムアップのそれぞれ利点・欠点がある。
+トップダウンとボトムアップにはそれぞれ利点・欠点がある。
 </p>
 
 <img
@@ -100,7 +100,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/bottomup.svg"
 トップダウンでは全体の構成がわかりやすい。それぞれの部品が果たす役割が明確だ。
 反面、実装について十分に考慮しないと部品を作るときに二重化等の無駄が出る。
 ボトムアップでは汎用の部品が作られる。流用できるものとなり仕様の変更に強い。
-反面、全体のなかでの役割を配慮しないと組み込むときに手直しが必要になる。
+反面、全体のなかでの役割を配慮しないと全体に組みこむときに手直しが必要になる。
 </p>
 
 <p>
