@@ -2,11 +2,11 @@ Maybe値からの値のとりだし
 
 <h2>はじめに</h2>
 
-<p>Maybe型から値をとりだす</p>
+<p>Maybe型から値をとりだす関数</p>
 
 <ul>
-<li>関数fromMaybe</li>
-<li>関数maybe</li>
+<li>fromMaybeと</li>
+<li>maybe</li>
 </ul>
 
 <p>を学ぶ。</p>
@@ -28,16 +28,16 @@ Prelude Data.Maybe&gt; fromMaybe ' ' (Just 'c')<br/>
 
 <h3>定義</h3>
 
+<p>Maybe型の値がJust値ならばなかの値xを、そうでなければ第1引数の値dを返す。</p>
+
 <p><code>fromMaybe _ (Just x) = x<br/>
 fromMaybe d _ = d</code></p>
 
-<p>Maybe型の値がJust値ならばなかの値xを、そうでなければ第1引数の値dを返す。</p>
-
 <h3>型</h3>
 
-<p><code>fromMaybe :: a -&gt; Maybe a -&gt; a</code></p>
-
 <p>デフォルト値、Maybe型のなかみ、返り値はすべて同じ型aだ。</p>
+
+<p><code>fromMaybe :: a -&gt; Maybe a -&gt; a</code></p>
 
 <h2>関数maybe</h2>
 
@@ -61,22 +61,22 @@ Prelude Data.Char&gt; maybe 0 ord Nothing<br/>
 
 <h3>定義</h3>
 
-<p><code>maybe _ f (Just x) = f x<br/>
-maybe d _ _ = d</code></p>
-
 <p>
 Maybe型の値がJust値ならばなかみの値xに引数で与えられた関数fを適用する。
 そうでなければデフォルト値を返す。
 </p>
 
-<h3>型</h3>
+<p><code>maybe _ f (Just x) = f x<br/>
+maybe d _ _ = d</code></p>
 
-<p><code>maybe :: b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b</code></p>
+<h3>型</h3>
 
 <p>
 第2引数はMaybe型のなかみの型aの値を型bの値に変換する関数だ。
 デフォルト値の型は変換後の値の型と同じ型bだ。返り値も型bだ。
 </p>
+
+<p><code>maybe :: b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b</code></p>
 
 <h2>まとめ</h2>
 

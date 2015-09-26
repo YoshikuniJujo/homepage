@@ -4,6 +4,8 @@
 
 <h3>動作</h3>
 
+<p>関数idは引数と同じ値を返す。</p>
+
 <pre><code>% ghci
 Prelude&gt; id 8
 8
@@ -18,7 +20,7 @@ alt="[関数idの図]"
 src="/computer/haskell/web_lecture/for_programmer/images/function_id.svg"
 />
 
-<p>関数idは引数と同じ値を返す。すべての型の値で「同じ値を返す」ことはできる。</p>
+<p>どんな型の値でも「同じ値を返す」ことはできる。つまり関数idは多相関数だ。</p>
 
 <h3>定義</h3>
 
@@ -51,7 +53,7 @@ href="/computer/haskell/web_lecture/for_programmer/05_polymorphic/id.hs"
 devide 0 = id<br/>
 devide a = (/ a)</code></p>
 
-<p>仮引数を減らすことでより直接的に表現できる。</p>
+<p>仮引数を減らすとより直接的な表現になる。</p>
 
 <p><code>% ghci id.hs<br/>
 *Main&gt; devide 6 9<br/>
@@ -61,22 +63,22 @@ devide a = (/ a)</code></p>
 
 <h3>型</h3>
 
-<p>関数idをInteger型の値8に適用した(id 8)ときの型を示す。</p>
+<p>関数idをInteger型の値8に適用した(id 8)ときの型は</p>
 
 <p><code>id :: Integer -&gt; Integer</code></p>
 
-<p>文字列"hello"に適用した(id "hello")ときは以下のようになる。</p>
+<p>となる。文字列"hello"に適用した(id "hello")ときは</p>
 
 <p><code>id :: String -&gt; String</code></p>
 
 <p>
-[型X] -&gt; [型X]の形だ。引数と返り値の型が同じであれば良い。
-型変数で表現する。型変数は小文字で始まる識別子で多くは小文字1文字だ。
+となる。
+[型X] -&gt; [型X]の形だ。引数と返り値の型が同じなら良い。
+型変数で表現する。型変数は小文字で始まる識別子で小文字1文字を使うことが多い。
+型aの値を取って同じ型aの値を返す。
 </p>
 
 <p><code>id :: a -&gt; a</code></p>
-
-<p>型aの値を取って同じ型aの値を返す。</p>
 
 <p><code>% ghci<br/>
 Prelude&gt; :t id<br/>
