@@ -80,7 +80,7 @@ xが条件を満たすならtsに追加しそうでないならesに追加する
 <h3>関数foldr</h3>
 
 <p><code>partitionF p = foldr<br/>
-	<span class="indent1">(\x (ts, es) -&gt; if p x then (x : ts, es) else (ts, x : es)</span><br/>
+	<span class="indent1">(\x (ts, es) -&gt; if p x then (x : ts, es) else (ts, x : es))</span><br/>
 	<span class="indent1">([], [])</span></code></p>
 
 <p>

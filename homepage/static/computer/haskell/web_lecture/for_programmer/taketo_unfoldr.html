@@ -44,7 +44,7 @@ xを追加した値を返す。
 
 <p><code>import Data.List</code></p>
 
-<p><code>takeTo = unfoldr $ \s -&gt; case s of<br/>
+<p><code>takeTo p = unfoldr $ \s -&gt; case s of<br/>
 	<span class="indent1">[] -&gt; Nothing</span><br/>
 	<span class="indent1">x : xs</span>
 		<span style="padding-left: 0.5em">| p x -&gt; Just (x, [])</span><br/>
