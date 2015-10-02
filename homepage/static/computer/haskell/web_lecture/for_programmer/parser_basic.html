@@ -2,53 +2,49 @@
 
 <h2>用意</h2>
 
-<p>モジュールData.Char、Data.Maybeの関数を使うのでファイルの先頭に</p>
+<p>モジュールData.Char、Data.Maybeを使う。ファイルの先頭に</p>
 
 <p><code>import Data.Maybe<br/>
 import Data.Char</code></p>
 
-<p>としておこう。</p>
+<p>を書く。</p>
 
 <h2>型</h2>
 
 <p>
-パーサの型を考えてみよう。
-字句解析は行わず直接構文解析してしまうことにする。
-すると引き数はStringで良いだろう。
-返り値は何になるかは用途次第なので
+パーサの型はどうなるだろうか。
+字句解析はせずに直接構文解析してしまう。
+引き数はStringだ。
+返り値は何かは決まらないので
 </p>
 
 <p><code>String -&gt; a</code></p>
 
 <p>
-がまず考えられる。
-これから考えていく例ではパーサ同士を結合して新たなパーサを作れるようにする。
-そのためには「パースした残りの文字列」が必要になる。
+が考えられる。
+パーサ同士を結合して新たなパーサを作るために「パースした残りの文字列」が必要だ。
 </p>
 
 <p><code>String -&gt; (a, String)</code></p>
 
-<p>複数のパース候補が必要になるので結果はリストにする。</p>
+<p>パース候補は複数あるので結果はリストだ。</p>
 
 <p><code>String -&gt; [(a, String)]</code></p>
 
-<p>これをParse型として名前をつけておく。</p>
+<p>名前をつけておく。</p>
 
 <p><code>type Parse a = String -&gt; [(a, String)]</code></p>
 
 <h2>いつも成功</h2>
 
-<p>
-文字列を消費せずにいつも成功し指定した値を返す関数を作る。
-何に必要なのかはすぐにわかる。
-</p>
+<p>文字を消費せずにいつも成功し指定した値を返す関数を作る。</p>
 
 <p><code>succeed :: a -&gt; Parse a<br/>
 succeed v i = [(v, i)]</code></p>
 
 <p>
 第1引数で指定した値vが返り文字列はそのまま次のパーサに渡す。
-この場合、ただひとつのパースの結果のみなので単一要素のリストとなる。
+パースの結果はひとつなので単一要素のリストとなる。
 </p>
 
 <p><code>% ghci parse.hs<br/>
@@ -63,7 +59,7 @@ succeed v i = [(v, i)]</code></p>
 check p (c : cs) | p c = [(c, cs)]<br/>
 check _ _ = []</code></p>
 
-<p>文字列が空かまたは先頭の文字が条件を満たさなければパースは失敗する。</p>
+<p>文字列が空または先頭の文字が条件を満たさなければパースは失敗だ。</p>
 
 <p><code>*Main&gt; :reload<br/>
 *Main&gt; check isDigit "123"<br/>
@@ -71,7 +67,7 @@ check _ _ = []</code></p>
 *Main&gt; check isDigit "abc"<br/>
 []</code></p>
 
-<p>直接指定した1文字を読み込む関数も作っておく。</p>
+<p>指定した1文字を読み込む関数も作る。</p>
 
 <p><code>char :: Char -&gt; Parse Char<br/>
 char = check . (==)</code></p>
@@ -84,7 +80,7 @@ char = check . (==)</code></p>
 
 <h2>または</h2>
 
-<p>ふたつのパーサをとりそのどちらでも読み込めるようなパーサを作る。</p>
+<p>ふたつのパーサの結果を複数の選択肢とするパーサを作る関数だ。</p>
 
 <p><code>alt :: Parse a -&gt; Parse a -&gt; Parse a<br/>
 (p1 `alt` p2) i = p1 i ++ p2 i</code></p>
@@ -117,7 +113,7 @@ build p f i = [ (f x, r) | (x, r) &lt;- p i ]</code></p>
 *Main&gt; (char 'a' &gt;*&gt; check isDigit) "a123"<br/>
 [(('a','1'),"23")]</code></p>
 
-<p>前後どちらかの返り値をそれぞれ無視する関数も作成する。</p>
+<p>前後どちらかの返り値をそれぞれ無視する関数も作る。</p>
 
 <p><code>(&gt;*) :: Parser a -&gt; Parser b -&gt; Parser a<br/>
 p1 &gt;* p2 = (p1 &gt;*&gt; p2) `build` fst</code></p>
