@@ -102,18 +102,20 @@ takeTo p (x : xs)<br/>
 
 <p>これを使って次のように書き換えられる。</p>
 
-<p><code>takeTo p (x : xs) = fun x (takeTo p xs)</code></p>
+<p><code>takeTo p (x : xs) = fun x (takeTo p xs)<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">fun x lst = if p x then [x] else x : lst</span></code></p>
 
 <p>
 わかるだろうか。
 わかりにくければ一度展開してみると良い。
+関数funを演算子とすると
 </p>
-
-<p>演算子的な表記にする。</p>
 
 <p><code>takeTo p (x : xs) = x `fun` takeTo p xs</code></p>
 
 <p>
+となる。
 すると関数takeToは以下のように書ける。
 関数の枠組みがわかりやすいようにあえて丸括弧を明示してある。
 </p>
@@ -169,7 +171,7 @@ Control.Applicativeモジュールを使う。
 	. ((([id, const []] !!) . fromEnum) .)</code></p>
 
 <p>
-うわぁ、Haskell恐い。
+うわぁぁぁぁぁ、Haskell恐い。
 ポイントフリーはほどほどにしないと嫌われてしまう。
 </p>
 
@@ -186,14 +188,14 @@ Control.Applicativeモジュールを使う。
 
 <p>整数をとって整数のリストを返す。</p>
 
-<p><code>collatsInf :: Integer -&gt; [Integer]</code></p>
+<p><code>collatzInf :: Integer -&gt; [Integer]</code></p>
 
 <h3>次を求める</h3>
 
-<p>関数collatsNextは与えられた値から次の値を求める。</p>
+<p>関数collatzNextは与えられた値から次の値を求める。</p>
 
-<p><code>collatsNext :: Integer -&gt; Integer<br/>
-collatsNext n<br/>
+<p><code>collatzNext :: Integer -&gt; Integer<br/>
+collatzNext n<br/>
 	<span class="indent1">| even n = n `div` 2</span><br/>
 	<span class="indent1">| otherwise = n * 3 + 1</span></code></p>
 
@@ -206,7 +208,7 @@ collatsNext n<br/>
 
 <h3>再帰部</h3>
 
-<p><code>collatsInf n = n : collatsInf (collatzNext n)</code></p>
+<p><code>collatzInf n = n : collatzInf (collatzNext n)</code></p>
 
 <p>
 nから始まるコラッツ数列はnの次の値から始まるコラッツ数列の先頭にnを追加したものだ。
@@ -214,19 +216,19 @@ nから始まるコラッツ数列はnの次の値から始まるコラッツ数
 
 <h3>出来上がり</h3>
 
-<p><code>collatsNext :: Integer -&gt; Integer<br/>
-collatsNext n<br/>
+<p><code>collatzNext :: Integer -&gt; Integer<br/>
+collatzNext n<br/>
 	<span class="indent1">| even n = n `div` 2</span><br/>
 	<span class="indent1">| otherwise = n * 3 + 1</span></code></p>
 
-<p><code>collatsInf :: Integer -&gt; [Integer]<br/>
-collatsInf n = n : collatsInf (collatsNext n)</code></p>
+<p><code>collatzInf :: Integer -&gt; [Integer]<br/>
+collatzInf n = n : collatzInf (collatzNext n)</code></p>
 
 <h3>関数iterate</h3>
 
-<p>collatsInf nによって作られるリストは以下のようになる。</p>
+<p>collatzInf nによって作られるリストは以下のようになる。</p>
 
-<p><code>[n, collatsNext n, collatsNext (collatsNext n), ...]</code></p>
+<p><code>[n, collatzNext n, collatzNext (collatzNext n), ...]</code></p>
 
 <p>
 関数iterateはこのような形のリストを作成する関数だ。
@@ -235,36 +237,36 @@ iterate f nは以下のようなリストを作成する。
 
 <p><code>[n, f n, f (f n), f (f (f n)), f (f (f (f n))), ...]</code></p>
 
-<p>関数collatsInfは次のように書ける。</p>
+<p>関数collatzInfは次のように書ける。</p>
 
-<p><code>collatsInf = iterate collatsNext</code></p>
+<p><code>collatzInf = iterate collatzNext</code></p>
 
 <h3>展開する</h3>
 
-<p>collatsNextを展開しておく。</p>
+<p>collatzNextを展開しておく。</p>
 
-<p><code>collatsInf = iterate $ \n -&gt; if even n then n `div` 2 else n * 3 + 1</code></p>
+<p><code>collatzInf = iterate $ \n -&gt; if even n then n `div` 2 else n * 3 + 1</code></p>
 
 <h2>無限数列からコラッツ数列をとりだす</h2>
 
-<p><code>collats :: Integer -&gt; [Integer]<br/>
-collats = takeTo (== 1) . collatsInf</code></p>
+<p><code>collatz :: Integer -&gt; [Integer]<br/>
+collatz = takeTo (== 1) . collatzInf</code></p>
 
-<p>関数collatsInfで作成した無限数列から値1までをとりだしてた。</p>
+<p>関数collatzInfで作成した無限数列から値1までをとりだしてた。</p>
 
 <h2>出来上がり</h2>
 
 <p><code>takeTo :: (a -&gt; Bool) -&gt; [a] -&gt; [a]<br/>
 takeTo p = foldr (\x -&gt; (x :) . if p x then const [] else id) []</code></p>
 
-<p><code>collatsInf :: Integer -&gt; [Integer]<br/>
-collatsInf = iterate $ \n -&gt; if even n then n `div` 2 else n * 3 + 1</code></p>
+<p><code>collatzInf :: Integer -&gt; [Integer]<br/>
+collatzInf = iterate $ \n -&gt; if even n then n `div` 2 else n * 3 + 1</code></p>
 
-<p><code>collats :: Integer -&gt; [Integer]<br/>
-collats = takeTo (== 1) . collatsInf</code></p>
+<p><code>collatz :: Integer -&gt; [Integer]<br/>
+collatz = takeTo (== 1) . collatzInf</code></p>
 
 <p><code>*Main&gt; :reload<br/>
-*Main&gt; collats 11<br/>
+*Main&gt; collatz 11<br/>
 [11,34,17,52,26,13,40,20,10,5,16,8,4,2,1]</code></p>
 
 <h2>まとめ</h2>
