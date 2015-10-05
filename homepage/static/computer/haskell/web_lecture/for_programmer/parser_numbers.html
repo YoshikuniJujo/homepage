@@ -2,15 +2,17 @@
 
 <h2>数のパース</h2>
 
+<p>
+check isDigitは数字1文字をパースする。
+list1で数字1文字以上の文字列をパースし結果をreadで数に変換する。
+</p>
+
 <p><code>number :: Parse Integer<br/>
 number = list1 (check isDigit) `build` read</code></p>
 
-<p>
-check isDigitは数字の1文字をパースする。
-list1で数字1文字以上のリストつまり数字のみを含む文字列をパースし
-結果をreadで数に変換する。
-関数readは部分関数であり使うのに注意が必要だが、
-今回は引数となる文字列は数字のみを含むことが保証されているので問題なく使える。
+</p>
+関数readは部分関数だ。使うのに注意が必要だ。
+今回は引数となる文字列は数字のみを含むことが保証されているので問題ない。
 </p>
 
 <p><code>*Main&gt; :reload<br/>
@@ -30,15 +32,12 @@ Maybe値として(listToMaybe)表示した。
 
 <h2>関数parse</h2>
 
-<p>
-最終的な結果をMaybe値として返す。
-対話環境で行った変換を関数としてとりだせば良い。
-</p>
+<p>結果をMaybe値としてとりだす。対話環境で行った変換を関数にする。</p>
 
 <p><code>parse :: Parse a -&gt; String -&gt; Maybe a<br/>
 parse p = listToMaybe . map fst . (p &gt;* eof)</code></p>
 
-<p>このままでも良いのだが仮引数pは消せる。</p>
+<p>仮引数pは消せる。</p>
 
 <p><code>parse p = ((listToMaybe . map fst) .) $ p &gt;* eof</code></p>
 
@@ -51,8 +50,15 @@ Just 4492</code></p>
 
 <h2>空白区切りの数値のリスト</h2>
 
+<p>1文字以上の空白文字をパースする。</p>
+
 <p><code>spaces1 :: Parse ()<br/>
 spaces1 = list1 (check isSpace) `build` const ()</code></p>
+
+<p>
+数をパースしたあとに「複数の空白文字と数字」のリストをパースする。
+`build`以下は(x, xs)の形のタプルをx : xsの形のリストにする。
+</p>
 
 <p><code>numbers :: Parse [Integer]<br/>
 numbers = (number &gt;*&gt; list (spaces1 *&gt; number)) `build` uncurry (:)</code></p>
@@ -63,11 +69,17 @@ Just [123,456,789]</code></p>
 
 <h2>コンマ区切りの数値のリスト</h2>
 
+<p>コンマ区切りのリストでは空白文字はオプションなので0個以上とする。</p>
+
 <p><code>spaces :: Parse ()<br/>
 spaces = list (check isSpace) `build` const ()</code></p>
 
+<p>コンマの前後にオプションの複数の空白文字をいれる。</p>
+
 <p><code>comma :: Parse ()<br/>
 comma = (spaces &gt;*&gt; char ',' &gt;*&gt; spaces) `build` const ()</code></p>
+
+<p>数のあとに「コンマと数字」のリストを続ける。</p>
 
 <p><code>cnumbers :: Parse [Integer]<br/>
 cnumbers = (number &gt;*&gt; list (comma *&gt; number)) `build` uncurry (:)</code></p>
@@ -78,10 +90,7 @@ Just [89,95,21,3]</code></p>
 
 <h2>まとめ</h2>
 
-<p>
-数のリストのパースを見た。
-基本的な部品をうまく作ることでわかりやすく表現することができる。
-</p>
+<p>数のリストのパースを見た。基本的な部品を組み合わせた。</p>
 
 <a href="/computer/haskell/web_lecture/for_programmer/parser_list.html"
 	>「リストのパーサ」へもどる</a>
