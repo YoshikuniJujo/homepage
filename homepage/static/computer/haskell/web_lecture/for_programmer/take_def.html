@@ -27,6 +27,11 @@ takeRaw _ _ = []</code></p>
 
 <h3>関数unfoldr</h3>
 
+<p><small>メモ: 関数curryとunfoldrを組み合わせる部分に説明を追加する</small></p>
+
+<p><small>全体に関するメモ: 「定石」や「慣用句」についての独立した説明を追加する。
+たとえば(f .) . gのような表現やuncurryを使った書きかたの練習等を追加したい。</small></p>
+
 <p><code>takeU = curry . unfoldr $ \nl -&gt; case nl of<br/>
 	<span class="indent1">(n, x : xs) | n &gt; 0 -&gt; Just (x, (n - 1, xs))</span><br/>
 	<span class="indent1">_ -&gt; Nothing</span></code></p>

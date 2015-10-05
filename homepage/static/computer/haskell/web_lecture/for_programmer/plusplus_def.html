@@ -47,7 +47,7 @@ foldrが(:)と[]を置き換える関数であることを思い出そう。
 
 <p><code>(.++..) = curry . unfoldr $ \xys -&gt; case xys of<br/>
 	<span class="indent1">(x : xs, ys) -&gt; Just (x, (xs, ys))</span><br/>
-	<span class="indent1">(_, y : ys) -&gt; Just (y, [], ys))</span><br/>
+	<span class="indent1">(_, y : ys) -&gt; Just (y, ([], ys))</span><br/>
 	<span class="indent1">_ -&gt; Nothing</span></code></p>
 
 <p>
