@@ -2,6 +2,31 @@
 
 <p>(工事中 0%)</p>
 
+<h2>表計算ソフトのセル</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/cells.hs"
+	>cells.hs</a></p>
+
+<p>表計算ソフトにはVisiCalc、Lotus 1-2-3、KSpreadなどがある。</p>
+
+<p><a href="https://ja.wikipedia.org/wiki/表計算ソフト"
+	>ウィキペディア: 表計算ソフト</a></p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/images/mkCells.html"
+	><img
+	src="/computer/haskell/web_lecture/for_programmer/images/cells.png"
+	alt="[KSpreadのスクリーンショット]" /></a></p>
+
+<p>それぞれのセルは英字1文字と整数値で表されるものとする。</p>
+
+<p><code>data Cell = Cell Char Int deriving Show</code></p>
+
+<p><code>% ghci cells.hs<br/>
+*Main&gt; Cell 'B' 3<br/>
+Cell 'B' 3<br/>
+*Main&gt; Cell 'A' 7<br/>
+Cell 'A' 7</code></p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/point_is_point.html"
 	>「点は点だ」へもどる</a>
