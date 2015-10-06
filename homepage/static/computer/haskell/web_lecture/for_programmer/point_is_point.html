@@ -1,10 +1,73 @@
 点は点だ
 
-<p>(工事中 0%)</p>
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/cpd2.hs"
+	>cpd2.hs</a></p>
+
+<h2>はじめに</h2>
+
+<p>
+直交座標と極座標のどちらで表現しても点は点だ。
+同じ平面上にプロットすることもできる。
+</p>
+
+<h2>まとめてしまおう</h2>
+
+<p>直交座標と極座標のどちらの表現も可能な点の型は</p>
+
+<p><code>data Point = Cartesian Double Double | Polar Double Double<br/>
+	<span class="indent1">deriving Show</span></code></p>
+
+<p>となる。</p>
+
+<h2>n倍する</h2>
+
+<p>パターンマッチでそれぞれの値構築子用の計算を行う。</p>
+
+<p><code>mul :: Point -&gt; Double -&gt; Point<br/>
+mul (Cartesian x y) n = Cartesian (x * n) (y * n)<br/>
+mul (Polar d r) n = Polar (d * n) r</code></p>
+
+<h2>例</h2>
+
+<p><code>point1, point2 :: Point<br/>
+point1 = Cartesian 8 5<br/>
+point2 = Polar 6 (pi / 3)</code></p>
+
+<p><code>% ghci cpd2.hs<br/>
+*Main&gt; mul point1<br/>
+Cartesian 24.0 15.0<br/>
+*Main&gt; mul point2<br/>
+Polar 6.0 1.0471975511965976</code></p>
+
+<p>直交座標か極座標かを気にすることなくn倍できる。</p>
+
+<h2>構文</h2>
+
+<p><code>data [型名] = [型構築子1] [型1-1] [型1-2] ... | [型構築子2] [型2-1] [型2-2] ... | ...</code></p>
+
+<h2>列挙型との関係</h2>
+
+<p>トランプのスートの定義は</p>
+
+<p><code>data Suit = Spade | Heart | Diamond | Club</code></p>
+
+<p>
+だった。これは型構築子のとる引数の数が0であるということだ。
+data構文は列挙型、構造体、共用体の機能を美しく融合させたものになっている。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+代数的データ型は新しい型を作る。
+新しい型を作るのに複数の型をひとつにまとめたり
+複数の型の組のどれかを選んだりすることができる。
+同じ枠組みで列挙も実現している。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/cartesian_polar.html"
 	>「直交座標と極座標」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/value_const_as_fun.html"
+	>「関数としての値構築子」へ</a>
 </p>
