@@ -1,16 +1,211 @@
 直交座標と極座標
 
-<p>(工事中 0%)</p>
+<h2>直交座標と極座標</h2>
+
+<p>
+平面上の点は横と縦の位置で決まる。
+直交座標(XY座標)上で点はX座標上の位置xとY座標上の位置yとで(x, y)と表せる。
+「南から3番目の道路と西から5番目の道路が交差するところ」
+のような言いかたが直交座標の考えかただ。
+</p>
+
+<p>
+極座標上では点は原点からの距離dとX軸からの角度rで(d, r)のように表せる。
+これは指でさしながら「こっちの方向に100m行ったところ」
+のように示すということだ。
+</p>
 
 <h2>型シノニム</h2>
 
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/cpt.hs"
+	>cpt.hs</a></p>
+
+<h3>直交座標</h3>
+
+<h4>型</h4>
+
+<p>
+直交座標による点の表現はx, yのそれぞれの値を表す実数値の組となる。型シノニムで
+</p>
+
+<p><code>type Cartesian = (Double, Double)</code></p>
+
+<p>とする。</p>
+
+<h4>n倍する</h4>
+
+<p>
+原点とその点を通る線上にあり原点からの距離が同じ向きでn倍となるような点を求める。
+</p>
+
+<p>[ここに点(8, 5)を3倍にする図を入れる]</p>
+
+<p>x, yのそれぞれをn倍すれば良いので</p>
+
+<p><code>mulC :: Cartesian -&gt; Double -&gt; Cartesian<br/>
+mulC (x, y) n = (x * n, y * n)</code></p>
+
+<p>となる。</p>
+
+<h4>例</h4>
+
+<p>例として</p>
+
+<p><code>point1 :: Cartesian<br/>
+point1 = (8, 5)</code></p>
+
+<p>を定義しておく。</p>
+
+<p><code>% ghci cpt.hs<br/>
+*Main&gt; mulC point1 3<br/>
+(24.0,15.0)</code></p>
+
+<h3>極座標</h3>
+
+<h4>型</h4>
+
+<p>
+原点からの距離dとX座標からの角度(ラジアン値)rで(d, r)のように表せる。型シノニムで
+</p>
+
+<p><code>type Polar = (Double, Double)</code></p>
+
+<p>とする。</p>
+
+<h4>n倍する</h4>
+
+<p>
+原点とその点を通る線上にあり原点からの距離が同じ向きでn倍となるような点を求める。
+</p>
+
+<p>[ここに点(6, pi / 3)を3倍にする図を入れる]</p>
+
+<p>原点からの距離だけn倍すれば良い。</p>
+
+<p><code>mulP (d, r) n = (d * n, r)</code></p>
+
+<h4>例</h4>
+
+<p><code>point2 :: Polar<br/>
+point2 = (6, pi / 3)</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; mulP point2 3<br/>
+(18,1.0471975511965976)</code></p>
+
+<h3>どっちがどっち</h3>
+
+<p>point1にmulPをpoint2にmulCを適用する。</p>
+
+<p><code>*Main&gt; mulP point1 3<br/>
+(24.0,5.0)<br/>
+*Main&gt; mulC point2 3<br/>
+(18.0,3.141592653589793)</code></p>
+
+<p>
+何事もなかったかのように誤った計算が続いていく。
+「見た目上問題ない」-&gt;「突然の死」-&gt;「徹夜」コース。
+</p>
+
 <h2>代数的データ型</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/cpd.hs"
+	>cpd.hs</a></p>
+
+<h3>はじめに</h3>
+
+<p>
+見えないところに潜伏するバグ、ほら、あなたの背後にも。
+暑い夏に背筋が寒くなる体験を求めているのでなければ
+代数的データ型を使って型による静的チェックの恩恵を受けよう。
+「正しくないとコンパイラが通らない」ということ。
+PerlやRubyでは味わえない安心感を手にいれよう。
+</p>
+
+<h3>直交座標</h3>
+
+<h4>型</h4>
+
+<p>代数的データ型では</p>
+
+<p><code>data Cartesian = Cartesian Double Double deriving Show</code></p>
+
+<p>となる。対話環境で表示できるようにderiving Showをつける。</p>
+
+<h4>n倍する</h4>
+
+<p>値構築子Cartesianでパターンマッチする。</p>
+
+<p><code>mulC :: Cartesian -&gt; Double -&gt; Cartesian<br/>
+mulC (Cartesian x y) n = Cartesian (x * n) (y * n)</code></p>
+
+<h4>例</h4>
+
+<p><code>point1 :: Cartesian<br/>
+point1 = Cartesian 8 5</code></p>
+
+<p><code>*Main&gt; :load cpd.hs<br/>
+*Main&gt; mulC point1 3<br/>
+Cartesian 24.0 15.0</code></p>
+
+<h3>極座標</h3>
+
+<h4>型</h4>
+
+<p>代数的データ型で</p>
+
+<p><code>data Polar = Polar Double Double deriving Show</code></p>
+
+<p>とする。</p>
+
+<h4>n倍する</h4>
+
+<p>値構築子Polarでパターンマッチする。</p>
+
+<p><code>mulP :: Polar -&gt; Double -&gt; Polar<br/>
+mulP (Polar d r) n = Polar (d * n) r</code></p>
+
+<h4>例</h4>
+
+<p><code>point2 :: Polar<br/>
+point2 = Polar 6 (pi / 3)</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; mulP point2 3<br/>
+Polar 18.0 1.0471975511965976</code></p>
+
+<h3>どっちがどっち</h3>
+
+<p>point1をmulPで3倍にしpoint2をmulCで3倍にする。</p>
+
+<p><code>*Main&gt; mulP point1</code></p>
+
+<p><code>&lt;interactive&gt;:X:Y:<br/>
+<span style="padding-left: 2em">Couldn't match expected type Polar
+	with actual type Cartesian</span><br/>
+<span style="padding-left: 2em">In the first argument of mulP,
+	namely point1</span><br/>
+<span style="padding-left: 2em">In the expression: mulP point1</span><br/>
+*Main&gt; mulC point2</code></p>
+
+<p><code>&lt;interactive&gt;:X:Y:<br/>
+<span style="padding-left: 2em">Couldn't match expected type Cartesian
+	with actual type Polar</span><br/>
+<span style="padding-left: 2em">In the first argument of mulC,
+	namely point2</span><br/>
+<span style="padding-left: 2em">In the expression: mulC point2</span></code></p>
+
+<p>「型が違う」と怒られる。</p>
 
 <h2>まとめ</h2>
 
 <p>
+「人間と商品」と同じことを「直交座標と極座標」で復習した。
+</p>
+
+<p>
 <a href="/computer/haskell/web_lecture/for_programmer/men_and_items.html"
 	>「人間と商品」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/point_is_point.html"
+	>「点は点だ」へ</a>
 </p>
