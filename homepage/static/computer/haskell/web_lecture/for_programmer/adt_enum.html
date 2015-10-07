@@ -61,11 +61,19 @@
 
 <p>4種類の値Spade、Heart、Diamond、Clubを持つ型Suitを定義した。</p>
 
+<p><code>% ghci suit.hs<br/>
+*Main&gt; :t Spade<br/>
+Spade :: Suit</code></p>
+
 <h3>色</h3>
 
 <p>型Colorを定義する。黒と赤の二色だ。</p>
 
 <p><code>data Color = Black | Red</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; :t Black<br/>
+Black :: Color</code></p>
 
 <h2>関数の型</h2>
 
