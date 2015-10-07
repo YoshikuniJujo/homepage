@@ -1,10 +1,124 @@
 多相型
 
-<p>(工事中 0%)</p>
+<h2>型引数</h2>
+
+<p>
+代数的データ型の定義には型引数を使うことができる。
+型引数を使ったデータ型はコンテナと考えられる。
+</p>
+
+<h2>同じ型の値ふたつ</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/twice.hs"
+	>twice.hs</a></p>
+
+<h3>定義</h3>
+
+<p>同じ型の値をふたつ保存する型を作る。</p>
+
+<p><code>data Twice a = Twice a a deriving Show</code></p>
+
+<p>これは複数の型を同時に定義したと考えられる。</p>
+
+<ul>
+<li>data Twice Int = Twice Int Int</li>
+<li>data Twice Char = Twice Char Char</li>
+<li>data Twice Bool = Twice Bool Bool</li>
+<li>data Twice [Int] = Twice [Int] [Int]</li>
+<li>data Twice (Char -&gt; Bool) = Twice (Char -&gt; Bool) (Char -&gt; Bool)</li>
+<li>...</li>
+</ul>
+
+<p><code>% ghci twice.hs<br/>
+*Main&gt; Twice 3 8<br/>
+Twice 3 8<br/>
+*Main&gt; Twice 'a' 'b'<br/>
+Twice 'a' 'b'<br/>
+*Main&gt; Twice True False<br/>
+Twice True False<br/>
+*Main&gt; :t Twice True False<br/>
+Twice True False :: Twice Bool<br/>
+*Main&gt; Twice False 'a'<br/>
+</code></p>
+
+<p><code>&lt;interactive&gt;:X:Y:<br/>
+<span style="padding-left: 2em">Couldn't match expected type `Bool' with
+	actual type `Char'</span><br/>
+<span style="padding-left: 2em">In the second argument of `Twice',
+	namely `'a''</span><br/>
+<span style="padding-left: 2em">In the expression: Twice False 'a'</span><br/>
+<span style="padding-left: 2em">In an equation for `it':
+	it = Twice False 'a'</span></code></p>
+
+<p>
+Twiceが存在する2つの値の型は同じ型変数aで宣言されている。
+同じ型でなければならない。
+</p>
+
+<h3>関数</h3>
+
+<p>型Twiceの2つの型に対して同じ値を適用する。</p>
+
+<p><code>mapTwice :: (a -&gt; b) -&gt; Twice a -&gt; Twice b<br/>
+mapTwice f (Twice x y) = Twice (f x) (f y)</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; mapTwice even $ Twice 8 11<br/>
+Twice True False<br/>
+*Main&gt; :m + Data.Char<br/>
+*Main Data.Char&gt; mapTwice ord $ Twice 'a' 'd'<br/>
+Twice 97 100</code></p>
+
+<h2>オプション</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/option.hs"
+	>option.hs</a></p>
+
+<p>
+a型の値に場合によってはb型の値がオプションとしてつく型を考える。
+名前と、もしわかれば年齢、を保存するような場合に使える。
+</p>
+
+<h3>定義</h3>
+
+<p><code>data Option a b = Single a | Option a b deriving Show</code></p>
+
+<p><code>% ghci option.hs<br/>
+*Main&gt; Single "Yoshio"<br/>
+Single "Yoshio"<br/>
+*Main&gt; Option "Yoshio" 39<br/>
+Option "Yoshio" 39</code></p>
+
+<h3>関数</h3>
+
+<p>この型の値から人を表現する文字列を作る。</p>
+
+<p><code>human :: Option String Int -&gt; String<br/>
+human (Single n) = n<br/>
+human (Option n a) = n ++ " (" ++ show a ++ ")"</code></p>
+
+<p><code>*Main&gt; human $ Single "Yoshio"<br/>
+"Yoshio"<br/>
+*Main&gt; human $ Option "Yoshio" 39<br/>
+"Yoshio (39)"</code></p>
+
+<h2>構文</h2>
+
+<p><code>[型構築子] [型引数1] [型引数2] ...<br/>
+	<span class="indent1">= [値構築子1] [型1-1] [型1-2] ...</span><br/>
+	<span class="indent1">| [値構築子2] [型2-1] [型2-2] ...</span><br/>
+	<span class="indent1">| ...</span></code></p>
+
+<h2>まとめ</h2>
+
+<p>
+代数的データ型は型変数を引数としてとることができる。
+型引数をとる型の多くはコンテナとみなすことができる。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/value_const_operator.html"
 	>「値構築演算子」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/tuple_def.html"
+	>「タプル」へ</a>
 </p>
