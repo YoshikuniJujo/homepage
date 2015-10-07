@@ -1,10 +1,131 @@
 値構築演算子
 
-<p>(工事中 0%)</p>
+<h2>はじめに</h2>
+
+<p>
+値構築子は特殊な関数だ。
+前置記法である関数に対して中置記法の演算子がある。
+同じように値構築子に対しても値構築演算子がある。
+</p>
+
+<h2>レクリエーション</h2>
+
+<p>
+ある幼稚園でレクリエーションをする。
+用意するものは赤、青、黄色の帽子だ。
+子供達は3色の帽子をわたされ、それぞれ好きな色の帽子をかぶる。
+そして、保母さんの指示にしたがって帽子を変える。
+指示は「今かぶっている帽子の色」と「次にかぶる帽子の色」から成る。
+たとえば「黄色の帽子をかぶっている子は青の帽子をかぶってください」と指示する。
+</p>
+
+<h2>実装</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/recreation.hs"
+	>recreation.hs</a></p>
+
+<h3>色つきの帽子</h3>
+
+<p>色つきの帽子を表す型を作る。</p>
+
+<p><code>data Cap = Red | Blue | Yellow deriving Show</code></p>
+
+<p><code>% ghci recreation.hs<br/>
+*Main&gt; Red<br/>
+Red<br/>
+*Main&gt; :t Red<br/>
+Red :: Cap</code></p>
+
+<h3>指示</h3>
+
+<p>指示を表す型を作る。</p>
+
+<p><code>data Order = Change Cap Cap deriving Show</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; Change Red Blue<br/>
+Change Red Blue<br/>
+*Main&gt; :t Change Red Blue<br/>
+Change Red Blue :: Order</code></p>
+
+<h3>レクリエーション関数</h3>
+
+<p><code>recreation :: Cap -&gt; [Order] -&gt; Cap<br/>
+recreation c [] = c<br/>
+recreation Red (Change Red c : os) = recreation c os<br/>
+recreation Blue (Change Blue c : os) = recreation c os<br/>
+recreation Yellow (Change Yellow c : os) = recreation c os<br/>
+recreation c (_ : os) = recreation c os</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; recreation Blue [Change Red Blue, Change Blue Red, Change Yellow Red, Change Red Yellow]<br/>
+Yellow</code></p>
+
+<h2>値構築演算子を使う</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/recreationOp.hs"
+	>recreationOp.hs</a></p>
+
+<p>
+関数には小文字で始まる識別子を使う。値構築子には大文字で始まる識別子を使う。
+演算子は:以外で始まる記号列を使う。値構築演算子には:で始まる記号列を使う。
+</p>
+
+<h3>指示</h3>
+
+<p>値構築演算子を使う。</p>
+
+<p><code>data Order = Cap :-&gt; Cap deriving Show</code></p>
+
+<h3>レクリエーション関数</h3>
+
+<p><code>recreation :: Cap -&gt; [Order] -&gt; Cap<br/>
+recreation c [] = c<br/>
+recreation Red (Red :-&gt; c : os) = recreation c os<br/>
+recreation Blue (Blue :-&gt; c : os) = recreation c os<br/>
+recreation Yellow (Yellow :-&gt; c : os) = recreation c os<br/>
+recreation c (_ : os) = recreation c os</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; recreation Blue [Red :-&gt; Blue, Blue :-&gt; Red, Change Yellow :-&gt; Red, Red :-&gt; Yellow]<br/>
+Yellow</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+関数に対して演算子があるように値構築子に対しては値構築演算子がある。
+値構築演算子は:から始まる記号列だ。
+値構築演算子を使うことでコードがわかりやすくなることがある。
+</p>
+
+<!--
+<h2>メモ</h2>
+
+<p>
+メモ: A :-&gt; Bのような値を使うダイクストラ法あたりが良さそうか。
+ダイクストラ法だと重みも必要になるので微妙かな。
+(A :-&gt; B, 3)のような感じもありかとは思うけど。
+むしろ幅優先探索の例のほうが良さそうだ。
+ひとつややこしいのはループを消すあたりか。
+履歴を保存しておいてそこに含まれるノードには行かないようにする、か。
+深さ優先探索のほうが簡単かな。
+これだとderiving Eqをさきに学ぶ必要がある。
+</p>
+
+<p>
+メモ:
+キャラクターの移動のエミュレーションを行う関数あたりか。
+いやこれもEqが必要だ。
+「場所」を3つにしてしまえば良い気がする。
+3つであることの必然性が欲しいな。
+何か「運ぶ」キャラクターを設定するか。
+3色の帽子を使ったレクリエーションとしようかな。
+</p>
+-->
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/value_const_as_fun.html"
 	>「関数としての値構築子」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/polymorphic_type.html"
+	>「多相型」へ</a>
 </p>
