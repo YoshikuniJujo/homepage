@@ -1,4 +1,5 @@
 .*.swp
 /homepage/log/access.log
+/homepage/log/access.log.old
 /homepage/tmp/
 /homepage/static/tmp/
