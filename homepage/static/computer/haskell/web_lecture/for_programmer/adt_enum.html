@@ -63,7 +63,21 @@
 
 <p><code>% ghci suit.hs<br/>
 *Main&gt; :t Spade<br/>
-Spade :: Suit</code></p>
+Spade :: Suit<br/>
+*Main&gt; Spade</code></p>
+
+<p><code>&lt;interactive&gt;:X:Y:<br/>
+<span style="padding-left: 2em">No instance for (Show Suit) arising from a use of
+`print'</span><br/>
+<span style="padding-left: 2em">Possible fix: add an instance declaration for (Show Suit)</span><br/>
+<span style="padding-left: 2em">In a stmt of an interactive GHCi command: print it</span>
+</code></p>
+
+<p>
+「型Suitは型クラスShowのインスタンスじゃないよ」と怒られた。
+対話環境で自作の型を簡単に表示する方法はあとで学ぶ。
+型を作っただけでは対話環境では表示できないことだけを覚えておく。
+</p>
 
 <h3>色</h3>
 

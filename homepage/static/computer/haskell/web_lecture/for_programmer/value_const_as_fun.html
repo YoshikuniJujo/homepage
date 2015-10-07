@@ -1,13 +1,11 @@
 関数としての値構築子
 
-<p>(工事中 0%)</p>
-
-<h2>表計算ソフトのセル</h2>
+<h2>値構築子の例</h2>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/cells.hs"
 	>cells.hs</a></p>
 
-<p>表計算ソフトにはVisiCalc、Lotus 1-2-3、KSpreadなどがある。</p>
+<p>VisiCalc、Lotus 1-2-3、KSpreadなどの表計算ソフトでは</p>
 
 <p><a href="https://ja.wikipedia.org/wiki/表計算ソフト"
 	>ウィキペディア: 表計算ソフト</a></p>
@@ -17,7 +15,10 @@
 	src="/computer/haskell/web_lecture/for_programmer/images/cells.png"
 	alt="[KSpreadのスクリーンショット]" /></a></p>
 
-<p>それぞれのセルは英字1文字と整数値で表されるものとする。</p>
+<p>
+セルをアルファベットと数字で表現する。
+実際には複数のアルファベットが使われるがここではアルファベット1文字で表現する。
+</p>
 
 <p><code>data Cell = Cell Char Int deriving Show</code></p>
 
@@ -25,7 +26,64 @@
 *Main&gt; Cell 'B' 3<br/>
 Cell 'B' 3<br/>
 *Main&gt; Cell 'A' 7<br/>
-Cell 'A' 7</code></p>
+Cell 'A' 7<br/>
+*Main&gt; :t Cell 'A' 7<br/>
+Cell 'A' 7 :: Cell</code></p>
+
+<h2>値構築子Cellの型</h2>
+
+<p>
+Cell 'A' 7という表現は関数Cellに引数'A'と7を与えている。
+値構築子Cellは文字と整数値をとり型Cellの値を返す関数とみなせる。
+</p>
+
+<p><code>*Main&gt; :t Cell<br/>
+Char -&gt; Int -&gt; Cell</code></p>
+
+<p>Cellは普通の関数と同じように扱える。関数合成することもできる。</p>
+
+<p><code>*Main&gt; :m + Data.Char<br/>
+*Main Data.Char&gt; (Cell . toUpper) 'a' 3</code></p>
+
+<p>部分適用もできる。</p>
+
+<p><code>*Main Data.Char&gt; let cellA = Cell 'A'<br/>
+*Main Data.Char&gt; cellA 3<br/>
+Cell 'A' 3</code></p>
+
+<h2>値構築子はパターン構築子だ</h2>
+
+<p>値構築子はパターンも作る。</p>
+
+<p><code>column :: Cell -&gt; Char<br/>
+column (Cell c _) = c</code></p>
+
+<p><code>row :: Cell -&gt; Int<br/>
+row (Cell _ r) = r</code></p>
+
+<p><code>cell1 :: Cell<br/>
+cell1 = Cell 'A' 8</code></p>
+
+<p><code>*Main Data.Char&gt; :reload<br/>
+*Main Data.Char&gt; column cell1<br/>
+'A'<br/>
+*Main Data.Char&gt; row cell1<br/>
+8</code></p>
+
+<h2>値の作成と分解</h2>
+
+<p>
+値構築子は関数でもありパターン構築子でもある。
+関数としての値構築子はその型の値を作成する。
+パターン構築子としては値をその構成要素に分解する。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+値構築子は関数でもありパターン構築子でもある。
+値を作成したり分解したりすることができる。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/point_is_point.html"
