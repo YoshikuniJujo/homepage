@@ -69,6 +69,39 @@ Twice True False<br/>
 *Main Data.Char&gt; mapTwice ord $ Twice 'a' 'd'<br/>
 Twice 97 100</code></p>
 
+<h2>同じ値の連続</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/rep.hs"
+	>rep.hs</a></p>
+
+<h3>定義</h3>
+
+<p>同じ値が何個も連続している値を意味する型を考える。</p>
+
+<p><code>data Rep a = Rep Int a deriving Show</code></p>
+
+<p>たとえば'a'が100個続いている値ならば</p>
+
+<p><code>*Main&gt; :load rep.hs<br/>
+*Main&gt; Rep 100 'a'<br/>
+Rep 100 'a'</code></p>
+
+<p>
+のようになる。
+すべて同じ値であることが保証されているならば、
+この型を使うことでリストを使うよりも空間効率が良くなる。
+</p>
+
+<h3>関数</h3>
+
+<p>この型をリストに変換する。</p>
+
+<p><code>toList :: Rep a -&gt; [a]<br/>
+toList (Rep n x) = replicate n x</code></p>
+
+<p><code>*Main&gt; toList $ Rep 50 'a'<br/>
+"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"</code></p>
+
 <h2>オプション</h2>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/option.hs"
@@ -83,7 +116,7 @@ a型の値に場合によってはb型の値がオプションとしてつく型
 
 <p><code>data Option a b = Single a | Option a b deriving Show</code></p>
 
-<p><code>% ghci option.hs<br/>
+<p><code>*Main&gt; :load option.hs<br/>
 *Main&gt; Single "Yoshio"<br/>
 Single "Yoshio"<br/>
 *Main&gt; Option "Yoshio" 39<br/>
