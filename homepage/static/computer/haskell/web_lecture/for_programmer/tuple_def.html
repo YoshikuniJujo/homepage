@@ -1,10 +1,61 @@
 タプルの定義
 
-<p>(工事中 0%)</p>
+<h2>はじめに</h2>
+
+<p>
+今までタプルは「与えられた型」として扱ってきた。
+構文糖などの表記に関してはそれは事実だ。
+しかし、中身に関して言うならば同等のものが代数的データ型の枠組みで実装できる。
+</p>
+
+<h2>タプル</h2>
+
+<p>タプルは以下のように定義されていると考えられる。</p>
+
+<p>data (,) a b = (,) a b deriving Show</p>
+
+<p>ただし使われている記号の問題でこれはHaskellとしては正しくない。</p>
+
+<h2>Tuple型</h2>
+
+<h3>定義</h3>
+
+<p>
+(,)の代わりに型構築子名、値構築子名として正当なTupleを使えば普通に定義できる。
+</p>
+
+<p>data Tuple a b = Tuple a b deriving Show</p>
+
+<h3>関数</h3>
+
+<p>関数fst, sndと同等な関数fstT, sndTを定義する。</p>
+
+<p><code>fstT :: Tuple a b -&gt; a<br/>
+fstT (Tuple x y) = x</code></p>
+
+<p><code>sndT :: Tuple a b -&gt; b<br/>
+sndT (Tuple x y) = y</code></p>
+
+<h2>タプルの構文糖</h2>
+
+<p>
+型構築子、値構築子の名前(,)が特殊であること以外は(,)とTupleとは同じだ。
+またデフォルトのタプルに対しては構文糖が用意してある。
+型宣言や値の記述の両方で以下のような脱糖が行われる。
+</p>
+
+<p></code>(a, b) ==&gt; (,) a b</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+代数的データ型は意味論レベルでは一般的なタプルを独自に定義するのに十分なだけ
+強力であることを示した。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/polymorphic_type.html"
 	>「多相型」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/maybe_def.html"
+	>「Maybe型」へ</a>
 </p>
