@@ -1,10 +1,45 @@
 Maybe型
 
-<p>(工事中 0%)</p>
+<h2>はじめに</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/maybe.hs"
+	>maybe.hs</a></p>
+
+<p>
+Maybe型は特別なところは何もない。Preludeで定義ずみの代数的データ型だ。
+</p>
+
+<h2>定義</h2>
+
+<p>Maybe'型を定義する。</p>
+
+<p><code>data Maybe' a = Just' a | Nothing' deriving Show</code></p>
+
+<h2>関数fromMaybe</h2>
+
+<p>新しく作った型で関数fromMaybeと同じ関数を定義する。</p>
+
+<p><code>fromMaybe' :: a -&gt; Maybe' a -&gt; a<br/>
+fromMaybe' _ (Just' x) = x<br/>
+fromMaybe' d _ = d</code></p>
+
+<h2>関数maybe</h2>
+
+<p>関数maybeについても同様に定義する。</p>
+
+<p><code>maybe' :: b -&gt; (a -&gt; b) -&gt; Maybe' a -&gt; b<br/>
+maybe' _ f (Just x) = f x<br/>
+maybe' d _ _ = d</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+Maybe型はPreludeで定義された単なる代数的データ型であることを示した。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/tuple_def.html"
 	>「タプル」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/either_def.html"
+	>「Either型」へ</a>
 </p>
