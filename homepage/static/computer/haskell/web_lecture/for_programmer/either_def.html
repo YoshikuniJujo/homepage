@@ -2,6 +2,120 @@ Either型
 
 <p>(工事中 0%)</p>
 
+<h2>はじめに</h2>
+
+<p>Either型はPreludeで定義されている。</p>
+
+<h2>どういう型か</h2>
+
+<p>
+Either型は型引数を2つとる。
+2つの型の値のどちらかを保持する値の型を作る。
+値構築子LeftとRightがありそれぞれの型の値を保持する。
+</p>
+
+<h2>使用例</h2>
+
+<h3>問題定義</h3>
+
+<p>
+あるサービスではユーザを特定するのに文字列または数値を使っているとする。
+たとえば以下のようになっているとする。
+</p>
+
+<ul>
+<li>yoshio: Yoshio Yamada</li>
+<li>yoshio2: Yoshio Yamada</li>
+<li>4492: Tatsuya Yamashiro</li>
+<li>keiko: Keiko Koike</li>
+<li>8855: Satoru Hananakajima</li>
+</ul>
+
+<p>
+このサービスには山田良男さんという同姓同名の人が2人いる。
+その2人と小池恵子さんのIDは文字列である。
+山背達也さんと花中島サトルさんはIDに数値が使われている。
+このようなときにEither型を使うことができる。
+IDから名前を検索する関数を作成する。
+</p>
+
+<h3>型</h3>
+
+<p>IDを表す型は</p>
+
+<p><code>Either Int String</code></p>
+
+<p>とし、IDと名前を対応づける辞書は</p>
+
+<p><code>[(Either Int String, String)]</code></p>
+
+<p>とする。Either Int Stringを毎回書くのも大変なので型シノニムを定義する。</p>
+
+<p><code>type Id = Either Int String</code></p>
+
+<p>すると辞書の型は</p>
+
+<p><code>[(Id, String)]</code></p>
+
+<p>となる。この辞書をIDで検索する関数の型は</p>
+
+<p><code>Id -&gt; [(Id, String)] -&gt; Maybe String</code></p>
+
+<p>となる。</p>
+
+<h3>関数</h3>
+
+<p>IDから名前を求めるには関数lookupが使える。</p>
+
+<p><code>name :: Id -&gt; [(Id, String)] -&gt; Maybe String<br/>
+name i t = lookup i t</code></p>
+
+<p>仮引数tが消せる。</p>
+
+<p><code>name i = lookup i</code></p>
+
+<p>仮引数iも消せる。結果として</p>
+
+<p><code>name :: Id -&gt; [(Id, String)] -&gt; Maybe String<br/>
+name = lookup</code></p>
+
+<p>
+となる。
+つまり関数nameは関数lookupである。
+ただし関数nameはlookupよりも型が限定されている。
+関数nameはlookupで完全に置き換えることができる。
+それでも関数nameを用意しておくことはインターフェースを明示するという意味で
+良いことだ。
+</p>
+
+<h3>例</h3>
+
+<p>上で挙げた例を辞書として定義しておく。</p>
+
+<p><code>users :: [(Id, String)]<br/>
+users = [<br/>
+	<span class="indent1">(Right "yoshio", "Yoshio Yamada")</span><br/>
+	<span class="indent1">(Right "yoshio2", "Yoshio Yamada")</span><br/>
+	<span class="indent1">(Left 4492, "Tatsuya Yamashiro")</span><br/>
+	<span class="indent1">(Right "keiko", "Keiko Koike")</span><br/>
+	<span class="indent1">(Left 8855, "Satoru Hananakajima") ]</span></code></p>
+
+<p><code>% ghci users.hs<br/>
+*Main&gt; name (Right "yoshio") users<br/>
+"Yoshio Yamada"<br/>
+*Main&gt; name (Left 4492) users<br/>
+"Tatsuya Yamashiro"</code></p>
+
+<h2>定義</h2>
+
+<p>Either型も普通の代数的データ型だ。</p>
+
+<p><code>hoge</code></p>
+
+<h2>関数</h2>
+
+<h2>まとめ</h2>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/maybe_def.html"
 	>「Maybe型」へもどる</a>
