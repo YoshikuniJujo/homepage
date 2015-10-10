@@ -1,7 +1,5 @@
 Either型
 
-<p>(工事中 0%)</p>
-
 <h2>はじめに</h2>
 
 <p>Either型はPreludeで定義されている。</p>
@@ -110,15 +108,51 @@ users = [<br/>
 
 <p>Either型も普通の代数的データ型だ。</p>
 
-<p><code>hoge</code></p>
+<p><code>data Either' a b = Left' a | Right' b deriving Show</code></p>
 
-<h2>関数</h2>
+<h2>関数either</h2>
+
+<h3>動作</h3>
+
+<p>
+Either型の値がLeftかRightかによって適用する関数を選ぶ。
+数値ならば0かどうかを文字列ならば空文字列かどうかを調べるには
+</p>
+
+<p><code>*Main&gt; either (== 0) null $ Left 0<br/>
+True<br/>
+*Main&gt; either (== 0) null $ Right ""<br/>
+True</code></p>
+
+<p>のようにする。</p>
+
+<h3>定義</h3>
+
+<p>
+第1引数はLeft値の中身に適用する関数で
+第2引数はRight値の中身に適用する関数だ。
+両者の返り値は同じ型であり全体の返り値となる。
+</p>
+
+<p><code>either' :: (a -&gt; c) -&gt; (b -&gt; c) -&gt; Either a b -&gt; c</code></p>
+
+<p>Left値ならば第1引数の関数をRight値ならば第2引数の関数を適用する。</p>
+
+<p><code>either' f _ (Left x) = f x<br/>
+either' _ g (Right y) = g y</code></p>
+
+<p><code>*Main&gt; either' (== 0) null $ Left' 0<br/>
+True<br/>
+*Main&gt; either' (== 0) null $ Right' 0<br/>
+True</code></p>
 
 <h2>まとめ</h2>
+
+<p>2つの型のどちらかの値を保持する型Eitherの動作、定義について学んだ。</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/maybe_def.html"
 	>「Maybe型」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/adt_recursive.html"
+	>「再帰的な型」へ</a>
 </p>
