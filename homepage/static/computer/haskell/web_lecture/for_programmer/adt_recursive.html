@@ -2,6 +2,28 @@
 
 <p>(工事中 0%)</p>
 
+<h2>はじめに</h2>
+
+<p>関数定義と同じように型も再帰的に定義できる。</p>
+
+<h2>りんごの樹</h2>
+
+<p>
+りんごの樹は枝分かれし枝のさきには葉っぱ、花、りんご、枝のどれかとなる。
+これをモデル化する型を作る。
+</p>
+
+<p><code>data AppleTree<br/>
+	<span class="indent1">= Branch AppleTree AppleTree</span><br/>
+	<span class="indent1">| Leaf</span><br/>
+	<span class="indent1">| Flower</span><br/>
+	<span class="indent1">| Apple</span><br/>
+	<span class="indent1">deriving Show</span></code></p>
+
+<p>
+この定義だとただの葉、花
+</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/either_def.html"
 	>「Either型」へもどる</a>

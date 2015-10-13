@@ -52,7 +52,7 @@ Prelude&gt; take 100 $ repeat "I love you!"<br/>
 
 <p>xをn回くりかえすにはxをn - 1回くりかえしたリストの先頭にxを追加する。</p>
 
-<p><code>replicateRaw x n | n &gt; 0 = x : replicateRaw (n - 1) x<br/>
+<p><code>replicateRaw n x | n &gt; 0 = x : replicateRaw (n - 1) x<br/>
 replicateRaw _ _ = []</code></p>
 
 <h3>関数take</h3>

@@ -93,10 +93,52 @@ char = check . (==)</code></p>
 
 <h2>加工</h2>
 
-<p>パーサが返した値を加工する。</p>
+<p>
+パーサが返した値を加工する。
+パーサは「すべての可能性」をリストとして返すことに注意する。
+</p>
 
-<p><code>build :: Parser a -&gt; (a -&gt; b) -&gt; Parser b<br/>
+<p><code>build :: Parse a -&gt; (a -&gt; b) -&gt; Parse b<br/>
 build p f i = [ (f x, r) | (x, r) &lt;- p i ]</code></p>
+
+<p>
+Parse型の値pは文字列を取ってタプルのリストを返す関数である。
+関数pに文字列iを与えるとタプル(結果, 残りの文字列)のリストが返る。
+内包表記の|の右側ではリストのそれぞれの要素であるタプルのそれぞれの要素で
+変数x, rを束縛している。
+|の左側で値xに関数fを適用し値rとのタプルにまとめ直している。
+この操作はリストの要素すべてに対して行われる。
+</p>
+
+<p>
+ここでp iの結果が[(1, "23"), (12, "3"), (123, "")]だった場合を考えよう。
+文字列"123"をパースした結果として「結果が1で残りが"23"」「結果が12で残りが"3"」
+「結果が123で文字列すべて消費」の3通りの可能性があるということだ。
+この場合に「結果を2倍する」ことを考える。
+</p>
+
+<p><code>[ (x * 2, r) | (x, r) &lt;- [(1, "23"), (12, "3"), (123, "")] ]</code></p>
+
+<p>
+まずは(1, "23")が(x, r)でマッチされxは1にrは"23"となる。
+そのとき結果の値は(2, "23")となる。
+同様にxが12、rが"3"となったときには結果は(24, "3")となり、
+xが123、rが""のときには結果は(246, "")となる。
+それぞれの結果はリストにまとめられるので[(2, "23"), (24, "3"), (246, "")]が全体の
+結果となる。
+これを関数mapで書き直すと
+</p>
+
+<p><code>map (\(x, r) -&gt; (x * 2, r)) [(1, "23"), (12, "3"), (123, "")]</code></p>
+
+<p>となる。</p>
+
+<p><code>*Main&gt; [ (x * 2, r) | (x, r) &lt;- [(1, "23"), (12, "3"), (123, "")]<br/>
+[(2,"23"),(24,"3"),(246,"")]<br/>
+*Main&gt; map (\(x, r) -&gt; (x * 2, r)) [(1, "23"), (12, "3"), (123, "")]<br/>
+[(2,"23"),(24,"3"),(246,"")]</code></p>
+
+<h3>試してみる</h3>
 
 <p><code>*Main&gt; :reload<br/>
 *Main&gt; (check isDigit `build` (read . (: ""))) "123" :: [(Integer, String)]<br/>
@@ -106,7 +148,7 @@ build p f i = [ (f x, r) | (x, r) &lt;- p i ]</code></p>
 
 <p>ふたつのパーサをつなげる。</p>
 
-<p><code>(&gt;*&gt;) :: Parser a -&gt; Parser b -&gt; Parser (a, b)<br/>
+<p><code>(&gt;*&gt;) :: Parse a -&gt; Parse b -&gt; Parse (a, b)<br/>
 (p1 &gt;*&gt; p2) i = [ ((x, y), r') | (x, r) &lt;- p1 i, (y, r') &lt;- p2 r ]</code></p>
 
 <p><code>*Main&gt; :reload<br/>
@@ -115,10 +157,10 @@ build p f i = [ (f x, r) | (x, r) &lt;- p i ]</code></p>
 
 <p>前後どちらかの返り値をそれぞれ無視する関数も作る。</p>
 
-<p><code>(&gt;*) :: Parser a -&gt; Parser b -&gt; Parser a<br/>
+<p><code>(&gt;*) :: Parse a -&gt; Parse b -&gt; Parse a<br/>
 p1 &gt;* p2 = (p1 &gt;*&gt; p2) `build` fst</code></p>
 
-<p><code>(*&gt;) :: Parser a -&gt; Parser b -&gt; Parser b<br/>
+<p><code>(*&gt;) :: Parse a -&gt; Parse b -&gt; Parse b<br/>
 p1 *&gt; p2 = (p1 &gt;*&gt; p2) `build` snd</code></p>
 
 <p><code>*Main&gt; :reload<br/>
