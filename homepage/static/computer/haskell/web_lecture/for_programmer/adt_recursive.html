@@ -6,7 +6,57 @@
 
 <p>関数定義と同じように型も再帰的に定義できる。</p>
 
-<h2>りんごの樹</h2>
+<h2>りんご屋さん</h2>
+
+<h3>問題定義</h3>
+
+<p>
+りんご屋さんがある。
+このりんご屋さんはりんごを売っている。
+ただしすこし変わったりんご屋さんでりんごの実だけではなく
+葉や花も「りんご」として売っている。
+</p>
+
+<ul>
+<li>りんご(葉) 50円</li>
+<li>りんご(花) 80円</li>
+<li>りんご(実) 100円</li>
+</ul>
+
+<p>
+のように陳列されている。
+このお店で買い物をして合計金額を求めてみよう。
+</p>
+
+<h3>型</h3>
+
+<p>葉、花、実を含むりんご型を定義する。</p>
+
+<p><code>data Apple = Leaf | Flower | Apple deriving Show</code></p>
+
+<p>買い物かごも用意しよう。</p>
+
+<p><code>type Basket = [Apple]</code></p>
+
+<h3>値段の対応</h3>
+
+<p>値段の対応を表現する関数を定義する。</p>
+
+<p><code>price1 :: Apple -&gt; Int<br/>
+price1 Leaf = 50<br/>
+price1 Flower = 80<br/>
+price1 Apple = 100</code></p>
+
+<h3>買い物かごの合計金額</h3>
+
+<p>price :: Basket -&gt; Int<br/>
+price = sum . map price1</p>
+
+<p><code>% ghci apple.hs<br/>
+*Main&gt; price [Leaf, Leaf, Flower, Apple, Apple, Apple]<br/>
+480</code></p>
+
+<h2>りんごの枝</h2>
 
 <p>
 りんごの樹は枝分かれし枝のさきには葉っぱ、花、りんご、枝のどれかとなる。
