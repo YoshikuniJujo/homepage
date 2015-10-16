@@ -1,10 +1,51 @@
 リスト
 
-<p>(工事中 0%)</p>
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/adt_list.hs"
+	>adt_list.hs</a></p>
+
+<h2>はじめに</h2>
+
+<p>
+今まで普通に使ってきたリストだが、
+これも構文糖などの特殊な表記以外については普通に代数的データ型として定義できる。
+</p>
+
+<h2>定義</h2>
+
+<p>
+a型の値のリストとは
+空リストかまたはa型の値のリストの先頭にa型の値を追加したものだ。
+</p>
+
+<p><code>data List a = Nil | a :~ List a deriving Show</code></p>
+
+<p><code>% ghci adt_list.hs<br/>
+*Main&gt; 3 :~ (8 :~ (5 :~ Nil))<br/>
+3 :~ (8 :~ (5 :~ Nil))</code></p>
+
+<h2>関数</h2>
+
+<h3>関数map</h3>
+
+<p>関数mapと同じ関数をList型の値に対して作る。</p>
+
+<p><code>mapL :: (a -&gt; b) -&gt; List a -&gt; List b<br/>
+mapL f (x :~ xs) = f x :~ mapL f xs<br/>
+mapL _ _ = Nil</code></p>
+
+<p><code>*Main&gt; mapL (* 2) $ 3 :~ (8 :~ (5 :~ Nil))<br/>
+6 :~ (16 :~ (10 :~ Nil))</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+リストは構文糖など、特殊な記法ができる以外は、
+代数的データ型で定義することができる普通の型だ。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/poly_rec_type.html"
 	>「再帰的な多相型」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/record_syntax.html"
+	>「構文: レコード構文」へ</a>
 </p>
