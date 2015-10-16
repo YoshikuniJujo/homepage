@@ -1,10 +1,112 @@
 再帰的な多相型
 
-<p>(工事中 0%)</p>
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/apple3.hs"
+	>apple3.hs</a></p>
+
+<h2>はじめに</h2>
+
+<p>
+前回は代数的データ型で樹構造を作る方法を学んだ。
+今回は葉となる要素の型を型変数として定義してみる。
+これは一般的なコンテナとしての樹構造となる。
+</p>
+
+<h2>葉、花、実</h2>
+
+<p>型Appleの定義を枝のないものにもどす。</p>
+
+<p><code>data Apple = Leaf | Flower | Apple deriving Show</code></p>
+
+<h2>一般的な枝</h2>
+
+<p>枝の先にどの型の値をつけるかを指定できる一般的な枝を作る。</p>
+
+<p><code>data Tree a = Branch (Tree a) (Tree a) | Atom a deriving Show</code></p>
+
+<p><code>% ghci apple3.hs<br/>
+*Main&gt; Branch (Branch (Atom Leaf) (Atom Flower)) (Atom Apple)<br/>
+Branch (Branch (Atom Leaf) (Atom Flower)) (Atom Apple)<br/>
+*Main&gt; :t Branch (Branch (Atom Leaf) (Atom Flower)) (Atom Apple)<br/>
+Branch (Branch (Atom Leaf) (Atom Flower)) (Atom Apple)<br/>
+	<span style="margin-left: 1em">:: Tree Apple</span></code></p>
+
+<p>
+葉、花、実を枝につけるときには値構築子AtomでTree Apple型の値にしてやる必要がある。
+この枝にはどの型の値でもつけることができる。
+</p>
+
+<p><code>*Main&gt; Branch (Atom True) (Atom False)<br/>
+Branch (Atom True) (Atom False)<br/>
+*Main&gt; :t Branch (Atom True) (Atom False)<br/>
+Branch (Atom True) (Atom False) :: Tree Bool</code></p>
+
+<h2>値段を求める関数</h2>
+
+<p>
+前回と同じルールで値段を求める関数を作成する。
+まずは葉、花、実の単独での値段を求める関数だ。
+</p>
+
+<p><code>priceA :: Apple -&gt; Int<br/>
+priceA Leaf = 50<br/>
+priceA Flower = 80<br/>
+priceA Apple = 100</code></p>
+
+<p>枝全体の値段を求める関数は</p>
+
+<p><code>price1 :: Tree Apple -&gt; Int<br/>
+price1 (Atom a) = priceA a<br/>
+price1 (Branch t1 t2) = price1 t1 + price1 t2</code></p>
+
+<p>となる。</p>
+
+<p><code>*Main&gt; price1 $
+	Branch (Branch (Atom Leaf) (Atom Flower)) (Atom Apple)<br/>
+270</code></p>
+
+<h2>枝から外す</h2>
+
+<p>枝から外してフラットなリストにする関数はより一般的に書ける。</p>
+
+<h3>深さ優先探索</h3>
+
+<p>
+アトムであればその値ひとつのリストであり、
+枝であれば左右の木を平坦にしたリストを結合したものだ。
+</p>
+
+<p><code>dfs :: Tree a -&gt; [a]<br/>
+dfs (Atom a) = [a]<br/>
+dfs (Branch t1 t2) = dfs t1 ++ dfs t2</code></p>
+
+<h3>幅優先探索</h3>
+
+<p>[ここらへんをもっとちゃんと説明する]</p>
+
+<p><code>bfs :: Tree a -&gt; [a]<br/>
+bfs = concat . bfsl . (: [])</code></p>
+
+<p><code>bfsl :: [Tree a] -&gt; [[a]]<br/>
+bfsl = unfoldr $ \t -&gt; if null t then Nothing else let<br/>
+	<span class="indent1">(ats, brs) =
+		partitionEithers $ map branch t in</span><br/>
+	<span class="indent1">Just (ats, concat brs)</span></code></p>
+
+<p><code>branch :: Tree a -&gt; Either a [Tree a]<br/>
+branch (Atom a) = Left a<br/>
+branch (Branch t1 t2) = Right [t1, t2]</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+再帰的なデータ型についてアトムとなる型を指定できるようにした。
+これは再帰的なコンテナということだ。
+このような型の値は要素を無限に収納可能なコンテナとなる。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/adt_recursive.html"
 	>「再帰的な型」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/adt_list.html"
+	>「リスト」へ</a>
 </p>
