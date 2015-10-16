@@ -2,5 +2,108 @@ Arrayの本質
 
 <p>(工事中 0%)</p>
 
+<h2>はじめに</h2>
+
+<p>
+Haskellで定義ずみの型の多くは完全に代数的データ型で表現できる。
+しかし、Arrayに関してはプリミティブな定義が必要になる。
+そこらへんが、もやもやするのですこし考察してみる。
+</p>
+
+<h2>配列</h2>
+
+<p>
+配列は値の順序つきの集合だ。
+そして大切なことはそれぞれの値へのアクセスがO(1)であるということだ。
+また、大きさが有限であることも特記すべきことだろう。
+リストでは値へのアクセスは値の位値をnとしてO(n)であり大きさは無限である。
+</p>
+
+<h2>リストの定義</h2>
+
+<p>リストはHaskellの代数的データ型の枠組みで</p>
+
+<p><code>data List a = Nil | a :-: List a</code></p>
+
+<p>のように定義可能である。</p>
+
+<h2>配列の定義</h2>
+
+<p>
+配列はHaskellの代数的データ型の範囲では定義できない。
+何らかのプリミティブが必要になる。
+配列に最低限必要な関数は
+</p>
+
+<p><code>array :: [a] -&gt; Array a</code></p>
+
+<p><code>index :: Array a -&gt; Int -&gt; a</code></p>
+
+<p>
+ということになるだろう。
+たとえば5要素の配列であれば以下のように定義することができる。
+</p>
+
+<p><code>data Array a = Array a a a a a</code></p>
+
+<p>これを見るとTemplateHaskellを使えば何とか定義できそうな気もする。</p>
+
+<h2>メモリの性質</h2>
+
+<p>
+配列へのアクセスがO(1)であるのはメモリへのアクセスがO(1)であるという
+ハードウェアの状件に依存している。
+つまり配列を扱うということは本質的にメモリを扱うということだ。
+数を指定したときにO(1)で値を得ることができるというのは魔法のようなものだ。
+ハードウェアに依存しないアルゴリズムであればどうしてもO(n)となるだろう。
+</p>
+
+<h2>ByteArray#</h2>
+
+<p><a href="/computer/haskell/ghc_deep/codes/byteArray2.hs"
+	>byteArray2.hs</a></p>
+
+<p>GHCでは型ByteArray#というプリミティブ型が用意されている。</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; :set -XMagichHash<br/>
+Prelude&gt; :m GHC.Prim<br/>
+Prelude GHC.Prim&gt; :info ByteArray#<br/>
+data ByteArray#</code></p>
+
+<p>何だかわからないけど最初からある何かといった感じだ。</p>
+
+<p><code>Prelude GHC.Prim&gt; :info newByteArray#<br/>
+newByteArray# :: Int# -&gt; State# d -&gt; (# State# d, MutableByteArray# d #)<br/>
+Prelude GHC.Prim&gt; :info unsafeFreezeByteArray#<br/>
+unsafeFreezeByteArray# ::<br/>
+	<span style="margin-left: 1em">MutableByteArray# d -&gt;
+		State# d -&gt; (# State# d, ByteArray# #)</span><br/>
+Prelude GHC.Prim&gt; :info State#<br/>
+data State# a</code></p>
+
+<p>
+ByteArray#を作るにはnewByteArray#でMutableByteArray#を作り、
+unsafeFreezeByteArray#でByteArray#に変換する。
+State#はダミーの値の型だ。
+これはrunSTとの関連で使われる。
+</p>
+
+<p><code>
+Prelude GHC.Prim&gt; :info writeIntArray#<br/>
+writeIntArray# ::<br/>
+<span style="margin-left: 1em">MutableByteArray# d -&gt;
+	Int# -&gt; Int# -&gt; State# d -&gt; State# d</span><br/>
+Prelude GHC.Prim&gt; :info indexIntArray#<br/>
+indexIntArray# :: ByteArray# -&gt; Int# -&gt; Int#</code></p>
+
+<p>
+writeIntArray#で値を書き込む。
+indexIntArray#で値を読み出す。
+これはメモリへの書き込み、読み出しでありO(1)で実行できる。
+</p>
+
+<p>(続く)</p>
+
 <p><a href="/computer/haskell/ghc_deep"
 	>「GHCの深層」トップへ</a>
