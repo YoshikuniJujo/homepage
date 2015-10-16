@@ -1,12 +1,13 @@
 再帰的な型
 
-<p>(工事中 0%)</p>
-
 <h2>はじめに</h2>
 
 <p>関数定義と同じように型も再帰的に定義できる。</p>
 
 <h2>りんご屋さん</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/apple1.hs"
+	>apple1.hs</a></p>
 
 <h3>問題定義</h3>
 
@@ -58,25 +59,92 @@ price = sum . map price1</p>
 
 <h2>りんごの枝</h2>
 
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/apple2.hs"
+	>apple2.hs</a></p>
+
+<h3>商売の拡張</h3>
+
 <p>
-りんごの樹は枝分かれし枝のさきには葉っぱ、花、りんご、枝のどれかとなる。
-これをモデル化する型を作る。
+さて、りんご屋さんはすこし商売を広げることにした。
+りんごの枝も商品とする。
+りんごの枝はふたつに分かれその先にりんご屋さんの扱っている商品がつく。
+枝の先につくのはりんごの葉、花、実だけではなくこの枝自体もつくかもしれない。
+つまり次々と枝分かれしていくりんごの枝も商品とするということだ。
+枝分かれごとに20円を追加し葉、花、実については今までと同じ値段とする。
 </p>
 
-<p><code>data AppleTree<br/>
-	<span class="indent1">= Branch AppleTree AppleTree</span><br/>
-	<span class="indent1">| Leaf</span><br/>
-	<span class="indent1">| Flower</span><br/>
-	<span class="indent1">| Apple</span><br/>
+<h3>型</h3>
+
+<p>新しい商品をモデル化する型を作る。</p>
+
+<p><code>data Apple = Leaf | Flower | Apple | Branch Apple Apple<br/>
 	<span class="indent1">deriving Show</span></code></p>
 
+<h3>値段の計算</h3>
+
+<p>葉、花、実の値段については同じだ。</p>
+
+<p><code>price1 :: Apple -&gt; Int<br/>
+price1 Leaf = 50<br/>
+price1 Flower = 80<br/>
+price1 Apple = 100</code></p>
+
+<p>枝については再帰的に計算する。</p>
+
+<p><code>price1 (Branch a1 a2) = 20 + price1 a1 + price1 a2</code></p>
+
+<p><code>*Main&gt; :load apple2.hs<br/>
+*Main&gt; price1 $ Branch (Branch Apple Leaf) Flower<br/>
+270</code></p>
+
+<h3>枝から取る</h3>
+
 <p>
-この定義だとただの葉、花
+葉、花、実を枝から外して並べることを考える。
+ひとつの枝を先のほうまでたどっていく方法と、
+根本に近いものから外していく方法とがある。
+前者を深さ優先探索と呼び後者を幅優先探索と呼ぶ。
 </p>
+
+<h4>深さ優先探索</h4>
+
+<p>
+枝の全てのアイテムは、
+左の枝の全てのアイテムと右の枝の全てのアイテムとを足したものだ。
+</p>
+
+<p><code>dfs :: Apple -&gt; [Apple]<br/>
+dfs (Branch a1 a2) = dfs a1 ++ dfs a2<br/>
+dfs a = [a]</code></p>
+
+<h4>幅優先探索</h4>
+
+<p>
+関数bfsはApple型のリストを次々にわたしながらApple型のリストを集めて
+リストを作る関数bfslの引き数と返り値とを変換することで作る。
+</p>
+
+<p><code>bfs :: Apple -&gt; [Apple]<br/>
+bfs = concat . bfsl . (: [])</code></p>
+
+<p>[このあたり説明を大幅に追加する必要あり]</p>
+
+<p><code>bfsl :: [Apple] -&gt; [[Apple]]<br/>
+bfsl = unfoldr $ \as -&gt; if null as then code Nothing else let<br/>
+	<span class="indent1">(ats, brs) = partitionEithers $ map branch as in</span><br/>
+	<span class="indent1">Just (ats, concat brs)</span></code></p>
+
+<p><code>branch :: Apple -&gt; Either Apple [Apple]<br/>
+branch (Branch a1 a2) = Right [a1, a2]<br/>
+branch a = Left a</code></p>
+
+<h2>まとめ</h2>
+
+<p>型が再帰的に定義できることを学んだ。</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/either_def.html"
 	>「Either型」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/poly_rec_type.html"
+	>「再帰的な多相型」へ</a>
 </p>
