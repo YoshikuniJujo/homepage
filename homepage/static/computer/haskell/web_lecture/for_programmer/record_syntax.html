@@ -1,7 +1,5 @@
 構文: レコード構文
 
-<p>(工事中 0%)</p>
-
 <h2>はじめに</h2>
 
 <p>
@@ -83,46 +81,259 @@ Circle (-3.0) 15.0 7.0</code></p>
 
 <h3>レコード構文を使った型の定義</h3>
 
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/circle2.hs"
+	>circle2.hs</a></p>
+
+<p>
+Circle型の値は3つのDouble値をもつ。
+この3つは値構築子Circleに与える順番でしか指定できない。
+つまりX座標、Y座標、半径の順番を覚えておく必要がある。
+どの値が何であるかを示したい。
+フィールドに名前をつけて型を定義する書きかたがある。
+</p>
+
+<p><code>data Circle = Circle { centerX :: Double, centerY :: Double, radius :: Double }<br/>
+	<span class="indent1">deriving Show</span></code></p>
+
+<p>レコード構文を使わない書きかたを再度示す。</p>
+
+<p><code>data Circle = Circle Double Double Double deriving Show</code></p>
+
+<p>
+前者でいくつかの関数と構文糖が導入される以外は両者は本質的には同じものだ。
+</p>
+
 <h3>それでもレコード構文を使わない</h3>
+
+<p>
+追加の関数が定義されることと構文糖が追加される以外は意味論的には変わらない。
+よってレコード構文を使わない定義と同じように使うことができる。
+</p>
+
+<p><code>% ghci circle2.hs<br/>
+*Main&gt; Circle 10 15 7<br/>
+Circle {centerX=10.0, centerY=15.0, radius=7.0}</code></p>
+
+<p>
+一見違うように見えるがこれはderiving Showによって定義される表示関数の定義が
+変わるだけで中身は同じだ。
+</p>
 
 <h3>フィールドの取得関数</h3>
 
+<p>
+レコード構文を使うと暗黙のうちにフィールドを取り出す関数が定義される。
+例では以下の関数が定義されることになる。
+</p>
+
+<p><code>centerX :: Circle -&gt; Double<br/>
+centerX (Circle x _ _) = x</code></p>
+
+<p><code>centerY :: Circle -&gt; Double<br/>
+centerY (Circle _ y _) = y</code></p>
+
+<p><code>radius :: Circle -&gt; Double<br/>
+radius (Circle _ _ r) = r</code></p>
+
+<p>このような定義が暗黙のうちに追加されている。</p>
+
+<p><code>*Main&gt; let c = Circle 10 15 7<br/>
+*Main&gt; centerX c<br/>
+10.0<br/>
+*Main&gt; centerY c<br/>
+15.0<br/>
+*Main&gt; radius c<br/>
+7.0</code></p>
+
 <h3>フィールド名を利用した値構築</h3>
+
+<p>
+値を並べるのではなく名前を明示して値を作ることでコードが読みやすくなることがある。
+</p>
+
+<p><code>*Main&gt; Circle { centerX = 10, centerY = 15, radius = 7 }<br/>
+Circle {centerX = 10.0, centerY = 15.0, radius = 7.0}</code></p>
+
+<p>
+名前つきでフィールドを定義する場合順番を入れ換えることができる。
+</p>
+
+<p><code>*Main&gt; Circle { radius = 7, centerX = 10, centerY = 15 }<br/>
+Circle {centerX = 10.0, centerY = 15.0, radius = 7.0}</code></p>
 
 <h3>部分的な更新</h3>
 
+<p>
+定義と類似した書きかたで一部のフィールドだけ異なる値を定義することができる。
+</p>
+
+<p><code>*Main&gt; let c = Circle { centerX = 10, centerY = 15, radius = 7 }<br/>
+*Main&gt; c<br/>
+Circle {centerX = 10.0, centerY = 15.0, radius = 7.0}<br/>
+*Main&gt; c { centerX = 25 }<br/>
+Circle {centerX = 25.0, centerY = 15.0, radius = 7.0}</code></p>
+
+<h3>部分的な定義</h3>
+
+<p>フィールドの値を部分的に指定することもできる。</p>
+
+<p><code>*Main&gt; let c2 = Circle { centerX = 10 }</code></p>
+
+<p><code>
+&lt;interactive&gt;:8:10: Warning:<br/>
+	<span style="margin-left: 2em">Fields of ‘Circle’ not initialised:
+		centerY, radius</span><br/>
+	<span style="margin-left: 2em">In the expression:
+		Circle {centerX = 10}</span><br/>
+	<span style="margin-left: 2em">In an equation for ‘c2’:
+		c2 = Circle {centerX = 10}</span><br/>
+*Main&gt; centerX c2<br/>
+10.0<br/>
+*Main&gt; c2<br/>
+Circle {centerX = 10.0, centerY = *** Exception: <interactive>:8:10-32: Missing field in record construction Main.centerY</code></p>
+
+<p>
+定義しているフィールドを使わなければエラーは出ない。
+しかし、Warningも出ているように、部分関数と同じで予期せぬエラーの原因となるので、
+このやりかたは推奨されない。
+</p>
+
 <h3>パターンマッチ</h3>
+
+<p>フィールドの名前を使ってパターンマッチすることもできる。</p>
+
+<p><code>*Main&gt; c<br/>
+Circle {centerX = 10.0, centerY = 15.0, radius = 7.0}<br/>
+*Main&gt; let Circle { centerX = cx, centerY = cy, radius = r } = c in (cx, cy, r)<br/>
+(10.0,15.0,7.0)<br/>
+*Main&gt; let Circle cx cy r = c in (cx, cy, r)<br/>
+(10.0,15.0,7.0)</code></p>
+
+<p>フィールドの一部だけを指定することもできる。</p>
+
+<p><code>*Main&gt; let Circle { centerX = cx } = c in cx<br/>
+10.0<br/>
+*Main&gt; let Circle cx _ _ = c in cx<br/>
+10.0</code></p>
+
+<p>このようなフィールド名を指定してのパターンマッチは構文糖と考えられる。</p>
 
 <h3>円を扱う関数</h3>
 
+<p>円を扱う関数をレコード構文で書き直してみる。</p>
+
 <h4>面積</h4>
+
+<p>area :: Circle -&gt; Double<br/>
+area Circle { radius = r } = r ^ 2 * pi</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; area $ Center 10 15 7<br/>
+153.9380400258985</code></p>
+
+<p>
+レコード構文は単なる構文糖なので普通の書きかたで作った値をレコード構文で
+パターンマッチできる。
+</p>
 
 <h4>内外の判定</h4>
 
+<p><code>inside :: Circle -&gt; (Double, Double) -&gt; Bool<br/>
+inside Circle { centerX = cx, centerY = cy, radius = r } (x, y) =<br/>
+	<span class="indent1">(x - cx) ^ 2 + (y - cy) ^ 2 &lt;= r ^ 2</span></code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; let c = Circle 10 15 7<br/>
+*Main&gt; inside c (7, 13)<br/>
+True<br/>
+*Main&gt; inside c (4, 20)<br/>
+False</code></p>
+
 <h4>平行移動</h4>
+
+<p>(@とレコード構文を併用する定石についての説明が必要)</p>
+
+<p><code>moveH :: Circle -&gt; Double -&gt; Circle<br/>
+moveH c@Circle { centerX = cx } dx = c { centerX = cx + dx }</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; let c = Circle 10 15 7<br/>
+*Main&gt; moveH c 15<br/>
+Circle {centerX = 25.0, centerY = 15,0, radius = 7.0}<br/>
+*Main&gt; moveH c (- 13)<br/>
+Circle {centerX = -3, centerY = 15.0, radius = 7.0}</code></p>
 
 <h2>構文</h2>
 
 <h3>型の定義</h3>
 
+<p><code>data 型名 = 値構築子名 {<br/>
+	<span class="indent1">フィールド名1 :: 型1,</span><br/>
+	<span class="indent1">フィールド名2 :: 型2,</span><br/>
+	<span class="indent1">...</span><br/>
+	<span class="indent1">}</span></code></p>
+
 <h3>値の構築</h3>
+
+<p><code>値構築子名 {<br/>
+	<span class="indent1">フィールド名1 = 値1,</span><br/>
+	<span class="indent1">フィールド名2 = 値2,</span><br/>
+	<span class="indent1">...</span><br/>
+	<span class="indent1">}</span></code></p>
 
 <h3>値の更新</h3>
 
+<p><code>値 {<br/>
+	<span class="indent1">フィールド名1 = 値1,</span><br/>
+	<span class="indent1">フィールド名2 = 値2,</span><br/>
+	<span class="indent1">...</span><br/>
+	<span class="indent1">}</span></code></p>
+
 <h3>パターンマッチ</h3>
+
+<p><code>値構築子名 {<br/>
+	<span class="indent1">フィールド名1 = 仮引数1,</span><br/>
+	<span class="indent1">フィールド名2 = 仮引数2,</span><br/>
+	<span class="indent1">...</span><br/>
+	<span class="indent1">}</span></code></p>
 
 <h2>長方形の2つの定義</h2>
 
+<p>
+長方形を表現するのにはいくつかの方法がある。
+左上の点と右下の点を指定する方法と左上の点と幅と高さを指定する方法とがある。
+</p>
+
 <p><code>data Rectangle<br/>
-	<span class="indent1">= RectBR { topL :: (Double, Double), bottomR :: (Double, Double) }</span><br/>
+	<span class="indent1">= RectBR { topL :: (Double, Double), botR :: (Double, Double) }</span><br/>
 	<span class="indent1">| RectWH { topL :: (Double, Double), width :: Double, height :: Double }</span><br/>
 	<span class="indent1">deriving Show</span></code></p>
 
-<p>(値構築子が複数ある場合の例)</p>
+<p>このように値構築子が複数ある場合もレコード構文を使うことができる。</p>
+
+<p><code>% ghci rectanble.hs<br/>
+*Main&gt; topL $ RectBR (3, 5) (4, 9)<br/>
+(3,5)<br/>
+*Main&gt; topL $ RectWH (3, 5) 1 4<br/>
+(3,5)<br/>
+*Main&gt; botR $ RectBR (3, 5) (4, 9)<br/>
+(4,9)<br/>
+*Main&gt; botR $ RectWH (3, 5) 1 4<br/>
+*** Exception: No match in record selector botR</code></p>
+
+<p>
+値構築子が含まないフィールドを取り出そうとすると例外が発生する。
+関数botRは全域関数ではない部分関数である。
+</p>
 
 <h2>まとめ</h2>
 
-<p>[HOGE]</p>
+<p>
+レコード構文を使うと代数的データ型のフィールドを位置ではなく名前で指定できる。
+複数の値構築子があるときには
+フィールドを取り出す関数は全域関数ではない部分関数になってしまうことがある。
+レコード構文と普通の記法とは場面に合わせて使いわけるとコードが読みやすくなる。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/adt_list.html"
