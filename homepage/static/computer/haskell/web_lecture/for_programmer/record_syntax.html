@@ -2,6 +2,128 @@
 
 <p>(工事中 0%)</p>
 
+<h2>はじめに</h2>
+
+<p>
+代数的データ型には構文糖としてレコード構文が用意されている。
+この構文を使うとそれぞれのフィールドに名前をつけることができる。
+値構築子がたくさんの引数をとる場合などにとくに有効だ。
+</p>
+
+<h2>円</h2>
+
+<p>
+直交座標上の円は中心の座標と半径によって表現できる。
+座標はふたつの実数で表され半径はひとつの実数で表される。
+よって平面上の円は3つの実数で表現できる。
+</p>
+
+<h3>レコード構文を使わずに</h3>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/circle1.hs"
+	>circle1.hs</a></p>
+
+<h4>定義</h4>
+
+<p>レコード構文を使わずに表現すると</p>
+
+<p><code>data Circle = Circle Double Double Double deriving Show</code></p>
+
+<p>
+のようになる。
+順にそれぞれX座標、Y座標上の値、円の半径を表す。
+</p>
+
+<p><code>% ghci circle1.hs<br/>
+*Main&gt; Circle 10 15 7<br/>
+Circle 10.0 15.0 7.0</code></p>
+
+<h4>面積</h4>
+
+<p>面積を計算する関数は</p>
+
+<p><code>area :: Circle -&gt; Double<br/>
+area (Circle _ _ r) = r ^ 2 * pi</code></p>
+
+<p>となる。</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; area (Circle 10 15 7)<br/>
+153.93804002589985</code></p>
+
+<h4>内外の判定</h4>
+
+<p>ある点(x, y)が円の内側にあるか外側にあるかを判定する関数は</p>
+
+<p><code>inside :: Circle -&gt; (Double, Double) -&gt; Bool<br/>
+inside (Circle cx cy r) (x, y) = (x - cx) ^ 2 + (y - cy) ^ 2 &lt;= r ^ 2</code></p>
+
+<p>となる。</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; inside (Circle 10 15 7) (13, 17)<br/>
+True<br/>
+*Main&gt; inside (Circle 10 15 7) (5, 10)<br/>
+False</code></p>
+
+<h4>平行移動</h4>
+
+<p>
+円を横向きに移動する。X座標の値を変化させれば良い。移動距離を指定することにする。
+</p>
+
+<p><code>moveH :: Circle -&gt; Double -&gt; Circle<br/>
+moveH (Circle cx cy r) dx = Circle (cx + dx) cy r</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; moveH (Circle 10 15 7) 15<br/>
+Circle 25.0 15.0 7.0<br/>
+*Main&gt; moveH (Circle 10 15 7) (- 13)<br/>
+Circle (-3.0) 15.0 7.0</code></p>
+
+<h3>レコード構文を使った型の定義</h3>
+
+<h3>それでもレコード構文を使わない</h3>
+
+<h3>フィールドの取得関数</h3>
+
+<h3>フィールド名を利用した値構築</h3>
+
+<h3>部分的な更新</h3>
+
+<h3>パターンマッチ</h3>
+
+<h3>円を扱う関数</h3>
+
+<h4>面積</h4>
+
+<h4>内外の判定</h4>
+
+<h4>平行移動</h4>
+
+<h2>構文</h2>
+
+<h3>型の定義</h3>
+
+<h3>値の構築</h3>
+
+<h3>値の更新</h3>
+
+<h3>パターンマッチ</h3>
+
+<h2>長方形の2つの定義</h2>
+
+<p><code>data Rectangle<br/>
+	<span class="indent1">= RectBR { topL :: (Double, Double), bottomR :: (Double, Double) }</span><br/>
+	<span class="indent1">| RectWH { topL :: (Double, Double), width :: Double, height :: Double }</span><br/>
+	<span class="indent1">deriving Show</span></code></p>
+
+<p>(値構築子が複数ある場合の例)</p>
+
+<h2>まとめ</h2>
+
+<p>[HOGE]</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/adt_list.html"
 	>「リスト」へもどる</a>
