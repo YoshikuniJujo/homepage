@@ -117,6 +117,11 @@ Prelude System.Random Control.Arrow&gt; take 3 . uncurry zip .
 (-0.4281869025678364, 0.969606436457163),
 (-0.7979778666086881, -0.6623840670853804)]</code></p>
 
+<p>
+最後の:: [(Double, Double)]に注意しよう。
+型注釈をつけないとデフォルトでIntegerと解釈されてしまい-1, 0, 1だけになってしまう。
+</p>
+
 <h3>関数split</h3>
 
 <p><code>split $ mkStdGen 8</code></p>
