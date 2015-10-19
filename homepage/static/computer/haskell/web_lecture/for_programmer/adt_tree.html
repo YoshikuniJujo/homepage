@@ -2,6 +2,40 @@
 
 <p>(工事中 0%)</p>
 
+<h2>はじめに</h2>
+
+<p>
+ライブラリData.Treeに一般的な樹構造のコンテナが定義されている。
+</p>
+
+<p><a href="https://downloads.haskell.org/~ghc/latest/docs/html/libraries/containers-0.5.6.2/Data-Tree.html"
+	>Data.Tree</a></p>
+
+<p><code>% ghci<br/>
+Prelude&gt; :m Data.Tree<br/>
+Prelude Data.Tree&gt; :info Tree<br/>
+data Tree a = Node {rootLabel :: a, subForest :: Forest a}<br/>
+        <span class="indent1">-- Defined in ‘Data.Tree’</span><br/>
+instance [safe] Eq a =&gt; Eq (Tree a) -- Defined in ‘Data.Tree’<br/>
+instance [safe] Monad Tree -- Defined in ‘Data.Tree’<br/>
+instance [safe] Functor Tree -- Defined in ‘Data.Tree’<br/>
+instance [safe] Read a =&gt; Read (Tree a) -- Defined in ‘Data.Tree’<br/>
+instance [safe] Show a =&gt; Show (Tree a) -- Defined in ‘Data.Tree’<br/>
+Prelude Data.Tree&gt; :info Forest<br/>
+type Forest a = [Tree a]
+	<span class="indent1">-- Defined in `Data.Tree'</span></code></p>
+
+<p>型Treeの定義は</p>
+
+<p><code>data Tree a = Node { rootLabel :: a, subForest :: Forest a }<br/>
+type Forest a = [Tree a]</code></p>
+
+<p>となっている。</p>
+
+<h2>りんご屋の例</h2>
+
+<p>りんご屋の例をこれを使って書き直してみよう。</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/record_syntax.html"
 	>「構文: レコード構文」へもどる</a>
