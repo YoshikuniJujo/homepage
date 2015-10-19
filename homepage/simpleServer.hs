@@ -20,10 +20,11 @@ import "crypto-random" Crypto.Random (
 import ShowPage (showPage, initLock)
 
 keyFile :: String
-keyFile = "../certs/private_2014.key"
+keyFile = "../certs/skami_20151019.key"
 
 certFile :: [String]
-certFile = ["../certs/2014_only_skami.cert", "../certs/owl_mid.pem"]
+certFile = ["../certs/skami_20151019.cert", "../certs/skami_20151019.mid"]
+-- certFile = ["../certs/skami_20151019.cert"]
 
 cipherSuites :: [CipherSuite]
 cipherSuites = [

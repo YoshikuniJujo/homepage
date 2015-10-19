@@ -98,8 +98,10 @@ showPage l ma hdl = do
 					then readBinaryFile else readFile) fp
 				<*> getModificationTime fp
 			putResponse hdl (responseH hdl
-					$ LBS.fromChunks [makePage fp_ mt tp cnt])
-				{ responseContentType = tp }
+					$ LBS.fromChunks [makePage fp_ mt tp cnt]) {
+						responseContentType = tp,
+						responseOthers = hsts
+					}
 		else do	now <- liftIO getCurrentTime
 			putResponse hdl (responseH hdl
 					$ LBS.fromChunks [makePage "/404" now html
@@ -180,3 +182,8 @@ pathToGetUri = ("?uri=http%3A%2F%2Fskami.iocikun.jp" ++) . escapeSlash
 	escapeSlash "" = ""
 	escapeSlash ('/' : cs) = "%2F" ++ escapeSlash cs
 	escapeSlash (c : cs) = c : escapeSlash cs
+
+hsts :: [(BSC.ByteString, BSC.ByteString)]
+hsts = [
+	("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
+	]
