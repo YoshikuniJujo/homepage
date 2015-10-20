@@ -1,0 +1,190 @@
+構文: 代数的データ型のインポート
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<h3>型Tree</h3>
+
+<p>
+ライブラリData.Treeに一般的な樹構造のコンテナが定義されている。
+</p>
+
+<p><a href="https://downloads.haskell.org/~ghc/latest/docs/html/libraries/containers-0.5.6.2/Data-Tree.html"
+	>Data.Tree</a></p>
+
+<p><code>% ghci<br/>
+Prelude&gt; :m Data.Tree<br/>
+Prelude Data.Tree&gt; :info Tree<br/>
+data Tree a = Node {rootLabel :: a, subForest :: Forest a}<br/>
+        <span class="indent1">-- Defined in ‘Data.Tree’</span><br/>
+instance [safe] Eq a =&gt; Eq (Tree a) -- Defined in ‘Data.Tree’<br/>
+instance [safe] Monad Tree -- Defined in ‘Data.Tree’<br/>
+instance [safe] Functor Tree -- Defined in ‘Data.Tree’<br/>
+instance [safe] Read a =&gt; Read (Tree a) -- Defined in ‘Data.Tree’<br/>
+instance [safe] Show a =&gt; Show (Tree a) -- Defined in ‘Data.Tree’<br/>
+Prelude Data.Tree&gt; :info Forest<br/>
+type Forest a = [Tree a]
+	<span class="indent1">-- Defined in `Data.Tree'</span></code></p>
+
+<p>型Treeの定義は</p>
+
+<p><code>data Tree a = Node { rootLabel :: a, subForest :: Forest a }<br/>
+type Forest a = [Tree a]</code></p>
+
+<p>
+となっている。
+ノードには必ずラベルがつく。
+子要素は2個以外にも0個以上の任意の個数持つことができる。
+子要素が0個の節が葉となる。
+わかりやすくするためにレコード構文を使わない定義にし
+型シノニムForestも展開すると
+</p>
+
+<p><code>data Tree a = Node a [Tree a]</code></p>
+
+<p>となる。</p>
+
+<p>[ここに樹の例の図を置く]</p>
+
+<p>この樹はTree型の値で表現すると</p>
+
+<p><code>Node 'a' [Node 'b' [Node 'd' [], Node 'e' []], Node 'c' []]</code></p>
+
+<p>となる。</p>
+
+<h3>暗黙のインポート</h3>
+
+<p><code>import Data.Tree</code></p>
+
+<p>
+のようにするとこのモジュールが公開しているすべての名前が導入される。
+このようにすると使われている変数がどのモジュール由来なのかわからなくなり、
+コードを読むときに大きな障害となる。
+</p>
+
+<p><code>import Asparagus<br/>
+import Beetroot<br/>
+import Carrot<br/>
+.<br/>
+.<br/>
+.<br/>
+import Zucchini</code></p>
+
+<p><code>favorites :: [Parts]<br/>
+favorites = [stem, leaf]</code></p>
+
+<p>
+このように書かれていたときstemやleafの定義を読もうと思ったら
+モジュールAsparagusからZucchiniまですべてのファイルを検索する必要がある。
+</p>
+
+<h3>修飾名つきインポート</h3>
+
+<p>
+ひとつの解決策は修飾名をつけてインポートすることだ。
+</p>
+
+<p><code>import qualified Asparagus as A<br/>
+import qualified Beetroot as B<br/>
+import qualified Carrot as C<br/>
+.<br/>
+.<br/>
+.<br/>
+import qualified Zucchini as Z</code></p>
+
+<p><code>favorites :: [Parts]<br/>
+favorites = [A.stem, C.leaf]</code></p>
+
+<p>
+このようにすればstemがAsparagusで定義されていてleafがCarrotで定義されている
+のは自明となる。
+</p>
+
+<h3>インポートリストの明示</h3>
+
+<p>修飾名を使うのがわずらわしい場合はインポートリストを明示するのが良い。</p>
+
+<p><code>import Asparagus (stem, asparagus)<br/>
+import Beetroot (root, beetroot)<br/>
+import Carrot (leaf, redmonster)<br/>
+.<br/>
+.<br/>
+.<br/>
+import Zucchini (zapallo, zucchini)</code></p>
+
+<p><code>favorites :: [Parts]<br/>
+favorites = [stem, leaf]</code></p>
+
+<p>このような形でもstemやleafが定義されているモジュールは明らかだ。</p>
+
+<h2>代数的データ型のインポート</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/adt_bad_import.hs"
+	>adt_bad_import.hs</a></p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/adt_good_import.hs"
+	>adt_good_import.hs</a></p>
+
+<p>
+変数についてはそのまま書けばインポートされる。
+それでは代数的データ型についてはどうだろうか。
+値構築子Nodeが使いたいとする。
+</p>
+
+<p><code>import Data.Tree (Node)</code></p>
+
+<p><code>tree1 = Node 'a' []</code></p>
+
+<p>のようなコードを読みこんでみよう。</p>
+
+<p><code>% ghci adt_bad_import.hs<br/>
+GHCi, version ...<br/>
+[ここにエラーメッセージを置く]<br/>
+Prelude&gt;</code></p>
+
+<p>
+エラーとなる。
+値構築子はそのままインポートリストに書くのではなく、
+型名のあとの括弧内に書く必要がある。
+</p>
+
+<p><code>import Data.Tree (Tree(Node))</code></p>
+
+<p><code>tree1 = Node 'a' []</code></p>
+
+<p><code>% ghci adt_good_import.hs<br/>
+*Main&gt; tree1<br/>
+[ここにtree1を表示する]</code></p>
+
+<h2>型に含まれる名前をすべてインポート</h2>
+
+<p>
+型名に達けて(..)のように書くと
+型に含まれる名前をすべてインポートすることができる。
+すべての値構築子とフィールド名がインポートされる。
+</p>
+
+<p><code>import Data.Tree (Tree(..))</code></p>
+
+<p><code>tree1 = Node 'a' []</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+モジュールをインポートするとき暗黙のうちに公開されたすべての名前を
+インポートするという方法があるがあまり良くない。
+修飾名をつけるか明示的にインポートする必要がある。
+値構築子は型名のあとの括弧内に置く。
+型名のあとに(..)とすることでその型の値構築子とフィールド名をすべて
+インポートすることができる。
+</p>
+
+<h2>(続く)</h2>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/record_syntax.html"
+	>「構文: レコード構文」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/adt_tree.html"
+	>「樹」へ</a>
+</p>
