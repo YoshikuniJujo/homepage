@@ -30,11 +30,91 @@ type Forest a = [Tree a]
 <p><code>data Tree a = Node { rootLabel :: a, subForest :: Forest a }<br/>
 type Forest a = [Tree a]</code></p>
 
-<p>となっている。</p>
+<p>
+となっている。
+ノードには必ずラベルがつく。
+子要素は2個以外にも0個以上の任意の個数持つことができる。
+子要素が0個の節が葉となる。
+</p>
 
-<h2>りんご屋の例</h2>
+<h2>NML</h2>
 
-<p>りんご屋の例をこれを使って書き直してみよう。</p>
+<h3>定義</h3>
+
+<p>
+XMLを徹底的にシンプルにしたNML(Nano Markup Language)を考えよう。
+NMLの開きタグは&lt;hoge&gt;といった形であり閉じタグは&lt;/hoge&gt;となる。
+子要素を持たないタグを&lt;hoge/&gt;と書けるようにする。
+また実体参照として最小限必要な&amp;lt;、&amp;gt;、&amp;amp;だけは
+使えるようにしよう。
+</p>
+
+<p>
+コードが簡単になるので閉じタグが存在しなかった場合にはエラーとせずに
+暗黙の閉じタグが存在するものとして処理する。
+タグ自体が&gt;によって閉じていない場合文字列の最後に&gt;があるものとして
+処理する。
+また、上記以外の実体参照や正しくない形式の実体参照があった場合、
+それ以降のデータが存在しないものとして処理する。
+空白文字のみのテキストデータは削除する。
+テキストデータの先頭と末尾の空白は削除する。
+それ以外の空白文字は処理しない。
+</p>
+
+<p>
+このような構文エラーに対する過度な寛容さはPerl的と言える。
+現実世界ではあまりこのようにはしないほうが良い。
+HaskellではMaybeモナド等のエラーを扱うモナドを導入することで
+エラー処理がきれいに書けるようになる。
+それまではPerl的寛容さに対する読者の寛容を請う。
+</p>
+
+<p>
+また、タグに囲まれた文字列と子要素を持たないタグとは同じものとして扱われる。
+</p>
+
+<ul>
+<li>&lt;hoge&gt;piyo&lt;/hoge&gt;</li>
+<li>&lt;hoge&gt;&lt;piyo&gt;&lt;/piyo&gt;&lt;/hoge&gt;</li>
+</ul>
+
+<p>のふたつは同じものとして扱われる。</p>
+
+<h3>コード</h3>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nml.hs"
+	>nml.hs</a></p>
+
+<h4>字句解析</h4>
+
+<h4>構文解析</h4>
+
+<h2>煩悶</h2>
+
+<p>
+う、う、う...思いつかない。
+XMLパーサとかどうだろうか。
+XMLパーサと言ってしまうと誇大広告になってしまうので、
+XMLもどきパーサと言っておいたほうが良いかもしれない。
+XMLは思いのほか複雑なのだ。
+JSONのほうがいいな。
+</p>
+
+<p>
+JSONパーサを使るのはいいかもしれない。
+前に作ったパーサコンビネータは使わない。
+まずはJSONの規格を調べねばな。
+</p>
+
+<p><a href="https://ja.wikipedia.org/wiki/JavaScript_Object_Notation">Wikipedia: JSON</a></p>
+
+<p>
+いまいち、かな。
+やはりXMLのサブセットのパーサのほうが良いような気がする。
+タグと&amp;lt;、&amp;gt;、&amp;amp;だけ扱えればいいだろう。
+これをNML(nano markup language)と勝手に名づけてそれのパーサを作ろう。
+</p>
+
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/record_syntax.html"
