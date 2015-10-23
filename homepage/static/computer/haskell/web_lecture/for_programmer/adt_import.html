@@ -1,7 +1,5 @@
 構文: 代数的データ型のインポート
 
-<p>(工事中 0%)</p>
-
 <h2>はじめに</h2>
 
 <h3>型Tree</h3>
@@ -45,13 +43,16 @@ type Forest a = [Tree a]</code></p>
 
 <p>となる。</p>
 
-<p>[ここに樹の例の図を置く]</p>
+<p><img src="/computer/haskell/web_lecture/for_programmer/images/tree_abcde.svg" alt="樹" /></p>
 
 <p>この樹はTree型の値で表現すると</p>
 
 <p><code>Node 'a' [Node 'b' [Node 'd' [], Node 'e' []], Node 'c' []]</code></p>
 
-<p>となる。</p>
+<p>
+となる。
+葉を子要素0の節として表現している。
+</p>
 
 <h3>暗黙のインポート</h3>
 
@@ -139,8 +140,21 @@ favorites = [stem, leaf]</code></p>
 <p>のようなコードを読みこんでみよう。</p>
 
 <p><code>% ghci adt_bad_import.hs<br/>
-GHCi, version ...<br/>
-[ここにエラーメッセージを置く]<br/>
+GHCi, version 7.8.4: http://www.haskell.org/ghc/  :? for help<br/>
+Loading package ghc-prim ... linking ... done.<br/>
+Loading package integer-gmp ... linking ... done.<br/>
+Loading package base ... linking ... done.<br/>
+[1 of 1] Compiling Main             ( adt_bad_import.hs, interpreted )</code></p>
+
+<p><code>adt_bad_import.hs:1:19:<br/>
+<span style="margin-left: 2em">In module ‘Data.Tree’:</span><br/>
+<span style="margin-left: 3em">‘Node’ is a
+		data constructor of ‘Tree’</span><br/>
+<span style="margin-left: 2em">To import it use</span><br/>
+<span style="margin-left: 3em">‘import’ Data.Tree( Tree( Node ) )</span><br/>
+<span style="margin-left: 2em">or</span><br/>
+<span style="margin-left: 3em">‘import’ Data.Tree( Tree(..) )</span><br/>
+Failed, modules loaded: none.<br/>
 Prelude&gt;</code></p>
 
 <p>
@@ -155,12 +169,12 @@ Prelude&gt;</code></p>
 
 <p><code>% ghci adt_good_import.hs<br/>
 *Main&gt; tree1<br/>
-[ここにtree1を表示する]</code></p>
+Node {rootLabel = 'a', subForest = []}</code></p>
 
 <h2>型に含まれる名前をすべてインポート</h2>
 
 <p>
-型名に達けて(..)のように書くと
+型名に続けて(..)のように書くと
 型に含まれる名前をすべてインポートすることができる。
 すべての値構築子とフィールド名がインポートされる。
 </p>
@@ -180,11 +194,9 @@ Prelude&gt;</code></p>
 インポートすることができる。
 </p>
 
-<h2>(続く)</h2>
-
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/record_syntax.html"
 	>「構文: レコード構文」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer/adt_tree.html"
-	>「樹」へ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/make_module.html"
+	>「構文: モジュールの作成」へ</a>
 </p>
