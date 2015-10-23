@@ -1,6 +1,123 @@
 構文: モジュールの作成
 
-<p>(工事中 0%)</p>
+<h2>今まで</h2>
+
+<p>
+ファイルで関数を定義してそれを読みこんでいた。
+</p>
+
+<p><code>% ghci some.hs<br/>
+*Main&gt;</code></p>
+
+<p>
+とくに指定しなければそのファイルはMainモジュールとみなされる。
+</p>
+
+<h2>明示的に</h2>
+
+<p>
+明示的にMainモジュールであることを記述してみよう。
+</p>
+
+<p><code>module Main where</code></p>
+
+<p><code>a, b, c :: Int<br/>
+a = 3<br/>
+b = 4<br/>
+c = 5</code></p>
+
+<h2>モジュールSome</h2>
+
+<p>
+モジュール名をMainではなくSomeにしてみよう。
+Mainモジュール以外ではモジュール名とファイル名は合わせておいたほうが良い。
+</p>
+
+<p><code>Some.hs</code></p>
+
+<p><code>module Some where</code></p>
+
+<p><code>a, b, c :: Int<br/>
+a = 3<br/>
+b = 4 * c<br/>
+c = 5</code></p>
+
+<p><code>% ghci Some.hs<br/>
+*Some&gt;</code></p>
+
+<h2>モジュールSomeをインポート</h2>
+
+<p>モジュールSomeをインポートしてみよう。</p>
+
+<p><code>import Some</code></p>
+
+<p><code>d :: Int<br/>
+d = a * b</code></p>
+
+<p><code>*Some&gt; :load useSome.hs<br/>
+*Main&gt; d<br/>
+60</code></p>
+
+<h2>エクスポートリストを明記しない場合</h2>
+
+<p>
+モジュールSomeではエクスポートリストを明記していない。
+このような場合、このモジュール内で定義された名前がすべてエクスポートされる。
+</p>
+
+<h2>エクスポートリストを明示する</h2>
+
+<p>
+普通はエクスポートリストは明示する。
+ローカルに使われる補助的な関数や値を公開したくはない。
+</p>
+
+<p><code>module Some (a, b) where</code></p>
+
+<p><code>a, b, c :: Int<br/>
+a = 3<br/>
+b = 4 * c<br/>
+c = 5</code></p>
+
+<p>インポートした側からは変数cは見えない。</p>
+
+<h2>対話環境におけるモジュールの内外の意味</h2>
+
+<p>対話環境においてモジュール名の前の*は「モジュールのなか」を意味する。</p>
+
+<p><code>*Main&gt; :load Some.hs<br/>
+*Some&gt; a<br/>
+3<br/>
+*Some&gt; b<br/>
+20<br/>
+*Some&gt; c<br/>
+5<br/>
+*Some&gt; :m Some<br/>
+Prelude Some&gt; a<br/>
+3<br/>
+Prelude Some&gt; b<br/>
+20<br/>
+Prelude Some&gt; c</code></p>
+
+<p><code>&lt;interactive&gt;:X:Y: Not in scope: `c'</code></p>
+
+<p>
+*SomeのようにモジュールSomeのなかにいるときは変数cにアクセスできた。
+しかしSomeのようにモジュールSomeのそとにいるときは公開されていない変数cには
+アクセスできない。
+またSomeのなかではPreludeの関数が使えるのでPreludeの追加のインポートは不要だ。
+しかしSomeのそとではPreludeを明示的にインポートする必要がある。
+よってPrelude Someのように複数のモジュールをインポートした形となっている。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+モジュールの作成方法を学んだ。
+module モジュール名 whereの形で指定する。
+指定がないときは暗黙のうちにモジュール名はMainとなる。
+Mainモジュール以外ではエクスポートリストは明示したほうが良い。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/adt_import.html"
