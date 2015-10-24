@@ -1,7 +1,5 @@
 構文: 代数的データ型のエクスポート
 
-<p>(工事中 0%)</p>
-
 <h2>はじめに</h2>
 
 <p>
@@ -174,6 +172,210 @@ Prelude TupleAB&gt; uncons it<br/>
 
 <h3>特定の条件を満たす値以外使わせない</h3>
 
+<p>
+関数の実行前に引数が特定の条件を満たしていることを保証したいことがある。
+リストがソート済みでなければならない、などだ。
+ここでは例として偶数であることを保証する型を考えてみよう。
+</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/Even.hs"
+	>Even.hs</a></p>
+
+<h4>型Even</h4>
+
+<p><code>data Even = Even Integer deriving Show</code></p>
+
+<p>
+値構築子をそのまま作えばEven 5とかEven 7とかの値もできてしまうので
+値を作る関数を別に作っておく。
+</p>
+
+<p><code>toEven :: Integer -&gt; Maybe Even<br/>
+toEven n | even n = Just $ Even n | otherwise = Nothing</code></p>
+
+<p>
+この関数は奇数を与えるとNothingを返す。
+Even型の値から整数値をとりだす関数も作る。
+</p>
+
+<p><code>fromEven :: Even -&gt; Integer<br/>
+fromEven (Even n) = n</code></p>
+
+<p>整数値を2倍することでEven型の値を作成する関数も作っておこう。</p>
+
+<p><code>double :: Integer -&gt; Even<br/>
+double n = Even $ 2 * n</code></p>
+
+<p><code>% ghci Even.hs<br/>
+*Main&gt;</code></p>
+
+<p>モジュール名をまだ指定していないのでMainモジュールとなる。</p>
+
+<p><code>*Main&gt; toEven 8<br/>
+Just (Even 8)<br/>
+*Main&gt; toEven 7<br/>
+Nothing<br/>
+*Main&gt; let Just e = toEven 8<br/>
+*Main&gt; e<br/>
+Even 8<br/>
+*Main&gt; fromEven e<br/>
+8<br/>
+*Main&gt; double 3<br/>
+Even 6</code></p>
+
+<p>
+公開する予定の関数のみを作えば
+Even型の値のなかには偶数しかありえないことがわかる。
+</p>
+
+<p><code>*Main&gt; Even 7<br/>
+Even 7</code></p>
+
+<p>値構築子を直接作うと不正な値が作れてしまう。</p>
+
+<h4>モジュール</h4>
+
+<p>
+モジュール名を指定して公開する識別子を明示する。
+先頭に
+</p>
+
+<p><code>module Even (Even, toEven, fromEven, double) where</code></p>
+
+<p>
+をつける。
+識別子Evenのあとに(..)がない。
+これは型だけ公開し値構築子を公開しないということだ。
+</p>
+
+<p><code>% ghci Even.hs<br/>
+*Even&gt; Even 7<br/>
+Even 7</code></p>
+
+<p>この状態ではまだモジュールEvenのなかなので値構築子は使えてしまう。</p>
+
+<p><code>*Even&gt; :m Even<br/>
+Prelude Even&gt;</code></p>
+
+<p>
+このようにモジュールEvenを明示的にインポートすることで
+モジュールEvenの外からモジュールEvenをインポートした状態となる。
+明示的に公開した識別子しか使えなくなる。
+</p>
+
+<p><code>Prelude Even&gt; Even 7</code></p>
+
+<p><code>&lt;interactive&gt;:X:Y: Not in scope: data constructor `Even'</code></p>
+
+<h4>その他の道具</h4>
+
+<p>
+Even型の値を扱ういくつかの関数を定義する。
+偶数同士の足し算や引き算では結果も偶数となる。
+</p>
+
+<p><code>add :: Even -&gt; Even -&gt; Even<br/>
+Even n1 `add` Even n2 = Even $ n1 + n2</code></p>
+
+<p>引き算を定義する前に符号を反転する関数を定義する。</p>
+
+<p><code>neg :: Even -&gt; Even<br/>
+neg (Even n) = Even $ - n</code></p>
+
+<p><code>sub :: Even -&gt; Even -&gt; Even<br/>
+e1 `sub` e2 = e1 `add` neg e2</code></p>
+
+<p>偶数値に整数値をかければ結果は偶数となる。</p>
+
+<p><code>mul :: Even -&gt; Integer -&gt; Even<br/>
+Even n1 `mul` n2 = Even $ n1 * n2</code></p>
+
+<p>偶数値を2で割った場合結果は偶数または奇数となる。</p>
+
+<p><code>div2 :: Even -&gt; Either Integer Even<br/>
+div2 (Even n)<br/>
+	<span class="indent1">| odd n' = Left n'</span><br/>
+	<span class="indent1">| otherwise = Right $ Even n'</span><br/>
+	<span class = "indent1">where n' = n `div` 2</span></code></p>
+
+<p>これらの関数も公開する。</p>
+
+<h4>出来上がり</h4>
+
+<p><code>module Even (Even, toEven, fromEven, double, add, sub, mul, neg, div2) where</code></p>
+
+<p><code>data Even = Even Integer deriving Show</code></p>
+
+<p><code>toEven :: Integer -&gt; Maybe Even<br/>
+toEven n | even n = Just $ Even n | otherwise = Nothing</code></p>
+
+<p><code>fromEven :: Even -&gt; Integer<br/>
+fromEven (Even n) = n</code></p>
+
+<p><code>double :: Integer -&gt; Even<br/>
+double n = Even $ 2 * n</code></p>
+
+<p><code>add :: Even -&gt; Even -&gt; Even<br/>
+Even n1 `add` Even n2 = Even $ n1 + n2</code></p>
+
+<p><code>neg :: Even -&gt; Even<br/>
+neg (Even n) = Even $ - n</code></p>
+
+<p><code>sub :: Even -&gt; Even -&gt; Even<br/>
+e1 `sub` e2 = e1 `add` neg e2</code></p>
+
+<p><code>mul :: Even -&gt; Integer -&gt; Even<br/>
+Even n1 `mul` n2 = Even $ n1 * n2</code></p>
+
+<p><code>div2 :: Even -&gt; Either Integer Even<br/>
+div2 (Even n)<br/>
+	<span class="indent1">| odd n' = Left n'</span><br/>
+	<span class="indent1">| otherwise = Right $ Even n'</span><br/>
+	<span class="indent1">where n' = n `div` 2</span></code></p>
+
+<h4>試してみる</h4>
+
+<p><code>Prelude Even&gt; :reload<br/>
+*Even Even&gt; :m Even<br/>
+Prelude Even&gt; let Just e1 = toEven 8<br/>
+Prelude Even&gt; let e2 = double 5<br/>
+Prelude Even&gt; e1 `add` e2<br/>
+Even 18<br/>
+Prelude Even&gt; e1 `sub` e2<br/>
+Even (-2)<br/>
+Prelude Even&gt; e1 `mul` 3<br/>
+Even 24<br/>
+Prelude Even&gt; div2 e1<br/>
+Right (Even 4)<br/>
+Prelude Even&gt; div2 e2<br/>
+Left 5</code></p>
+
+<h4>使ってみる</h4>
+
+<p>'a'を偶数個くりかえした文字列を作るには</p>
+
+<p><code>evenAs :: Even -&gt; String<br/>
+evenAs e = replicate (fromIntegral $ fromEven e) 'a'</code></p>
+
+<p><code>Prelude Even&gt; :m - Even<br/>
+Prelude&gt; :load useEven.hs<br/>
+*Main&gt; let Just e = toEven 8<br/>
+*Main&gt; evenAs e<br/>
+"aaaaaaaa"<br/>
+*Main&gt; evenAs (double 3)<br/>
+"aaaaaa"</code></p>
+
+<p>この関数を使ってできる文字列の長さは必ず偶数となる。</p>
+
+<h2>まとめ</h2>
+
+<p>
+モジュールを作成すると公開する識別子を制限することができる。
+それによって引数が特定の条件を満たすことを保証することができる。
+</p>
+
+<!--
+
 <p>[ソート済み以外の例を考えてみる]</p>
 
 <ul>
@@ -218,6 +420,8 @@ Prelude TupleAB&gt; uncons it<br/>
 	<li>片方が偶数、片方が奇数となるように変換するとか</li>
 	</ul></li>
 </ul>
+
+-->
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/make_module.html"
