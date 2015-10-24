@@ -14,10 +14,8 @@
 <p>
 エクスポートリストに型名(..)のように記述すると
 その型の持つ値構築子のすべてが公開される。
-それぞれの値構築子を明示することもできる。
+それぞれの値構築子を明示することもでき...
 </p>
-
-<p>...</p>
 
 <p>Wake up, Neo ...<br/>
 The Matrix has you ...<br/>
@@ -37,7 +35,7 @@ Nothing more.
 </p>
 
 <p>
-モーフィアス: これがお前の最後のチャンスだ。
+(モーフィアス: これがお前の最後のチャンスだ。
 後もどりできるのはここまでだ。
 青い薬を選べば物語は終わる。
 いつものベッドで目覚めるだろう。
@@ -45,7 +43,7 @@ Nothing more.
 赤い薬を選べば『夢の国』だ。
 うさぎの穴がどれだけ深いかを教えよう。
 私が教えるのは本当のことだ。
-それ以上ではない。
+それ以上ではない)
 </p>
 
 <p><code>module Morpheus (Pill(..), select) where</code></p>
@@ -98,10 +96,81 @@ Morpheusモジュールで値構築子Blueを公開しないのは現実的に�
 
 <h3>用意した値以外使わせない</h3>
 
-<ul>
-<li>5通り程度の値しか許さないような例がいいな</li>
-<li>たとえば互いに素な2組の数によって2整数を表現する例とか?</li>
-</ul>
+<p>
+2つの整数の組を互いに素な整数をべき等することで表現する。
+互いに素な整数として2, 3を使うと例を示す。
+</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/tuple23.hs"
+	>tuple23.hs</a></p>
+
+<p><code>cons :: Integer -&gt; Integer -&gt; Integer<br/>
+cons x y = 2 ^ x * 3 ^ y</code></p>
+
+<p><code>unpower :: Ingeger -&gt; Integer -&gt; Integer<br/>
+unpower n x<br/>
+	<span class="indent1">| x `mod` n /= 0 = 0</span><br/>
+	<span class="indent1">| otherwise = 1 + unpower n (x `div` n)</span></code></p>
+
+<p><code>uncons :: Integer -&gt; (Integer, Integer)<br/>
+uncons xy = (unpower 2 xy, unpower 3 xy)</code></p>
+
+<p><code>% ghci tuple23.hs<br/>
+*Main&gt; cons 5 7<br/>
+69984<br/>
+*Main&gt; uncons it<br/>
+(5,7)</code></p>
+
+<p>
+2, 3以外のペアを使うことを考える。
+モジュール側でいくつかのペアを用意して、それ以外は使えないようにする。
+</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/TupleAB.hs"
+	>TupleAB.hs</a></p>
+
+<p><code>module TupleAB (cons, uncons, Pair, p1, p2, p3, p4, p5) where</code></p>
+
+<p><code>data Pair = Pair Integer Integer deriving Show</code></p>
+
+<p><code>p1, p2, p3, p4, p5 :: Pair<br/>
+p1 = Pair 2 3<br/>
+p2 = Pair 5 7<br/>
+p3 = Pair 4 9<br/>
+p4 = Pair 10 21<br/>
+p5 = Pair 15 16</code></p>
+
+<p><code>cons :: Pair -&gt; Integer -&gt; Integer -&gt; Integer<br/>
+cons (Pair a b) x y = a ^ x * b ^ y</code></p>
+
+<p><code>unpower :: Integer -&gt; Integer -&gt; Integer<br/>
+unpower n x<br/>
+	<span class="indent1">| x `mod` n /= 0 = 0</span><br/>
+	<span class="indent1">| otherwise = 1 + unpower n (x `div` n)</span></code></p>
+
+<p><code>uncons :: Pair -&gt; Intger -&gt; (Integer, Integer)<br/>
+uncons (Pair a b) xy = (unpower a xy, unpower b xy)</code></p>
+
+<p><code>*Main&gt; :load TupleAB.hs<br/>
+*TupleAB&gt; :m TupleAB<br/>
+Prelude TupleAB&gt; cons p1 5 7<br/>
+69984<br/>
+Prelude TupleAB&gt; uncons it<br/>
+(5,7)<br/>
+Prelude TupleAB&gt; cons p3 5 7<br/>
+4897760256<br/>
+Prelude TupleAB&gt; uncons it<br/>
+(5,7)<br/>
+Prelude TupleAB&gt; uncons p5 5 7<br/>
+203843174400000<br/>
+Prelude TupleAB&gt; uncons it<br/>
+(5,7)</code></p>
+
+<p>
+型名Pairだけを公開して値構築子Pairを隠蔽しているためp1からp5までの
+5個の値以外のPair型の値を作ることはできない。
+たとえば2と4のペアなどの不正な値を使うことができないようになっている。
+</p>
 
 <h3>特定の条件を満たす値以外使わせない</h3>
 
