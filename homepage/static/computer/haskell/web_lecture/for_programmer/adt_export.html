@@ -2,6 +2,154 @@
 
 <p>(工事中 0%)</p>
 
+<h2>はじめに</h2>
+
+<p>
+自分で作った代数的データ型をエクスポートすることを考える。
+何をエクスポートするかによって値の保護が可能となる。
+</p>
+
+<h2>すべてを公開する</h2>
+
+<p>
+エクスポートリストに型名(..)のように記述すると
+その型の持つ値構築子のすべてが公開される。
+それぞれの値構築子を明示することもできる。
+</p>
+
+<p>...</p>
+
+<p>Wake up, Neo ...<br/>
+The Matrix has you ...<br/>
+Follow the white rabbit</p>
+
+<p>Knock, knock, Neo.</p>
+
+<p>
+Morpheus: This is your last chance.
+After this, there is no turning back.
+You take the blue pill -- the story ends,
+you wake up in your bed and believe whatever you want to believe.
+You take the red pill -- you stay in Wonderland,
+and I show you how deep the rabbit hole goes.
+Remember: all I'm offering is the truth.
+Nothing more.
+</p>
+
+<p>
+モーフィアス: これがお前の最後のチャンスだ。
+後もどりできるのはここまでだ。
+青い薬を選べば物語は終わる。
+いつものベッドで目覚めるだろう。
+信じたいものを信じ続ければいい。
+赤い薬を選べば『夢の国』だ。
+うさぎの穴がどれだけ深いかを教えよう。
+私が教えるのは本当のことだ。
+それ以上ではない。
+</p>
+
+<p><code>module Morpheus (Pill(..), select) where</code></p>
+
+<p><code>data Pill = Blue | Red deriving Show</code></p>
+
+<p><code>select :: Pill -&gt; String<br/>
+select Blue = "The story ends."<br/>
+select Red = "You stay in Wonderland."<code></p>
+
+<p><code>% ghci Morpheus.hs<br/>
+*Morpheus&gt; :m Morpheus<br/>
+Prelude Morpheus&gt; select Blue<br/>
+"The story ends."<br/>
+Prelude Morpheus&gt; select Red<br/>
+"You stay in Wonderland."</code></p>
+
+<p>明示的にエクスポートしても同じことだ。</p>
+
+<p><code>module Morpheus (Pill(Blue, Red), select) where</code></p>
+
+<p>もっと強引なモーフィアスにしたければ</p>
+
+<p><code>module Morpheus (Pill(Red), select) where</code></p>
+
+<p>とする。</p>
+
+<p><code>Prelude Morpheus&gt; :reload<br/>
+*Morpheus Morpheus&gt; :m Morpheus<br/>
+Prelude Morpheus&gt; select Blue</code></p>
+
+<p><code>&lt;interactive&gt;X:Y: Not in scope: data constructor Blue<br/>
+Prelude Morpheus&gt; select Red<br/>
+"You stay in Wonderland"</code></p>
+
+<p>
+この場合、値構築子Blueは決して使うことができない。
+「夢の国」から今までの生活にもどることは不可能だ。
+</p>
+
+<h2>値構築子を公開しない</h2>
+
+<p>
+Morpheusモジュールで値構築子Blueを公開しないのは現実的には意味がない。
+単にdata Pill = Redとすれば良いだけだ。
+値構築子を公開しない場合には何らかの方法で
+その値構築子を使った値を公開することになるだろう。
+特定の値そのものを用意するか、あるいはそれらの値を返す関数を公開するかだ。
+</p>
+
+<h3>用意した値以外使わせない</h3>
+
+<ul>
+<li>5通り程度の値しか許さないような例がいいな</li>
+<li>たとえば互いに素な2組の数によって2整数を表現する例とか?</li>
+</ul>
+
+<h3>特定の条件を満たす値以外使わせない</h3>
+
+<p>[ソート済み以外の例を考えてみる]</p>
+
+<ul>
+<li>何らかの前処理が必要な何かであれば良い</li>
+<li>あるいは何らかの条件が必要とか</li>
+<li>素数とか?奇数とか?</li>
+<li>値を生成するときに素数性を確認するとか、ね</li>
+<li>偶数であることを保証する型Evenとかどうだろうか
+	<ul>
+	<li>Even型にラップするときに偶数であることを確認する</li>
+	<li>奇数ならばNothingとする</li>
+	<li>Even型の2引数関数、加減乗を用意する</li>
+	<li>2で割る関数はEither Even Integerを返すようにしようかな</li>
+	</ul></li>
+<li>偶数であることを必要とする演算が何かあるといいけど</li>
+</ul>
+
+<p>[ソート済みの値を意味するSorted型の例が良さそうだ]</p>
+
+<ul>
+<li>本来はData.Set.Setを使うべきであるということをどこかに書いておく
+	<ul>
+	<li>このような注意書きが不要な例はないかな?</li>
+	</ul></li>
+<li>ソートされていることを前提としたアルゴリズムを何か考えること</li>
+<li>最小自由数あたりかな</li>
+<li>同一の要素は無いものとする</li>
+<li>Sorted a -&gt; Sorted aな変換ではソートの状態は崩れないこととする
+	<ul>
+	<li>要素の削除</li>
+	<li>正しい場所へのインサート、値の重複のときはNothing</li>
+	<li>正しいやりかたでのマージ、値の重複のときはNothing</li>
+	<li>すべての要素の正整数倍</li>
+	</ul></li>
+<li>ソートの状態が崩れるような変換はSorted a -&gt; [a]となる</li>
+<li>Sorted a型の値から[a]型の値を取り出すのは自由</li>
+<li>関数sortは[a] -&gt; Sorted aという型を持ちこれ以外ではSorted型の値は作れない</li>
+<li>ユーザIDというメタファが良さそうだ
+	<ul>
+	<li>ただこれだとマージのときにメタファが破綻するかも</li>
+	<li>IDのわりふりかたを変えるというのはどうだろうか</li>
+	<li>片方が偶数、片方が奇数となるように変換するとか</li>
+	</ul></li>
+</ul>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/make_module.html"
 	>「構文: モジュールの作成」へもどる</a>
