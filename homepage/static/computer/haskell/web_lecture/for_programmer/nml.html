@@ -1,45 +1,12 @@
-樹
+NML(Nano Markup Language)
 
 <p>(工事中 20%)</p>
 
 <h2>はじめに</h2>
 
-<p>
-ライブラリData.Treeに一般的な樹構造のコンテナが定義されている。
-</p>
+<p>Data.TreeモジュールのTree型の値を扱う例題を挙げる。</p>
 
-<p><a href="https://downloads.haskell.org/~ghc/latest/docs/html/libraries/containers-0.5.6.2/Data-Tree.html"
-	>Data.Tree</a></p>
-
-<p><code>% ghci<br/>
-Prelude&gt; :m Data.Tree<br/>
-Prelude Data.Tree&gt; :info Tree<br/>
-data Tree a = Node {rootLabel :: a, subForest :: Forest a}<br/>
-        <span class="indent1">-- Defined in ‘Data.Tree’</span><br/>
-instance [safe] Eq a =&gt; Eq (Tree a) -- Defined in ‘Data.Tree’<br/>
-instance [safe] Monad Tree -- Defined in ‘Data.Tree’<br/>
-instance [safe] Functor Tree -- Defined in ‘Data.Tree’<br/>
-instance [safe] Read a =&gt; Read (Tree a) -- Defined in ‘Data.Tree’<br/>
-instance [safe] Show a =&gt; Show (Tree a) -- Defined in ‘Data.Tree’<br/>
-Prelude Data.Tree&gt; :info Forest<br/>
-type Forest a = [Tree a]
-	<span class="indent1">-- Defined in `Data.Tree'</span></code></p>
-
-<p>型Treeの定義は</p>
-
-<p><code>data Tree a = Node { rootLabel :: a, subForest :: Forest a }<br/>
-type Forest a = [Tree a]</code></p>
-
-<p>
-となっている。
-ノードには必ずラベルがつく。
-子要素は2個以外にも0個以上の任意の個数持つことができる。
-子要素が0個の節が葉となる。
-</p>
-
-<h2>NML</h2>
-
-<h3>定義</h3>
+<h2>定義</h2>
 
 <p>
 XMLを徹底的にシンプルにしたNML(Nano Markup Language)を考えよう。
@@ -63,7 +30,7 @@ NMLの開きタグは&lt;hoge&gt;といった形であり閉じタグは&lt;/hog
 
 <p>
 このような構文エラーに対する過度な寛容さはPerl的と言える。
-現実世界ではあまりこのようにはしないほうが良い。
+実用的なコードではあまりこのようにはしないほうが良い。
 HaskellではMaybeモナド等のエラーを扱うモナドを導入することで
 エラー処理がきれいに書けるようになる。
 それまではPerl的寛容さに対する読者の寛容を請う。
@@ -80,14 +47,60 @@ HaskellではMaybeモナド等のエラーを扱うモナドを導入するこ�
 
 <p>のふたつは同じものとして扱われる。</p>
 
-<h3>コード</h3>
-
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/nml.hs"
 	>nml.hs</a></p>
 
-<h4>字句解析</h4>
+<h2>字句解析</h2>
 
-<h4>構文解析</h4>
+<p>
+まずは文字列を開きタグ、閉じタグ、タグでない文字列の3つのトークンに分解する。
+</p>
+
+<h3>型Token</h3>
+
+<p><code>data Token = Open String | Close String | Text String deriving Show</code></p>
+
+<p>それぞれ開きタグ、閉じタグ、タグでない文字列に対応する。</p>
+
+<h3>関数token</h3>
+
+<p>
+関数tokenはトークンをひと切り出し残りの文字列とともに返す。
+空文字列や不正な実体参照の場合にはNothingを返す。
+</p>
+
+<p><code>token :: String -&gt; (Token, String)<br/>
+token ('&lt;' : s) = Just $ tag s<br/>
+token ('&amp;' : s) = entity s<br/>
+token s = Just $ let (tx, r) = span (`notElem` "&lt;&amp;") s in (Text tx, r)</code></p>
+
+<p>
+&lt;があればタグを切り出し、&amp;があれば実体参照を切り出す。
+どちらでもなければそれらが出現するまでをテキストとして切り出す。
+</p>
+
+<h4>タグの切り出し</h4>
+
+<p>
+タグを切り出す関数には最初の&lt;を落とした文字列がわたされる。
+最初の文字が/ならば閉じタグを返し、そうでなければ開きタグを返す。
+タグは&gt;で終わる。
+</p>
+
+<p><code>tag :: String -&gt; (Token, String)<br/>
+tag ('/' : s) = case span (/= '&gt;') s of<br/>
+	<span class="indent1">(tg, _ : r) -&gt; (Close tg, r)</span><br/>
+	<span class="indent1">(tg, _) -&gt; (Close tg, "")</span><br/>
+tag s = case span (/= '&gt;') s of<br/>
+	<span class="indent1">(tg, _ : r) -&gt; (Open tg, r)</span><br/>
+	<span class="indent1">(tg, _) -&gt; (Open tg, "")</span></code></p>
+
+<p>
+</p>
+
+<h4>実体参照の切り出し</h4>
+
+<h2>構文解析</h2>
 
 <h2>煩悶</h2>
 
