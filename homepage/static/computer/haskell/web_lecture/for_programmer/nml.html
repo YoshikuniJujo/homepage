@@ -1,6 +1,6 @@
-NML(Nano Markup Language)
+NML(Nano Markup Language): 構文解析
 
-<p>(工事中 20%)</p>
+<p>(工事中 70%)</p>
 
 <h2>はじめに</h2>
 
@@ -295,39 +295,81 @@ tokens = concatMap emptyTag . filter (not . null . value)<br/>
 
 <h2>構文解析</h2>
 
+<p>字句解析ができたのでトークン列を読み込んで樹構造を返す関数を作成しよう。</p>
+
+<h3>型</h3>
+
+<p>型はData.Tree.Treeを利用することにする。モジュールの先頭に</p>
+
+<p><code>import Data.Tree</code></p>
+
+<p>を置き</p>
+
+<p><code>type Nml = Tree String</code></p>
+
+<p>とする。</p>
+
+<h3>関数parse</h3>
+
+<p>関数parseとparsesとは相互再帰の例となっている。</p>
+
+<p><code>parse :: [Token] -&gt; (Maybe Nml, [Token])<br/>
+parse (Text tx : ts) = (Just $ Node tx [], ts)<br/>
+parse (Open tg : ts) = case parses ts of<br/>
+	<span class="indent1">(ns, Close tg' : r) | tg == tg' -&gt;
+		(Just $ Node tg ns, r)</span><br/>
+	<span class="indent1">(ns, r) -&gt; (Just $ Node tg ns, r)</span><br/>
+parse ts = (Nothing, ts)</code></p>
+
 <p>
-字句解析ができたのでトークン列を読み込んで樹構造を返す関数を作成しよう。
+関数parseは樹をひとつ読みこむ。
+Textトークンに対しては単一要素の樹を返す。
+Openトークンに対しては続きから複数の樹を読みこむ。
+対応するCloseトークンがあればそれを消したものを残りのトークンとする。
+対応するCloseトークンがなければそのまま残りのトークンとする。
+Closeトークンに対しては樹を読みこむことができずNothingとなる。
 </p>
 
-<h2>煩悶</h2>
+<h3>関数parses</h3>
+
+<p><code>parses :: [Token] -&gt; ([Nml], [Token])<br/>
+parses ts = case parse ts of<br/>
+	<span class="indent1">(Just n, r) -&gt; let (ns, r') = parses r in (n : ns, r')</span><br/>
+	<span class="indent1">(_, r) -&gt; ([], r)</span></code></p>
 
 <p>
-う、う、う...思いつかない。
-XMLパーサとかどうだろうか。
-XMLパーサと言ってしまうと誇大広告になってしまうので、
-XMLもどきパーサと言っておいたほうが良いかもしれない。
-XMLは思いのほか複雑なのだ。
-JSONのほうがいいな。
+関数parseで樹を読みこめれば、続きの樹を読みこみそれに、さっきの樹を追加する。
+樹が読みこめなければ空リストと、残りとして、もともとのトークン列を返す。
 </p>
 
-<p>
-JSONパーサを使るのはいいかもしれない。
-前に作ったパーサコンビネータは使わない。
-まずはJSONの規格を調べねばな。
-</p>
+<h3>関数nml</h3>
 
-<p><a href="https://ja.wikipedia.org/wiki/JavaScript_Object_Notation">Wikipedia: JSON</a></p>
+<p>関数nmlは引数や返り値を使いやすくした関数parseのラッパーだ。</p>
 
-<p>
-いまいち、かな。
-やはりXMLのサブセットのパーサのほうが良いような気がする。
-タグと&amp;lt;、&amp;gt;、&amp;amp;だけ扱えればいいだろう。
-これをNML(nano markup language)と勝手に名づけてそれのパーサを作ろう。
-</p>
+<p><code>nml :: String -&gt; Maybe Nml<br/>
+nml s = case parse $ token s of (Just n, []) -&gt; Just n; _ -&gt; Nothing</code></p>
+
+<h2>モジュールNmlParse</h2>
+
+<p>外から使う関数は関数nmlだけなので</p>
+
+<p><code>module NmlParse (nml) where</code></p>
+
+<p>をファイルの先頭に置く。</p>
+
+<p><code>*Main&gt; :reload<br/>
+*NmlParse&gt; :m NmlParse<br/>
+Prelude NmlParse&gt; nml "&lt;hello&gt;world&lt;/hello&gt;"<br/>
+Just (Node {rootLabel = "hello", subForest = [Node {rootLabel = "world", subForest = []}]})<br/>
+Prelude NmlParse&gt; nml "&lt;flowers&gt;rose&lt;&gt;tulip&lt;&gt;lily&lt;/flowers&gt;"<br/>
+Just (Node {rootLabel = "flowers", subForest = [
+Node {rootLabel = "rose", subForest = []},
+Node {rootLabel = "tulip", subForest = []},
+Node {rootLabel = "lily", subForest = []}]})</code></p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/adt_export.html"
 	>「構文: 代数的データ型のエクスポート」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/nml2.html"
+	>「NML(2): 他の型へ/からの変換」へ</a>
 </p>

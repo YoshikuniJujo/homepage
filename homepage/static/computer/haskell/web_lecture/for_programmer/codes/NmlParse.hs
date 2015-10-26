@@ -11,7 +11,7 @@ nml s = case parse $ tokens s of (Just n, []) -> Just n; _ -> Nothing
 
 parse :: [Token] -> (Maybe Nml, [Token])
 parse (Text tx : ts) = (Just $ Node tx [], ts)
-parse (Open tg : s) = case parses s of
+parse (Open tg : ts) = case parses ts of
 	(ns, Close tg' : r) | tg == tg' -> (Just $ Node tg ns, r)
 	(ns, r) -> (Just $ Node tg ns, r)
 parse ts = (Nothing, ts)
