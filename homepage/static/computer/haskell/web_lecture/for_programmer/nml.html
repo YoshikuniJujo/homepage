@@ -12,8 +12,9 @@ NML(Nano Markup Language)
 XMLを徹底的にシンプルにしたNML(Nano Markup Language)を考えよう。
 NMLの開きタグは&lt;hoge&gt;といった形であり閉じタグは&lt;/hoge&gt;となる。
 子要素を持たないタグを&lt;hoge/&gt;と書けるようにする。
-また実体参照として最小限必要な&amp;lt;、&amp;gt;、&amp;amp;だけは
+実体参照として最小限必要な&amp;lt;、&amp;gt;、&amp;amp;だけは
 使えるようにしよう。
+また、これらの実体参照はタグ名にも使えることとする。
 </p>
 
 <p>
@@ -21,8 +22,6 @@ NMLの開きタグは&lt;hoge&gt;といった形であり閉じタグは&lt;/hog
 暗黙の閉じタグが存在するものとして処理する。
 タグ自体が&gt;によって閉じていない場合文字列の最後に&gt;があるものとして
 処理する。
-また、上記以外の実体参照や正しくない形式の実体参照があった場合、
-それ以降のデータが存在しないものとして処理する。
 空白文字のみのテキストデータは削除する。
 テキストデータの先頭と末尾の空白は削除する。
 それ以外の空白文字は処理しない。
@@ -36,9 +35,7 @@ HaskellではMaybeモナド等のエラーを扱うモナドを導入するこ�
 それまではPerl的寛容さに対する読者の寛容を請う。
 </p>
 
-<p>
-また、タグに囲まれた文字列と子要素を持たないタグとは同じものとして扱われる。
-</p>
+<p>タグに囲まれた文字列と子要素を持たないタグとは同じものとして扱われる。</p>
 
 <ul>
 <li>&lt;hoge&gt;piyo&lt;/hoge&gt;</li>
@@ -47,13 +44,13 @@ HaskellではMaybeモナド等のエラーを扱うモナドを導入するこ�
 
 <p>のふたつは同じものとして扱われる。</p>
 
-<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nml.hs"
-	>nml.hs</a></p>
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/NmlParse.hs"
+	>NmlParse.hs</a></p>
 
 <h2>字句解析</h2>
 
 <p>
-まずは文字列を開きタグ、閉じタグ、タグでない文字列の3つのトークンに分解する。
+まずは文字列を開きタグ、閉じタグ、タグでない文字列の3種類のトークンに分解する。
 </p>
 
 <h3>型Token</h3>
@@ -66,17 +63,15 @@ HaskellではMaybeモナド等のエラーを扱うモナドを導入するこ�
 
 <p>
 関数tokenはトークンをひと切り出し残りの文字列とともに返す。
-空文字列や不正な実体参照の場合にはNothingを返す。
+空文字列の場合にはNothingを返す。
 </p>
 
 <p><code>token :: String -&gt; (Token, String)<br/>
 token ('&lt;' : s) = Just $ tag s<br/>
-token ('&amp;' : s) = entity s<br/>
-token s = Just $ let (tx, r) = span (`notElem` "&lt;&amp;") s in (Text tx, r)</code></p>
+token s = Just $ let (tx, r) = span (/= '&lt;') s in (Text tx, r)</code></p>
 
 <p>
-&lt;があればタグを切り出し、&amp;があれば実体参照を切り出す。
-どちらでもなければそれらが出現するまでをテキストとして切り出す。
+&lt;があればタグを切り出す。それ以外では&lt;までをテキストとして切り出す。
 </p>
 
 <h4>タグの切り出し</h4>
@@ -95,12 +90,214 @@ tag s = case span (/= '&gt;') s of<br/>
 	<span class="indent1">(tg, _ : r) -&gt; (Open tg, r)</span><br/>
 	<span class="indent1">(tg, _) -&gt; (Open tg, "")</span></code></p>
 
+<p>基本的には&gt;までを切り出している。</p>
+
 <p>
+(tg, _) -&gt; (Close tg, "")や(tg, _) -&gt; (Open tg, "")の行は
+対応する&gt;がなかったときには&gt;を追加して解釈するということを示す。
+エラーを表すモナドを学ぶまではエラーの処理が繁雑となるのでPerl的な
+やりかたにした。
 </p>
 
-<h4>実体参照の切り出し</h4>
+<h3>試してみる</h3>
+
+<p><code>% ghci NmlParse.hs<br/>
+*Main&gt; token "&lt;hello&gt;world&lt;/hello&gt;"<br/>
+Just (Open "hello","world&lt;hello&gt;")</code></p>
+
+<p>
+Data.Listモジュールのunfoldrを使うと複数のトークンのリストを求めることができる。
+</p>
+
+<p><code>*Main&gt; :m + Data.List<br/>
+*Main Data.List&gt; unfoldr token "&lt;hello&gt;world&lt;/hello&gt;"<br/>
+[Open "hello",Text "world",Close "hello"]<br/>
+*Main Data.List&gt; unfoldr token "&lt;hello&gt;&amp;lt;world&amp;gt;&lt;/hello&gt;"<br/>
+[Open "hello",Text "&amp;lt;world&amp;gt;",Close "hello"]</code></p>
+
+<h2>トークン列の変換</h2>
+
+<p>トークン列に対していくつかの変換を加える。</p>
+
+<h3>実体参照の展開</h3>
+
+<p>
+実体参照を展開する。
+具体的には&amp;lt;, &amp;gt;, &amp;amp;をそれぞれ&lt;, &gt;, &amp;にする。
+</p>
+
+<p><code>entity :: String -&gt; String<br/>
+entity ('&amp;' : 'l' : 't' : ';' : s) = '&lt;' : entity s<br/>
+entity ('&amp;' : 'g' : 't' : ';' : s) = '&gt;' : entity s<br/>
+entity ('&amp;' : 'a' : 'm' : 'p' : ';' : s) = '&amp;' : entity s<br/>
+entity (c : s) = c : entity s<br/>
+catTexts _ = ""</code></p>
+
+<p>
+これをタグ名とテキストの両方に適用する。
+Token型のそれぞれの値の中身に関数を作用させる関数を作る。
+</p>
+
+<p><code>apply :: (String -&gt; String) -&gt; Token -&gt; Token<br/>
+apply f (Open tg) = Open $ f tg<br/>
+apply f (Close tg) = Close $ f tg<br/>
+apply f (Text tx) = Text $ f tx</code></p>
+
+<p><code>*Main Data.List&gt; map (apply entity) $
+	unfoldr token "&lt;hello&gt;&amp;lt;world&amp;gt;&lt;/hello&gt;"<br/>
+[Open "hello",Text "&lt;workd&gt;",Close "hello"]</code></p>
+
+<h3>空白の処理</h3>
+
+<p>
+前後の空白を削除する。
+前の空白についてはdropWhile isSpaceで良い。
+後ろの空白については関数takeWhileRを定義して使う。
+関数takeWhileRは右から見ていって条件を満たす要素が現れるまでを消去する関数だ。
+リストは前から順にアクセスするのでないと効率が悪いので
+実際の動作はもうすこし複雑だ。
+</p>
+
+<p><code>takeWhileR :: (a -&gt; Bool) -&gt; [a] -&gt; [a]<br/>
+takeWhileR = twr [] where<br/>
+	<span class="indent1">twr s p (x : xs)</span><br/>
+	<span class="indent2">| p x = reverse s ++ [x] ++ twr [] p xs</span><br/>
+	<span class="indent2">| otherwise = twr (x : s) p xs</span><br/>
+	<span class="indent1">twr _ _ _ = []</span><br/>
+	</code></p>
+
+<p>
+(
+引数がひとつ(or複数)多い補助関数を作りそれに最初の引数を与えるという
+やりかたを「定石」としてまとめる
+)
+</p>
+
+<p>
+関数takeWhile自体は関数twrへの単純なラッパーとなっている。
+使いやすさのために関数twrに空リストを初期値として与えている。
+関数twrは状態(蓄積)変数sを持つ。
+変数sには条件を満たさない値が逆順に保存されている。
+もしも次の値xが条件を満たすならば変数sに保存されていた値と値xとが
+結果のリストに加えられる。
+値xが条件を満たさないならば値xは変数sに追加される。
+</p>
+
+<p><code>*Main Data.List&gt; :m + Data.Char<br/>
+*Main Data.List Data.Char&gt; takeWhileR isDigit "12ab34cd"<br/>
+"12ab34"<br/>
+*Main Data.List Data.Char&gt; takeWhileR isDigit "I have 3 dogs and 40 cats."<br/>
+"I have 3 dogs and 40"</code></p>
+
+<p>「数字ではない」文字が右から消されていったのがわかる。</p>
+
+<p><code>twr [] isDigit "12ab34cd"<br/>
+=&gt; reverse [] ++ ['1'] ++ twr [] isDigit "2ab34cd"<br/>
+=&gt; "1" ++ reverse [] ++ ['2'] ++ twr [] isDigit "ab34cd"<br/>
+=&gt; "1" ++ "2" ++ twr ('a' : []) "b34cd"<br/>
+=&gt; "1" ++ "2" ++ twr "a" "b34cd"<br/>
+=&gt; "1" ++ "2" ++ twr ('b' : "a") "34cd"<br/>
+=&gt; "1" ++ "2" ++ twr "ba" "34cd"<br/>
+=&gt; "1" ++ "2" ++ reverse "ba" ++ ['3'] ++ twr [] "4cd"<br/>
+=&gt; "1" ++ "2" ++ "ab" ++ "3" ++ twr [] "4cd"<br/>
+=&gt; "1" ++ "2" ++ "ab" ++ "3" ++ reverse [] ++ ['4'] ++ twr [] "cd"<br/>
+=&gt; "1" ++ "2" ++ "ab" ++ "3" ++ "4" ++ twr ('c' : []) "d"<br/>
+=&gt; "1" ++ "2" ++ "ab" ++ "3" ++ "4" ++ twr "c" "d"<br/>
+=&gt; "1" ++ "2" ++ "ab" ++ "3" ++ "4" ++ twr ('d' : "c") ""<br/>
+=&gt; "1" ++ "2" ++ "ab" ++ "3" ++ "4" ++ twr "dc" ""<br/>
+=&gt; "1" ++ "2" ++ "ab" ++ "3" ++ "4" ++ []<br/>
+=&gt; "12ab34"</code></p>
+
+<p>
+数字はそのまま返り値の前に追加される。
+数字以外はとりあえず状態(蓄積)変数に保存され、
+数字を読み込んだときに返り値に一気に追加される。
+状態(蓄積)変数のなかで文字は逆順に保存されているので
+追加するときにはreverseする必要がある。
+もしも数字が出てくる前に文字を消費しつくしたら状態(蓄積)変数に
+保存された文字列は捨てられることになる。
+</p>
+
+<p>これを利用すれば前後の空白の削除は簡単だ。</p>
+
+<p><code>spaces :: String -&gt; String<br/>
+spaces = takeWhileR (not . isSpace) . dropWhile isSpace</code></p>
+
+<p>関数Data.Char.isSpaceを使うのでモジュールの先頭に</p>
+
+<p><code>import Data.List</code></p>
+
+<p>を追加する。</p>
+
+<p><code>*Main Data.List Data.Char&gt; :m - Data.Char<br/>
+*Main Data.List&gt; :reload<br/>
+*Main Data.List&gt; unfoldr token
+	"&lt;hello&gt;\n\tworld and you\n&lt;/hello&gt;\n"<br/>
+[Open "hello",Text "\n\tworld and you\n",Close "hello",Text "\n"]<br/>
+*Main Data.List&gt; map (apply spaces) $ unfoldr token
+	"&lt;hello&gt;\n\tworld and you\n&lt;/hello&gt;\n"<br/>
+[Open "hello",Text "world and you",Close "hello", Text ""]</code></p>
+
+<h3>空文字列の処理</h3>
+
+<p>
+空文字列を持つタグやテキストは消去することにする。
+[Token]型の値をろ過すれば良い。
+Token型の値からなかの文字列を取り出す関数を作っておく。
+</p>
+
+<p><code>value :: Token -&gt; String<br/>
+value (Open tg) = tg<br/>
+value (Close tg) = tg<br/>
+value (Text tx) = tx</code></p>
+
+<p>これを使ってろ過すれば良い。</p>
+
+<p><code>*Main Data.List&gt; :reload<br/>
+*Main Data.List&gt; filter (not . null . value) . map (apply spaces) $ unfoldr token
+	"&lt;hello&gt;\n\tworld and you\n&lt;/hello&gt;\n"<br/>
+[Open "hello",Text "world and you",Close "hello"]</code></p>
+
+<h3>空タグの処理</h3>
+
+<p>&lt;hoge/&gt;のようなタグを&lt;hoge&gt;&lt;/hoge&gt;と解釈するようにする。</p>
+
+<p><code>emptyTag :: Token -&gt; [Token]<br/>
+emptyTag (Open tg) | last tg == '/' = map ($ init tg) [Open, Close]<br/>
+emptyTag tg = [tg]</code></p>
+
+<p><code>*Main Data.List&gt; :reload<br/>
+*Main Data.List&gt; unfoldr token "&lt;hello/&gt;"<br/>
+[Open "hello/"]<br/>
+*Main Data.List&gt; concatMap emptyTag $ unfoldr token "&lt;hello/&gt;"<br/>
+[Open "hello", Close "hello"]</code></p>
+
+<h3>トークン列</h3>
+
+<p>トークンの読み込みと変換を関数tokensにまとめる。</p>
+
+<p><code>tokens :: String -&gt; [Token]<br/>
+tokens = concatMap emptyTag . filter (not . null . value)<br/>
+	<span class="indent1">. map (apply $ entity . spaces) . unfoldr token</span></code></p>
+
+<p>Data.List.unfoldrを使っているのでモジュールの先頭に</p>
+
+<p><code>import Data.List</code></p>
+
+<p>を追加する。</p>
+
+<p><code>*Main Data.List&gt; :m - Data.List<br/>
+*Main&gt; :reload<br/>
+*Main&gt; tokens "&lt;hello&gt;\n\t&amp;lt;world and you&amp;gt;\n&lt;/hello&gt;\n"<br/>
+[Open "hello",Text "&lt;world and you&gt;",Close "hello"]<br/>
+*Main&gt; tokens "&lt;hello&gt;&lt;world/&gt;&lt;/hello&gt;"<br/>
+[Open "hello",Open "world",Close "world",Close "hello"]</code></p>
 
 <h2>構文解析</h2>
+
+<p>
+字句解析ができたのでトークン列を読み込んで樹構造を返す関数を作成しよう。
+</p>
 
 <h2>煩悶</h2>
 
