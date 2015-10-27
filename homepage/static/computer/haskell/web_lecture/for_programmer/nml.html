@@ -351,9 +351,9 @@ nml s = case parse $ token s of (Just n, []) -&gt; Just n; _ -&gt; Nothing</code
 
 <h2>モジュールNmlParse</h2>
 
-<p>外から使う関数は関数nmlだけなので</p>
+<p>外から使うのは型Nmlと関数nmlなので</p>
 
-<p><code>module NmlParse (nml) where</code></p>
+<p><code>module NmlParse (Nml, nml) where</code></p>
 
 <p>をファイルの先頭に置く。</p>
 

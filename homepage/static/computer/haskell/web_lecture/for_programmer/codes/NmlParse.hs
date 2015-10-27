@@ -1,4 +1,4 @@
-module NmlParse (nml) where
+module NmlParse (Nml, nml) where
 
 import Data.List (unfoldr)
 import Data.Tree (Tree(..))

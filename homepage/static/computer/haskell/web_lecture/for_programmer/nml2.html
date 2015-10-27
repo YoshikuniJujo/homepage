@@ -1,10 +1,227 @@
 NML(Nano Markup Language): 2. 他の型へ/からの変換
 
-<p>(工事中 0%)</p>
+<p>(工事中 70%)</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/books.hs"
+	>books.hs</a></p>
+
+<h2>はじめに</h2>
+
+<p>NMLを利用して本のリストを読みこんでみよう。</p>
+
+<h2>型Book</h2>
+
+<p>本は題名と作者で表現されるものとする。</p>
+
+<p><code>data Book = Book {<br/>
+	<span class="indent1">title :: String</span><br/>
+	<span class="indent1">author :: String }</span><br/>
+	<span class="indent1">deriving Show</span></code></p>
+
+<h2>変換関数</h2>
+
+<p>Nml型の値から[Book]型の値への変換関数をつくる。</p>
+
+<h3>NMLによる表現</h3>
+
+<p>NMLによる本のリストは以下のような表現とする。</p>
+
+<p><code>&lt;books&gt;<br/>
+	<span class="indent1">&lt;book&gt;</span><br/>
+		<span class="indent2">&lt;title&gt;The Old Man and the Sea&lt;/title&gt;</span><br/>
+		<span class="indent2">&lt;author&gt;Ernest Hemingway&lt;/author&gt;</span><br/>
+	<span class="indent1">&lt;/book&gt;</span></code></p>
+<p><code>
+	<span class="indent1">&lt;book&gt;</span><br/>
+		<span class="indent2">&lt;title&gt;The Catcher in the Rye&lt;/title&gt;</span><br/>
+		<span class="indent2">&lt;author&gt;J. D. Salinger&lt;/author&gt;</span><br/>
+	<span class="indent1">&lt;/book&gt;</span><br/>
+&lt;/books&gt;</code></p>
+
+<p>このサンプルを文字列として定義しておく。</p>
+
+<p><code>books1 :: String<br/>
+books1 = "&lt;books&gt;" ++<br/>
+	<span class="indent1">"&lt;book&gt;" ++</span><br/>
+	<span class="indent1">"&lt;title&gt;The Old Man and the Sea&lt;/title&gt;" ++</span><br/>
+	<span class="indent1">"&lt;author&gt;Ernest Hemingway&lt;/author&gt;" ++</span><br/>
+	<span class="indent1">"&lt;/book&gt;" ++</span><br/>
+	<span class="indent1">"&lt;book&gt;" ++</span><br/>
+	<span class="indent1">"&lt;title&gt;The Cather in the Rye&lt;title&gt;" ++</span><br/>
+	<span class="indent1">"&lt;author&gt;J. D. Salinger&lt;author&gt;" ++</span><br/>
+	<span class="indent1">"&lt;/book&gt;" ++</span><br/>
+	<span class="indent1">"&lt;/books&gt;"</span></code></p>
+
+<p>モジュールNmlParseを使うので</p>
+
+<p><code>import NmlParse</code></p>
+
+<p>をモジュールの先頭に追加しておく。</p>
+
+<p><code>% ghci books.hs<br/>
+*Main&gt; nml books1<br/>
+Just (Node {rootLabel = "books", subForest = [Node {rootLabel = "book",
+subForest = [Node {rootLabel = "title", subForest = [Node {rootLabel = "The
+Old Man and the Sea", subForest = []}]},Node {rootLabel = "author", subForest
+= [Node {rootLabel = "Ernest Hemingway", subForest = []}]}]},Node {rootLabel =
+"book", subForest = [Node {rootLabel = "title", subForest = [Node {rootLabel =
+"The Cather in the Rye", subForest = []}]},Node {rootLabel = "author",
+subForest = [Node {rootLabel = "J. D. Salinger", subForest = []}]}]}]})
+</code></p>
+
+<h3>関数booklistNml</h3>
+
+<p>
+関数booklistNmlは1番外側のタグがbooksであることを確認したうえで
+なかのbookのリストを変換する。
+</p>
+
+<p><code>booklistNml :: Nml -&gt; Maybe [Book]<br/>
+booklistNml (Node "books" bl) = Just $ mapMaybe book bl<br/>
+booklistNml _ = Nothing</code></p>
+
+<p>
+関数bookはまだ作っていないがNml -&gt; Maybe Book型の関数だ。
+mapMaybeはMaybe型を返す関数をリストの全要素に適用し、Just値だけを集める関数だ。
+構文エラーや型エラーのチェックのために一度読みこんでおく。
+mapMaybeを使うためにData.Maybeをインポートする。
+また関数bookのスタブを用意しておこう。
+モジュールの先頭に
+</p>
+
+<p><code>import Data.Maybe</code></p>
+
+<p>を追加し関数bookのスタブを追加する。</p>
+
+<p><code>book :: Nml -&gt; Maybe Book<br/>
+book = undefined</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt;</code></p>
+
+<h3>関数book</h3>
+
+<p>
+関数bookはtitleタグとauthorタグのそれぞれについてそれ自体の存在と
+その中身の存在を確認し、存在すればそれらから値をとりだしてBook型にまとめる。
+関数getTitle, getAuthorのスタブも作っておこう。
+</p>
+
+<p><code>book :: Nml -&gt; Maybe Book<br/>
+book b@(Node "book" _) = case getTitle b of<br/>
+	<span class="indent1">Just t -&gt; case getAuthor b of</span><br/>
+		<span class="indent2">Just a -&gt; Just $ Book { title = t, author = a }</span><br/>
+		<span class="indent2">_ -&gt; Nothing</span><br/>
+	<span class="indent1">_ -&gt; Nothing</span><br/>
+book _ = Nothing</code></p>
+
+<p><code>getTitle, getAuthor :: Nml -&gt; Maybe String<br/>
+getTitle = undefined<br/>
+getAuthor = undefined</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt;</code></p>
+
+<h3>関数getTitle, getAuthor</h3>
+
+<p>
+getTitleとgetAuthorとはタグ名が"title"と"author"で違うだけだ。
+このような関数同士は違う部分を引数にしてまとめてしまったほうが良い。
+関数bookのgetTitleとgetAuthorをそれぞれ
+getValue "title"とgetValue "author"に書き換える。
+</p>
+
+<p><code>... = case getTitle b of<br/>
+	<span class="indent1">Just t -&gt; case getAuthor b of</span><br/>
+	<span class="indent1">...</span></code></p>
+
+<p>を</p>
+
+<p><code>... = case getValue "title" b of<br/>
+	<span class="indent1">Just t -&gt; case getValue "author" b of</span><br/>
+	<span class="indent1">...</span></code></p>
+
+</p>とする。またスタブも</p>
+
+<p><code>getTitle, getAuthor :: Nml -&gt; Maybe String<br/>
+getTitle = undefined<br/>
+getAuthor = undefined</code></p>
+
+<p>を</p>
+
+<p><code>getValue :: String -&gt; Nml -&gt; Maybe String<br/>
+getValue = undefined</code></p>
+
+<p>としておこう。</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt;</code></p>
+
+<h3>関数getValue</h3>
+
+<p>
+特定のタグを持つ子要素を集めてくれる関数childrenがあれば
+関数getValueは
+</p>
+
+<p><code>getValue :: String -&gt; Nml -&gt; Maybe String<br/>
+getValue t b = case children t b of<br/>
+	<span class="indent1">Node _ [Node v []] : _ -&gt; Just v</span><br/>
+	<span class="indent1">_ -&gt; Nothing</span></code></p>
+
+<p>と書ける。</p>
+
+<p>
+children t bの値をパターンマッチして中の値をとりだしている。
+パターンNode _ [Node v []] : _は(Node _ [Node v []]) : _ということであり、
+Node _ [Node v []]の部分は一番はじめの子要素となる。
+子要素のなかには値がひとつ含まれる。
+Tree型では葉となる要素がNode v []のように表現されることを思い出そう。
+</p>
+
+<h3>関数children</h3>
+
+<p>関数childrenは子要素のうち特定のタグを持つ要素だけを集める関数だ。</p>
+
+<p><code>children :: String -&gt; Nml -&gt; [Nml]<br/>
+children tg (Node _ cs) = filter ((== tg) . rootLabel) cs</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; let Just n = nml books1<br/>
+*Main&gt; n<br/>
+Just (Node {rootLabel = "books", subForest = [Node {rootLabel = "book",
+subForest = [Node {rootLabel = "title", subForest = [Node {rootLabel = "The
+Old Man and the Sea", subForest = []}]},Node {rootLabel = "author", subForest
+= [Node {rootLabel = "Ernest Hemingway", subForest = []}]}]},Node {rootLabel =
+"book", subForest = [Node {rootLabel = "title", subForest = [Node {rootLabel =
+"The Cather in the Rye", subForest = []}]},Node {rootLabel = "author",
+subForest = [Node {rootLabel = "J. D. Salinger", subForest = []}]}]}]})<br/>
+*Main&gt; booklistNml n<br/>
+Just [Book {title = "The Old Man and the Sea", author = "Ernest
+Hemingway"},Book {title = "The Catcher in the Rye", author = "J. D.
+Salinger"}]
+</code></p>
+
+<h3>関数booklist</h3>
+
+<p>使いやすくするために文字列から直接[Book]型の値を入手する関数を作っておく。</p>
+
+<p><code>booklist :: String -&gt; Maybe [Book]<br/>
+booklist s = case nml s of Just bl -&gt; booklistNml bl; _ -&gt; Nothing</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; booklist books1<br/>
+Just [Book {title = "The Old Man and the Sea", author = "Ernest
+Hemingway"},Book {title = "The Catcher in the Rye", author = "J. D.
+Salinger"}]</code></p>
+
+<h2>まとめ</h2>
+
+<p>HOHOGEGEGE</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/nml.html"
 	>「NML(1): 構文解析」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/nml3.html"
+	>「NML(3): 表示」へ</a>
 </p>
