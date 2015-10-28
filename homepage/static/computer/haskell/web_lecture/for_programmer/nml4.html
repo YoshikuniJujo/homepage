@@ -2,6 +2,41 @@ NML(Nano Markup Language): 4. 表示
 
 <p>(工事中 0%)</p>
 
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/Nml.hs"
+	>Nml.hs</a></p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/Nml0.hs"
+	>Nml0.hs</a></p>
+
+<h2>はじめに</h2>
+
+<p>Nml型の値を文字列に変換する。</p>
+
+<h2>スタブ</h2>
+
+<p>モジュールNmlに以下のスタブを追加する。</p>
+
+<p><code>fromNml :: Nml -&gt; String<br/>
+fromNml = toString . addSep . toTokens</code></p>
+
+<p><code>toString :: [Token] -&gt; String<br/>
+toString = undefined</code></p>
+
+<p><code>addSep :: [Token] -&gt; [Token]<br/>
+addSep = undefined</code></p>
+
+<p><code>toTokens :: Nml -&gt; [Token]<br/>
+toTokens = undefined</code></p>
+
+<h2>関数toTokens</h2>
+
+<h2>方針</h2>
+
+<p>
+まずは整形なしの関数を示す。
+interactを学び標準出力への書き出しをしながら整形機能を追加していく。
+</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/nml3.html"
 	>「NML(3): 他の型からの変換」へもどる</a>
