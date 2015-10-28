@@ -1,6 +1,6 @@
 NML(Nano Markup Language): 3. 他の型からの変換
 
-<p>(工事中 0%)</p>
+<p>(工事中 70%)</p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/Books.hs"
 	>Books.hs</a></p>
@@ -27,8 +27,28 @@ fromBook = undefined</code></p>
 
 <p>
 関数fromBooklistはNmlから文字列への変換関数を
-モジュールNmlに作成してから定義することにする。
+モジュールNmlに作成してから定義することになる。
 </p>
+
+<h2>関数fromBook</h2>
+
+<p>
+Book型の値をNml型の値、つまりTree String型の値に変換する。
+</p>
+
+<p><code>fromBook :: Book -&gt; Nml<br/>
+fromBook b = Node "book" [<br/>
+	<span class="indent1">Node "title" [Node (title b) []],</span><br/>
+	<span class="indent1">Node "author" [Node (author b) []] ]</span></code></p>
+
+<h2>関数fromBooklistNml</h2>
+
+<p><code>fromBooklist :: [Book] -&gt; Nml<br/>
+fromBooklistNml = Node "books" . map fromBook</code></p>
+
+<h2>まとめ</h2>
+
+<p>UUURRRRYYYYYYYYYYYYYY</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/nml2.html"

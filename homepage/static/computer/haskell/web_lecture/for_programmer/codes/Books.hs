@@ -3,7 +3,7 @@ module Books (Book(..), booklist) where
 import Data.Maybe
 import Data.Tree
 
-import NmlParse
+import Nml
 
 data Book = Book {
 	title :: String,
@@ -53,7 +53,9 @@ fromBooklist :: [Book] -> String
 fromBooklist = undefined
 
 fromBooklistNml :: [Book] -> Nml
-fromBooklistNml = undefined
+fromBooklistNml = Node "books" . map fromBook
 
 fromBook :: Book -> Nml
-fromBook = undefined
+fromBook b = Node "book" [
+	Node "title" [Node (title b) []],
+	Node "author" [Node (author b) []] ]
