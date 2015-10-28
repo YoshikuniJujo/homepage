@@ -6,6 +6,8 @@ import Data.Char (isSpace)
 
 type Nml = Tree String
 
+-- DECODE
+
 nml :: String -> Maybe Nml
 nml s = case parse $ tokens s of (Just n, []) -> Just n; _ -> Nothing
 
@@ -70,3 +72,24 @@ tag ('/' : s) = case span (/= '>') s of
 tag s = case span (/= '>') s of
 	(tg, _ : r) -> (Open tg, r)
 	(tg, _) -> (Open tg, "")
+
+-- ENCODE
+
+fromNml :: Nml -> String
+fromNml = toString . addSep . toTokens
+
+toString :: [Token] -> String
+toString (Open ot : Close ct : ts) | ot == ct = "<" ++ ot ++ "/>" ++ toString ts
+toString (Open tg : ts) = "<" ++ tg ++ ">" ++ toString ts
+toString (Close tg : ts) = "</" ++ tg ++ ">" ++ toString ts
+toString (Text tx : ts) = tx ++ toString ts
+toString _ = ""
+
+addSep :: [Token] -> [Token]
+addSep (t1@(Text _) : ts@(Text _ : _)) = t1 : Open "" : addSep ts
+addSep (t : ts) = t : addSep ts
+addSep _ = []
+
+toTokens :: Nml -> [Token]
+toTokens (Node tx []) = [Text tx]
+toTokens (Node tg ns) = Open tg : concatMap toTokens ns ++ [Close tg]

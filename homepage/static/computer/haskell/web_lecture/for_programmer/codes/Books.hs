@@ -1,4 +1,4 @@
-module Books (Book(..), booklist) where
+module Books (Book(..), booklist, fromBooklist) where
 
 import Data.Maybe
 import Data.Tree
@@ -8,7 +8,7 @@ import Nml
 data Book = Book {
 	title :: String,
 	author :: String }
-	deriving Show
+	deriving (Show, Read)
 
 books1 :: String
 books1 = "<books>" ++
@@ -50,7 +50,7 @@ children tg (Node _ cs) = filter ((== tg) . rootLabel) cs
 -- ENCODE
 
 fromBooklist :: [Book] -> String
-fromBooklist = undefined
+fromBooklist = fromNml . fromBooklistNml
 
 fromBooklistNml :: [Book] -> Nml
 fromBooklistNml = Node "books" . map fromBook
