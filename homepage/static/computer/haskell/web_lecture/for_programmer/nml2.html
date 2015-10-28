@@ -1,9 +1,9 @@
-NML(Nano Markup Language): 2. 他の型へ/からの変換
+NML(Nano Markup Language): 2. 他の型への変換
 
 <p>(工事中 70%)</p>
 
-<p><a href="/computer/haskell/web_lecture/for_programmer/codes/books.hs"
-	>books.hs</a></p>
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/Books.hs"
+	>Books.hs</a></p>
 
 <h2>はじめに</h2>
 
@@ -214,6 +214,14 @@ booklist s = case nml s of Just bl -&gt; booklistNml bl; _ -&gt; Nothing</code><
 Just [Book {title = "The Old Man and the Sea", author = "Ernest
 Hemingway"},Book {title = "The Catcher in the Rye", author = "J. D.
 Salinger"}]</code></p>
+
+<h2>モジュールBooks</h2>
+
+<p>後で使いやすいようにモジュール名をつけておこう。先頭に</p>
+
+<p><code>module Books (Books(..), booklist) where</code></p>
+
+<p>を追加する。</p>
 
 <h2>まとめ</h2>
 

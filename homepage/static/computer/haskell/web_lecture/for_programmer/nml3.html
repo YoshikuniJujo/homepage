@@ -1,10 +1,38 @@
-NML(Nano Markup Language): 3. 表示
+NML(Nano Markup Language): 3. 他の型からの変換
 
 <p>(工事中 0%)</p>
 
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/Books.hs"
+	>Books.hs</a></p>
+
+<h2>はじめに</h2>
+
+<p>
+Nml型の値から[Book]型の値への変換を見た。
+次は[Book]型からNml型の値への変換を見る。
+</p>
+
+<h2>スタブ</h2>
+
+<p>必要そうな関数がだいたいわかるのでスタブを先に使っておく。</p>
+
+<p><code>fromBooklist :: [Book] -&gt; String<br/>
+fromBooklist = undefined</code></p>
+
+<p><code>fromBooklistNml :: [Book] -&gt; Nml<br/>
+fromBooklistNml = undefined</code></p>
+
+<p><code>fromBook :: Book -&gt; Nml<br/>
+fromBook = undefined</code></p>
+
+<p>
+関数fromBooklistはNmlから文字列への変換関数を
+モジュールNmlに作成してから定義することにする。
+</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/nml2.html"
-	>「NML(2): 他の型へ/からの変換」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+	>「NML(2): 他の型への変換」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/nml4.html"
+	>「NML(4): 表示」へ</a>
 </p>

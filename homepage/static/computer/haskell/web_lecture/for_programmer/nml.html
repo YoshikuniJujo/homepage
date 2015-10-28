@@ -44,8 +44,8 @@ HaskellではMaybeモナド等のエラーを扱うモナドを導入するこ�
 
 <p>のふたつは同じものとして扱われる。</p>
 
-<p><a href="/computer/haskell/web_lecture/for_programmer/codes/NmlParse.hs"
-	>NmlParse.hs</a></p>
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/Nml.hs"
+	>Nml.hs</a></p>
 
 <h2>字句解析</h2>
 
@@ -101,7 +101,7 @@ tag s = case span (/= '&gt;') s of<br/>
 
 <h3>試してみる</h3>
 
-<p><code>% ghci NmlParse.hs<br/>
+<p><code>% ghci Nml.hs<br/>
 *Main&gt; token "&lt;hello&gt;world&lt;/hello&gt;"<br/>
 Just (Open "hello","world&lt;hello&gt;")</code></p>
 
@@ -349,19 +349,19 @@ parses ts = case parse ts of<br/>
 <p><code>nml :: String -&gt; Maybe Nml<br/>
 nml s = case parse $ token s of (Just n, []) -&gt; Just n; _ -&gt; Nothing</code></p>
 
-<h2>モジュールNmlParse</h2>
+<h2>モジュールNml</h2>
 
 <p>外から使うのは型Nmlと関数nmlなので</p>
 
-<p><code>module NmlParse (Nml, nml) where</code></p>
+<p><code>module Nml (Nml, nml) where</code></p>
 
 <p>をファイルの先頭に置く。</p>
 
 <p><code>*Main&gt; :reload<br/>
-*NmlParse&gt; :m NmlParse<br/>
-Prelude NmlParse&gt; nml "&lt;hello&gt;world&lt;/hello&gt;"<br/>
+*Nml&gt; :m Nml<br/>
+Prelude Nml&gt; nml "&lt;hello&gt;world&lt;/hello&gt;"<br/>
 Just (Node {rootLabel = "hello", subForest = [Node {rootLabel = "world", subForest = []}]})<br/>
-Prelude NmlParse&gt; nml "&lt;flowers&gt;rose&lt;&gt;tulip&lt;&gt;lily&lt;/flowers&gt;"<br/>
+Prelude Nml&gt; nml "&lt;flowers&gt;rose&lt;&gt;tulip&lt;&gt;lily&lt;/flowers&gt;"<br/>
 Just (Node {rootLabel = "flowers", subForest = [
 Node {rootLabel = "rose", subForest = []},
 Node {rootLabel = "tulip", subForest = []},
@@ -371,5 +371,5 @@ Node {rootLabel = "lily", subForest = []}]})</code></p>
 <a href="/computer/haskell/web_lecture/for_programmer/adt_export.html"
 	>「構文: 代数的データ型のエクスポート」へもどる</a>
 <a href="/computer/haskell/web_lecture/for_programmer/nml2.html"
-	>「NML(2): 他の型へ/からの変換」へ</a>
+	>「NML(2): 他の型への変換」へ</a>
 </p>
