@@ -2,9 +2,52 @@
 
 <p>(工事中 0%)</p>
 
+<h2>はじめに</h2>
+
+<p>
+deriving Showとすると自分で定義した型の値を「いい感じに」表示してくれる
+関数showを使うことができるようになる。
+derivingで指定できる値はShowだけでなくいくつかある。
+今回はReadを学ぶ。
+</p>
+
+<h2>複数のderiving</h2>
+
+<p>
+derivingで複数の値を指定する場合は括弧でくくりコンマでくぎる。
+ShowとReadを指定する場合には以下のようになる。
+</p>
+
+<p><code>data Foo = Bar | Baz deriving (Show, Read)</code></p>
+
+<h2>Read</h2>
+
+<p>
+deriving Readとすると自分で定義した型の値を「いい感じに」読みこんでくれる
+関数readが使えるようになる。
+関数showによって得られた文字列を関数readによって読みこむともとの値が得られる。
+ただし関数readの返り値は多相的なので型注釈が必要になる。
+</p>
+
+<p><code>data Foo = Bar Bool Char | Baz Int Double deriving (Show, Read)</code></p>
+
+<p><code>% ghci deriving_read.hs<br/>
+*Main&gt; show $ Bar False 'c'<br/>
+"Bar False 'c'"<br/>
+*Main&gt; read it :: Foo<br/>
+Bar False 'c'<br/>
+*Main&gt; show $ Baz 8 5<br/>
+"Baz 8 5.0"<br/>
+*Main&gt; read it :: Foo<br/>
+Baz 8 5.0</code></p>
+
+<h2>まとめ</h2>
+
+<p>ズキュウウウン</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/nml4.html"
 	>「NML(4): 表示」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/interact.html"
+	>「関数: 簡易的なIO」へ</a>
 </p>
