@@ -1,9 +1,6 @@
 NML(Nano Markup Language): 4. 表示
 
-<p>(工事中 0%)</p>
-
-<p><a href="/computer/haskell/web_lecture/for_programmer/codes/Nml.hs"
-	>Nml.hs</a></p>
+<p>(工事中 70%)</p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/Nml0.hs"
 	>Nml0.hs</a></p>
@@ -17,7 +14,7 @@ NML(Nano Markup Language): 4. 表示
 <p>モジュールNmlに以下のスタブを追加する。</p>
 
 <p><code>fromNml :: Nml -&gt; String<br/>
-fromNml = toString . addSep . toTokens</code></p>
+fromNml = concatMap toString . addSep . toTokens</code></p>
 
 <p><code>toString :: [Token] -&gt; String<br/>
 toString = undefined</code></p>
@@ -30,6 +27,76 @@ toTokens = undefined</code></p>
 
 <h2>関数toTokens</h2>
 
+<p>まずは樹構造をフラットなトークン列に変換する。</p>
+
+<p><code>toTokens :: Nml -&gt; [Token]<br/>
+toTokens (Node tx []) = [Text tx]<br/>
+toTokens (Node tg ns) = Open tg : concatMap toTokens ns ++ [Close tg]</code></p>
+
+<p>テスト用のサンプルNmlデータを作成しておく。</p>
+
+<p><code>sample1, sample2 :: Nml<br/>
+sample1 = Node "hello" [Node "world" []]<br/>
+sample2 = Node "hello" [Node "world" [], Node "and" [], Node "you" []]</code></p>
+
+<p><code>% ghci Nml.hs<br/>
+*Nml&gt; toTokens sample1<br/>
+[Open "hello",Text "world",Close "hello"]<br/>
+*Nml&gt; toTokens sample2<br/>
+[Open "hello",Text "world",Text "and",Text "you",Close "hello"]</code></p>
+
+<h2>関数addSep</h2>
+
+<p>
+Textデータが複数並んだものをそのまま文字列に変換してしまうと
+ひとつのTextデータにまとまってしまうので、
+セパレータとして空開きタグを挿入する。
+</p>
+
+<p><code>addSep :: [Token] -&gt; [Token]<br/>
+addSep (t1@(Text _) : ts@(Text _ : _)) = t1 : Open "" : addSep ts<br/>
+addSep (t : ts) = t : addSep ts<br/>
+addSep _ = []</code></p>
+
+<h2>関数toString</h2>
+
+<p>ひとつのトークンを文字列に変換する。</p>
+
+<p><code>toString :: Token -&gt; String<br/>
+toString (Open tg) = "&lt;" ++ tg ++ "&gt;"<br/>
+toString (Close tg) = "&lt;/" ++ tg ++ "&gt;"<br/>
+toString (Text tx) = tx</code></p>
+
+<p><code>*Nml&gt; :reload<br/>
+*Nml&gt; fromNml sample1<br/>
+"&lt;hello&gt;world&lt;/hello&gt;"<br/>
+*Nml&gt; fromNml sample2<br/>
+"&lt;hello&gt;world&lt;&gt;and&lt;&gt;you&lt;/hello&gt;"</code></p>
+
+<h2>エクスポートリスト</h2>
+
+<p>エクスポートリストにfromNmlを追加する。</p>
+
+<p><code>module Nml (Nml, nml, fromNml) where</code></p>
+
+<h2>関数fromBooklist</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/Books.hs"
+	>Books.hs</a></p>
+
+<p>モジュールBooksの関数fromBooklistを完成される。</p>
+
+<p><code>fromBooklist :: [Book] -&gt; String<br/>
+fromBooklist = fromNml . fromBooklistNml</code></p>
+
+<p>エクスポートリストに追加する。</p>
+
+<p><code>module Books (Book(..), booklist, fromBooklist) where</code></p>
+
+<h2>まとめ</h2>
+
+<p>UUUUUUUUUUUURRRRRRRRRRRRRRRRYYYYYYYYYYYYYY</p>
+
 <h2>方針</h2>
 
 <p>
@@ -40,6 +107,6 @@ interactを学び標準出力への書き出しをしながら整形機能を追
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/nml3.html"
 	>「NML(3): 他の型からの変換」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/deriving_read.html"
+	>「構文: deriving Read」へ</a>
 </p>
