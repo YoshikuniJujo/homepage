@@ -1,16 +1,76 @@
 関数: 簡易的なIO
 
-<p>(工事中 0%)</p>
+<p>(工事中 70%)</p>
 
 <h2>はじめに</h2>
 
+<p>IOモナドを学ぶまえに簡易的な入出力のやりかたを見てみよう。</p>
+
+<h2>すべてのプログラムはフィルタである</h2>
+
 <p>
-IOモナドを学ぶまえに簡易的な入出力のやりかたを見てみよう。
+「UNIXという考え方」のなかで「すべてのプログラムはフィルタである」とある。
+「フィルタ」とはここでは入力を変換して出力するものという意味だ。
+たとえばファイルのフォーマットを変換するプログラムなどではわかりやすい。
+ゲームなどはフィルタっぽくないが、
+これも「時間」と「ユーザの入力」という入力値を変換して
+「画面」として出力するプログラムと考えればフィルタである。
 </p>
+
+<p>
+すべてのプログラムはフィルタであるにしても
+最もフィルタっぽいプログラムは標準入力からの入力を変換して
+標準出力に出力するプログラムだろう。
+</p>
+
+<h2>String -&gt; String</h2>
+
+<p>
+ここに文字列を文字列に変換する関数がある。
+これがあればフィルタを作成するには十分だ。
+String -&gt; String型の関数をフィルタに変換することを考える。
+</p>
+
+<h2>あるよ</h2>
+
+<p>String -&gt; String型の関数をフィルタに変換する関数がある。</p>
+
+<p><code>interact :: (String -&gt; String) -&gt; IO ()</code></p>
+
+<p>
+IO ()という見なれない型が出てきた。
+これは今のところは入出力等いろいろなことのできる機械の型であると考えておこう。
+つまりinteractは文字列変換関数をとって機械を返す関数となる。
+</p>
+
+<h2>まとめ</h2>
+
+<!--
+<h2>対話環境では</h2>
+
+<p>対話環境で「機械」以外の値は文字列化されて表示される。</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; 8<br/>
+8<br/>
+Prelude&gt; True<br/>
+True</code></p>
+
+<p>対話環境に「機械」を与えるとその機械をその場で動かしてくれる。</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; :m Data.Char<br/>
+Prelude&gt; :t map toUpper<br/>
+[Char] -&gt; [Char]<br/>
+Prelude&gt; map toUpper "Haskell"<br/>
+"HASKELL"<br/>
+Prelude&gt; interact $ map toUpper<br/>
+HHaAsSkKeElL</code></p>
+-->
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/deriving_read.html"
 	>「構文: deriving Read」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/main.html"
+	>「機能: main」へ</a>
 </p>
