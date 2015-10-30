@@ -6,16 +6,15 @@
 <h2>はじめに</h2>
 
 <p>
-前回は代数的データ型で樹構造を作る方法を学んだ。
-今回は葉となる要素の型を型変数として定義してみる。
-これは一般的なコンテナとしての樹構造となる。
+代数的データ型で樹構造を作る方法を学んだ。
+葉となる要素の型を型変数として一般化する。樹構造のコンテナとなる。
 </p>
 
 <h2>葉、花、実</h2>
 
 <p>型Appleの定義を枝のないものにもどす。</p>
 
-<p><code>data Apple = Leaf | Flower | Apple deriving Show</code></p>
+<p><code>data Apple = Leaf | Flower | Fruit deriving Show</code></p>
 
 <h2>一般的な枝</h2>
 
@@ -24,15 +23,15 @@
 <p><code>data Tree a = Branch (Tree a) (Tree a) | Atom a deriving Show</code></p>
 
 <p><code>% ghci apple3.hs<br/>
-*Main&gt; Branch (Branch (Atom Leaf) (Atom Flower)) (Atom Apple)<br/>
-Branch (Branch (Atom Leaf) (Atom Flower)) (Atom Apple)<br/>
-*Main&gt; :t Branch (Branch (Atom Leaf) (Atom Flower)) (Atom Apple)<br/>
-Branch (Branch (Atom Leaf) (Atom Flower)) (Atom Apple)<br/>
+*Main&gt; Branch (Branch (Atom Leaf) (Atom Flower)) (Atom Fruit)<br/>
+Branch (Branch (Atom Leaf) (Atom Flower)) (Atom Fruit)<br/>
+*Main&gt; :t Branch (Branch (Atom Leaf) (Atom Flower)) (Atom Fruit)<br/>
+Branch (Branch (Atom Leaf) (Atom Flower)) (Atom Fruit)<br/>
 	<span style="margin-left: 1em">:: Tree Apple</span></code></p>
 
 <p>
 葉、花、実を枝につけるときには値構築子AtomでTree Apple型の値にしてやる必要がある。
-この枝にはどの型の値でもつけることができる。
+この枝にはどんな型の値でもつけられる。
 </p>
 
 <p><code>*Main&gt; Branch (Atom True) (Atom False)<br/>
@@ -50,18 +49,18 @@ Branch (Atom True) (Atom False) :: Tree Bool</code></p>
 <p><code>priceA :: Apple -&gt; Int<br/>
 priceA Leaf = 50<br/>
 priceA Flower = 80<br/>
-priceA Apple = 100</code></p>
+priceA Fruit = 100</code></p>
 
 <p>枝全体の値段を求める関数は</p>
 
 <p><code>price1 :: Tree Apple -&gt; Int<br/>
 price1 (Atom a) = priceA a<br/>
-price1 (Branch t1 t2) = price1 t1 + price1 t2</code></p>
+price1 (Branch t1 t2) = 20 + price1 t1 + price1 t2</code></p>
 
 <p>となる。</p>
 
 <p><code>*Main&gt; price1 $
-	Branch (Branch (Atom Leaf) (Atom Flower)) (Atom Apple)<br/>
+	Branch (Branch (Atom Leaf) (Atom Flower)) (Atom Fruit)<br/>
 270</code></p>
 
 <h2>枝から外す</h2>
@@ -103,6 +102,17 @@ branch (Branch t1 t2) = Right [t1, t2]</code></p>
 これは再帰的なコンテナということだ。
 このような型の値は要素を無限に収納可能なコンテナとなる。
 </p>
+
+<h2>課題</h2>
+
+<ol>
+<li>上記Treeに枝がひとつしかない値を追加した型を作成せよ
+	<ul>
+	<li>上記Tree自体は枝が2つの場合と葉の場合のみ</li>
+	<li>それに枝が1つの場合を追加する</li>
+	</ul></li>
+<li>課題1で定義した樹の要素を深さ優先探索で列挙する関数を作成せよ</li>
+</ol>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/adt_recursive.html"

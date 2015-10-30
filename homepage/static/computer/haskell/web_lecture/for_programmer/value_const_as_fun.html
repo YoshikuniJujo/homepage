@@ -43,7 +43,8 @@ Char -&gt; Int -&gt; Cell</code></p>
 <p>Cellは普通の関数と同じように扱える。関数合成することもできる。</p>
 
 <p><code>*Main&gt; :m + Data.Char<br/>
-*Main Data.Char&gt; (Cell . toUpper) 'a' 3</code></p>
+*Main Data.Char&gt; (Cell . toUpper) 'a' 3<br/>
+Cell 'A' 3</code></p>
 
 <p>部分適用もできる。</p>
 
@@ -84,6 +85,16 @@ cell1 = Cell 'A' 8</code></p>
 値構築子は関数でもありパターン構築子でもある。
 値を作成したり分解したりすることができる。
 </p>
+
+<h2>課題</h2>
+
+<ol>
+<li>与えられた文字を大文字にしてJust値として返す関数を関数合成で書け
+	<ul>
+	<li>import Data.Listが必要</li>
+	<li>ファイルにtoJustUpper = ...のような形で定義し対話環境で試す</li>
+	</ul></li>
+</ol>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/point_is_point.html"

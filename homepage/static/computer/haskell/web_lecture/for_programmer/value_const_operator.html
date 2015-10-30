@@ -67,8 +67,10 @@ Yellow</code></p>
 	>recreationOp.hs</a></p>
 
 <p>
-関数には小文字で始まる識別子を使う。値構築子には大文字で始まる識別子を使う。
-演算子は:以外で始まる記号列を使う。値構築演算子には:で始まる記号列を使う。
+関数には小文字で始まる識別子を使うのに対して、
+値構築子には大文字で始まる識別子を使う。
+同じように、演算子は:以外で始まる記号列を使うのに対して、
+値構築演算子には:で始まる記号列を使う。
 </p>
 
 <h3>指示</h3>
@@ -76,6 +78,10 @@ Yellow</code></p>
 <p>値構築演算子を使う。</p>
 
 <p><code>data Order = Cap :-&gt; Cap deriving Show</code></p>
+
+<p>矢印で「変化」の感じを出した。</p>
+
+<!-- <p>顔文字のようにも見えるが矢印と思ってほしい。</p> -->
 
 <h3>レクリエーション関数</h3>
 
@@ -87,7 +93,7 @@ recreation Yellow (Yellow :-&gt; c : os) = recreation c os<br/>
 recreation c (_ : os) = recreation c os</code></p>
 
 <p><code>*Main&gt; :reload<br/>
-*Main&gt; recreation Blue [Red :-&gt; Blue, Blue :-&gt; Red, Change Yellow :-&gt; Red, Red :-&gt; Yellow]<br/>
+*Main&gt; recreation Blue [Red :-&gt; Blue, Blue :-&gt; Red, Yellow :-&gt; Red, Red :-&gt; Yellow]<br/>
 Yellow</code></p>
 
 <h2>まとめ</h2>
@@ -97,6 +103,16 @@ Yellow</code></p>
 値構築演算子は:から始まる記号列だ。
 値構築演算子を使うことでコードがわかりやすくなることがある。
 </p>
+
+<h2>課題</h2>
+
+<ol>
+<li>同じ文字の連続を文字と整数値で表現する型を作成せよ
+	<ul>
+	<li>値構築演算子名には:*:を使用せよ</li>
+	</ul></li>
+<li>上記の型の値のリストを文字列に変換する関数を作成せよ</li>
+</ol>
 
 <!--
 <h2>メモ</h2>
