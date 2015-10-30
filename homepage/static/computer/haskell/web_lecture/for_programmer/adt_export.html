@@ -40,8 +40,7 @@ Nothing more.
 信じたいものを信じ続ければいい。
 赤い薬を選べば『夢の国』だ。
 うさぎの穴がどれだけ深いかを教えよう。
-私が教えるのは本当のことだ。
-それ以上ではない)
+すべて本当のこと、それだけだ。)
 </p>
 
 <p><code>module Morpheus (Pill(..), select) where</code></p>
@@ -59,15 +58,15 @@ Prelude Morpheus&gt; select Blue<br/>
 Prelude Morpheus&gt; select Red<br/>
 "You stay in Wonderland."</code></p>
 
-<p>明示的にエクスポートしても同じことだ。</p>
+<p>明示的にエクスポートしても同じだ。</p>
 
 <p><code>module Morpheus (Pill(Blue, Red), select) where</code></p>
 
-<p>もっと強引なモーフィアスにしたければ</p>
+<p>もっと強引なモーフィアスであれば</p>
 
 <p><code>module Morpheus (Pill(Red), select) where</code></p>
 
-<p>とする。</p>
+<p>となる。</p>
 
 <p><code>Prelude Morpheus&gt; :reload<br/>
 *Morpheus Morpheus&gt; :m Morpheus<br/>
@@ -78,25 +77,24 @@ Prelude Morpheus&gt; select Red<br/>
 "You stay in Wonderland"</code></p>
 
 <p>
-この場合、値構築子Blueは決して使うことができない。
-「夢の国」から今までの生活にもどることは不可能だ。
+値構築子Blueは決して使えない。「夢の国」から今までの生活にはもどれない。
 </p>
 
 <h2>値構築子を公開しない</h2>
 
 <p>
-Morpheusモジュールで値構築子Blueを公開しないのは現実的には意味がない。
-単にdata Pill = Redとすれば良いだけだ。
+Morpheusモジュールで値構築子Blueを公開しないのは実際には意味がない。
+単にdata Pill = Redとすれば良い。
 値構築子を公開しない場合には何らかの方法で
-その値構築子を使った値を公開することになるだろう。
-特定の値そのものを用意するか、あるいはそれらの値を返す関数を公開するかだ。
+その値構築子を使った値を公開することになる。
+値そのものを用意するか、あるいは値を返す関数を公開するかだ。
 </p>
 
 <h3>用意した値以外使わせない</h3>
 
 <p>
-2つの整数の組を互いに素な整数をべき等することで表現する。
-互いに素な整数として2, 3を使うと例を示す。
+2つの整数の組を、互いに素な整数のべき乗で表現する。
+互いに素な整数として2, 3を使う例だ。
 </p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/tuple23.hs"
@@ -120,8 +118,8 @@ uncons xy = (unpower 2 xy, unpower 3 xy)</code></p>
 (5,7)</code></p>
 
 <p>
-2, 3以外のペアを使うことを考える。
-モジュール側でいくつかのペアを用意して、それ以外は使えないようにする。
+2, 3以外のペアを使いたい。モジュール側でいくつかのペアを用意する。
+それ以外は使えないようにする。
 </p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/TupleAB.hs"
@@ -165,9 +163,9 @@ Prelude TupleAB&gt; uncons it<br/>
 (5,7)</code></p>
 
 <p>
-型名Pairだけを公開して値構築子Pairを隠蔽しているためp1からp5までの
-5個の値以外のPair型の値を作ることはできない。
-たとえば2と4のペアなどの不正な値を使うことができないようになっている。
+型名Pairだけを公開して値構築子Pairを隠蔽している。
+p1からp5までの5個の値以外のPair型の値は作れない。
+たとえば2と4のペアなどの不正な値は使えない。
 </p>
 
 <h3>特定の条件を満たす値以外使わせない</h3>
@@ -175,7 +173,7 @@ Prelude TupleAB&gt; uncons it<br/>
 <p>
 関数の実行前に引数が特定の条件を満たしていることを保証したいことがある。
 リストがソート済みでなければならない、などだ。
-ここでは例として偶数であることを保証する型を考えてみよう。
+ここでは例として偶数であることを保証する型を考える。
 </p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/Even.hs"
@@ -194,14 +192,13 @@ Prelude TupleAB&gt; uncons it<br/>
 toEven n | even n = Just $ Even n | otherwise = Nothing</code></p>
 
 <p>
-この関数は奇数を与えるとNothingを返す。
-Even型の値から整数値をとりだす関数も作る。
+この関数は奇数を与えるとNothingを返す。Even型の値から整数値をとりだす関数も作る。
 </p>
 
 <p><code>fromEven :: Even -&gt; Integer<br/>
 fromEven (Even n) = n</code></p>
 
-<p>整数値を2倍することでEven型の値を作成する関数も作っておこう。</p>
+<p>整数値を2倍することでEven型の値を作成する関数も作っておく。</p>
 
 <p><code>double :: Integer -&gt; Even<br/>
 double n = Even $ 2 * n</code></p>
@@ -235,16 +232,12 @@ Even 7</code></p>
 
 <h4>モジュール</h4>
 
-<p>
-モジュール名を指定して公開する識別子を明示する。
-先頭に
-</p>
+<p>モジュール名を指定して公開する識別子を明示する。先頭に</p>
 
 <p><code>module Even (Even, toEven, fromEven, double) where</code></p>
 
 <p>
-をつける。
-識別子Evenのあとに(..)がない。
+をつける。識別子Evenのあとに(..)がない。
 これは型だけ公開し値構築子を公開しないということだ。
 </p>
 
@@ -258,9 +251,9 @@ Even 7</code></p>
 Prelude Even&gt;</code></p>
 
 <p>
-このようにモジュールEvenを明示的にインポートすることで
-モジュールEvenの外からモジュールEvenをインポートした状態となる。
-明示的に公開した識別子しか使えなくなる。
+このようにモジュールEvenを明示的にインポートすると
+モジュールEvenのそとからモジュールEvenをインポートした状態になる。
+明示的に公開した識別子だけ使える。
 </p>
 
 <p><code>Prelude Even&gt; Even 7</code></p>
@@ -357,22 +350,50 @@ Left 5</code></p>
 <p><code>evenAs :: Even -&gt; String<br/>
 evenAs e = replicate (fromIntegral $ fromEven e) 'a'</code></p>
 
+<p>:m - モジュール名でインポートしたモジュールを消すことができる。</p>
+
 <p><code>Prelude Even&gt; :m - Even<br/>
 Prelude&gt; :load useEven.hs<br/>
 *Main&gt; let Just e = toEven 8<br/>
 *Main&gt; evenAs e<br/>
 "aaaaaaaa"<br/>
-*Main&gt; evenAs (double 3)<br/>
+*Main&gt; evenAs $ double 3<br/>
 "aaaaaa"</code></p>
 
-<p>この関数を使ってできる文字列の長さは必ず偶数となる。</p>
+<p>この関数でできる文字列の長さは必ず偶数となる。</p>
 
 <h2>まとめ</h2>
 
 <p>
-モジュールを作成すると公開する識別子を制限することができる。
-それによって引数が特定の条件を満たすことを保証することができる。
+モジュールを作成すると公開する識別子を制限できる。
+引数が特定の条件を満たすことを保証できる。
 </p>
+
+<h2>課題</h2>
+
+<ol>
+<li>モジュールAnpanmanを作成し型Friendを定義せよ
+	<ul>
+	<li>型Friendは値構築子Friendをもつ</li>
+	<li>値構築子Friendは文字列を引数としてもつ</li>
+	<li>deriving Showをしておく</li>
+	</ul></li>
+<li>値ai, yuukiを定義せよ
+	<ul>
+	<li>値aiは文字列"Ai"をもつFriend型の値</li>
+	<li>値yuukiは文字列"Yuuki"をもつFriend型の値</li>
+	</ul></li>
+<li>エクスポートリストを明示して型Friend、値ai、yuukiだけを指定せよ
+	<ul>
+	<li>値構築子Friendは公開しない</li>
+	</ul></li>
+<li>対話環境に読みこめ
+	<ul>
+	<li>まずはモジュール内ではaiとyuuki以外のFriendも作れることを確認する</li>
+	<li>明示的に:m Anpanmanとしてモジュールの外に出よ</li>
+	<li>aiとyuukiだけがFriendであることを確認せよ</li>
+	</ul></li>
+</ol>
 
 <!--
 

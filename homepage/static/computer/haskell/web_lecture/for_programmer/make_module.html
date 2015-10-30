@@ -1,23 +1,18 @@
 構文: モジュールの作成
 
-<h2>今まで</h2>
+<h2>デフォルトはモジュールMain</h2>
 
-<p>
-ファイルで関数を定義してそれを読みこんでいた。
-</p>
+<p>空のファイルを作成しそれを対話環境に読みこむ。</p>
 
-<p><code>% ghci some.hs<br/>
+<p><code>% touch some.hs<br/>
+% ghci some.hs<br/>
 *Main&gt;</code></p>
 
-<p>
-とくに指定しなければそのファイルはMainモジュールとみなされる。
-</p>
+<p>指定がなければMainモジュールとなる。</p>
 
 <h2>明示的に</h2>
 
-<p>
-明示的にMainモジュールであることを記述してみよう。
-</p>
+<p>明示的にMainモジュールであることを記述する。</p>
 
 <p><code>module Main where</code></p>
 
@@ -29,8 +24,8 @@ c = 5</code></p>
 <h2>モジュールSome</h2>
 
 <p>
-モジュール名をMainではなくSomeにしてみよう。
-Mainモジュール以外ではモジュール名とファイル名は合わせておいたほうが良い。
+モジュール名をMainではなくSomeにする。
+Mainモジュール以外ではモジュール名とファイル名は合わせておく。
 </p>
 
 <p><code>Some.hs</code></p>
@@ -68,8 +63,8 @@ d = a * b</code></p>
 <h2>エクスポートリストを明示する</h2>
 
 <p>
-普通はエクスポートリストは明示する。
-ローカルに使われる補助的な関数や値を公開したくはない。
+普通はエクスポートリストを明示する。
+ローカルに使われる補助的な関数や値を公開したくない。
 </p>
 
 <p><code>module Some (a, b) where</code></p>
@@ -83,7 +78,7 @@ c = 5</code></p>
 
 <h2>対話環境におけるモジュールの内外の意味</h2>
 
-<p>対話環境においてモジュール名の前の*は「モジュールのなか」を意味する。</p>
+<p>対話環境のモジュール名の前の*は「モジュールのなか」ということだ。</p>
 
 <p><code>*Main&gt; :load Some.hs<br/>
 *Some&gt; a<br/>
@@ -102,12 +97,11 @@ Prelude Some&gt; c</code></p>
 <p><code>&lt;interactive&gt;:X:Y: Not in scope: `c'</code></p>
 
 <p>
-*SomeのようにモジュールSomeのなかにいるときは変数cにアクセスできた。
-しかしSomeのようにモジュールSomeのそとにいるときは公開されていない変数cには
-アクセスできない。
-またSomeのなかではPreludeの関数が使えるのでPreludeの追加のインポートは不要だ。
-しかしSomeのそとではPreludeを明示的にインポートする必要がある。
-よってPrelude Someのように複数のモジュールをインポートした形となっている。
+*Someで表されるモジュールSomeのなかでは変数cにアクセスできる。
+SomeのようにモジュールSomeのそとでは公開されていない変数cにはアクセスできない。
+またSomeのなかではPreludeの関数が使える。
+しかしSomeのそとではPreludeをインポートする必要がある。
+よってPrelude Someのように複数のモジュールをインポートした形となる。
 </p>
 
 <h2>まとめ</h2>
@@ -118,6 +112,17 @@ module モジュール名 whereの形で指定する。
 指定がないときは暗黙のうちにモジュール名はMainとなる。
 Mainモジュール以外ではエクスポートリストは明示したほうが良い。
 </p>
+
+<h2>課題</h2>
+
+<ol>
+<li>モジュールNumbersを定義せよ</li>
+<li>モジュールNumbersのなかで整数値one, two, threeを定義せよ</li>
+<li>整数値eightをtwo ^ threeで定義せよ</li>
+<li>エクスポートリストで明示的にoneとeightだけを指定せよ</li>
+<li>対話環境で読みこみまずはone, two, three, eightのすべてにアクセスできることを確認せよ</li>
+<li>:m Numbersとしてtwoとthreeにはアクセスできないことを確認せよ</li>
+</ol>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/adt_import.html"

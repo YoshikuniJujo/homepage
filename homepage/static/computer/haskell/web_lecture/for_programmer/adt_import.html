@@ -60,8 +60,8 @@ type Forest a = [Tree a]</code></p>
 
 <p>
 のようにするとこのモジュールが公開しているすべての名前が導入される。
-このようにすると使われている変数がどのモジュール由来なのかわからなくなり、
-コードを読むときに大きな障害となる。
+これだと使われている変数がどのモジュール由来なのかわからなくなる。
+コードを読むときの大きな障害だ。
 </p>
 
 <p><code>import Asparagus<br/>
@@ -76,8 +76,8 @@ import Zucchini</code></p>
 favorites = [stem, leaf]</code></p>
 
 <p>
-このように書かれていたときstemやleafの定義を読もうと思ったら
-モジュールAsparagusからZucchiniまですべてのファイルを検索する必要がある。
+stemやleafの定義を読みたければ
+モジュールAsparagusからZucchiniまでのファイルを検索する。
 </p>
 
 <h3>修飾名つきインポート</h3>
@@ -98,13 +98,12 @@ import qualified Zucchini as Z</code></p>
 favorites = [A.stem, C.leaf]</code></p>
 
 <p>
-このようにすればstemがAsparagusで定義されていてleafがCarrotで定義されている
-のは自明となる。
+このようにすればstemがAsparagusで、leafがCarrotで定義されているのは自明だ。
 </p>
 
 <h3>インポートリストの明示</h3>
 
-<p>修飾名を使うのがわずらわしい場合はインポートリストを明示するのが良い。</p>
+<p>修飾名を使うのがわずらわしい場合はインポートリストを明示する。</p>
 
 <p><code>import Asparagus (stem, asparagus)<br/>
 import Beetroot (root, beetroot)<br/>
@@ -117,7 +116,7 @@ import Zucchini (zapallo, zucchini)</code></p>
 <p><code>favorites :: [Parts]<br/>
 favorites = [stem, leaf]</code></p>
 
-<p>このような形でもstemやleafが定義されているモジュールは明らかだ。</p>
+<p>stemやleafが定義されているモジュールは明らかだ。</p>
 
 <h2>代数的データ型のインポート</h2>
 
@@ -128,8 +127,7 @@ favorites = [stem, leaf]</code></p>
 	>adt_good_import.hs</a></p>
 
 <p>
-変数についてはそのまま書けばインポートされる。
-それでは代数的データ型についてはどうだろうか。
+変数のインポートはそのまま書けば良い。代数的データ型についてはどうだろうか。
 値構築子Nodeが使いたいとする。
 </p>
 
@@ -137,7 +135,7 @@ favorites = [stem, leaf]</code></p>
 
 <p><code>tree1 = Node 'a' []</code></p>
 
-<p>のようなコードを読みこんでみよう。</p>
+<p>のようにしたとする。</p>
 
 <p><code>% ghci adt_bad_import.hs<br/>
 GHCi, version 7.8.4: http://www.haskell.org/ghc/  :? for help<br/>
@@ -158,9 +156,8 @@ Failed, modules loaded: none.<br/>
 Prelude&gt;</code></p>
 
 <p>
-エラーとなる。
-値構築子はそのままインポートリストに書くのではなく、
-型名のあとの括弧内に書く必要がある。
+エラーだ。値構築子はそのままではインポートリストに書けない。
+型名のあとの括弧内に書く。
 </p>
 
 <p><code>import Data.Tree (Tree(Node))</code></p>
@@ -174,8 +171,7 @@ Node {rootLabel = 'a', subForest = []}</code></p>
 <h2>型に含まれる名前をすべてインポート</h2>
 
 <p>
-型名に続けて(..)のように書くと
-型に含まれる名前をすべてインポートすることができる。
+型名に続けて(..)とすると型に含まれるすべての名前をインポートできる。
 すべての値構築子とフィールド名がインポートされる。
 </p>
 
@@ -186,12 +182,10 @@ Node {rootLabel = 'a', subForest = []}</code></p>
 <h2>まとめ</h2>
 
 <p>
-モジュールをインポートするとき暗黙のうちに公開されたすべての名前を
-インポートするという方法があるがあまり良くない。
-修飾名をつけるか明示的にインポートする必要がある。
-値構築子は型名のあとの括弧内に置く。
-型名のあとに(..)とすることでその型の値構築子とフィールド名をすべて
-インポートすることができる。
+モジュールのインポートで、公開されたすべての名前をインポートする方法がある。
+あまり良くない。修飾名をつけるかインポートリストを明示する。
+値構築子は型名のあとの括弧内に書く。
+型名のあとに(..)とするとその型の値構築子とフィールド名をすべてインポートできる。
 </p>
 
 <p>
