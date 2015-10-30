@@ -1,6 +1,122 @@
 NML(Nano Markup Language): 5. スタンドアロンなプログラム
 
-<p>(工事中 0%)</p>
+<p>(工事中 50%)</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/Books.hs"
+	>Books.hs</a></p>
+
+<h2>変換する</h2>
+
+<p>
+本のリストのHaskellデータ型による表現とNMLによる表現とそ相互変換する
+プログラムを作成する。
+入出力は標準入出力を使う。
+</p>
+
+<h2>Haskellデータ型の読みこみ</h2>
+
+<p>
+Haskellのデータ型を文字列から読みこめるようにする。
+derivingにReadを追加する。
+</p>
+
+<p><code>data Book = Book {<br/>
+<span class="indent1">title :: String,</span><br/>
+<span class="indent1">author :: String }</span><br/>
+<span class="indent1">deriving (Show, Read)</span></code></p>
+
+<h2>サンプルファイル</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/booklist.nml"
+	>booklist.nml</a></p>
+
+<p><code>&lt;books&gt;</code></p>
+
+	<p><code><span class="indent1">&lt;book&gt;</span><br/>
+	<span class="indent1">&lt;title&gt;The Old Man and the
+		Sea&lt;/title&gt;</span><br/>
+	<span class="indent1">&lt;author&gt;Ernest
+		Hemingway&lt;/author&gt;</span><br/>
+	<span class="indent1">&lt;/book&gt;</span></code></p>
+
+	<p><code><span class="indent1">&lt;book&gt;</span><br/>
+	<span class="indent1">&lt;title&gt;The Catcher in the
+		Rye&lt;/title&gt;</span><br/>
+	<span class="indent1">&lt;author&gt;J. D.
+		Salinger&lt;/author&gt;</span><br/>
+	<span class="indent1">&lt;/book&gt;</span></code></p>
+
+<p><code>&lt;/books&gt;</code></p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/booklist.dat"
+	>booklist.dat</a></p>
+
+<p><code>[<br/>
+Book {title = "The Old Man and the Sea", author = "Ernest Hemingway"},<br/>
+Book {title = "The Catcher in the Rye", author = "J. D. Salinger"}<br/>
+]</code></p>
+
+<h2>NMLからHaskellのデータ型への変換</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/decodeBooks.hs"
+	>decodeBooks.hs</a></p>
+
+<p><code>import Books</code></p>
+
+<p><code>main :: IO ()<br/>
+main = interact $ maybe "" ((++ "\n") . show) . booklist</code></p>
+
+<p><code>% cat booklist.nml | runghc decodeBooks.hs<br/>
+HOHOGE</code></p>
+
+<h2>Haskellのデータ型からNMLへの変換</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/encodeBooks.hs"
+	>encodeBooks.hs</a></p>
+
+<p><code>import Books</code></p>
+
+<p><code>main :: IO ()<br/>
+main = interact $ fromBooklist . read</code></p>
+
+<p><code>% cat booklist.dat | runghc encodeBooks.hs<br/>
+HOHOGEGE</code></p>
+
+<h2>整形</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/Nml.hs"
+	>Nml.hs</a></p>
+
+<p>
+encodeBooksは今のところ1行にだらだらと出力する。
+改行やインデントによるある程度の整形がしたい。
+モジュールNmlの関数fromNmlとtoStringを編集する。
+</p>
+
+<p><code>fromNml :: Nml -&gt; String<br/>
+fromNml = toString 0 . addSep . toTokens</code></p>
+
+<p><code>toString :: Int -&gt; [Token] -&gt; String<br/>
+toString i (Open "" : ts) =<br/>
+	<span class="indent1">replicate i '\t' ++ "&lt;&gt;\n" ++
+		toString i ts</span><br/>
+toString i (Open tg : ts) =<br/>
+	<span class="indent1">replicate i '\t' ++ "&lt;" ++ tg ++
+		"&gt;\n" ++ toString (i + 1) ts</span><br/>
+toString i (Close tg : ts) =<br/>
+	<span class="indent1">replicate (i - 1) '\t' ++ "&lt;/" ++ tg ++
+		"&gt;\n" ++ toString (i - 1) ts<br/>
+toString i (Text tx : ts) =<br/>
+	<span class="indent1">replicate i '\t' ++ tx ++ "\n" ++
+		toString i ts<br/>
+toString _ _ = ""</code></p>
+
+<p><code>% cat booklist.dat | runghc encodeBooks.hs<br/>
+HOGEEEE</code></p>
+
+<h2>まとめ</h2>
+
+<p>UUUUUUUUUUURRRRRRRYYYYYYYYYYYYYYYY</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/main.html"

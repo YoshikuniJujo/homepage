@@ -28,6 +28,7 @@ contentType fp = case takeExtension fp of
 	".ico" -> ico; ".png" -> png; ".jpg" -> jpg; ".svg" -> svg
 	".css" -> css; ".html" -> html; ".hs" -> plain; ".cabal" -> plain
 	".ebuild" -> plain; ".txt" -> plain; ".mf" -> plain; ".sf" -> plain
+	".nml" -> plain; ".dat" -> plain
 	".gz" -> gz; ".tar.gz" -> targz; ".xpi" -> xpi; ".js" -> js
 	_ -> octet
 
