@@ -313,13 +313,13 @@ tokens = concatMap emptyTag . filter (not . null . value)<br/>
 
 <p>関数parseとparsesとは相互再帰の例となっている。</p>
 
-<p><code>parse :: [Token] -&gt; (Maybe Nml, [Token])<br/>
-parse (Text tx : ts) = (Just $ Node tx [], ts)<br/>
+<p><code>parse :: [Token] -&gt; Maybe (Nml, [Token])<br/>
+parse (Text tx : ts) = Just (Node tx [], ts)<br/>
 parse (Open tg : ts) = case parses ts of<br/>
 	<span class="indent1">(ns, Close tg' : r) | tg == tg' -&gt;
-		(Just $ Node tg ns, r)</span><br/>
+		Just (Node tg ns, r)</span><br/>
 	<span class="indent1">(ns, r) -&gt; (Just $ Node tg ns, r)</span><br/>
-parse ts = (Nothing, ts)</code></p>
+parse _ = Nothing</code></p>
 
 <p>
 関数parseは樹をひとつ読みこむ。
@@ -334,8 +334,8 @@ Closeトークンに対しては樹を読みこむことができずNothingと�
 
 <p><code>parses :: [Token] -&gt; ([Nml], [Token])<br/>
 parses ts = case parse ts of<br/>
-	<span class="indent1">(Just n, r) -&gt; let (ns, r') = parses r in (n : ns, r')</span><br/>
-	<span class="indent1">(_, r) -&gt; ([], r)</span></code></p>
+	<span class="indent1">Just (n, r) -&gt; let (ns, r') = parses r in (n : ns, r')</span><br/>
+	<span class="indent1">_ -&gt; ([], ts)</span></code></p>
 
 <p>
 関数parseで樹を読みこめれば、続きの樹を読みこみそれに、さっきの樹を追加する。
@@ -347,7 +347,7 @@ parses ts = case parse ts of<br/>
 <p>関数nmlは引数や返り値を使いやすくした関数parseのラッパーだ。</p>
 
 <p><code>nml :: String -&gt; Maybe Nml<br/>
-nml s = case parse $ token s of (Just n, []) -&gt; Just n; _ -&gt; Nothing</code></p>
+nml s = case parse $ token s of Just (n, []) -&gt; Just n; _ -&gt; Nothing</code></p>
 
 <h2>モジュールNml</h2>
 

@@ -1,4 +1,4 @@
-module Nml (Nml, nml) where
+module Nml (Nml, nml, fromNml) where
 
 import Data.List (unfoldr)
 import Data.Tree (Tree(..))
@@ -9,19 +9,19 @@ type Nml = Tree String
 -- DECODE
 
 nml :: String -> Maybe Nml
-nml s = case parse $ tokens s of (Just n, []) -> Just n; _ -> Nothing
+nml s = case parse $ tokens s of Just (n, []) -> Just n; _ -> Nothing
 
-parse :: [Token] -> (Maybe Nml, [Token])
-parse (Text tx : ts) = (Just $ Node tx [], ts)
+parse :: [Token] -> Maybe (Nml, [Token])
+parse (Text tx : ts) = Just (Node tx [], ts)
 parse (Open tg : ts) = case parses ts of
-	(ns, Close tg' : r) | tg == tg' -> (Just $ Node tg ns, r)
-	(ns, r) -> (Just $ Node tg ns, r)
-parse ts = (Nothing, ts)
+	(ns, Close tg' : r) | tg == tg' -> Just (Node tg ns, r)
+	(ns, r) -> Just (Node tg ns, r)
+parse _ = Nothing
 
 parses :: [Token] -> ([Nml], [Token])
 parses ts = case parse ts of
-	(Just n, r) -> let (ns, r') = parses r in (n : ns, r')
-	(_, r) -> ([], r)
+	Just (n, r) -> let (ns, r') = parses r in (n : ns, r')
+	_ -> ([], ts)
 
 data Token = Open String | Close String | Text String deriving Show
 
@@ -76,14 +76,18 @@ tag s = case span (/= '>') s of
 -- ENCODE
 
 fromNml :: Nml -> String
-fromNml = toString . addSep . toTokens
+fromNml = toString 0 . addSep . toTokens
 
-toString :: [Token] -> String
-toString (Open ot : Close ct : ts) | ot == ct = "<" ++ ot ++ "/>" ++ toString ts
-toString (Open tg : ts) = "<" ++ tg ++ ">" ++ toString ts
-toString (Close tg : ts) = "</" ++ tg ++ ">" ++ toString ts
-toString (Text tx : ts) = tx ++ toString ts
-toString _ = ""
+toString :: Int -> [Token] -> String
+toString i (Open "" : ts) =
+	replicate i '\t' ++ "<>\n" ++ toString i ts
+toString i (Open tg : ts) =
+	replicate i '\t' ++ "<" ++ tg ++ ">\n" ++ toString (i + 1) ts
+toString i (Close tg : ts) =
+	replicate (i - 1) '\t' ++ "</" ++ tg ++ ">\n" ++ toString (i - 1) ts
+toString i (Text tx : ts) =
+	replicate i '\t' ++ tx ++ "\n" ++ toString i ts
+toString _ _ = ""
 
 addSep :: [Token] -> [Token]
 addSep (t1@(Text _) : ts@(Text _ : _)) = t1 : Open "" : addSep ts
@@ -93,3 +97,9 @@ addSep _ = []
 toTokens :: Nml -> [Token]
 toTokens (Node tx []) = [Text tx]
 toTokens (Node tg ns) = Open tg : concatMap toTokens ns ++ [Close tg]
+
+-- SAMPLES
+
+sample1, sample2 :: Nml
+sample1 = Node "hello" [Node "world" []]
+sample2 = Node "hello" [Node "world" [], Node "and" [], Node "you" []]
