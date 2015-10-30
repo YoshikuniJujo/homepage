@@ -1,10 +1,56 @@
 機能: main
 
-<p>(工事中 0%)</p>
+<p>(工事中 70%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+今までは対話環境でいろいろな関数や値を試してきた。
+このあともIOモナドを学ぶまではそのやりかたをとる。
+しかし、ちょっとだけスタンドアロンなプログラムを見てみよう。
+</p>
+
+<h2>どのように考えるか</h2>
+
+<p>
+Haskellの関数にできることは値を変換することだ。
+変換の結果新たな値ができる。
+関数自体には入出力はできない。
+標準入力から読みこむことも標準出力に書きだすこともファイルを扱うこともできない。
+できるのはこれらを実行する「機械」を返すことだ。
+関数を引数としてフィルタという「機械」を返す関数interactを紹介した。
+関数interactを使えば「機械」が手に入る。
+</p>
+
+<h2>機械はただそこにあるだけ</h2>
+
+<p>
+たとえば整数値も文字も整数値のリストも値としては「ただそこにあるだけ」だ。
+対話環境がそれらの値を評価し表示してくれる。
+「機械」も単なる値なので何もしなければただそこにあるだけだ。
+「機械」を駆動するのは関数ではない。
+「機械」によってmainという変数を束縛しておく。
+すると処理系がその機械のスイッチを入れてくれる。
+</p>
+
+<p><code>import Data.Char</code></p>
+
+<p><code>main :: IO ()<br/>
+main = interact $ map toUpper</code></p>
+
+<p><code>% runghc upper.hs<br/>
+hello<br/>
+HELLO<br/>
+Ctrl-D</code></p>
+
+<p><code>% echo "hoge" | runghc upper.hs<br/>
+HOGE</code></p>
+
+<p>コンパイルせずにインタプリタ実行するにはrunghcが使える。</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/interact.html"
 	>「関数: 簡易的なIO」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/nml5.html"
+	>「NML(5): スタンドアロンなプログラム」へ</a>
 </p>
