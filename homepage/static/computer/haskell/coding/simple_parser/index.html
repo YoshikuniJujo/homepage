@@ -1,0 +1,113 @@
+単純なパーサ
+
+<p>(工事中 50%)</p>
+
+<p><a href="/computer/haskell/coding/simple_parser/codes/Parse.hs"
+	>Parse.hs</a></p>
+
+<h2>はじめに</h2>
+
+<p>
+非常に単純なパーサコンビネータを作る。
+モナディックにもしないしアロウにもアプリカティブにもしない。
+使いかたをまちがえるとO(2^n)になる。
+また左再帰を使うと何も言わずに無限ループになる。
+そんなダメダメだけど愛らしいパーサコンビネータだ。
+</p>
+
+<h2>型シノニム</h2>
+
+<p>
+型シノニムを使ったゆるふわパーサとする。
+トークンを文字限定にするともっとゆるふわになるけど
+すぐに字句解析したくなるだろうのでトークン列は一般化しておく。
+</p>
+
+<p><code>type Parse t a = [t] -&gt; [(a, [t])]</code></p>
+
+<h2>お決まりの関数たち</h2>
+
+<p>
+お決まりの関数たちを定義しておく。
+1要素リスト[a]をreturn xと書き空要素[]をfail ""と書くのは「何となく」だ。
+</p>
+
+<h3>関数succeed</h3>
+
+<p>
+トークンを消費せずに決まった値を返す関数だ。
+関数listを定義するときに空リストを返すために使ったりする。
+</p>
+
+<p><code>succeed :: a -&gt; Parse t a<br/>
+succeed = (return .) . (,)</code></p>
+
+<h3>関数spot</h3>
+
+<p>条件を満たすトークンをひとつ読みこむ。</p>
+
+<p><code>spot :: (t -&gt; Bool) -&gt; Parse t t<br/>
+spot p (t : ts) | p t = return (t, ts)<br/>
+spot _ _ = fail ""</code></p>
+
+<h3>関数token</h3>
+
+<p>特定のトークンを読みこむ。</p>
+
+<p><code>token :: Eq t =&gt; t -&gt; Parse t t<br/>
+token = spot . (==)</code></p>
+
+<h3>関数alt</h3>
+
+<p>どちらかのパース結果を採用する。</p>
+
+<p><code>alt :: Parse t a -&gt; Parse t a -&gt; Parse t a<br/>
+alt = (&lt;*&gt;) . (mplus &lt;$&gt;)</code></p>
+
+<h3>関数build</h3>
+
+<p>パースした結果に関数を適用する。</p>
+
+<p><code>build :: Parse t a -&gt; (a -&gt; b) -&gt; Parse t b<br/>
+build = (. (&lt;$&gt;) . first) . flip (.)</code></p>
+
+<h3>演算子&gt;*&gt;, &gt;*, *&gt;</h3>
+
+<p>パーサをつなげる。</p>
+
+<p><code>(&gt;*&gt;) :: Parse t a -&gt; Parse t b -&gt; Parse t (a, b)<br/>
+(p1 &gt;*&gt; p2) i = [ ((x, y), r') | (x, r) &lt;- p1 i, (y, r') &lt;- p2 r ]</code></p>
+
+<p>前や後ろの結果を無視する。</p>
+
+<p><code>(&gt;*) :: Parse t a -&gt; Parse t b -&gt; Parse t a<br/>
+(&gt;*) = ((`build` fst) .) . (&gt;*&gt;)</code></p>
+
+<p><code>(*&gt;) :: Parse t a -&gt; Parse t b -&gt; Parse t b<br/>
+(*&gt;) = ((`build` snd) .) . (&gt;*&gt;)</code></p>
+
+<h3>関数eof</h3>
+
+<p><code>eof :: Parse t ()<br/>
+eof = bool (return ((), [])) (fail "") . null</code></p>
+
+<h3>関数list, list1</h3>
+
+<p>それぞれ0要素以上のリストと1要素以上のリストをパースする。</p>
+
+<p><code>list, list1 :: Parse t a -&gt; Parse t [a]<br/>
+list = (succeed [] `alt`) . list1<br/>
+list1 = (`build` uncurry (:)) . ((&gt;*&gt;) &lt;$&gt; id &lt;*&gt; list)</code></p>
+
+<h2>モジュールParse</h2>
+
+<p>エクスポートリストを作成しモジュール宣言だ。</p>
+
+<p><code>module Parse (<br/>
+	<span class="indent1">Parse, succeed, spot, char, alt, build,
+		(&gt;*&gt;), (&gt;*), (*&gt;), eof,</span><br/>
+	<span class="indent1">list, list1 ) where</span></code></p>
+
+<h2>できあがり</h2>
+
+<p>できた。</p>
