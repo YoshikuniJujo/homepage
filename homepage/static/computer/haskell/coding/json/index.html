@@ -1,0 +1,88 @@
+JSON codec
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+JSONのencoder, decoderライブラリを作成する。
+なんかめんどくさい感じがするので、
+チュートリアル的ドキュメントを作成しながら作ることで、
+モティベーションを維持しようかということだ。
+</p>
+
+<h2>まずは一番簡単なものを作る</h2>
+
+<p>
+仕様を厳密に満たそうとはしない。
+ゆるふわとする。
+文字列はStringを配列はリストを連想配列にもリストを使う。
+また、数値はIntegerとしておこう。
+Wikipediaを参考にする。
+とりあえずは、ね。
+そのうちちゃんと<a href="https://tools.ietf.org/html/rfc7159"
+>RFC 7159</a>を読まないとだけど。
+</p>
+
+<p><a href="https://ja.wikipedia.org/wiki/JavaScript_Object_Notation"
+	>ウィキペディア: Javascript Object Notation</a>
+
+<h2>何はともあれ型</h2>
+
+<h3>JSONのデータ型</h3>
+
+<ul>
+<li>数値</li>
+<li>文字列</li>
+<li>真偽値</li>
+<li>配列</li>
+<li>オブジェクト</li>
+<li>null</li>
+</ul>
+
+<h3>Haskellでの表現</h3>
+
+<p><code>data Json<br/>
+	<span class="indent1">= Number Integer</span><br/>
+	<span class="indent1">| String String</span><br/>
+	<span class="indent1">| Bool Bool</span><br/>
+	<span class="indent1">| Array [Json]</span><br/>
+	<span class="indent1">| Object [(String, JSon)]</span><br/>
+	<span class="indent1">| Null</span><br/>
+	<span class="indent1">deriving Show</span></code></p>
+
+<h2>形式について</h2>
+
+<p>
+本当はきちんとRFC読んで数値や文字列の形式について調べる必要がある。
+げど、とりあえずはHaskellでの表現をそのまま使うことにする。
+</p>
+
+<h2>decoder</h2>
+
+<h3>関数decode</h3>
+
+<p>補助関数を使う。</p>
+
+<p><code>decode :: String -&gt; Maybe Json<br/>
+decode s = case perse s of<br/>
+	<span class="indent1">Just (j, "") -&gt; Just j<br/>
+	<span class="indent1">_ -&gt; Nothing</span></code></p>
+
+<h3>パーサコンビネータ</h3>
+
+<p>
+簡易的なパーサコンビネータを作る。
+型シノニムParseを定義しておく。
+</p>
+
+<p><code>type Parse a = String -&gt; Maybe (a, String)</code></p>
+
+<h3>関数parse</h3>
+
+<p><code>parse :: Parse Json<br/>
+parse </code></p>
+
+<h3>数値</h3>
+
+<h2>encoder</h2>
