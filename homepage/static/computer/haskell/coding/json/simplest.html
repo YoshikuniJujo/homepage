@@ -2,6 +2,8 @@ JSON codec: 単純なもの
 
 <p>(工事中 0%)</p>
 
+<p><a href="/computer/haskell/coding/json/codes/simplest.hs">simplest.hs</a></p>
+
 <h2>はじめに</h2>
 
 <p>
@@ -62,8 +64,6 @@ href="/computer/haskell/coding/simple_parser/codes/Parse.hs"
 
 <h3>関数decode</h3>
 
-<p>補助関数を使う。</p>
-
 <p><code>decode :: String -&gt; Maybe Json<br/>
 decode s = case filter (null . snd) $ json s of<br/>
 	<span class="indent1">(j, "") : _ -&gt; Just j<br/>
@@ -72,13 +72,32 @@ decode s = case filter (null . snd) $ json s of<br/>
 <h3>関数json</h3>
 
 <p><code>json :: Parse Char Json<br/>
-json = ...</code></p>
+json = number `build` Number<br/>
+	<span class="indent1">`alt` string `build` String</span><br/>
+	<span class="indent1">`alt` bool `build` Bool</span><br/>
+	<span class="indent1">`alt` array `build` Array</span><br/>
+	<span class="indent1">`alt` object `build` Object</span><br/>
+	<span class="indent1">`alt` null `build` const Null</span><br/>
+	</code></p>
 
 <h3>数値</h3>
 
 <p>とりあえずは数字の並びをreadするだけにする。</p>
 
 <p><code>number :: Parse Char Integer<br/>
-number = ...</code></p>
+number = list1 (spot isDigit) `build` read</code></p>
+
+<h3>文字列</h3>
+
+<p><code>string :: Parse Char String<br/>
+string = char '"' *&gt; list (spot (/= '"')) &gt;* char '"'</code></p>
+
+<h3>真偽値</h3>
+
+<h3>null</h3>
+
+<h3>配列</h3>
+
+<h3>オブジェクト</h3>
 
 <h2>encoder</h2>
