@@ -35,11 +35,11 @@ string = char '"' *> list (spot (/= '"')) >* char '"'
 
 bool, false, true :: Parse Char Bool
 bool = false `alt` true
-false = foldr (*>) (succeed ()) (map char "false") `build` const False
-true = foldr (*>) (succeed ()) (map char "true") `build` const True
+false = foldr ((*>) . char) (succeed ()) "false" `build` const False
+true = foldr ((*>) . char) (succeed ()) "true" `build` const True
 
 null :: Parse Char ()
-null = foldr (*>) (succeed ()) (map char "null") `build` const ()
+null = foldr ((*>) . char) (succeed ()) "null" `build` const ()
 
 array :: Parse Char [Json]
 array = char '[' >*> char ']' `build` const [] `alt`

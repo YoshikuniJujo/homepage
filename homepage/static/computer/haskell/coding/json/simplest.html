@@ -94,10 +94,30 @@ string = char '"' *&gt; list (spot (/= '"')) &gt;* char '"'</code></p>
 
 <h3>真偽値</h3>
 
+<p><code>bool, false, true :: Parse Char Bool<br/>
+bool = false `alt` true<br/>
+false = foldr ((*&gt;) . char) (succeed ()) "false" `build` const False<br/>
+true = foldr ((*&gt;) . char) (succeed ()) "true" `build` const True</code></p>
+
 <h3>null</h3>
+
+<p><code>null :: Parse Char ()<br/>
+null = foldr ((*&gt;) . char) (succeed ()) "null" `build` const ()</code></p>
 
 <h3>配列</h3>
 
+<p><code>array :: Parse Char [Json]<br/>
+array = char '[' &gt;*&gt; char ']' `build` const [] `alt`<br/>
+	<span class="indent1">char '[' *&gt; json &gt;*&gt; list (char ',' *&gt; json) &gt;* char ']' `build` uncurry (:)</span></code></p>
+
 <h3>オブジェクト</h3>
+
+<p><code>object :: Parse Char [(String, Json)]<br/>
+object = char '{' *&gt; char '}' `build` const [] `alt`<br/>
+	<span class="indent1">char '{' *&gt; member &gt;*&gt; list (char ',' *&gt; member) &gt;* char '}'</span><br/>
+		<span class="indent2">`build` uncurry (:)</span></code></p>
+
+<p><code>member :: Parse Char (String, Json)<br/>
+member = string &gt;*&gt; char ':' *&gt; json</code></p>
 
 <h2>encoder</h2>
