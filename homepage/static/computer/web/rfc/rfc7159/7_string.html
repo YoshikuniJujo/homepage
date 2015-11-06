@@ -1,0 +1,50 @@
+RFC 7159 7. 文字列
+
+<p>
+文字列の表現はC系のプログラミング言語の慣習と似ている。
+文字列の始めと終わりは引用符だ。
+それらの引用符のなかに以下のエスケープが必要な文字以外の
+すべてのユニコード文字が置ける。
+引用符、逆斜線、コントロール文字(U+0000からU+001F)。
+</p>
+
+<p>
+どの文字もエスケープできる。
+もし文字が基本多言語平面(U+0000からU+FFFF)にあれば、
+以下の6文字の並びで表現できる。
+逆斜線、小文字のu、
+その文字のコードポイントを表す4桁の16進数字。
+16進文字のAからFは大文字でも小文字でも良い。
+たとえば、逆斜線のみを含む文字列は"\u005C"と表せる。
+</p>
+
+<p>
+代替手段として、よく使われる文字については、2文字でのエスケープ表現がある。
+たとえば、逆斜線のみを含む文字列は"\\"と表せる。
+</p>
+
+<p>
+基本多言語平面に含まれない拡張文字をエスケープするには、
+UTF-16のサロゲートペアを符号化する12文字の並びで表現する。
+たとえば、ト音記号(U+1D11E)のみを含む文字列は"\uD834\uDD1E"と表せる。
+</p>
+
+<p><code>string = quotation-mark *char quotation-mark</code></p>
+
+<p><code>char = unescaped /<br/>
+	<span class="indent1">%x22 /		; " 引用符	U+0022</span></br/>
+	<span class="indent1">%x5C /		; \ 逆斜線	U+005C</span></br/>
+	<span class="indent1">%x2F /		; / 斜線	U+002F</span></br/>
+	<span class="indent1">%x62 /		; b バックスペース	
+								U+0008</span></br/>
+	<span class="indent1">%x66 /		; f 改ページ	U+000C</span></br/>
+	<span class="indent1">%x6E /		; n 行送り	U+000A</span></br/>
+	<span class="indent1">%x72 /		; r 復帰	U+000D</span></br/>
+	<span class="indent1">%x74 /		; t タブ	U+0009</span></br/>
+	<span class="indent1">%x75 4HEXDIG )	; uXXXX		U+ XXXX</span></code></p>
+
+<p><code>escape = %x5C			; \</code></p>
+
+<p><code>quotation-mark = %x22		; "</code></p>
+
+<p><code>unescaped = %x20-21 / %x23-5B / %x5d-10FFFF</code></p>

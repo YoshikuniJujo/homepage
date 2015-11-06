@@ -1,0 +1,45 @@
+RFC 7159 6. 数値
+
+<p>(工事中 30%)</p>
+
+<p>
+数値の表現はほとんどのプログラミング言語で使われているものと似ている。
+数値は10進数字を使った10進法で表される。
+負符号が前置されるかもしれない整数部、
+これに小数部かつ/または指数部が続くかもしれない、から成る。
+頭の0は許されない。
+</p>
+
+<p>小数部では小数点に1以上の数字が続く。</p>
+
+<p>
+指数部は大文字か小文字の文字Eから始まり、
+正負いずれかの符号が続くかもしれない。
+Eとあるかもしれない符号のあとに1以上の数字が続く。
+</p>
+
+<p>以下で表現できない数値(InfinityやNaNなど)は許されない。</p>
+
+<p><code>number = [ minus ] int [ frac ] [ exp ]</code></p>
+
+<p><code>decimal-point = %x2E	; .</code></p>
+
+<p><code>digit1-9 = %x31-39	; 1-9</code></p>
+
+<p><code>e = %x65 / %x45	; e E</code></p>
+
+<p><code>exp = e [ minus / plus ] 1*DIGIT</code></p>
+
+<p><code>frac = decimal-point 1*DIGIT</code></p>
+
+<p><code>int = zero / ( digit1-9 *DIGIT )</code></p>
+
+<p><code>minus = %x2D		; -</code></p>
+
+<p><code>plus =	%x2B		; +</code></p>
+
+<p><code>zero =	%x30		; 0</code></p>
+
+<p>[数値の範囲や精度に関するinteroperabilityの話]</p>
+
+<p>[範囲[-(2**53)+1,(2**53)-1]の整数値は受け入れるという話]</p>

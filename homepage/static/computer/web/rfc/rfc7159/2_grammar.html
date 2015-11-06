@@ -1,0 +1,42 @@
+RFC 7159 2. 文法
+
+<p>(工事中 0%)</p>
+
+<p>
+JSON文書はトークンの並びだ。
+トークンは6つの構文文字、文字列、数値、3つのリテラル名から成る。
+</p>
+
+<p>
+JSON文書は直列化された値だ。
+以前のJSONの仕様ではJSON文書をオブジェクトまたは配列と規定していたものがある
+ことに注意する。
+[以下1文、あとで訳す]
+Implementations that generate only objects or arrays where a JSON text is called for
+will be interoperable in the sense that all implementations will accept these as
+conforming JSON texts.
+</p>
+
+<p><code>JSON-text = ws value ws</code></p>
+
+<p>以下に6つの構文文字を示す:</p>
+
+<p><code>begin-array = ws %x5B ws; [ 左角括弧</code></p>
+
+<p><code>begin-object = ws %x7B ws; { 左波括弧</code></p>
+
+<p><code>end-array = ws %x5D ws; ] 右角括弧</code></p>
+
+<p><code>end-object = ws %x7D ws; } 右波括弧</code></p>
+
+<p><code>name-separator = ws %x3A ws; : colon</code></p>
+
+<p><code>value-separator = ws %x2C ws; , comma</code></p>
+
+<p>意味のない空白は6つの構文文字の前にも後ろにもつけられる。</p>
+
+<p><code>ws = *(<br/>
+	<span class="indent1">%x20 /	; スペース</span><br/>
+	<span class="indent1">%x09 /	; 水平タブ</span><br/>
+	<span class="indent1">%x0A /	; 行送りまたは改行</span><br/>
+	<span class="indent1">%x0D )	; 復帰</span></code></p>

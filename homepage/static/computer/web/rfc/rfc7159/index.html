@@ -2,22 +2,31 @@ RFC 7159 JSON
 
 <p>(工事中 0%)</p>
 
+<h2>翻訳</h2>
+
 <ul>
 <li><a href="https://tools.ietf.org/html/rfc7159">RFC 7159</a>: 全文(英語)</li>
 <li><a href="/computer/web/rfc/rfc7159/abstract.html"
-	>概要</a> (工事中 0%)</li>
+	>概要</a> (工事中 5%)</li>
 <li>このメモの状態 (工事中 0%)</li>
 <li>著作権表示 (工事中 0%)</li>
 <li>目次 (工事中 0%)</li>
 <li><a href="/computer/web/rfc/rfc7159/1_introduction.html"
-	>1. 導入</a> (工事中 0%)</li>
-<li>2. JSON文法 (工事中 0%)</li>
-<li>3. 値 (工事中 0%)</li>
-<li>4. オブジェクト (工事中 0%)</li>
-<li>5. 配列 (工事中 0%)</li>
-<li>6. 数値 (工事中 0%)</li>
-<li>7. 文字列 (工事中 0%)</li>
-<li>8. 文字列と文字について (工事中 0%)</li>
+	>1. 導入</a> (工事中 30%)</li>
+<li><a href="/computer/web/rfc/rfc7159/2_grammar.html"
+	>2. JSON文法</a> (工事中 0%)</li>
+<li><a href="/computer/web/rfc/rfc7159/3_value.html"
+	>3. 値</a></li>
+<li><a href="/computer/web/rfc/rfc7159/4_object.html"
+	>4. オブジェクト</a> (工事中 30%)</li>
+<li><a href="/computer/web/rfc/rfc7159/5_array.html"
+	>5. 配列</a></li>
+<li><a href="/computer/web/rfc/rfc7159/6_number.html"
+	>6. 数値</a> (工事中 30%)</li>
+<li><a href="/computer/web/rfc/rfc7159/7_string.html"
+	>7. 文字列</a></li>
+<li><a href="/computer/web/rfc/rfc7159/8_string_issue.html"
+	>8. 文字列と文字について</a> (工事中 0%)</li>
 <li>9. 構文解析器 (工事中 0%)</li>
 <li>10. 生成器 (工事中 0%)</li>
 <li>11. IANAの考慮 (工事中 0%)</li>
@@ -27,3 +36,87 @@ RFC 7159 JSON
 <li>15. 参考 (工事中 0%)</li>
 <li>Appendix A. RFC 4627からの変更点 (工事中 0%)</li>
 </ul>
+
+<h2>ABNF</h2>
+
+<p><code>JSON-text = ws value ws</code></p>
+
+<p><code>begin-array = ws %x5B ws; [ 左角括弧</code></p>
+
+<p><code>begin-object = ws %x7B ws; { 左波括弧</code></p>
+
+<p><code>end-array = ws %x5D ws; ] 右角括弧</code></p>
+
+<p><code>end-object = ws %x7D ws; } 右波括弧</code></p>
+
+<p><code>name-separator = ws %x3A ws; : colon</code></p>
+
+<p><code>value-separator = ws %x2C ws; , comma</code></p>
+
+<p><code>ws = *(<br/>
+	<span class="indent1">%x20 /	; スペース</span><br/>
+	<span class="indent1">%x09 /	; 水平タブ</span><br/>
+	<span class="indent1">%x0A /	; 行送りまたは改行</span><br/>
+	<span class="indent1">%x0D )	; 復帰</span></code></p>
+
+<p><code>value = false / null / true / object / array / number / string</code></p>
+
+<p><code>false = %x66.61.6c.73.65	; false</code></p>
+
+<p><code>null = %x6e.75.6c.6c		; null</code></p>
+
+<p><code>true = %x74.72.75.65		; true</code></p>
+
+<p><code>object = begin-object
+	[ member *( value-separator member ) ] end-object</code></p>
+
+<p><code>member = string name-separator value</code></p>
+
+<p><code>array = begin-array
+	[ value *( value-separator value ) ] end-array</code></p>
+
+<p><code>number = [ minus ] int [ frac ] [ exp ]</code></p>
+
+<p><code>decimal-point = %x2E	; .</code></p>
+
+<p><code>digit1-9 = %x31-39	; 1-9</code></p>
+
+<p><code>e = %x65 / %x45	; e E</code></p>
+
+<p><code>exp = e [ minus / plus ] 1*DIGIT</code></p>
+
+<p><code>frac = decimal-point 1*DIGIT</code></p>
+
+<p><code>int = zero / ( digit1-9 *DIGIT )</code></p>
+
+<p><code>minus = %x2D		; -</code></p>
+
+<p><code>plus =	%x2B		; +</code></p>
+
+<p><code>zero =	%x30		; 0</code></p>
+
+<p><code>string = quotation-mark *char quotation-mark</code></p>
+
+<p><code>char = unescaped /<br/>
+	<span class="indent1">%x22 /		; " 引用符	U+0022</span></br/>
+	<span class="indent1">%x5C /		; \ 逆斜線	U+005C</span></br/>
+	<span class="indent1">%x2F /		; / 斜線	U+002F</span></br/>
+	<span class="indent1">%x62 /		; b バックスペース	
+								U+0008</span></br/>
+	<span class="indent1">%x66 /		; f 改ページ	U+000C</span></br/>
+	<span class="indent1">%x6E /		; n 行送り	U+000A</span></br/>
+	<span class="indent1">%x72 /		; r 復帰	U+000D</span></br/>
+	<span class="indent1">%x74 /		; t タブ	U+0009</span></br/>
+	<span class="indent1">%x75 4HEXDIG )	; uXXXX		U+ XXXX</span></code></p>
+
+<p><code>escape = %x5C			; \</code></p>
+
+<p><code>quotation-mark = %x22		; "</code></p>
+
+<p><code>unescaped = %x20-21 / %x23-5B / %x5d-10FFFF</code></p>
+
+<h2>ノート</h2>
+
+<p>
+UTF-8が望ましいがUTF-16やUTF-32も使える。
+</p>

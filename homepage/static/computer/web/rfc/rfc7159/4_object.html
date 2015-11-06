@@ -1,0 +1,21 @@
+RFC 7159 4. オブジェクト
+
+<p>(工事中 30%)</p>
+
+<p>
+オブジェクトの構文は0以上の名前/値ペア(メンバー)を
+1組の波括弧でかこったものだ。
+名前は文字列だ。
+ひとつのコロンが名前のあとに置かれ、名前と値をわける。
+ひとつのコンマが値と続く名前とをわける。
+オブジェクトのなかの名前は一意であることが望ましい。
+</p>
+
+<p><code>object = begin-object
+	[ member *( value-separator member ) ] end-object</code></p>
+
+<p><code>member = string name-separator value</code></p>
+
+<p>[名前が一意じゃなかったときの話]</p>
+
+<p>[メンバーの順序に依存した実装はinteroperableじゃないよという話]</p>
