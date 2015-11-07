@@ -1,0 +1,35 @@
+パッケージ: sqlite-simplest
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>最低限の機能だけが使えるsqliteライブラリを作成する。</p>
+
+<h2>必要な機能</h2>
+
+<ul>
+<li>接続と切断</li>
+<li>テーブルの作成</li>
+<li>要素の追加</li>
+<li>要素の更新</li>
+<li>キーとスロットを指定して値を取得</li>
+</ul>
+
+<h2>型</h2>
+
+<ul>
+<li>newtype SQLite3</li>
+<li>data Table = Table ByteString</li>
+<li>data Keys = { primaryKey :: ByteString, keys :: [ByteString] }</li>
+<li></li>
+</ul>
+
+<h2>関数</h2>
+
+<ul>
+<li>open :: IO SQLite3</li>
+<li>close :: SQLite3 -&gt; IO ()</li>
+<li>table :: SQLite3 -&gt; Table -&gt; Keys -&gt; IO ()</li>
+<li>insert :: SQLite3 -&gt; Table</li>
+</ul>
