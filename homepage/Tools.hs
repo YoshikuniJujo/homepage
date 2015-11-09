@@ -29,6 +29,7 @@ contentType fp = case takeExtension fp of
 	".css" -> css; ".html" -> html; ".hs" -> plain; ".cabal" -> plain
 	".ebuild" -> plain; ".txt" -> plain; ".mf" -> plain; ".sf" -> plain
 	".nml" -> plain; ".dat" -> plain; ".h" -> plain; ".c" -> plain
+	".md" -> plain
 	".gz" -> gz; ".tar.gz" -> targz; ".xpi" -> xpi; ".js" -> js
 	_ -> octet
 
