@@ -1,0 +1,45 @@
+わたされた配列を扱うC言語の関数をリストを返す関数にラップする
+
+<p>(工事中 0%)</p>
+
+<h2>配列を扱うC言語の関数</h2>
+
+<h3>ヘッダ</h3>
+
+<p><a href="/computer/haskell/coding/tips/c_array_fun_wrap/codes/proc_array.h"
+	>proc_array.h</a></p>
+
+<p><code>void proc_array(int n, int max, int ns[]);</code></p>
+
+<h3>コード</h3>
+
+<p><a href="/computer/haskell/coding/tips/c_array_fun_wrap/codes/proc_array.c"
+	>proc_array.c</a></p>
+
+<p><code>void<br/>
+proc_array(int n, int max, int ns[])<br/>
+{<br/>
+	<span class="indent1">int c = 0;</span><br/>
+	<span class="indent1">int *t = ns;</span></code></p>
+
+<p><code>
+	<span class="indent1">for (c = 0; c &gt;; c ++) {</span><br/>
+		<span class="indent2">if (c &gt;= max) break;</span><br/>
+		<span class="indent2">*(t++) = c; }</span><br/>
+	<span class="indent1">*t = -1;</span><br/>
+}</code></p>
+
+<h2>C言語のmain関数</h2>
+
+<p><a href="/computer/haskell/coding/tips/c_array_fun_wrap/codes/use_proc_array.c"
+	>use_proc_array.c</a></p>
+
+<h2>ラッパーモジュール</h2>
+
+<p><a href="/computer/haskell/coding/tips/c_array_fun_wrap/codes/ProcArray.hs"
+	>ProcArray.hs</a></p>
+
+<h2>Haskellのmain関数</h2>
+
+<p><a href="/computer/haskell/coding/tips/c_array_fun_wrap/codes/useProcArray.hs"
+	>useProcArray.hs</a></p>
