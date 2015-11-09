@@ -1,17 +1,15 @@
 NML(Nano Markup Language): 2. 他の型への変換
 
-<p>(工事中 70%)</p>
-
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/Books.hs"
 	>Books.hs</a></p>
 
 <h2>はじめに</h2>
 
-<p>NMLを利用して本のリストを読みこんでみよう。</p>
+<p>NMLで表現された本のリストをHaskellのデータ構造Bookに読みこんでみよう。</p>
 
 <h2>型Book</h2>
 
-<p>本は題名と作者で表現されるものとする。</p>
+<p>本は題名と作者で表現する。</p>
 
 <p><code>data Book = Book {<br/>
 	<span class="indent1">title :: String</span><br/>
@@ -38,7 +36,7 @@ NML(Nano Markup Language): 2. 他の型への変換
 	<span class="indent1">&lt;/book&gt;</span><br/>
 &lt;/books&gt;</code></p>
 
-<p>このサンプルを文字列として定義しておく。</p>
+<p>このサンプルを文字列として定義する。</p>
 
 <p><code>books1 :: String<br/>
 books1 = "&lt;books&gt;" ++<br/>
@@ -52,9 +50,9 @@ books1 = "&lt;books&gt;" ++<br/>
 	<span class="indent1">"&lt;/book&gt;" ++</span><br/>
 	<span class="indent1">"&lt;/books&gt;"</span></code></p>
 
-<p>モジュールNmlParseを使うので</p>
+<p>モジュールNmlを使うので</p>
 
-<p><code>import NmlParse</code></p>
+<p><code>import Nml</code></p>
 
 <p>をモジュールの先頭に追加しておく。</p>
 
@@ -81,12 +79,11 @@ booklistNml (Node "books" bl) = Just $ mapMaybe book bl<br/>
 booklistNml _ = Nothing</code></p>
 
 <p>
-関数bookはまだ作っていないがNml -&gt; Maybe Book型の関数だ。
-mapMaybeはMaybe型を返す関数をリストの全要素に適用し、Just値だけを集める関数だ。
-構文エラーや型エラーのチェックのために一度読みこんでおく。
+関数bookはまだ作っていない。Nml -&gt; Maybe Book型の関数だ。
+mapMaybeはMaybe型を返す関数をリストの全要素に適用し、Just値だけを集める。
+構文エラーや型エラーのチェックのために対話環境で読みこんでみる。
 mapMaybeを使うためにData.Maybeをインポートする。
-また関数bookのスタブを用意しておこう。
-モジュールの先頭に
+関数bookのスタブも用意する。モジュールの先頭に
 </p>
 
 <p><code>import Data.Maybe</code></p>
@@ -99,12 +96,14 @@ book = undefined</code></p>
 <p><code>*Main&gt; :reload<br/>
 *Main&gt;</code></p>
 
+<p>構文エラーや型エラーはないようだ。</p>
+
 <h3>関数book</h3>
 
 <p>
 関数bookはtitleタグとauthorタグのそれぞれについてそれ自体の存在と
 その中身の存在を確認し、存在すればそれらから値をとりだしてBook型にまとめる。
-関数getTitle, getAuthorのスタブも作っておこう。
+関数getTitle, getAuthorのスタブも作る。
 </p>
 
 <p><code>book :: Nml -&gt; Maybe Book<br/>
@@ -122,11 +121,13 @@ getAuthor = undefined</code></p>
 <p><code>*Main&gt; :reload<br/>
 *Main&gt;</code></p>
 
+<p>構文エラーや型エラーはない。</p>
+
 <h3>関数getTitle, getAuthor</h3>
 
 <p>
 getTitleとgetAuthorとはタグ名が"title"と"author"で違うだけだ。
-このような関数同士は違う部分を引数にしてまとめてしまったほうが良い。
+このような関数同士は違う部分を引数にしてまとめてしまおう。
 関数bookのgetTitleとgetAuthorをそれぞれ
 getValue "title"とgetValue "author"に書き換える。
 </p>
@@ -141,7 +142,7 @@ getValue "title"とgetValue "author"に書き換える。
 	<span class="indent1">Just t -&gt; case getValue "author" b of</span><br/>
 	<span class="indent1">...</span></code></p>
 
-</p>とする。またスタブも</p>
+</p>とする。スタブも</p>
 
 <p><code>getTitle, getAuthor :: Nml -&gt; Maybe String<br/>
 getTitle = undefined<br/>
@@ -152,7 +153,7 @@ getAuthor = undefined</code></p>
 <p><code>getValue :: String -&gt; Nml -&gt; Maybe String<br/>
 getValue = undefined</code></p>
 
-<p>としておこう。</p>
+<p>とする。</p>
 
 <p><code>*Main&gt; :reload<br/>
 *Main&gt;</code></p>
@@ -174,9 +175,9 @@ getValue t b = case children t b of<br/>
 <p>
 children t bの値をパターンマッチして中の値をとりだしている。
 パターンNode _ [Node v []] : _は(Node _ [Node v []]) : _ということであり、
-Node _ [Node v []]の部分は一番はじめの子要素となる。
+Node _ [Node v []]の部分が一番はじめの子要素だ。
 子要素のなかには値がひとつ含まれる。
-Tree型では葉となる要素がNode v []のように表現されることを思い出そう。
+Tree型では葉となる要素がNode v []のように表現される。
 </p>
 
 <h3>関数children</h3>
@@ -204,7 +205,7 @@ Salinger"}]
 
 <h3>関数booklist</h3>
 
-<p>使いやすくするために文字列から直接[Book]型の値を入手する関数を作っておく。</p>
+<p>文字列から直接[Book]型の値を入手する関数を作る。</p>
 
 <p><code>booklist :: String -&gt; Maybe [Book]<br/>
 booklist s = case nml s of Just bl -&gt; booklistNml bl; _ -&gt; Nothing</code></p>
@@ -217,7 +218,7 @@ Salinger"}]</code></p>
 
 <h2>モジュールBooks</h2>
 
-<p>後で使いやすいようにモジュール名をつけておこう。先頭に</p>
+<p>後で使いやすいようにモジュール名をつける。先頭に</p>
 
 <p><code>module Books (Books(..), booklist) where</code></p>
 
@@ -225,7 +226,9 @@ Salinger"}]</code></p>
 
 <h2>まとめ</h2>
 
-<p>HOHOGEGEGE</p>
+<p>
+NMLで表現された本のリストをHaskellのデータ型[Book]に読みこむ関数を作成した。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/nml.html"

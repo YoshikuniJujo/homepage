@@ -1,6 +1,4 @@
-NML(Nano Markup Language): 5. スタンドアロンなプログラム
-
-<p>(工事中 50%)</p>
+NML(Nano Markup Language): 5. スタンドアロンなデコーダ、エンコーダ
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/Books.hs"
 	>Books.hs</a></p>
@@ -8,7 +6,7 @@ NML(Nano Markup Language): 5. スタンドアロンなプログラム
 <h2>変換する</h2>
 
 <p>
-本のリストのHaskellデータ型による表現とNMLによる表現とそ相互変換する
+本のリストのHaskellデータ型による表現とNMLによる表現とを相互に変換する
 プログラムを作成する。
 入出力は標準入出力を使う。
 </p>
@@ -26,6 +24,8 @@ derivingにReadを追加する。
 <span class="indent1">deriving (Show, Read)</span></code></p>
 
 <h2>サンプルファイル</h2>
+
+<p>以下のサンプルファイルを作成(またはコピペ、ダウンロード)しておこう。</p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/booklist.nml"
 	>booklist.nml</a></p>
@@ -67,7 +67,8 @@ Book {title = "The Catcher in the Rye", author = "J. D. Salinger"}<br/>
 main = interact $ maybe "" ((++ "\n") . show) . booklist</code></p>
 
 <p><code>% cat booklist.nml | runghc decodeBooks.hs<br/>
-HOHOGE</code></p>
+[Book {title = "The Old Man and the Sea", author = "Ernest Hemingway"},Book
+{title = "The Catcher in the Rye", author = "J. D. Salinger"}]</code></p>
 
 <h2>Haskellのデータ型からNMLへの変換</h2>
 
@@ -80,7 +81,8 @@ HOHOGE</code></p>
 main = interact $ fromBooklist . read</code></p>
 
 <p><code>% cat booklist.dat | runghc encodeBooks.hs<br/>
-HOHOGEGE</code></p>
+&lt;books&gt;&lt;book&gt;&lt;title&gt;The Old Man and the Sea&lt;/title&gt;&lt;author&gt;Ernest Hemingway&lt;/author&gt;&lt;/book&gt;&lt;book&gt;&lt;title&gt;The Catcher in the Rye&lt;/title&gt;&lt;author&gt;J. D. Salinger&lt;/author&gt;&lt;/book&gt;&lt;/books&gt;
+</code></p>
 
 <h2>整形</h2>
 
@@ -88,7 +90,7 @@ HOHOGEGE</code></p>
 	>Nml.hs</a></p>
 
 <p>
-encodeBooksは今のところ1行にだらだらと出力する。
+encodeBooksは1行にだらだらと出力する。
 改行やインデントによるある程度の整形がしたい。
 モジュールNmlの関数fromNmlとtoStringを編集する。
 </p>
@@ -111,12 +113,40 @@ toString i (Text tx : ts) =<br/>
 		toString i ts<br/>
 toString _ _ = ""</code></p>
 
+<p>
+「現在のインデント数」を変数iとして次々と渡していく。
+開きタグの場合はその後のインデントを深くし、
+閉じタグならばその後のインデントを浅くする。
+空文字列の開きタグやテキストならばインデントはそのままにする。
+</p>
+
 <p><code>% cat booklist.dat | runghc encodeBooks.hs<br/>
-HOGEEEE</code></p>
+&lt;books&gt;<br/>
+	<span class="indent1">&lt;book&gt;</span><br/>
+		<span class="indent2">&lt;title&gt;</span><br/>
+			<span class="indent3">The Old Man and the Sea</span><br/>
+		<span class="indent2">&lt;/title&gt;</span><br/>
+		<span class="indent2">&lt;author&gt;</span><br/>
+			<span class="indent3">Ernest Hemingway</span><br/>
+		<span class="indent2">&lt;/author&gt;</span><br/>
+	<span class="indent1">&lt;/book&gt;</span><br/>
+	<span class="indent1">&lt;book&gt;</span><br/>
+		<span class="indent2">&lt;title&gt;</span><br/>
+			<span class="indent3">The Catcher in the Rye</span><br/>
+		<span class="indent2">&lt;/title&gt;</span><br/>
+		<span class="indent2">&lt;author&gt;</span><br/>
+			<span class="indent3">J. D. Salinger</span><br/>
+		<span class="indent2">&lt;/author&gt;</span><br/>
+	<span class="indent1">&lt;/book&gt;</span><br/>
+&lt;/books&gt;</code></p>
 
 <h2>まとめ</h2>
 
-<p>UUUUUUUUUUURRRRRRRYYYYYYYYYYYYYYYY</p>
+<p>
+標準入力から読みこみ、
+標準出力へ書きだす形でNml形式とHaskellのデータ型とのあいだでの
+相互変換関数を作成した。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/main.html"

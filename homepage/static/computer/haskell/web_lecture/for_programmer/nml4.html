@@ -1,7 +1,5 @@
 NML(Nano Markup Language): 4. 表示
 
-<p>(工事中 70%)</p>
-
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/Nml0.hs"
 	>Nml0.hs</a></p>
 
@@ -11,7 +9,7 @@ NML(Nano Markup Language): 4. 表示
 
 <h2>スタブ</h2>
 
-<p>モジュールNmlに以下のスタブを追加する。</p>
+<p>モジュールNmlにスタブを作る。</p>
 
 <p><code>fromNml :: Nml -&gt; String<br/>
 fromNml = concatMap toString . addSep . toTokens</code></p>
@@ -27,13 +25,19 @@ toTokens = undefined</code></p>
 
 <h2>関数toTokens</h2>
 
-<p>まずは樹構造をフラットなトークン列に変換する。</p>
+<p>樹構造をフラットなトークン列に変換する。</p>
 
 <p><code>toTokens :: Nml -&gt; [Token]<br/>
 toTokens (Node tx []) = [Text tx]<br/>
 toTokens (Node tg ns) = Open tg : concatMap toTokens ns ++ [Close tg]</code></p>
 
-<p>テスト用のサンプルNmlデータを作成しておく。</p>
+<p>
+葉(Node _ [])であれば値をTextトークンとして返す。
+子要素を持つのであれば開きタグと閉じタグとを両端に置き、
+子要素のリストそれぞれに対し再帰的に関数toTokensを適用する。
+</p>
+
+<p>テスト用のサンプルNmlデータを定義する。</p>
 
 <p><code>sample1, sample2 :: Nml<br/>
 sample1 = Node "hello" [Node "world" []]<br/>
@@ -49,7 +53,7 @@ sample2 = Node "hello" [Node "world" [], Node "and" [], Node "you" []]</code></p
 
 <p>
 Textデータが複数並んだものをそのまま文字列に変換してしまうと
-ひとつのTextデータにまとまってしまうので、
+ひとつのTextデータにまとまってしまう。
 セパレータとして空開きタグを挿入する。
 </p>
 
@@ -57,6 +61,8 @@ Textデータが複数並んだものをそのまま文字列に変換してし�
 addSep (t1@(Text _) : ts@(Text _ : _)) = t1 : Open "" : addSep ts<br/>
 addSep (t : ts) = t : addSep ts<br/>
 addSep _ = []</code></p>
+
+<p>Textトークンが連続する場合にはOpen ""をあいだにはさむ。</p>
 
 <h2>関数toString</h2>
 
@@ -66,6 +72,8 @@ addSep _ = []</code></p>
 toString (Open tg) = "&lt;" ++ tg ++ "&gt;"<br/>
 toString (Close tg) = "&lt;/" ++ tg ++ "&gt;"<br/>
 toString (Text tx) = tx</code></p>
+
+<p>開きタグ、閉じタグ、テキストをそれぞれ適切な文字列表現に変換する。</p>
 
 <p><code>*Nml&gt; :reload<br/>
 *Nml&gt; fromNml sample1<br/>
@@ -84,7 +92,7 @@ toString (Text tx) = tx</code></p>
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/Books.hs"
 	>Books.hs</a></p>
 
-<p>モジュールBooksの関数fromBooklistを完成される。</p>
+<p>モジュールBooksの関数fromBooklistを完成させる。</p>
 
 <p><code>fromBooklist :: [Book] -&gt; String<br/>
 fromBooklist = fromNml . fromBooklistNml</code></p>
@@ -95,13 +103,10 @@ fromBooklist = fromNml . fromBooklistNml</code></p>
 
 <h2>まとめ</h2>
 
-<p>UUUUUUUUUUUURRRRRRRRRRRRRRRRYYYYYYYYYYYYYY</p>
-
-<h2>方針</h2>
-
 <p>
-まずは整形なしの関数を示す。
-interactを学び標準出力への書き出しをしながら整形機能を追加していく。
+これで文字列から型[Book]へのデコーダbooklist、
+型[Book]から文字列へのエンコーダfromBooklistの
+両方向の変換関数が作成できた。
 </p>
 
 <p>

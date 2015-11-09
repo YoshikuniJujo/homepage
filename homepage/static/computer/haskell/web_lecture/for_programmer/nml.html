@@ -1,23 +1,22 @@
 NML(Nano Markup Language): 構文解析
 
-<p>(工事中 70%)</p>
-
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/Nml0.hs"
 	>Nml0.hs</a></p>
 
 <h2>はじめに</h2>
 
-<p>Data.TreeモジュールのTree型の値を扱う例題を挙げる。</p>
+<p>
+Data.TreeモジュールのTree型の値を扱う例だ。
+</p>
 
 <h2>定義</h2>
 
 <p>
-XMLを徹底的にシンプルにしたNML(Nano Markup Language)を考えよう。
-NMLの開きタグは&lt;hoge&gt;といった形であり閉じタグは&lt;/hoge&gt;となる。
-子要素を持たないタグを&lt;hoge/&gt;と書けるようにする。
-実体参照として最小限必要な&amp;lt;、&amp;gt;、&amp;amp;だけは
-使えるようにしよう。
-また、これらの実体参照はタグ名にも使えることとする。
+XMLをシンプルにしたNML(Nano Markup Language)を考える。
+NMLの開きタグは&lt;hoge&gt;であり閉じタグは&lt;/hoge&gt;とする。
+子要素を持たないタグは&lt;hoge/&gt;とも書ける。
+実体参照として最低限必要な&amp;lt;、&amp;gt;、&amp;amp;を使えるようにする。
+これらの実体参照はタグ名にも使えることとする。
 </p>
 
 <p>
@@ -59,7 +58,7 @@ HaskellではMaybeモナドなどのエラーを扱うモナドでエラー処�
 <h3>関数token</h3>
 
 <p>
-関数tokenはトークンをひと切り出し残りの文字列とともに返す。
+関数tokenはトークンをひとつ切り出し残りの文字列とともに返す。
 空文字列の場合にはNothingを返す。
 </p>
 
@@ -92,8 +91,8 @@ tag s = case span (/= '&gt;') s of<br/>
 <p>
 (tg, _) -&gt; (Close tg, "")や(tg, _) -&gt; (Open tg, "")の行は
 対応する&gt;がなかったときには&gt;を追加して解釈するということを示す。
-エラーを表すモナドを学ぶまではエラーの処理が繁雑となるのでPerl的な
-やりかたにした。
+エラーを表すモナドを学ぶまではエラーの処理が繁雑となる。
+Perl的なやりかた(とにかく何かを返す)でごまかす。
 </p>
 
 <h3>試してみる</h3>
@@ -108,9 +107,7 @@ Data.Listモジュールのunfoldrを使うと複数のトークンのリスト�
 
 <p><code>*Main&gt; :m + Data.List<br/>
 *Main Data.List&gt; unfoldr token "&lt;hello&gt;world&lt;/hello&gt;"<br/>
-[Open "hello",Text "world",Close "hello"]<br/>
-*Main Data.List&gt; unfoldr token "&lt;hello&gt;&amp;lt;world&amp;gt;&lt;/hello&gt;"<br/>
-[Open "hello",Text "&amp;lt;world&amp;gt;",Close "hello"]</code></p>
+[Open "hello",Text "world",Close "hello"]</code></p>
 
 <h2>トークン列の変換</h2>
 
@@ -128,7 +125,7 @@ entity ('&amp;' : 'l' : 't' : ';' : s) = '&lt;' : entity s<br/>
 entity ('&amp;' : 'g' : 't' : ';' : s) = '&gt;' : entity s<br/>
 entity ('&amp;' : 'a' : 'm' : 'p' : ';' : s) = '&amp;' : entity s<br/>
 entity (c : s) = c : entity s<br/>
-catTexts _ = ""</code></p>
+entity _ = ""</code></p>
 
 <p>
 これをタグ名とテキストの両方に適用する。
@@ -148,7 +145,7 @@ apply f (Text tx) = Text $ f tx</code></p>
 
 <p>
 前後の空白を削除する。
-前の空白についてはdropWhile isSpaceで良い。
+前の空白についてはdropWhile isSpaceだ。
 後ろの空白については関数takeWhileRを定義して使う。
 関数takeWhileRは右から見ていって条件を満たす要素が現れるまでを消去する関数だ。
 リストは前から順にアクセスするのでないと効率が悪いので
@@ -164,18 +161,19 @@ takeWhileR = twr [] where<br/>
 	</code></p>
 
 <p>
-(
-引数がひとつ(or複数)多い補助関数を作りそれに最初の引数を与えるという
-やりかたを「定石」としてまとめる
-)
+(引数がひとつ(or複数)多い補助関数を作りそれに最初の引数を与えるという
+やりかたを「定石」としてまとめる)
 </p>
 
 <p>
-関数takeWhile自体は関数twrへの単純なラッパーとなっている。
-使いやすさのために関数twrに空リストを初期値として与えている。
+関数takeWhile自体は関数twrへの単純なラッパーだ。
+関数twrに空リストを初期値として与える。
+</p>
+
+<p>
 関数twrは状態(蓄積)変数sを持つ。
-変数sには条件を満たさない値が逆順に保存されている。
-もしも次の値xが条件を満たすならば変数sに保存されていた値と値xとが
+変数sには条件を満たさない値が逆順に保存される。
+次の値xが条件を満たすならば変数sに保存されていた値と値xとが
 結果のリストに加えられる。
 値xが条件を満たさないならば値xは変数sに追加される。
 </p>
@@ -186,7 +184,7 @@ takeWhileR = twr [] where<br/>
 *Main Data.List Data.Char&gt; takeWhileR isDigit "I have 3 dogs and 40 cats."<br/>
 "I have 3 dogs and 40"</code></p>
 
-<p>「数字ではない」文字が右から消されていったのがわかる。</p>
+<p>「数字ではない」文字が右から消されたのと同じ結果だ。</p>
 
 <p><code>twr [] isDigit "12ab34cd"<br/>
 =&gt; reverse [] ++ ['1'] ++ twr [] isDigit "2ab34cd"<br/>
@@ -210,12 +208,12 @@ takeWhileR = twr [] where<br/>
 数字以外はとりあえず状態(蓄積)変数に保存され、
 数字を読み込んだときに返り値に一気に追加される。
 状態(蓄積)変数のなかで文字は逆順に保存されているので
-追加するときにはreverseする必要がある。
-もしも数字が出てくる前に文字を消費しつくしたら状態(蓄積)変数に
-保存された文字列は捨てられることになる。
+追加するときにはreverseする。
+数字が出てくる前に文字を消費しつくしたら
+状態(蓄積)変数に保存された文字列は捨てられる。
 </p>
 
-<p>これを利用すれば前後の空白の削除は簡単だ。</p>
+<p>これを作って前後の空白を削除する。</p>
 
 <p><code>spaces :: String -&gt; String<br/>
 spaces = takeWhileR (not . isSpace) . dropWhile isSpace</code></p>
@@ -238,8 +236,7 @@ spaces = takeWhileR (not . isSpace) . dropWhile isSpace</code></p>
 <h3>空文字列の処理</h3>
 
 <p>
-空文字列を持つタグやテキストは消去することにする。
-[Token]型の値をろ過すれば良い。
+空文字列を持つタグやテキストは消去する。[Token]型の値をろ過する。
 Token型の値からなかの文字列を取り出す関数を作っておく。
 </p>
 
@@ -248,7 +245,7 @@ value (Open tg) = tg<br/>
 value (Close tg) = tg<br/>
 value (Text tx) = tx</code></p>
 
-<p>これを使ってろ過すれば良い。</p>
+<p>これを使ってろ過する。</p>
 
 <p><code>*Main Data.List&gt; :reload<br/>
 *Main Data.List&gt; filter (not . null . value) . map (apply spaces) $ unfoldr token
@@ -257,7 +254,7 @@ value (Text tx) = tx</code></p>
 
 <h3>空タグの処理</h3>
 
-<p>&lt;hoge/&gt;のようなタグを&lt;hoge&gt;&lt;/hoge&gt;と解釈するようにする。</p>
+<p>&lt;hoge/&gt;のようなタグは&lt;hoge&gt;&lt;/hoge&gt;と解釈する。</p>
 
 <p><code>emptyTag :: Token -&gt; [Token]<br/>
 emptyTag (Open tg) | last tg == '/' = map ($ init tg) [Open, Close]<br/>
@@ -363,6 +360,19 @@ Just (Node {rootLabel = "flowers", subForest = [
 Node {rootLabel = "rose", subForest = []},
 Node {rootLabel = "tulip", subForest = []},
 Node {rootLabel = "lily", subForest = []}]})</code></p>
+
+<p>
+NMLでは空文字列を名前とするタグ&lt;&gt;を利用して
+テキストの配列を表現することができる。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+単純なXMLライクな構造のデコーダを作成した。
+文字列の操作や再帰的な読みこみやデータ構造の構築の例となっている。
+ごちゃごちゃしているがひとつひとつ追っていけば理解できるはずだ。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/adt_export.html"

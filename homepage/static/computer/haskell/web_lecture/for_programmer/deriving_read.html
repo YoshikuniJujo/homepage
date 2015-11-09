@@ -1,32 +1,32 @@
 構文: deriving Read
 
-<p>(工事中 0%)</p>
-
 <h2>はじめに</h2>
 
 <p>
-deriving Showとすると自分で定義した型の値を「いい感じに」表示してくれる
-関数showを使うことができるようになる。
-derivingで指定できる値はShowだけでなくいくつかある。
-今回はReadを学ぶ。
+deriving Showで、
+自分で定義した型の値を「いい感じに」表示してくれる関数showができる。
+derivingで指定できるのはShowだけではない。
+今回はReadを見てみよう。
 </p>
 
 <h2>複数のderiving</h2>
 
 <p>
-derivingで複数の値を指定する場合は括弧でくくりコンマでくぎる。
-ShowとReadを指定する場合には以下のようになる。
+derivingで複数の値を指定するには括弧でくくりコンマでくぎる。
+ShowとReadのふたつを指定するには
 </p>
 
 <p><code>data Foo = Bar | Baz deriving (Show, Read)</code></p>
 
+<p>とする。</p>
+
 <h2>Read</h2>
 
 <p>
-deriving Readとすると自分で定義した型の値を「いい感じに」読みこんでくれる
-関数readが使えるようになる。
-関数showによって得られた文字列を関数readによって読みこむともとの値が得られる。
-ただし関数readの返り値は多相的なので型注釈が必要になる。
+deriving Readで、
+自分で定義した型の値を「いい感じに」読みこんでくれる関数readが使える。
+関数showで得られた文字列を関数readで読みこむともとの値となる。
+関数readの返り値は多相的なので型注釈が必要だ。
 </p>
 
 <p><code>data Foo = Bar Bool Char | Baz Int Double deriving (Show, Read)</code></p>
@@ -43,7 +43,10 @@ Baz 8 5.0</code></p>
 
 <h2>まとめ</h2>
 
-<p>ズキュウウウン</p>
+<p>
+deriving Readを使えば、「型クラス」を学ぶ前でも、
+自分で定義した型の値を文字列から読みこめるようになる。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/nml4.html"
