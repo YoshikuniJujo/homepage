@@ -1,0 +1,56 @@
+SQLite: C言語からHello
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+SQLiteはデータベースに単一のファイルを使うので使いやすい、ゆるふわなSQLだ。
+ゆるふわとは言っても中規模なデータベースにおけるベンチマークで
+断トツなスコアを記録するなどなかなかの実力の持ち主だ。
+実用的なプロジェクトでもとくに理由がなければSQLiteを使うのもひとつの選択肢だ。
+</p>
+
+<h2>接続と切断</h2>
+
+<p><a href="/computer/programming/database/sqlite/from_c/hello/codes/simplest.c"
+	>simplest.c</a></p>
+
+<p>
+データベースへの接続と切断は関数sqlite3_open、sqlite3_closeを使う。
+</p>
+
+<h3>include</h3>
+
+<p><code>#include &lt;stdio.h&gt;<br/>
+#include &lt;stdlib.h&gt;<br/>
+#include &lt;sqlite3.h&gt;</code></p>
+
+<h3>関数main</h3>
+
+<p>関数mainのスタブを書いておく。</p>
+
+<p><code>int<br/>
+main(int argc, char *argv[])<br/>
+{<br/>
+	<span class="indent1">return 0;</span><br/>
+}</code></p>
+
+<h3>変数宣言</h3>
+
+<p><code><span class="indent1">int ret = 0;</span></br>
+	<span class="indent1">sqlite3 *conn = NULL;</span></code></p>
+
+<p>変数を初期化しておくのは良い習慣だ。</p>
+
+<h3>open</h3>
+
+<p><code><span class="indent1">HOGE</span></code></p>
+
+<h3>close</h3>
+
+<p><code><span class="indent1">FOO</span></code></p>
+
+<h3>コンパイル・実行</h3>
+
+<p><code>% FOOBAR</code></p>
