@@ -1,10 +1,151 @@
 基本的な型を型クラスBoolLikeのインスタンスにする
 
-<p>(工事中 0%)</p>
+<p>(工事中 90%)</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/boolLike.hs"
+	>boolLike.hs</a></p>
+
+<h2>はじめに</h2>
+
+<p>
+基本的な型を型クラスBoolLikeのインスタンスにする。
+以下の型を扱う。
+</p>
+
+<p><code>(), Bool, Int, Integer, Float, Double, Char</code></p>
+
+<p>
+型()を覚えているだろうか。
+これはユニット型と呼ばれる型である。
+型Boolはふたつの値False, Trueを持つが型()はひとつの値()だけを持つ。
+型Floatは浮動小数点数だ。
+型Doubleが倍精度浮動小数点数である。
+</p>
+
+<h2>Falseになるもの</h2>
+
+<p>基本的な型のなかでFalseになるものをもう一度列挙する。</p>
+
+<ul>
+<li>()</li>
+<li>False</li>
+<li>0</li>
+<li>0.0</li>
+<li>'\0', '0'</li>
+</ul>
+
+<h2>型Integer</h2>
+
+<p>
+型Integerでは値0だけがFalseとなりそれ以外はTrueとなる。
+つまり以下のような関数toBoolを定義すれば良い。
+</p>
+
+<p><code>toBool 0 = False<br/>
+toBool _ = True</code></p>
+
+<p>
+Haskellではクラス関数を実装するときにはその型が
+型クラスのインスタンスであることを明示する必要がある。
+</p>
+
+<p><code>instance BoolLike Integer where<br/>
+	<span class="indent1">toBool 0 = False</span><br/>
+	<span class="indent1">toBool _ = True</span>
+	</code></p>
+
+<p><code>% ghci boolLike.hs<br/>
+*Main&gt; toBool 8<br/>
+True<br/>
+*Main&gt; toBool 0<br/>
+False<br/>
+*Main&gt; toBool (- 3)<br/>
+True</code></p>
+
+<p>クラス関数toBoolが型Integerに対して適切に定義された。</p>
+
+<h2>型Char</h2>
+
+<p>文字については'\0'と'0'のみがFalseなので</p>
+
+<p><code>instance BoolLike Char where<br/>
+	<span class="indent1">toBool '\0' = False</span><br/>
+	<span class="indent1">toBool '0' = False</span><br/>
+	<span class="indent1">toBool _ = True</span></code></p>
+
+<p>となる。</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; toBool 'c'<br/>
+True<br/>
+*Main&gt; toBool '\0'<br/>
+False<br/>
+*Main&gt; toBool '0'<br/>
+False<br/>
+*Main&gt; toBool ' '<br/>
+True</code></p>
+
+<h2>型Bool</h2>
+
+<p>型Boolはそのままで良いので</p>
+
+<p><code>instance BoolLike Bool where<br/>
+	<span class="indent1">toBool = id</span></code></p>
+
+<h2>型()</h2>
+
+<p>ユニット型()はひとつのユニット値()のみを持つので</p>
+
+<p><code>instance BoolLike Bool where<br/>
+	<span class="indent1">toBool () = False</span></code></p>
+
+<p>としても良いしワイルドカードを使って</p>
+
+	<p><code><span class="indent1">toBool _ = False</span></code></p>
+
+<p>としても良い。</p>
+
+<h2>試してみる</h2>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; toBool ()<br/>
+False<br/>
+*Main&gt; toBool True<br/>
+True<br/>
+*Main&gt; toBool 3<br/>
+True<br/>
+*Main&gt; toBool 0<br/>
+False<br/>
+*Main&gt; toBool '0'<br/>
+False</code></p>
+
+<h2>構文</h2>
+
+<p>型を型クラスのインスタンスにするには</p>
+
+<p><code>instance 型クラス名 型名 where<br/>
+	<span class="indent1">クラス関数1の定義</span><br/>
+	<span class="indent1">クラス関数2の定義</span><br/>
+	<span class="indent1">...</span></code></p>
+
+<p>のようにする。</p>
+
+<h2>まとめ</h2>
+
+<p>
+型を型クラスのインスタンスにするためにはクラス関数を
+それぞれの型に合わせて定義する。
+</p>
+
+<h2>課題</h2>
+
+<ol>
+<li>型Int, Float, Doubleを型クラスBoolLikeのインスタンスにせよ</li>
+</ol>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/boollike_class.html"
 	>「型クラスBoolLike」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/boollike_iff.html"
+	>「アドホック多相関数iff」へ</a>
 </p>
