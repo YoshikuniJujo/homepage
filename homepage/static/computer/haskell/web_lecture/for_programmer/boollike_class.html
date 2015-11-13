@@ -1,10 +1,72 @@
 型クラスBoolLike
 
-<p>(工事中 0%)</p>
+<p>(工事中 90%)</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/boolLike.hs"
+	>boolLike.hs</a></p>
+
+<h2>型クラスBoolLike</h2>
+
+<p>
+「Boolのようである」という性質を表現する型クラスを作成する。
+この性質は「その型をBool値に変換する関数が存在する」ことで表現できる。
+つまり以下のような関数がその型に対して存在すれば良い。
+</p>
+
+<p><code>toBool :: [その型] -&gt; Bool</code></p>
+
+<p>
+そして関数toBoolを持つという性質自体に名前をつける。
+ここではBoolLikeという名前にする。
+この「性質」が型クラスであり
+</p>
+
+<p><code>class BoolLike a where<br/>
+	<span class="indent1">toBool :: a -&gt; Bool</span></code></p>
+
+<p>
+のように書く。
+ファイルに定義して対話環境に読みこむ。
+</p>
+
+<p><code>% ghci boolLike.hs<br/>
+*Main&gt; :info BoolLike<br/>
+class BoolLike a where<br/>
+	<span class="indent1">toBool :: a -&gt; Bool</span><br/>
+	<span class="indent1">-- Defined at boolLike.hs:1:1</span></code></p>
+
+<p>ちゃんと定義できたようだ。</p>
+
+<h2>性質</h2>
+
+<p>
+型クラスは型の性質を表す。
+性質は特定の関数を持つことで表現される。
+ある型Tが型クラスCの性質を持つとき「型Tは型クラスCのインスタンスである」と言う。
+性質を示す関数は複数であっても良い。
+このような関数をクラス関数と呼ぶ。
+</p>
+
+<h2>構文</h2>
+
+<p><code>class 型クラス名 型変数 where<br/>
+	<span class="indent1">クラス関数1の名前 :: クラス関数1の型</span><br/>
+	<span class="indent1">クラス関数2の名前 :: クラス関数2の型</span><br/>
+	<span class="indent1">...</span></code></p>
+
+<p>型クラス名は大文字ではじまる識別である。</p>
+
+<h2>まとめ</h2>
+
+<p>
+型クラスは型の持つ性質を表す。
+性質は特定の関数を持つことで表現される。
+型Tが型クラスCの性質を持つことを型Tは型クラスCのインスタンスであると言う。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/boollike_spec.html"
 	>「条件分岐をわかりにくくする」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/boollike_basic_types.html"
+	>「基本的な型を型クラスBoolLikeのインスタンスにする」へ</a>
 </p>
