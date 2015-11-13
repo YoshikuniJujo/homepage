@@ -1,6 +1,6 @@
 型クラスに触れる
 
-<p>(工事中 1%)</p>
+<p>(工事中 50%)</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/yjslide3/lecture13.hs"
@@ -18,9 +18,62 @@
 
 <h2>型クラスのチェック</h2>
 
+<p>型Charがどの型クラスに所属するのかを確認してみよう。</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; :info Char<br/>
+data Char = GHC.Types.C# GHC.Prim.Char#		-- Defined in `GHC.Types'<br/>
+instance Bounded Char -- Defined in `GHC.Enum'<br/>
+instance Enum Char -- Defined in `GHC.Enum'<br/>
+instance Eq Char -- Defined in `GHC.Classes'<br/>
+instance Ord Char -- Defined in `GHC.Classes'<br/>
+instance Read Char -- Defined in `GHC.Read'<br/>
+instance Show Char -- Defined in `GHC.Show'<br/>
+Prelude&gt;</code></p>
+
+<p>
+型Charが型クラスBounded, Enum, Eq, Ord, Read, Showのインスタンスであることが
+わかる。
+</p>
+
 <h2>クラス関数のチェック</h2>
 
+<p>型クラスにどのようなクラス関数があるかを確認する。</p>
+
+<p><code>Prelude&gt; :info Eq<br/>
+class Eq a where<br/>
+	<span class="indent1">(==) :: a -&gt; a -&gt; Bool</span><br/>
+	<span class="indent1">(/=) :: a -&gt; a -&gt; Bool</span><br/>
+...</code></p>
+
+<p>型クラスEqにはクラス関数(==)と(/=)とがある。</p>
+
 <h2>インスタンスのチェック</h2>
+
+<p>さっきの結果をもう一度見てみよう。</p>
+
+<p><code>Prelude&gt; :info Eq<br/>
+class Eq a where<br/>
+	<span class="indent1">(==) :: a -&gt; a -&gt; Bool</span><br/>
+	<span class="indent1">(/=) :: a -&gt; a -&gt; Bool</span><br/>
+...<br/>
+instance Eq Integer<br/>
+...<br/>
+instance Eq Ordering<br/>
+instance Eq Int<br/>
+instance Eq Float<br/>
+instance Eq Double<br/>
+instance Eq Char<br/>
+instance Eq Bool<br/>
+...</code></p>
+
+<p>基本的な型はすべて型クラスEqのインスタンスとなっている。</p>
+
+<h2>まとめ</h2>
+
+<p>
+対話環境で型クラスに関する情報を表示してみた。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/whats_type_class.html"

@@ -340,26 +340,53 @@ src="/computer/haskell/web_lecture/for_programmer/images/the_functional_language
 
 <h2>型クラス</h2>
 
+<p>
+[方針] はじめは「型クラスとは」から始めようかと思ったが、
+むしろ自分で型クラスを作っていくなかでそれらの説明を随時していくほうが
+わかりやすい気がする。
+まずは型クラスをひとつつくり、それに対するインスタンスとなる型を作る。
+そのなかで構文や型クラスの意味を説明していこう。
+すでにすこしだけ書いた
+「<a href="/computer/haskell/web_lecture/for_programmer/whats_type_class.html"
+	>型クラスとは</a> (工事中 30%)」や
+「<a href="/computer/haskell/web_lecture/for_programmer/touch_type_class.html"
+	>型クラスに触れる</a> (工事中 50%)」は
+随時入れていく説明の参考にする。
+
 <ul>
-<li><a href="/computer/haskell/web_lecture/for_programmer/whats_type_class.html"
-	>型クラスとは</a> (工事中 30%)</li>
-<li><a href="/computer/haskell/web_lecture/for_programmer/touch_type_class.html"
-	>型クラスに触れる</a> (工事中 1%)</li>
-<li>自作の型を既存の型クラスのインスタンスにする
-	<ul>
-	<li>スタバのドリンクのサイズの例</li>
-	<li>deriving Showはさらっと使っておく</li>
-	<li>deriving (Eq, Ord)について軽く触れる</li>
-	</ul></li>
-<li>自作の型クラス
+<li><a href="/computer/haskell/web_lecture/for_programmer/boollike_spec.html"
+	>条件分岐をわかりにくくする</a> (工事中 0%)</li>
+<li><a href="/computer/haskell/web_lecture/for_programmer/boollike_class.html"
+	>型クラスBoolLike</a> (工事中 0%)</li>
+<li>基本的な型を型クラスBoolLikeのインスタンスにする (工事中 0%)</li>
+<li>アドホック多相関数iff (工事中 0%)</li>
+<li>複合的な型を型クラスBoolLikeのインスタンスにする (工事中 0%)</li>
+<li>関数iffを使ってみる</li>
+<li>どこかにクラス関数のデフォルト定義の話を入れる</li>
+<li>返り値の多相性を持つクラス関数についての話も</li>
+<li>値そのものの多相性の話(型クラスBounded以外に必要なら)</li>
+<li>実装を後回しにするという話もどこかで</li>
+<li><a href="/computer/haskell/web_lecture/for_programmer/make_type_class.html"
+	>型クラスを作る</a> (工事中 0%)
 	<ul>
 	<li>できるかぎり単純な例を</li>
 	</ul></li>
+<li>型クラス: Eq</li>
+<li>型クラス: Ord</li>
 <li>型クラス: Bounded</li>
 <li>型クラス: Enum</li>
 <li>アルゴリズム: 差分リスト</li>
 <li>型クラス: Show</li>
 <li>型クラス: Read</li>
+<li>自作の型を既存の型クラスのインスタンスにする
+	<ul>
+	<li>スタバのドリンクのサイズの例</li>
+	<li>deriving Showはさらっと使っておく</li>
+	<li>deriving (Eq, Ord)について軽く触れる</li>
+	<li>それよりもderivingできる型クラスのすべてに対して
+		手動でインスタンスにするか</li>
+	<li>そのあと、これ全部derivingでできます、って感じか</li>
+	</ul></li>
 <li>derivingの説明
 	<ul>
 	<li>derivingできる型クラスの一覧
@@ -367,10 +394,6 @@ src="/computer/haskell/web_lecture/for_programmer/images/the_functional_language
 		<li>Eq, Ord, Enum, Ix, Bounded, Show, Read</li>
 		</ul></li>
 	<li>Ix以外をざっくりと説明する</li>
-	</ul></li>
-<li>型クラスを作成する
-	<ul>
-	<li>簡単な型クラスの例を考える</li>
 	</ul></li>
 <li>..</li>
 </ul>
