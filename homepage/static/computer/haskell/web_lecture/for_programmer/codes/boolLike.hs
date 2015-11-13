@@ -4,10 +4,6 @@ class BoolLike a where
 instance BoolLike Bool where
 	toBool = id
 
-instance BoolLike Int where
-	toBool 0 = False
-	toBool _ = True
-
 instance BoolLike Integer where
 	toBool 0 = False
 	toBool _ = True
@@ -15,6 +11,10 @@ instance BoolLike Integer where
 instance BoolLike Char where
 	toBool '\0' = False
 	toBool '0' = False
+	toBool _ = True
+
+instance BoolLike (Maybe a) where
+	toBool Nothing = False
 	toBool _ = True
 
 instance BoolLike a => BoolLike [a] where

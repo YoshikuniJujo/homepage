@@ -1,11 +1,92 @@
 複合的な型を型クラスBoolLikeのインスタンスにする
 
-<p>(工事中 0%)</p>
+<p>(工事中 90%)</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/boolLike.hs"
+	>boolLike.hs</a></p>
 
 <h2>はじめに</h2>
 
 <p>
 リスト型やMaybe型などの複合的な型を型クラスのインスタンスにする。
+</p>
+
+<h2>Maybe型</h2>
+
+<p>Maybe型においてはNothingだけが偽とされる。</p>
+
+<p><code>instance BoolLike (Maybe a) where<br/>
+	<span class="indent1">toBool Nothing = False</span><br/>
+	<span class="indent1">toBool _ = True</span></code></p>
+
+<p>
+このように型引数を持つ型においては型引数の部分に型変数を置くことで
+型クラスのインスタンスにできる。
+</p>
+
+<p><code>% ghci boolLike.hs<br/>
+*Main&gt; iff Nothing "Nothing is true." "Nothing is false."<br/>
+"Nothing is false."<br/>
+*Main&gt; iff (Just 8) "Just 8 is true." "Just 8 is false."<br/>
+"Just 8 is true."</code></p>
+
+<h2>リスト型</h2>
+
+<p>
+文字列を含むリスト型について型クラスBoolLikeのインスタンスにする。
+問題は"\0"や"0"を偽とする必要があるということだ。
+より一般的に
+</p>
+
+<ul>
+<li>要素数が1であり</li>
+<li>その唯一の要素が偽である</li>
+</ul>
+
+<p>
+ときにリスト全体としても偽とするようにルールを拡張する。
+このときリストの要素も型クラスBoolLikeのインスタンスでなければならない。
+インスタンス宣言に型制約をつける。
+</p>
+
+<p><code>instance BoolLike a =&gt; BoolLike [a] where<br/>
+	<span class="indent1">toBool [] = False</span><br/>
+	<span class="indent1">toBool [x] = toBool x</span><br/>
+	<span class="indent1">toBool _ = True</span></code></p>
+
+<p>
+空リストならFalse、要素がひとつでその要素が偽ならばFalse、
+それ以外ならTrueとする。
+</p>
+
+<p><code>*Main&gt; iff "0" "\"0\" is true." "\"0\" is false."<br/>
+"\"0\" is false."<br/>
+*Main&gt; iff "" "\"\" is true." "\"\" is false."<br/>
+"\"\" is false."<br/>
+*Main&gt; iff [[]] "[[]] is true." "[[]] is false."<br/>
+"[[]] is false."<br/>
+*Main&gt; iff [15] "[15] is true." "[15] is false."<br/>
+"[15] is true."</code></p>
+
+<h2>構文</h2>
+
+<p>
+型引数をとる型は型引数の部分に型変数を置くことで型クラスのインスタンスにできる。
+</p>
+
+<p><code>instance 型クラス名 (型構築子名 型変数1 型変数2 ...) where<br/>
+	<span class="indent1">...</span></code></p>
+
+<p>型引数部の型変数に関して型クラス制約をつけることができる。</p>
+
+<p><code>instance 型制約 =&gt; 型クラス名 (型構築子名 型変数1 型変数2 ...) where<br/>
+	<span class="indent1">...</span></code></p>
+
+<h2>まとめ</h2>
+
+<p>
+型引数をとる型は型引数の部分に型変数を置き全体として型クラスのインスタンスにできる。
+型引数の部分に置かれる関変数に対してクラス制約をつけることもできる。
 </p>
 
 <p>
