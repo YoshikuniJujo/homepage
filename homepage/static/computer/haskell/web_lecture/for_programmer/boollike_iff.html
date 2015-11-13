@@ -29,21 +29,19 @@
 <p>
 第1引数が真偽値、第2引数が真だったときの値、第3引数が偽だったときの値だ。
 真だったときの値と偽だったときの値と返り値は同じである必要がある。
-ここで型bはどの型でもいいわけではない。
-型クラスBoolLikeのインスタンスである必要がある。
+型bは何でもいいわけではない。
+型クラスBoolLikeのインスタンスでなければならない。
 </p>
 
 <p><code>iff :: BoolLike b =&gt; b -&gt; a -&gt; a -&gt; a</code></p>
 
 <p>
 BoolLike b =&gt;は型bが型クラスBoolLikeであるという制約を追加している。
-これを型クラス制約と呼ぶ。
+これが型クラス制約だ。
 これによって型bがtoBool :: b -&gt; Boolを持つことが保証される。
 </p>
 
 <p><code>iff b x y = if toBool b then x else y<code></p>
-
-<p>toBool bとすることができる。</p>
 
 <p><code>% ghci boolLike.hs<br/>
 *Main&gt; iff 8 "8 is true." "8 is false."<br/>

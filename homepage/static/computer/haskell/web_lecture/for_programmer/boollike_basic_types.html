@@ -45,8 +45,7 @@
 toBool _ = True</code></p>
 
 <p>
-Haskellではクラス関数を実装するときにはその型が
-型クラスのインスタンスであることを明示する必要がある。
+クラス関数を実装するときは型が型クラスのインスタンスであることを明示する。
 </p>
 
 <p><code>instance BoolLike Integer where<br/>
@@ -61,8 +60,6 @@ True<br/>
 False<br/>
 *Main&gt; toBool (- 3)<br/>
 True</code></p>
-
-<p>クラス関数toBoolが型Integerに対して適切に定義された。</p>
 
 <h2>型Char</h2>
 

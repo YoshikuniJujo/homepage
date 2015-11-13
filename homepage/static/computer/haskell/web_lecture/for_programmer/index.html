@@ -358,7 +358,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/the_functional_language
 
 <ul>
 <li><a href="/computer/haskell/web_lecture/for_programmer/boollike_spec.html"
-	>条件分岐をわかりにくくする</a> (工事中 90%)</li>
+	>条件分岐をわかりにくくする</a> (工事中 70%)</li>
 <li><a href="/computer/haskell/web_lecture/for_programmer/boollike_class.html"
 	>型クラスBoolLike</a> (工事中 90%)</li>
 <li><a href="/computer/haskell/web_lecture/for_programmer/boollike_basic_types.html"
@@ -367,6 +367,8 @@ src="/computer/haskell/web_lecture/for_programmer/images/the_functional_language
 	>アドホック多相関数iff</a> (工事中 90%)</li>
 <li><a href="/computer/haskell/web_lecture/for_programmer/boollike_complex_types.html"
 	>複合的な型を型クラスBoolLikeのインスタンスにする</a> (工事中 90%)</li>
+<li><a href="/computer/haskell/web_lecture/for_programmer/typeclass_as_spec.html"
+	>仕様としての型クラス: 実装と仕様をわける</a> (工事中 10%)</li>
 <li>クラス関数のデフォルト定義
 	<ul>
 	<li>デフォルト定義が役に立つ例を作る</li>
@@ -376,24 +378,22 @@ src="/computer/haskell/web_lecture/for_programmer/images/the_functional_language
 		<li>別の定義か</li>
 		</ul>を選べると便利な例を考える</li>
 	</ul></li>
+<li>「その型」をクラス関数の引数で2回使う例</li>
+<li>型クラス: Eq</li>
+<li>型クラスの定義にクラス制約をつける例</li>
+<li>型クラス: Ord</li>
+<li>型クラス: Enum</li>
 <li>返り値の多相性を持つクラス関数についての話も</li>
 <li>値そのものの多相性の話(型クラスBounded以外に必要なら)</li>
-<li>実装を後回しにするという話もどこかで</li>
-<li>構文: 複数の型クラス制約</li>
-<li>型クラス: Eq</li>
-<li>型クラス: Ord</li>
 <li>型クラス: Bounded</li>
-<li>型クラス: Enum</li>
+<li>構文: 複数の型クラス制約</li>
 <li>アルゴリズム: 差分リスト</li>
 <li>型クラス: Show</li>
 <li>型クラス: Read</li>
 <li>自作の型を既存の型クラスのインスタンスにする
 	<ul>
 	<li>スタバのドリンクのサイズの例</li>
-	<li>deriving Showはさらっと使っておく</li>
-	<li>deriving (Eq, Ord)について軽く触れる</li>
-	<li>それよりもderivingできる型クラスのすべてに対して
-		手動でインスタンスにするか</li>
+	<li>derivingできる型クラスのすべてに対して手動でインスタンスにする</li>
 	<li>そのあと、これ全部derivingでできます、って感じか</li>
 	</ul></li>
 <li>derivingの説明
@@ -424,6 +424,8 @@ src="/computer/haskell/web_lecture/for_programmer/images/the_functional_language
 <h2>ファンクター</h2>
 
 <ul>
+<li>型の種類(kind)</li>
+<li>種類* -&gt; *に対する型クラス</li>
 <li>..</li>
 </ul>
 

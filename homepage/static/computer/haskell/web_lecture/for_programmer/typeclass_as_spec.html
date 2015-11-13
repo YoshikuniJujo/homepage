@@ -1,0 +1,111 @@
+仕様としての型クラス: 実装と仕様をわける
+
+<p>(工事中 10%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+型クラスは型の「性質」だ。
+性質は特定のクラス関数を持つということで表現される。
+クラス関数はその型を扱うためのAPIとも見ることができる。
+型クラスは「仕様」と考えられる。
+</p>
+
+<h2>キュー</h2>
+
+<p>
+キューとはFirst In, First Outでアクセスできるデータ構造だ。
+先に入ったものが先に取り出される。
+入った順番に出てくるということだ。
+たとえばプリンタに送られたデータはとりあえずキューに保存され
+順番に実行される。
+</p>
+
+<h2>リストを使う</h2>
+
+<p>
+リストを使えば良い。
+リストの先頭に値を追加しリストの後ろから値をとりだせば良い。
+</p>
+
+<p><code>enqueue :: Int -&gt; [Int] -&gt; [Int]<br/>
+enqueue = (:)</code></p>
+
+<p><code>dequeue :: [Int] -&gt; Maybe (Int, [Int])<br/>
+dequeue q<br/>
+	<span class="indent1">| null q = Nothing</span><br/>
+	<span class="indent1">| otherwise = Just (last q, init q)</span></code></p>
+
+<p><code>ghci listQueue.hs<br/>
+*Main&gt; let q1 = enqueue 3 []<br/>
+*Main&gt; let q2 = enqueue 8 q1<br/>
+*Main&gt; let q3 = enqueue 15 q2<br/>
+*Main&gt; let Just (x, q4) = dequeue q3<br/>
+*Main&gt; x<br/>
+3<br/>
+*Main&gt; let q5 = enqueue 2 q4<br/>
+*Main&gt; let Just (y, q6) = dequeue q5<br/>
+*Main&gt; y<br/>
+8<br/>
+*Main&gt; let Just (z, q7) = dequeue q6<br/>
+*Main&gt; z<br/>
+15<br/>
+*Main&gt; let Just (w, q8) = dequeue q7<br/>
+*Main&gt; w<br/>
+2<br/>
+*Main&gt; q8<br/>
+[]</code></p>
+
+<p>
+うまくいった。
+しかし、これには問題がある。
+リストは頭への追加や削除に関しては定数時間である。
+後ろへの追加や削除には要素数に比例した時間がかかる。
+リストは前からたどっていく以外に最後の要素に到達する方法がないからだ。
+キューに保存されるデータ量が増えたときに問題となるだろう。
+</p>
+
+<h2>解決法はある、けどめんどくさい</h2>
+
+<p>
+ちょっと工夫すれば実行時間の問題は解決できる。
+けど、まずはとりあえず動くものを作りたい。
+キューのところはとりあえずリストを使っておき、
+あとで効率的なものとさしかえたい。
+</p>
+
+<h2>キュークラス</h2>
+
+<p>
+リストを直接使うのではなくキュークラスを作りそのインターフェースを使って
+コードを書く。
+リストをキュークラスのインスタンスにしておく。
+より効率の良い実装を持つ型を後からキュークラスのインスタンスにすれば良い。
+キュークラスは以下のようになるだろう。
+</p>
+
+<p><code>class Queue q where<br/>
+	<span class="indent1">enqueue :: Int -&gt; q -&gt; q</span><br/>
+	<span class="indent1">dequeue :: q -&gt; Maybe (Int, q)</span></code></p>
+
+<p>
+キューには値を追加することができ、値をとりだすことができる。
+Queueクラスのインスタンスであればこれらの関数を持つことが保証される。
+「追加した順番でとりだす」という制約は実装者の責任だ。
+</p>
+
+<h2>キューを使った関数</h2>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/boollike_complex_types.html"
+	>「複合的な型を型クラスBoolLikeのインスタンスにする」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer"
+	>「1から学ぶHaskell」トップへ</a>
+</p>
+
+<small>
+[脚注]
+<ul>
+<li>「これらの関数を持つことが保証される」には若干の嘘が含まれる</li>
+</ul>
+</small>

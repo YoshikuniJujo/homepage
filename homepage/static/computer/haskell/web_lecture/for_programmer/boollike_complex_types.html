@@ -20,7 +20,7 @@
 	<span class="indent1">toBool _ = True</span></code></p>
 
 <p>
-このように型引数を持つ型においては型引数の部分に型変数を置くことで
+このように型引数を持つ型においては型引数の部分に型変数をおくことで
 型クラスのインスタンスにできる。
 </p>
 
@@ -56,7 +56,7 @@
 
 <p>
 空リストならFalse、要素がひとつでその要素が偽ならばFalse、
-それ以外ならTrueとする。
+それ以外はTrueだ。
 </p>
 
 <p><code>*Main&gt; iff "0" "\"0\" is true." "\"0\" is false."<br/>
@@ -71,7 +71,7 @@
 <h2>構文</h2>
 
 <p>
-型引数をとる型は型引数の部分に型変数を置くことで型クラスのインスタンスにできる。
+型引数をとる型は型引数の部分に型変数をおくことで型クラスのインスタンスにできる。
 </p>
 
 <p><code>instance 型クラス名 (型構築子名 型変数1 型変数2 ...) where<br/>
@@ -85,13 +85,13 @@
 <h2>まとめ</h2>
 
 <p>
-型引数をとる型は型引数の部分に型変数を置き全体として型クラスのインスタンスにできる。
-型引数の部分に置かれる関変数に対してクラス制約をつけることもできる。
+型引数をとる型は型引数の部分に型変数をおき全体として型クラスのインスタンスにできる。
+型引数の部分におかれる型変数に対してクラス制約もつけられる。
 </p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/boollike_iff.html"
 	>「アドホック多相関数iff」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/typeclass_as_spec.html"
+	>「仕様としての型クラス」へ</a>
 </p>
