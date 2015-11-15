@@ -2,6 +2,13 @@
 
 <p>(工事中 10%)</p>
 
+<h2>修正が必要</h2>
+
+<p>
+むしろ、幅優先探索にキューがあるといいよね、
+それじゃキューを用意するけど...のような感じの流れがいいね。
+</p>
+
 <h2>はじめに</h2>
 
 <p>
@@ -94,11 +101,33 @@ Queueクラスのインスタンスであればこれらの関数を持つこと
 「追加した順番でとりだす」という制約は実装者の責任だ。
 </p>
 
-<h2>キューを使った関数</h2>
+<h2>幅優先探索</h2>
+
+<img	src="/computer/haskell/web_lecture/for_programmer/images/tree_int.svg"
+	alt="サンプルの樹"/>
 
 <p>
-<a href="/computer/haskell/web_lecture/for_programmer/boollike_complex_types.html"
-	>「複合的な型を型クラスBoolLikeのインスタンスにする」へもどる</a>
+樹の根からまずは1つ下の深さの節の値すべてを集め、
+次にその下の深さの値のすべてを集め、
+というように浅い層の値から順に集めていく方法を幅優先探索と呼ぶ。
+上の例だと8, 4, 5, 10, 2のようになる。
+</p>
+
+<p>
+幅優先探索はキューを使って実装できる。
+</p>
+
+<ol>
+<li>根の節をキューに入れる</li>
+<li>キューから節をとりだす</li>
+<li>とりだした節の値を結果のリストに追加する</li>
+<li>その節の子要素をすべてキューに追加する</li>
+<li>キューが空になるまで2から4をくりかえす</li>
+</ol>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/newtype.html"
+	>「構文: newtype」へもどる</a>
 <a href="/computer/haskell/web_lecture/for_programmer"
 	>「1から学ぶHaskell」トップへ</a>
 </p>
