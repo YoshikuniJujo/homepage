@@ -1,0 +1,42 @@
+Hubot
+
+<p>(工事中 0%)</p>
+
+<h2>インストール</h2>
+
+<p><code>% npm install -g hubot hubot-slack yo generator-hubot coffee-script</code></p>
+
+<h2>ひな形の作成</h2>
+
+<p><code>% mkdir hellobot<br/>
+% cd hellobot<br/>
+% yo hubot</code></p>
+
+<h2>scripts</h2>
+
+<p>scriptsディレクトリ下にスクリプトを作成する。</p>
+
+<p><code>% vi scripts/helloworld.coffee<br/>
+module.exports = (robot) -&gt;<br/>
+	<span class="indent1">robot.hear /HELLO$/i, (msg) -&gt;</span><br/>
+		<span class="indent2">msg.send "world"</span></code></p>
+
+<h2>動作確認</h2>
+
+<p><code>% ./bin/hubot</code></p>
+
+<p>エラーメッセージが出るがエンターを押す。</p>
+
+<p><code>Hubot&gt; Hubot hello<br/>
+Hubot&gt; world<br/>
+exit</code></p>
+
+<h2>Slackと連携する</h2>
+
+<p>
+SlackのIntegrationページでHubotとの連携を設定する。
+HUBOT_SLACK_TOKENをメモする。
+</p>
+
+<p><code>% HUBOT_SLACK_TOKEN=xxxxxxxxxxxxxx HUBOT_SLACK_TEAM=xxxx
+	HUBOT_SLACK_BOTNAME=hubot bin/hubot --adapter slack</code></p>
