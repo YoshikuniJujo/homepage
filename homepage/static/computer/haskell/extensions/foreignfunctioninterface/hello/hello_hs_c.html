@@ -1,7 +1,5 @@
 C言語の関数をHaskellから利用する
 
-<p>(工事中 0%)</p>
-
 <h2>お決まりの関数sinの例</h2>
 
 <p><a href="/computer/haskell/extensions/foreignfunctioninterface/hello/codes/sin.hs"
@@ -30,3 +28,116 @@ GHCが内部的にlibm.cを利用しているためにこれはうまく動く�
 <p><code>% ghci -lm sin.hs</code></p>
 
 <p>とする。</p>
+
+<h2>Cの関数を自分で作る</h2>
+
+<h3>3を足す関数</h3>
+
+<p>
+<a href="/computer/programming/languages/c/shared/codes/add3.h"
+	>add3.h</a>
+<a href="/computer/programming/languages/c/shared/codes/add3.c"
+	>add3.c</a>
+</p>
+
+<p>
+ここでは与えられた整数に3を足す関数を例とする。
+</p>
+
+<h3>Cの関数を利用するHaskellのコード</h3>
+
+<p><a href="/computer/haskell/extensions/foreignfunctioninterface/hello/codes/add3_hs.hs"
+	>add3_hs.hs</a></p>
+
+<p><code>% cat add3_hs.hs<br/>
+import Foreign.C.Types/code></p>
+
+<p><code>foriegn import ccall unsafe "add3.h add3" c_add3 :: CInt -&gt; CInt</code></p>
+
+<p><code>add3 :: Int -&gt; Int<br/>
+add3 = fromIntegral . c_add3 . fromIntegral</code></p>
+
+<h3>対話環境で使う</h3>
+
+<h4>静的リンク</h4>
+
+<p>ghcを使ってCのコードをオブジェクトファイルにしておく。</p>
+
+<p><code>ghc -c add3.c</code></p>
+
+<p>対話環境にはHaskellコードとともにオブジェクトファイルを指定する。</p>
+
+<p><code>% ghci add3_hs.hs add3.o<br/>
+*Main&gt; add3 8<br/>
+11<br/>
+*Main&gt;</code></p>
+
+<h4>動的リンク</h4>
+
+<p>共有ライブラリを作成する。</p>
+
+<p><a href="/computer/programming/languages/c/shared"
+	>共有ライブラリの作りかた</a></p>
+
+<p>-L, -lオプションの引数を適切に指定してやる。</p>
+
+<p><code>% ghci add3_hs.hs -L. -ladd3<br/>
+*Main&gt; add3 8<br/>
+11<br/>
+*Main&gt;</code></p>
+
+<h3>Haskellのmain関数</h3>
+
+<p>add3_hs.hsに関数mainを追加する。</p>
+
+<p><code>main :: IO ()<br/>
+main = print $ add3 8</code></p>
+
+<h3>スクリプト実行</h3>
+
+<p>スクリプト実行には動的リンクが必要になる。</p>
+
+<p><code>% runghc -L. -ladd3 add3_hs.hs<br/>
+11</code></p>
+
+<h3>コンパイル</h3>
+
+<h4>静的リンク</h4>
+
+<p>コンパイル時にオブジェクトファイルを指定する。</p>
+
+<p><code>% ghc add3_hs.hs add3.o<br/>
+% ./add3_hs<br/>
+11</code></p>
+
+<p>オブジェクトファイルではなくCのソースコードを指定しても良い。</p>
+
+<p><code>% ghc add3_hs.hs add3.c<br/>
+% ./add3_hs<br/>
+11</code></p>
+
+<h4>動的リンク</h4>
+
+<p>コンパイル時には-L, -lオプションを適切に指定する。</p>
+
+<p><code>% ghc add3_hs.hs -L. -ladd3</code></p>
+
+<p>実行時には共有ライブラリのあるディレクトリにパスを通す必要がある。</p>
+
+<p><code>% LD_LIBRARY_PATH=. ./add3_hs<br/>
+11</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+Cの関数をHaskellから使う6通りの方法を示した。
+</p>
+
+<ul>
+<li>対話環境で静的リンク</li>
+<li>対話環境で動的リンク</li>
+<li>スクリプト実行</li>
+<li>静的リンクでコンパイル</li>
+<li>静的リンクで同時にコンパイル</li>
+<li>動的リンクでコンパイル</li>
+</ul>
