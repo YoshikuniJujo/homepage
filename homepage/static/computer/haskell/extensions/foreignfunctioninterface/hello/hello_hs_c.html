@@ -1,0 +1,32 @@
+C言語の関数をHaskellから利用する
+
+<p>(工事中 0%)</p>
+
+<h2>お決まりの関数sinの例</h2>
+
+<p><a href="/computer/haskell/extensions/foreignfunctioninterface/hello/codes/sin.hs"
+	>sin.hs</a></p>
+
+<p><code>% cat sin.hs<br/>
+import Foreign<br/>
+import Foreign.C.Types</code></p>
+
+<p><code>foreign import ccall unsafe "math.h sin" c_sin :: CDouble -&gt; CDouble</code></p>
+
+<p><code>hsSin :: Double -&gt; Double<br/>
+hsSin = realToFrac . c_sin . realToFrac<br/>
+% ghci sin.hs<br/>
+*Main&gt; hsSin $ pi / 2<br/>
+1.0<br/>
+*Main&gt; hsSin $ pi / 6<br/>
+0.499999999999999994<br/>
+*Main&gt;</code></p>
+
+<p>
+GHCが内部的にlibm.cを利用しているためにこれはうまく動く。
+明示的にその使用を示すには
+</p>
+
+<p><code>% ghci -lm sin.hs</code></p>
+
+<p>とする。</p>
