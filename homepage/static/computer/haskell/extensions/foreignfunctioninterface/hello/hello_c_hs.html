@@ -1,0 +1,182 @@
+Haskellの関数をC言語から利用する
+
+<p>(工事中 0%)</p>
+
+<p><a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/ffi-ghc.html#foreign-export-ghc"
+	>8.2.1. Using foreign export and foreign import ccall "wrapper" with GHC</a></p>
+
+<p><a href="http://www.kotha.net/ghcguide_ja/7.6.2/ffi-ghc.html"
+	>8.2. GHCでFFIを使う</a></p>
+
+<h2>はじめに</h2>
+
+<p>Haskellの関数をC言語から利用することができる。</p>
+
+<h2>Haskellの関数</h2>
+
+<p><a href="/computer/haskell/extensions/foreignfunctioninterface/hello/codes/Mul8.hs"
+	>Mul8.hs</a></p>
+
+<p>与えられた整数値に8をかける関数を作成しforeign exportする。</p>
+
+<p><code>% cat Mul8.hs<br/>
+module Mul8 where</code></p>
+
+<p><code>foreign export ccall mul8 :: Int -&gt; Int</code></p>
+
+<p><code>mul8 :: Int -&gt; Int<br/>
+mul8 = (* 8)<br/>
+% ghc Mul8.hs<br/>
+... Mul8_stub.h ...</code></p>
+
+<p>
+いつものファイルに加えてMul8_stub.hというヘッダファイルができる。
+</p>
+
+<h2>自分で用意したmain()を使う</h2>
+
+<p><a href="/computer/haskell/extensions/foreignfunctioninterface/hello/codes/main_mul8.c"
+	>main_mul8.c</a></p>
+
+<p>C言語でmain関数を作成する。mul8(6)の値を表示する。</p>
+
+<p><code>% cat main_mul8.c<br/>
+#include &lt;stdio.h&gt;<br/>
+#include "HsFFI.h"</code></p>
+
+<p><code>#ifdef __GLASGOW_HASKELL__<br/>
+#include "Mul8_stub.h"<br/>
+#endif</code></p>
+
+<p><code>int<br/>
+main(int argc, char *argv[])<br/>
+{<br/>
+	<span class="indent1">hs_init(&amp;argc, &amp;argv);</span></code></p>
+
+<p><code><span class="indent1">printf("%d\n", mul8(6));</span></code></p>
+
+<p><code><span class="indent1">hs_exit();</span><br/>
+	<span class="indent1">return 0;</span><br/>
+}<br/>
+% ghc -no-hs-main main_mul8.c Mul8.o -o main_mul8</code></p>
+
+<p>
+C言語で作ったmain関数を使うために-no-hs-mainが必要になる。
+Mul8_stub.hが必要となるので
+</p>
+
+<p><code>ghc -no-hs-main main_mul8.c Mul8.hs -o main_mul8</code></p>
+
+<p>のようにHaskellのコードとCのコードを同時にコンパイルすることはできない。</p>
+
+<p><code>% ./main_mul8<br/>
+48</code></p>
+
+<h2>Haskellコードからライブラリを作る</h2>
+
+<h3>追加のコード</h3>
+
+<p>
+<a href="/computer/haskell/extensions/foreignfunctioninterface/hello/codes/mul8.c"
+	>mul8.c</a>
+<a href="/computer/haskell/extensions/foreignfunctioninterface/hello/codes/mul8.h"
+	>mul8.h</a>
+<a href="/computer/haskell/extensions/foreignfunctioninterface/hello/codes/lib_mul8.c"
+	>lib_mul8.c</a>
+</p>
+
+<p>イニシャライズ、ファイナライズを行う関数を追加する。</p>
+
+<p><code>% cat mul8.c<br/>
+#include &lt;stdlib.h&gt;<br/>
+#include "HsFFI.h"<br/></code></p>
+
+<p><code>HsBool<br/>
+mul8_init(void)<br/>
+{
+	<span class="indent1">int argc = 0;</span><br/>
+	<span class="indent1">char *argv[] = { NULL };</span><br/>
+	<span class="indent1">char **pargv = argv;</span></code></p>
+
+<p><code><span class="indent1">hs_init(&amp;argc, &amp;pargv);</span></code></p>
+
+<p><code><span class="indent1">return HS_BOOL_TRUE;</span><br/>
+}</code></p>
+
+<p><code>void<br/>
+mul8_end(void)<br/>
+{<br/>
+	<span class="indent1">hs_exit();</span></br/>
+}</code></p>
+
+<p>ヘッダファイルを作成する。</p>
+
+<p><code>% cat mul8.h<br/>
+#include "HsFFI.h"</code></p>
+
+<p><code>#ifdef __GLASGOW_HASKELL__<br/>
+#include "Mul8_stub.h"<br/>
+#endif</code></p>
+
+<p><code>HsBool mul8_init(void);<br/>
+void mul8_end(void);</code></p>
+
+<p>main関数を含むファイルを作成する。</p>
+
+<p><code>% cat lib_mul8.c<br/>
+#include &lt;stdio.h&gt;<br/>
+#include "mul8.h"</code></p>
+
+<p><code>int<br/>
+main(int argc, char *argv[])<br/>
+{<br/>
+	<span class="indent1">mul8_init();</span></code></p>
+
+<p><code><span class="indent1">printf("%d\n", mul8(6));</span></code></p>
+
+<p><code><span class="indent1">mul8_end();</span><br/>
+	<span class="indent1">return 0;</span><br/>
+}</code></p>
+
+<h3>静的リンク</h3>
+
+<p>静的にリンクはとくに問題ない。</p>
+
+<p><code>% ghc Mul8.hs<br/>
+% ghc -c mul8.c<br/>
+% ghc -no-hs-main lib_mul8.c mul8.o Mul8.o -o lib_mul8<br/>
+% ./lib_mul8<br/>
+48</code></p>
+
+<h3>動的リンク</h3>
+
+<p>
+静的にリンクするライブラリは作れるが
+動的にリンクするライブラリを作ろうとすると
+hs_exit()のところでsegmentation faultが生じる。
+テストしたghc, gccのバージョンは以下の通り。
+</p>
+
+<p><code>% ghc --version<br/>
+The Glorious Glasgow Haskell Compiler System, version 7.8.4<br/>
+% gcc --version<br/>
+gcc ... 4.9.3<br/>
+...</code></p>
+
+<p><code>% ghc -shared -fPIC Mul8.hs mul8.c -o libmul8.so<br/>
+% ghc -no-hs-main -L. -lmul8 lib_mul8.c -o so_mul8<br/>
+% LD_LIBRARY_PATH=. ./so_mul8<br/>
+48<br/>
+zsh: segmentation fault LD_LIBRARY_PATH=. ./so_mul8</code></p>
+
+<p>segmentation faultが生じてしまう... </p>
+
+<h2>まとめ</h2>
+
+<p>
+Haskellの関数をC言語から使うことができる。
+直接リンクすることもできるし静的リンクライブラリとすることもできる。
+動的リンクのライブラリにしようとするとsegmentation faultとなってしまう。
+これは僕のやりかたが悪いのかもしれない。
+あるいはghcやgccのバージョンの問題も考えられる。
+</p>
