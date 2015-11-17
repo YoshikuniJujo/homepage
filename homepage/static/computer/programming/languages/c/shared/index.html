@@ -1,0 +1,59 @@
+共有ライブラリの作りかた
+
+<h2>はじめに</h2>
+
+<p>
+たとえばHaskellでrunghcなどとするときに自分で書いたCのコードが
+共有ライブラリとして使えるとうれしい。
+</p>
+
+<h2>サンプルコード</h2>
+
+<p>
+<a href="/computer/programming/languages/c/shared/codes/add3.h">add3.h</a>
+<a href="/computer/programming/languages/c/shared/codes/add3.c">add3.c</a>
+</p>
+
+<p>
+サンプルとして単純な関数を用意する。
+引数として与えられた整数値に3を足して返す関数を作る。
+</p>
+
+<p><code>% cat add3.h<br/>
+int add3(int n);<br/>
+% cat add3.c<br/>
+int<br/>
+add3(int n)<br/>
+{<br/>
+	<span class="indent1">return n + 3;</span><br/>
+}</code></p>
+
+<h2>gccでsoにコンパイルする</h2>
+
+<p><code>% gcc -shared -fPIC -o libadd3.so add3.c</code></p>
+
+<h2>main関数から使う</h2>
+
+<p><a href="/computer/programming/languages/c/shared/codes/useAdd3_c.c"
+	>useAdd3.c</a></p>
+
+<p><code>% cat useAdd3.c<br/>
+#include &lt;stdio.h&gt;<br/>
+#include "add3.h"</code></p>
+
+<p><code>int<br/>
+main(int argc, char *argv[])<br/>
+{<br/>
+	<span class="indent1">printf("%d\n", add3(8));</span><br/>
+	<span class="indent1">return 0;</span><br/>
+}<br/>
+% gcc useAdd3.c -o useAdd3 -I. -L. -ladd3<br/>
+% LD_LIBRARY_PATH=. ./useAdd3<br/>
+11</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+自分で共有ライブラリを作成し使ってみた。
+これでFFIでCの関数を使ったHaskellのコードをrunghcで実行できる。
+</p>
