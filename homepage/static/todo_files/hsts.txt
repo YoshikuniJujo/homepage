@@ -1,0 +1,10 @@
+putResponse hdl (responseH hdl
+		$ LBS.fromChunks [makePage fp_ mt tp cnt]) {
+			responseContentType = tp,
+			responseOthers = hsts
+		}
+
+hsts :: [(BSC.ByteString, BSC.ByteString)]
+hsts = [
+	("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
+	]
