@@ -1,3 +1,239 @@
 Hello SQLite3
 
-<p>(工事中 0%)</p>
+<h2>SQLite3とは</h2>
+
+<p>
+サーバとしてではなくアプリケーションに組みこむライブラリとして使える
+軽量のSQLデータベースだ。
+APIは単に関数呼びだしですみまたデータの保存には単一のファイルを使う。
+手軽に使えるということだ。
+</p>
+
+<h2>データベースへの接続と切断</h2>
+
+<p>
+新規にデータベースを作る場合や既存のデータベースに接続するには
+単にファイル名を引数にしてsqlite3コマンドを実行すれば良い。
+</p>
+
+<p><code>% sqlite3 hello.sqlite3<br/>
+...<br/>
+sqlite&gt;</code></p>
+
+<p>
+拡張子は何でもいい。無くてもいい。
+.sqlite3とする人が多いようだ。
+対話環境からぬけるには.quitを入力する。
+</p>
+
+<p><code>sqlite&gt; .quit</code></p>
+
+<h2>テーブルの作成、削除と表示</h2>
+
+<p>
+テーブルを作成するにはテーブル名、列名を指定する必要がある。
+ここではテーブル名をgreetingとし列名をwords, greeteeとする。
+</p>
+
+<p><code>sqlite3 hello.sqlite3<br/>
+...<br/>
+sqlite&gt; CREATE TABLE greeting(words, greetee);<br/>
+sqlite&gt; .tables<br/>
+greeting<br/>
+sqlite&gt;</code></p>
+
+<p>
+CREATE TABLEでテーブルを作成することができる。
+.tablesでテーブルの一覧が表示される。
+SQLのキーワードは大文字でも小文字でも良い。
+「SQLのキーワードは大文字にしてね」という文化もある。
+ファイルに書くときは大文字、対話環境からの入力は小文字といった使いわけが
+妥当なように思われる。
+テーブルを消すにはDROP TABLEを使う。
+</p>
+
+<p><code>sqlite&gt; DROP TABLE greeting;<br/>
+sqlite&gt; .tables<br/>
+sqlite&gt;</code></p>
+
+<p>小文字のキーワードを使うと</p>
+
+<p><code>sqlite&gt; create table greeting(words, greetee);<br/>
+sqlite&gt; .tables<br/>
+greeting<br/>
+sqlite&gt;</code></p>
+
+<p>のような感じになる。キーワードが</p>
+
+<ul>
+<li>大文字だと見やすくて</li>
+<li>小文字だと書きやすい。</li>
+</ul>
+
+<p>
+見やすさのためこのページではキーワードは大文字で書くが
+対話環境からの入力であれば小文字を使っておけば良いと思う。
+</p>
+
+<p>
+テーブルがどんな列名を持つのかを見たい。
+そんなときはメタテーブルを参照する。
+</p>
+
+<p><code>sqlite&gt; SELECT * FROM sqlite_master;<br/>
+table|greeting|greeting|2|CREATE TABLE greeting(words, greetee)</code></p>
+
+<p>
+よりわかりやすく表示するにはlineモードにしておくと良い
+(デフォルトはlistモード)。
+</p>
+
+<p><code>sqlite&gt; .mode line<br/>
+sqlite&gt; SELECT * FROM sqlite_master;<br/>
+type = table<br/>
+name = greeting<br/>
+tbl_name = greeting<br/>
+root_pabe = 2<br/>
+sql = CREATE TABLE greeting(words, greetee)<br/>
+sqlite&gt; .mode list<br/>
+sqlite&gt;</code></p>
+
+<p>sqlの項目だけを見たければ.schemaコマンドを使っても良い。</p>
+
+<p><code>sqlite&gt; .schema<br/>
+CREATE TABLE greeting(words, greetee);</code></p>
+
+<h2>データの追加</h2>
+
+<p>データを追加するには</p>
+
+<ul>
+<li>すべてのカラムに値を設定する方法と</li>
+<li>カラムを指定して値を設定する方法と</li>
+<li>値を設定しない方法</li>
+</ul>
+
+<p>とがある。</p>
+
+<h3>すべてのカラムに値を設定</h3>
+
+<p>すべてのカラムに値を設定してデータを追加する方法を示す。</p>
+
+<p><code>sqlite&gt; INSERT INTO greeting VALUES ('hello', 'world');<br/>
+sqlite&gt; SELECT * FROM greeting;<br/>
+hello|world<br/>
+sqlite&gt;</code></p>
+
+<p>データの追加は</p>
+
+<p><code>INSERT INTO 表名 VALUES (値1, 値2, ...);</code></p>
+
+<p>のようにする。表のすべての値を表示するには</p>
+
+<p><code>SELECT * FROM 表名;</code></p>
+
+<p>とする。</p>
+
+<h3>カラムを指定して値を設定</h3>
+
+<p>カラム指定した値の設定によるデータの追加は</p>
+
+<p><code>sqlite&gt; INSERT INTO greeting(words, greetee)
+	VALUES ('hello', 'you');<br/>
+sqlite&gt;</code></p>
+
+<p>のように表名のあとに指定するカラム名のリストを置く。</p>
+
+<p><code>sqlite&gt; SELECT * FROM greeting<br/>
+hello|world<br/>
+hello|you</code></p>
+
+<h3>値を設定しない</h3>
+
+<p>ひとつも値を設定しないでデータを追加することができる。</p>
+
+<p><code>sqlite&gt; INSERT INTO greeting DEFAULT VALUES;<br/>
+sqlite&gt; SELECT * FROM greeting<br/>
+hello|world<br/>
+hello|you<br/>
+|</code></p>
+
+<p>構文は</p>
+
+<p><code>INSERT INTO 表名 DEFAULT VALUES;</code></p>
+
+<p>となる。</p>
+
+<h2>データの削除</h2>
+
+<p>
+データを削除するにはDELETE FROMを使う。
+DELETE FROM 表名;のようにすると表のなかのすべてのデータが削除される。
+削除されるデータをしぼりたければWHERE節をつける。
+</p>
+
+<p><code>sqlite&gt; DELETE FROM greeting WHERE greetee = 'you';<br/>
+sqlite&gt; SELECT * FROM greeting;<br/>
+hello|world<br/>
+|<br/>
+sqlite&gt;</code></p>
+
+<p>
+値を指定しないで追加したデータは(NULL, NULL)のようになっている。
+NULL値は=で比較しても偽となってしまうのでIS NULLを使う。
+</p>
+
+<p><code>sqlite&gt; DELETE FROM greeting WHERE words IS NULL;<br/>
+sqlite&gt; SELECT * FROM greeting;<br/>
+hello|world<br/>
+sqlite&gt;</code></p>
+
+<h2>データの更新</h2>
+
+<p>データの更新にはUPDATEを使う。</p>
+
+<p><code>UPDATE 表名 SET カラム名1 = 値1, カラム名2 = 値2, ...
+	WHERE 条件式;</code></p>
+
+<p><code>sqlite&gt; UPDATE greeting SET words = 'good-bye'
+	WHERE greetee = 'world';<br/>
+sqlite&gt; SELECT * FROM greeting;<br/>
+good-bye|world<br/>
+sqlite&gt;</code></p>
+
+<h2>データの検索</h2>
+
+<p>
+条件式によって対象となるデータをしぼりこみ、
+そのうちの必要なカラムだけを取得することができる。
+</p>
+
+<p><code>sqlite&gt; SELECT greetee FROM greeting WHERE words = 'good-bye';<br/>
+world<br/>
+sqlite&gt;</code></p>
+
+<h3>複数の結果</h3>
+
+<p>
+データの検索で複数の結果を取得することもできる。
+</p>
+
+<p><code>sqlite&gt; INSERT INTO greeting VALUES ('hello', 'yoshio');<br/>
+sqlite&gt; INSERT INTO greeting VALUES ('good-bye', 'yoshio');<br/>
+sqlite&gt; INSERT INTO greeting VALUES ('good-bye', 'yoshikazu');<br/>
+sqlite&gt; SELECT * FROM greeting;<br/>
+good-bye|world<br/>
+hello|yoshio<br/>
+good-bye|yoshio<br/>
+good-bye|yoshikazu<br/>
+sqlite&gt; SELECT greetee FROM greeting WHERE words = 'good-bye';<br/>
+world<br/>
+yoshio<br/>
+yoshikazu</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+コマンドラインからのデータベースの基本的な操作を学んだ。
+表の作成と削除、データの追加、更新、削除と検索を見た。
+</p>
