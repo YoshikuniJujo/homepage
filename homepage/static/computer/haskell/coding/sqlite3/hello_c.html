@@ -1,3 +1,44 @@
 Hello SQLite3: C
 
 <p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+C言語からSQLite3を使う。
+すべてのAPIの説明が<a href="https://www.sqlite.org/capi3ref.html"
+>C-language Interface Specification for SQLite</a>にある。
+ここでは
+</p>
+
+<ul>
+<li>データベースへの接続と切断、</li>
+<li>SQLをまとめて実行、</li>
+<li>SQLをステップ実行</li>
+</ul>
+
+<p>について説明する。</p>
+
+<h2>データベースへの接続と切断</h2>
+
+<h2>SQLをまとめて実行</h2>
+
+<p>
+<a href="https://www.sqlite.org/capi3ref.html#sqlite3_exec">sqlite3_exec</a>を使う。
+</p>
+
+<p><code>int sqlite3_exec(<br/>
+	<span class="indent1">sqlite3*,</span><br/>
+	<span class="indent1">const char *sql,</span><br/>
+	<span class="indent1">int (*callback)(vaoid*,int,char**,char**),</span><br/>
+	<span class="indent1">void *,</span><br/>
+	<span class="indent1">char **errmsg</span><br/>
+);</code></p>
+
+<p>
+sqlite3_prepare_v2(), sqlite3_step(), sqlite3_finalize()あたりを
+まとめて実行してくれるラッパーだ。
+スピードが問題でなければこれを使えば良い。
+</p>
+
+<h2>SQLをステップ実行</h2>
