@@ -1,0 +1,82 @@
+関数ポインタ
+
+<p>(工事中 70%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+コマンドライン引数によって総和、総積のどちらかを求める関数を例とする。
+</p>
+
+<h2>左たたみこみ関数</h2>
+
+<p>
+<a href="/computer/programming/languages/c/functionpointer/codes/foldl.h"
+	>foldl.h</a>
+<a href="/computer/programming/languages/c/functionpointer/codes/foldl.c"
+	>foldl.c</a>
+<a href="/computer/programming/languages/c/functionpointer/codes/use_foldl.c"
+	>use_foldl.c</a>
+</p>
+
+<p>1桁の整数の総和または総積を求める。</p>
+
+<p><code>% cat foldl.h<br/>
+typedef int (*Op)(int x, int y);</code></p>
+
+<p><code>int foldl(Op op, int x0, int n, int xs[]);</code></p>
+
+
+<p><code>% cat foldl.c</code></p>
+<p><code>typedef int (*Op)(int x, int y);</code></p>
+
+<p><code>int<br/>
+foldl(Op op, int x0, int n, int xs[])<br/>
+{<br/>
+	<span class="indent1">int s = x0; int i = 0;</span></code></p>
+
+<p><code><span class="indent1">for (i = 0; i &lt; n; i ++) s = op(s, xs[i]);</span><br/>
+	<span class="indent1">return s</span><br/>
+}</code></p>
+
+<h2>main関数</h2>
+
+<p><code>% cat use_foldl.c<br/>
+#include &lt;stdio.h&gt;<br/>
+#include &lt;stdlib.h&gt;<br/>
+#include &lt;string.h&gt;</code></p>
+
+<p><code>int read1(char s[]) { return s[0] - '0'; }</code></p>
+
+<p><code>int<br/>
+main(int argc, char *argv[])<br/>
+{<br/>
+	<span class="indent1">char c = '\0'; Op op = NULL; int x0 = 0;</span><br/>
+	<span class="indent1">int n = argc - 2; int xs[100];</span><br/>
+	<span class="indent1">int i = 0;</span></code></p>
+
+<p><code><span class="indent1">if (n &lt; 0) exit(1);</span><br/>
+	<span class="indent1">if (!strcmp(argv[1], "sum")) {
+		x0 = 0; c = '+'; op = add; }</span><br/>
+	<span class="indent1">if (!strcmp(argv[1], "product")) {
+		x0 = 1; c = '*'; op = mul; }</span><br/>
+	<span class="indent1">if (op == NULL) exit(1);</span></code></p>
+
+<p><code><span class="indent1">for (i = 0; i &lt; 100; i++) {</span><br/>
+		<span class="indent2">xs[i] = read1(argv[i + 2]);</span><br/>
+		<span class="indent2">printf("%d ", xs[i]);</span><br/>
+		<span class="indent2">if (i == n - 1) break;</span><br/>
+		<span class="indent2">printf("%c ", c); }</span><br/>
+	<span class="indent1">printf("= %d\n", foldl(op, x0, n, xs));</span><br/>
+</code></p>
+
+<p><code><span class="indent1">return 0;</span><br/>
+}</code></p>
+
+<h2>コンパイル・実行</h2>
+
+<p><code>% gcc -Wall foldl.c use_foldl.c -o use_foldl<br/>
+% ./use_foldl sum 3 5 8 9<br/>
+3 + 5 + 8 + 9 = 25<br/>
+% ./use_foldl product 3 5 8 9<br/>
+3 * 5 * 8 * 9 = 1080</code></p>
