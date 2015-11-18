@@ -1,10 +1,110 @@
 関数wrapper
 
-<p>(工事中 0%)</p>
+<p>(工事中 90%)</p>
 
 <h2>はじめに</h2>
 
 <p>
 C言語の関数で関数ポインタを引数にとるものがある。
 そのような関数にHaskellの関数を与えたいときがある。
+</p>
+
+<h2>C言語の関数ポインタ</h2>
+
+<p>
+<a href="/computer/programming/languages/c/functionpointer"
+>「C言語: 関数ポインタ」</a>を参照せよ。
+この<a href="/computer/programming/languages/c/functionpointer/codes/foldl.h"
+>foldl.h</a>と<a
+href="/computer/programming/languages/c/functionpointer/codes/foldl.c"
+>foldl.c</a>をここでも利用する。
+</p>
+
+<p><code>% cat foldl.h<br/>
+typedef int (*Op)(int x, int y);</code></p>
+
+<p><code>int foldl(Op op, int x0, int n, int xs[]);</code></p>
+
+<p><code>int add(int x, int y);<br/>
+int mul(int x, int y);</code></p>
+
+<p><code>int sample[];</code></p>
+
+<p>オブジェクトコードを作っておく。</p>
+
+<p><code>% ghc -c foldl.c</code></p>
+
+<h2>C言語の値を使う</h2>
+
+<p><a
+href="/computer/haskell/extensions/foreignfunctioninterface/wrapper/codes/Foldl.hs"
+	>Foldl.hs</a></p>
+
+<p><code>% cat Foldl.hs<br/>
+module Foldl() where</code></p>
+
+<p><code>import Foreign<br/>
+import Foreign.C.Types</code></p>
+
+<p><code>foreign import ccall unsafe "foldl.h foldl" c_foldl ::<br/>
+	<span class="indent1">FunPtr (CInt -&gt; CInt -&gt; CInt) -&gt; CInt -&gt; CInt -&gt; Ptr CInt -&gt; CInt</span></code></p>
+
+<p><code>foreign import ccall unsafe "foldl.h &amp;add" c_add ::
+	FunPtr (CInt -&gt; CInt -&gt; CInt)<br/>
+foreign import ccall unsafe "foldl.h &amp;mul" c_mul ::
+	FunPtr (CInt -&gt; CInt -&gt; CInt)</code></p>
+
+<p><code>foreign import ccall unsafe "foldl.h &amp;sample" c_sample :: Ptr CInt</code></p>
+
+<p>対話環境で試してみる。</p>
+
+<p><code>% ghci Foldl.hs foldl.o<br/>
+*Foldl&gt; c_foldl c_add 0 4 c_sample<br/>
+25<br/>
+*Foldl&gt; c_foldl c_mul 1 4 c_sample<br/>
+1080<br/>
+*Foldl&gt;</code></p>
+
+<h2>Haskellのリストを使う</h2>
+
+<p>
+HaskellのリストをC言語の配列に変換して使う。
+モジュールForeign.Marshal.ArrayのwithArrayLenを使う。
+</p>
+
+<p><code>*Foldl&gt; :m + Foreign.Marshal.Array<br/>
+*Foldl Foreign.Marshal.Array&gt; withArrayLen [3, 4, 5, 6] $ \n xs -&gt; return $ c_foldl c_add 0 (fromIntegral n) xs<br/>
+18<br/>
+*Foldl Foreign.Marshal.Array&gt; withArrayLen [3, 4, 5, 6] $ \n xs -&gt; return $ c_foldl c_mul 1 (fromIntegral n) xs<br/>
+360</code></p>
+
+<h2>Haskellの関数を関数ポインタにする</h2>
+
+<p>
+関数wrapperを使うとHaskellの関数をC用の関数ポインタに変換できる。
+Foldl.hsに
+</p>
+
+<p><code>foreign import ccall unsafe "wrapper" wrap ::<br/>
+	<span class="indent1">(CInt -&gt; CInt -&gt; CInt -&gt;) -&gt;
+		IO (FunPtr (CInt -&gt; CInt -&gt; CInt))</span></code></p>
+
+<p>を追加する。</p>
+
+<p><code>*Foldl Foreign.Marshal.Array&gt; :reload<br/>
+*Foldl Foreign.Marshal.Array&gt; withArrayLen [3, 4, 5, 6] $ \n xs -&gt;
+	do { add &lt;- wrap (+); return $ c_foldl add 0 (fromIntegral n) xs<br/>
+18<br/>
+*Foldl Foreign.Marshal.Array&gt; withArrayLen [3, 4, 5, 6] $ \n xs -&gt;
+	do { mul &lt;- wrap (*); return $ c_foldl mul 1 (fromIntegral n) xs<br/>
+360</code></p>
+
+<p>
+wrap (+)で演算子+を、wrap (*)で演算子*を、それぞれ関数ポインタにした。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+関数wrapperを使うことでHaskellの関数を関数ポインタとしてCの関数にわたすことができる。
 </p>
