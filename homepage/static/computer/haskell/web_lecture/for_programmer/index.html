@@ -350,6 +350,20 @@ Hubotのインストールあたりの話題はまだ必要ないかもしれな
 たとえばiocikun2とか作ってもいいのかな。
 </p>
 
+<p>
+与えられた文字列をシードとしてランダムに返答を作る。
+それを基本としてそのうえにたとえばBMIを教えてくれるしくみを作る。
+他にもいくつかの機能をつけるってのはどうだろうか。
+["体重", "身長"]というリストと[isDigit, isDigit]
+を与えるとRead a =&gt; String -&gt; [a]として
+[178, 85]のようなリストを返してくれる関数を作っておくと便利かも。
+「最初のisDigitを満たすものの空ではない連続」を取るようにしよう。
+空白文字はさきにけずっておくか。
+</p>
+
+<p>参考: <a href="/computer/haskell/web_lecture/for_programmer/codes/others/conv.hs"
+	>conv.hs</a></p>
+
 <ul>
 <li><a href="/computer/web/bot/hubot"
 	>準備1: HubotのインストールとHello, Bot!</a></li>
