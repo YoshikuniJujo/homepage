@@ -24,11 +24,16 @@
 <p><code>% cat foldl.h<br/>
 typedef int (*Op)(int x, int y);</code></p>
 
-<p><code>int foldl(Op op, int x0, int n, int xs[]);</code></p>
+<p><code>int add(int x, int y);<br/>
+int mul(int x, int y);</code></p>
 
+<p><code>int foldl(Op op, int x0, int n, int xs[]);</code></p>
 
 <p><code>% cat foldl.c</code></p>
 <p><code>typedef int (*Op)(int x, int y);</code></p>
+
+<p><code>int add(int x, int y) { return x + y; }<br/>
+int mul(int x, int y) { return x * y; }</code></p>
 
 <p><code>int<br/>
 foldl(Op op, int x0, int n, int xs[])<br/>
