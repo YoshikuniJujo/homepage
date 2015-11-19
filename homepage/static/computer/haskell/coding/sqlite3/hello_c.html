@@ -30,7 +30,7 @@ C言語からSQLite3を使う。
 <p><code>int sqlite3_exec(<br/>
 	<span class="indent1">sqlite3*,</span><br/>
 	<span class="indent1">const char *sql,</span><br/>
-	<span class="indent1">int (*callback)(vaoid*,int,char**,char**),</span><br/>
+	<span class="indent1">int (*callback)(void*,int,char**,char**),</span><br/>
 	<span class="indent1">void *,</span><br/>
 	<span class="indent1">char **errmsg</span><br/>
 );</code></p>
