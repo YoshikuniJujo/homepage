@@ -294,6 +294,163 @@ SQLの部分を以下のようにし、コールバック関数にshow_rowを指
 <h2>SQLをステップ実行</h2>
 
 <p>
+<a href="https://www.sqlite.org/capi3ref.html#sqlite3_prepare"
+	>sqlite3_prepare_v2</a>
+<a href="https://www.sqlite.org/capi3ref.html#sqlite3_bind_parameter_index"
+	>sqlite3_bind_parameter_index</a>
+<a href="https://www.sqlite.org/capi3ref.html#sqlite3_bind_blob"
+	>sqlite3_bind_*</a>
+<a href="https://www.sqlite.org/capi3ref.html#sqlite3_step"
+	>sqlite3_step</a>
+<a href="https://www.sqlite.org/capi3ref.html#sqlite3_finalize"
+	>sqlite3_finalize</a>
+</p>
+
+<p>
+行の挿入のところで見たようにsqlite3_execを使うと
+SQL命令の一部を引数としてさしかえることができない。
+このような場合にはSQLをステップ実行する必要がある。
+それ以外にも効率等の問題もある。
+</p>
+
+<ol>
+<li>sqlite3_prepare_v2(): stmtを作成</li>
+<li>sqlite3_bind_??(): クエリを加工</li>
+<li>sqlite3_step(): クエリを実行、1回以上</li>
+<li>sqlite3_reset(): stmtの内部バッファをクリア</li>
+<li>必要なら2にもどる</li>
+<li>sqlite3_finalize(): stmtを開放</li>
+</ol>
+
+<p>とある。またsqlite3_step()の返り値は以下のようになる。</p>
+
+<ul>
+<li>SQLITE_ERROR</li>
+<li>SQLITE_ROW</li>
+<li>SQLITE_BUSY</li>
+<li>SQLITE_DONE</li>
+</ul>
+
+<h3>テーブルを作成する</h3>
+
+<p><a href="/computer/haskell/coding/sqlite3/hello_c/codes/create_table.c"
+	>create_table.c</a></p>
+
+<p>最も単純な例としてテーブルの作成を挙げる。</p>
+
+<ol>
+<li>sqlite3_prepare_v2()</li>
+<li>sqlite3_step()</li>
+<li>返り値をSQLITE_DONEと比較する</li>
+</ol>
+
+<p><code>int sqlite3_prepare_v2(<br/>
+	<span class="indent1">sqlite3 *db,</span><br/>
+	<span class="indent1">const char *zSql,</span><br/>
+	<span class="indent1">int nByte,</span><br/>
+	<span class="indent1">sqlite3_stmt **ppStmt,</span><br/>
+	<span class="indent1">const char **pzTail</span><br/>
+)</code></p>
+
+<p>
+第1、第2引数は見ての通りだ。
+第3引数はSQLの文字列の最大長だ。
+これを負(-1など)にすると0終端文字列として読みこんでくれる。
+ppStmtに結果が格納される。
+pzTailがNULLでなければ処理された残りの文字列が格納される。
+</p>
+
+<p><code>int sqlite3_step(sqlite3_stmt*)</code></p>
+
+<p>
+いくつかの返り値がある。
+SQLITE_ROWのときはもう1度sqlite3_step()をしても良い。
+SQLITE_DONEは成功して終了だ。
+それ以外ならエラーということになる。
+SQLITE_BUSYの場合にはやり直せば良い。
+ただしトランザクションのなかでCOMMIT以外のことをした場合には
+ロールバックする必要がある。
+</p>
+
+<p>
+テーブルの作成にはSQLITE_BUSYかSQLITE_DONEまたはその他のエラーが返る。
+SQLITE_BUSYのときにはすこしsleepしてからやり直すのが良さそうだ。
+あるいはエラー終了としても良いだろう。
+SQLITE_DONEだったら成功として次に進むのが良いだろう。
+エラーメッセージはsqlite3_errmsg()あたりを使えば良いだろう。
+</p>
+
+<p>
+データベースへの接続、切断については今までと同じにする。
+open_close.cあたりをコピーすれば良いだろう。
+必要な変数を宣言する。
+</p>
+
+<p><code>sqlite3_stmt *stmt = NULL;<br/>
+const char *tail = NULL;</code></p>
+
+<p>データベースの接続と切断のあいだに以下のコードを入れる。</p>
+
+<p><code>ret = sqlite3_prepare_v2(db,<br/>
+	<span class="indent1">"CREATE TABLE greeting(id, words, greetee)",
+		-1, &amp;stmt, &amp;tail);"</span><br/>
+if (ret != SQLITE_OK) { ... }</code></p>
+
+<p><code>ret = sqlite3_step(stmt);<br/>
+if (ret != SQLITE_DONE) { ... }</code></p>
+
+<p><code>ret = sqlite3_finalize(stmt);<br/>
+if (ret != SQLITE_OK) { ... }</code></p>
+
+<h3>いくつかのデータを挿入する</h3>
+
+<p><a href="/computer/haskell/coding/sqlite3/hello_c/codes/insert.c"
+	>insert.c</a></p>
+
+<p>プレースホルダーを使う例だ。プレースホルダーには</p>
+
+<ul>
+<li>?</li>
+<li>?NNN</li>
+<li>:VVV</li>
+<li>@VVV</li>
+<li>$VVV</li>
+</ul>
+
+<p>のような形式がある。</p>
+
+<ol>
+<li>sqlite3_prepare_v2()</li>
+<li>sqlite3_bind_parameter_index()</li>
+<li>sqlite3_bind_text()</li>
+<li>sqlite3_bind_parameter_index()</li>
+<li>sqlite3_bind_text()</li>
+<li>sqlite3_step()</li>
+<li>必要ならsqlite3_reset()して2へもどる</li>
+<li>sqlite3_finalize()</li>
+</ol>
+
+<p>ここでは以下のようなデータを入力する。</p>
+
+<ul>
+<li>1|hello|world</li>
+<li>2|good-bye|world</li>
+<li>3|hello|you</li>
+<li>4|hello|world</li>
+<li>5|good-bye|world</li>
+<li>6|hello|you</li>
+<li>7|hello|world</li>
+<li>8|good-bye|world</li>
+<li>9|hello|you</li>
+</ul>
+
+<p>とりあえずはcreate_table.cをコピーする。</p>
+
+<h3>データを表示する</h3>
+
+<p>SQLITE_ROWを受けとって次のstepを行う例だ。</p>
+
+<p>
 <a href="/computer/haskell/coding/sqlite3/hello.html"
 	>「Hello SQLite3: コマンドライン」へもどる</a>
 <a href="/computer/haskell/coding/sqlite3"
