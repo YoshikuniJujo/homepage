@@ -188,6 +188,109 @@ sqlite3_prepare_v2(), sqlite3_step(), sqlite3_finalize()あたりを
 スピードが問題でなければこれを使えば良い。
 </p>
 
+<p>
+第1、第2引数は見ての通りだ。
+第3引数はコールバック関数だ。
+この引数がNULLならば結果に対しては何も行わない。
+第4引数は第3引数の関数の第1引数としてわたされる。
+第5引数はエラーメッセージの格納場所を返すために使われる。
+エラーが生じた場合この引数の値はきちんとsqlite3_free()する必要がある。
+</p>
+
+<p>
+コールバック関数が0以外の値を返したならその場でSQLITE_ABORTを返す。
+コールバック関数の第2引数は結果のカラムの数だ。
+第3引数は配列でカラムの値がテキストとして格納される。
+第4引数はカラムの名前の配列だ。
+</p>
+
+<p>
+第2引数がNULLか空文字列か空白文字のみから成る場合には何もしない。
+</p>
+
+<p><a href="/computer/haskell/coding/sqlite3/hello_c/codes/hello_c.c"
+	>hello_c.c</a></p>
+
+<h3>テーブルの作成</h3>
+
+<p>
+まずはテーブルを作成する。
+これは結果を必要としないのでコールバック関数はNULLで良い。
+まずはエラーメッセージを受けとるための変数を変数宣言に追加する。
+</p>
+
+<p><code><span class="indent1">char *msg = NULL;</span></code></p>
+
+<p>
+まずはopen_close.cをコピーして、print("sqlite3 *db = %p\n", db);を以下で
+置き換えよう。
+</p>
+
+<p><code><span class="indent1">ret = sqlite3_exec(db,</span><br/>
+		<span class="indent2">"CREATE TABLE greeting(words, greetee)",
+			NULL, NULL, &amp;msg);</span><br/>
+	<span class="indent1">if (ret != SQLITE_OK) {</span><br/>
+		<span class="indent2">fprintf(stderr,
+			"Cannot create table: %s\n", msg);</span><br/>
+		<span class="indent2">sqlite3_close(db);</span><br/>
+		<span class="indent2">return 1; }</span><br/>
+	<span class="indent1">sqlite3_free(msg);</span><br/>
+</code></p>
+
+<p>コンパイルして実行する。</p>
+
+<p><code>% gcc -Wall hello_c.c -o hello_c -lsqlite3<br/>
+% ./hello_c</code></p>
+
+<p>
+テーブルが正しく作成されていることをコマンドラインツールで確かめてみよう。
+</p>
+
+<p><code>% sqlite3 hello.sqlite3<br/>
+sqlite&gt; .tables<br/>
+greeting<br/>
+sqlite&gt; .schema<br/>
+CREATE TABLE greeting(words, greetee)<br/>
+sqlite&gt;</code></p>
+
+<h3>行の挿入</h3>
+
+<p>
+ここでは決めうちで3行ほど挿入してみる。
+簡単のため3通りのINSERT文をそれぞれ作ってしまう。
+上と同じコードでSQLの部分をそれぞれ以下の3つに置き換えたものを追加する。
+</p>
+
+<p><code>INSERT INTO greeting VALUES ('hello', 'world');</code></p>
+
+<p><code>INSERT INTO greeting VALUES ('good-bye', 'world');</code></p>
+
+<p><code>INSERT INTO greeting VALUES ('hello', 'you');</code></p>
+
+<h3>すべての行を表示</h3>
+
+<p>コールバック関数を作る。</p>
+
+<p><code>int<br/>
+show_row(void *v0, int n, char **vs, char **ns)<br/>
+{<br/>
+	<span class="indent1">int i;</span></code></p>
+
+<p><code><span class="indent1">for (i = 0; i &lt; n; i++) {</span><br/>
+	<span class="indent2">printf("%s: %s", ns[i], vs[i]);</span><br/>
+	<span class="indent2">if (i == n - 1) break;</span><br/>
+	<span class="indent2">printf(", "); }</span><br/>
+	<span class="indent1">print("\n");</span></code></p>
+
+<p><code><span class="indent1">return 0;</span><br/>
+}</code></p>
+
+<p>
+SQLの部分を以下のようにし、コールバック関数にshow_rowを指定したものを追加する。
+</p>
+
+<p><code>SELECT * FROM greeting</code></p>
+
 <h2>SQLをステップ実行</h2>
 
 <p>
