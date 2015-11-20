@@ -5,6 +5,13 @@ Hello SQLite3: Haskell
 <p><a href="https://www.sqlite.org/capi3ref.html"
 >C-language Interface Specification for SQLite</a></p>
 
+<p>
+<a href="/computer/haskell/coding/sqlite3/hello_hs/codes/SQLite3.hs"
+	>SQLite3.hs</a>
+<a href="/computer/haskell/coding/sqlite3/hello_hs/codes/SQLite3/Constants.hsc"
+	>SQLite3/Constants.hsc</a>
+</p>
+
 <h2>はじめに</h2>
 
 <p>
@@ -26,3 +33,62 @@ Hello SQLite3: Haskell
 
 <p><a href="https://www.sqlite.org/capi3ref.html#sqlite3_close"
 	>sqlite3_close()</a></p>
+
+<h3>SQLITE_OK</h3>
+
+<p><a href="https://www.sqlite.org/capi3ref.html#SQLITE_ABORT"
+	>SQLITE_OK</a></p>
+
+<p>hsc2hsを利用する。</p>
+
+<p><code>#include &lt;sqlite3.h&gt;</code></p>
+
+<p><code>sQLITE_OK :: CInt<br/>
+sQLITE_OK = #const SQLITE_OK</code></p>
+
+<p>とする。</p>
+
+<h3>sqlite3_errmsg()</h3>
+
+<p><a href="https://www.sqlite.org/capi3ref.html#sqlite3_errcode"
+	>sqlite3_errmsg()</a></p>
+
+<h2>バイトコードの作成</h2>
+
+<h3>sqlite3_prepare_v2()</h3>
+
+<p><a href="https://www.sqlite.org/capi3ref.html#sqlite3_prepare"
+	>sqlite3_prepare_v2()</a></p>
+
+<h3>sqlite3_finalize()</h3>
+
+<p><a href="https://www.sqlite.org/capi3ref.html#sqlite3_finalize"
+	>sqlite3_finalize()</a></p>
+
+<h3>sqlite3_reset()</h3>
+
+<p><a href="https://www.sqlite.org/capi3ref.html#sqlite3_reset"
+	>sqlite3_reset()</a></p>
+
+<h3>sqlite3_bind_parameter_index()</h3>
+
+<h3>sqlite3_bind_int()</h3>
+
+<h3>sqlite3_bind_text()</h3>
+
+<h2>ステップ実行</h2>
+
+<h3>sqlite3_step()</h3>
+
+<p><a href="https://www.sqlite.org/capi3ref.html#sqlite3_step"
+	>sqlite3_step()</a></p>
+
+<h3>sqlite3_column_int()</h3>
+
+<p><a href="https://www.sqlite.org/capi3ref.html#sqlite3_column_blob"
+	>sqlite3_column_int()</a></p>
+
+<h3>sqlite3_column_text()</h3>
+
+<p><a href="https://www.sqlite.org/capi3ref.html#sqlite3_column_blob"
+	>sqlite3_column_text()</a></p>

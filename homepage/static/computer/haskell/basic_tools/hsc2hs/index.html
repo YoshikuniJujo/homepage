@@ -1,0 +1,63 @@
+hsc2hs
+
+<p>(工事中 0%)</p>
+
+<p>
+<a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/hsc2hs.html"
+	>11.2. Writing Haskell interfaces to C code: hsc2hs</a>
+<a href="http://www.kotha.net/ghcguide_ja/7.6.2/hsc2hs.html"
+	>12.2. CコードへのHaskellインタフェースを書く: hsc2hs</a>
+</p>
+
+<h2>はじめに</h2>
+
+<p>
+HaskellにはForeignFunctionInterfaceがありC言語の関数を使うことができる。
+しかし、C言語の定数や構造体を使うにはプリプロセスが必要になる。
+そのプリプロセスを行うのがhsc2hsだ。
+</p>
+
+<h2>どのように</h2>
+
+<p>
+必要なヘッダファイルをインクルードしたC言語のソースコードを作成し
+それを実行することでHaskellのソースコードを作成している。
+</p>
+
+<h2>文法</h2>
+
+<p><a href="/computer/haskell/basic_tools/hsc2hs/codes/basic.hsc"
+	>basic.hsc</a></p>
+
+<p>
+hsc2hsが解釈する特別な構文はすべて#で始まる。
+#そのものをHaskellのコードに書きたい場合は##とする。
+文字列のなかやコメントのなかの#はそのままになる。
+</p>
+
+<p>
+#のあとには複数のスペースやタブが続いても良い。
+その後にキーワードと引数が続く。
+引数のまわりは括弧でくくらないが引数同士はコンマでくぎる。
+構文のおわりは構文内に対応する開きのない), ], }か(), [], {} '' "" /**/
+のなかにない改行で示される。
+#のあとに明示的に{を置くことで対応する}までがその構文とし扱われる。
+</p>
+
+<p><code>cat basic.hsc<br/>
+#define HELLO 888</code></p>
+
+<p><code>(##) :: Int -&gt; Int -&gt; Int<br/>
+(##) = (+)</code></p>
+
+<p><code>main :: IO (#define WORLD 999)<br/>
+main = do<br/>
+	<span class="indent1">pr#{define YOU 111}int #const HELLO</span><br/>
+	<span class="indent1">print $ #{const WORLD} ## #const YOU</span></code></p>
+
+<h2></h2>
+
+<p>
+<a href="/computer/haskell/basic_tools"
+	>「基本的なツール」へもどる</a>
+</p>
