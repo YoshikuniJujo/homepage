@@ -1,0 +1,198 @@
+Hello SQLite3: C
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+C言語からSQLite3を使う。
+すべてのAPIの説明が<a href="https://www.sqlite.org/capi3ref.html"
+>C-language Interface Specification for SQLite</a>にある。
+ここでは
+</p>
+
+<ul>
+<li>データベースへの接続と切断、</li>
+<li>SQLをまとめて実行、</li>
+<li>SQLをステップ実行</li>
+</ul>
+
+<p>について説明する。</p>
+
+<p>
+また、<a href="http://zetcode.com/db/sqlitec/">SQLite C tutorial</a>も参照する。
+</p>
+
+<h2>データベースへの接続と切断</h2>
+
+<p>
+<a href="https://www.sqlite.org/capi3ref.html#sqlite3"
+	>型: sqlite3</a>
+<a href="https://www.sqlite.org/capi3ref.html#sqlite3_open"
+	>関数: sqlite3_open</a>
+<a href="https://www.sqlite.org/capi3ref.html#sqlite3_close"
+	>関数: sqlite3_close</a>
+</p>
+
+<h3>sqlite3_open_v2</h3>
+
+<p><code>int sqlite3_open_v2(<br/>
+	<span class="indent1">const char *filename,</span><br/>
+	<span class="indent1">sqlite3 **ppDb,</span><br/>
+	<span class="indent1">int flags,</span><br/>
+	<span class="indent1">const char * zVfs</span><br/>
+);</code></p>
+
+<p>
+データベースのファイル名をfilenameに指定する。
+開かれた結果はppDbに格納される。
+開くのに成功すればSQLITE_OKが返る。
+そうでなければerror codeが返る。
+sqlite3_errmsg()を使えば英語でのエラーメッセージが取得できる。
+開くのに成功しても失敗してもsqlite3_close()かsqlite3_close_v2()で
+メモリ領域を開放する必要がある。
+</p>
+
+<p>
+flag引数にはまず以下の3つのうちひとつが選ばれる。
+</p>
+
+<ul>
+<li>SQLITE_OPEN_READONLY</li>
+<li>SQLITE_OPEN_READWRITE</li>
+<li>SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE</li>
+</ul>
+
+<p>
+そしてオプションで以下のフラグが追加される。
+</p>
+
+<ul>
+<li>SQLITE_OPEN_NOMUTEX: 排他制御をしない</li>
+<li>SQLITE_OPEN_FULLMUTEX: 排他制御をする</li>
+<li>SQLITE_OPEN_SHAREDCACHE: キャッシュの共有に参加する</li>
+<li>SQLITE_OPEN_PRIVATECACHE: キャッシュの共有に参加しない</li>
+</ul>
+
+<p>とりあえずは</p>
+
+<p><code>SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE |
+	SQLITE_OPEN_FULLMUTEX | SQLITE_OPEN_SHAREDCACHE</code></p>
+
+<p>あたりで良さそうだ。</p>
+
+<p>
+zVfsはsqlite3_vfsオブジェクトの名前だ。
+NULLだとデフォルトのsqlite3_vfsオブジェクトが使われる。
+デフォルトではunixでデフォルトを使えば良いが他には以下のようなものがある。
+</p>
+
+<ul>
+<li>unix-dotfile</li>
+<li>unix-excl</li>
+<li>unix-none</li>
+<li>unix-namedsem</li>
+</ul>
+
+<h3>sqlite3_close_v2</h3>
+
+<p><code>int sqlite3_close_v2(sqlite3*);</code></p>
+
+<p>
+sqlite3_close()とsqlite3_close_v2()は成功するとSQLITE_OKを返す。
+2つの違いは失敗した場合だ。
+sqlite3_close()はSQLITE_BUSYで失敗するが
+sqlite3_close_v2()はSQLITE_OKを返し、
+prepared statements, BLOB handles, sqlite3_backupがすべて閉じられるまで
+待ってリソースを開放する。
+</p>
+
+<p>
+prepared statementはすべてfinalizeされていなければならないし、
+BLOB handleはすべて閉じておかなければならない。
+また、sqlite3_backupはすべて終わらせておく必要がある。
+</p>
+
+<p>
+sqlite3_close(), sqlite3_close_v2()はともにNULLに対して呼んでも問題ない。
+</p>
+
+<h3>実際に使ってみる</h3>
+
+<p><a href="/computer/haskell/coding/sqlite3/hello_c/codes/open_close.c"
+	>open_close.c</a></p>
+
+<p>
+openのほうはsqlite3_open_v2()の後ろの2つのパラメータがデフォルト値で良ければ
+sqlite3_open()を使えば良い。
+また、sqlite3_close_v2()はprepared statement等をGCする場合に必要となるが、
+今回は明示的にdestroyするのでsqlite3_closeで良さそうだ。
+</p>
+
+<p><code>% cat open_close.c<br/>
+#include &lt;stdio.h&gt;<br/>
+#include &lt;sqlite3.h&gt;</code></p>
+
+<p><code>int<br/>
+main(int argc, char *argv[])<br/>
+{<br/>
+	<span class="indent1">sqlite3 *db = NULL;</span><br/>
+	<span class="indent1">int ret = 0;</span></code></p>
+
+<p><code><span class="indent1">ret = sqlite3_open("hello.sqlite3", &amp;db);</span><br/>
+	<span class="indent1">if (ret != SQLITE_OK) {</span><br/>
+		<span class="indent2">fprintf(stderr,
+			"Cannot open database: %s\n",
+			sqlite3_errmsg(db));</span><br/>
+		<span class="indent2">sqlite3_close(db);</span><br/>
+		<span class="indent2">return 1; }</span><br/>
+</code></p>
+
+<p><code><span class="indent1">printf("sqlite3 *db = %p\n", db);</span></code></p>
+
+<p><code><span class="indent1">ret = sqlite3_close(db);</span><br/>
+	<span class="indent1">if (ret != SQLITE_OK) {</span><br/>
+		<span class="indent2">fprintf(stderr,
+			"Cannot close database: %s\n",
+			sqlite3_errmsg(db));</span><br/>
+		<span class="indent2">return 1; }</span><br/>
+	<span class="indent1">db = NULL;</span></code></p>
+
+<p><code><span class="indent1">return 0;</span><br/>
+}</code></p>
+
+<p>コンパイルして実行する。</p>
+
+<p><code>% gcc -Wall open_close.c -o open_close -lsqlite3<br/>
+% ./open_close<br/>
+sqlite3 *db = 0x8ac9010</code></p>
+
+<h2>SQLをまとめて実行</h2>
+
+<p>
+<a href="https://www.sqlite.org/capi3ref.html#sqlite3_exec"
+>sqlite3_exec</a>を使う。
+</p>
+
+<p><code>int sqlite3_exec(<br/>
+	<span class="indent1">sqlite3*,</span><br/>
+	<span class="indent1">const char *sql,</span><br/>
+	<span class="indent1">int (*callback)(void*,int,char**,char**),</span><br/>
+	<span class="indent1">void *,</span><br/>
+	<span class="indent1">char **errmsg</span><br/>
+);</code></p>
+
+<p>
+sqlite3_prepare_v2(), sqlite3_step(), sqlite3_finalize()あたりを
+まとめて実行してくれるラッパーだ。
+スピードが問題でなければこれを使えば良い。
+</p>
+
+<h2>SQLをステップ実行</h2>
+
+<p>
+<a href="/computer/haskell/coding/sqlite3/hello.html"
+	>「Hello SQLite3: コマンドライン」へもどる</a>
+<a href="/computer/haskell/coding/sqlite3"
+	>「コーディング: SQLite3」トップへ</a>
+</p>
