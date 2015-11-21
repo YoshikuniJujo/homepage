@@ -70,11 +70,56 @@ sQLITE_OK = #const SQLITE_OK</code></p>
 <p><a href="https://www.sqlite.org/capi3ref.html#sqlite3_reset"
 	>sqlite3_reset()</a></p>
 
+<p>
+stmtをresetしてもう一度使う例を作成してみる。
+</p>
+
 <h3>sqlite3_bind_parameter_index()</h3>
+
+<p><a href="https://www.sqlite.org/capi3ref.html#sqlite3_bind_parameter_index"
+	>sqlite3_bind_parameter_index()</a></p>
+
+<ul>
+<li>:VVV</li>
+<li>@VVV</li>
+<li>$VVV</li>
+</ul>
+
+<p>
+?や?NNNの場合をどうするかは考え中。
+?のときにはInt -&gt; String -&gt; Stmtのような形にできないだろうか。
+いや、めんどくさいな。
+</p>
+
+<p>
+bind sm "words" "hello"やbind sm "id" 8のような形で使えるbindを作るほうが
+良さそうだ。
+</p>
+
+<p><code>bind :: SqliteData a =&gt; Stmt -&gt; String -&gt; a -&gt; IO ()</code></p>
+
+<p>のような形のクラス関数としよう。</p>
+
 
 <h3>sqlite3_bind_int()</h3>
 
+<p><a href="https://www.sqlite.org/capi3ref.html#sqlite3_bind_blob"
+	>sqlite3_bind_int()</a></p>
+
 <h3>sqlite3_bind_text()</h3>
+
+<p><a href="https://www.sqlite.org/capi3ref.html#sqlite3_bind_blob"
+	>sqlite3_bind_text()</a></p>
+
+<h3>sqlite3_bind_blob()</h3>
+
+<p><a href="https://www.sqlite.org/capi3ref.html#sqlite3_bind_blob"
+	>sqlite3_bind_blob()</a></p>
+
+<h3>sqlite3_bind_null()</h3>
+
+<p><a href="https://www.sqlite.org/capi3ref.html#sqlite3_bind_blob"
+	>sqlite3_bind_null()</a></p>
 
 <h2>ステップ実行</h2>
 
@@ -92,3 +137,13 @@ sQLITE_OK = #const SQLITE_OK</code></p>
 
 <p><a href="https://www.sqlite.org/capi3ref.html#sqlite3_column_blob"
 	>sqlite3_column_text()</a></p>
+
+<h3>sqlite3_column_blob()</h3>
+
+<p><a href="https://www.sqlite.org/capi3ref.html#sqlite3_column_blob"
+	>sqlite3_column_blob()</a></p>
+
+<h3>sqlite3_column_type()</h3>
+
+<p><a href="https://www.sqlite.org/capi3ref.html#sqlite3_column_blob"
+	>sqlite3_column_type()</a></p>
