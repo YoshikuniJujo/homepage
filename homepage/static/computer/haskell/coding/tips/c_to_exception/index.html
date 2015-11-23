@@ -1,0 +1,72 @@
+C言語の関数のエラーを例外として処理する
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+C言語は返り値でエラーを表現する。
+これを例外として扱う。
+また、例外の種類によってキャッチするかどうかを決められるようにする。
+例外の階層構造が必要になる。
+C言語のエラー値が増えると手書きではすこし「やってられない」くらいに
+ボイラープレートが増える。
+ここらへんはTemplateHaskellで対応すれば良いかと思う。
+</p>
+
+<h2>C関数のモデル</h2>
+
+<p>
+エラーを示す定数をいくつか定義する。
+関数の引数によってそのどれかのエラーを返す関数を作る。
+</p>
+
+<p><code>% cat script.h<br/>
+#define OK 0<br/>
+#define FILE_ERR_NOT_EXIST 1<br/>
+#define FILE_ERR_ALREADY_EXIST 2<br/>
+#define SYNTAX_ERR_NO_VAR 3<br/>
+#define SYNTAX_ERR_UNMATCHED_PAREN<br/>
+#define OTHER_ERR</code></p>
+
+<p>エラーの階層は以下のようになるだろう。</p>
+
+<ul>
+<li>SomeException
+	<ul>
+	<li>SomeMyException
+		<ul>
+		<li>SomeMyFileException
+			<ul>
+			<li>FileNotExist</li>
+			<li>FileAlreadyExist</li>
+			</ul></li>
+		<li>SomeMySyntaxException
+			<ul>
+			<li>NoVariable</li>
+			<li>UnmatchedParen</li>
+			</ul></li>
+		<li>OtherMyException</li>
+		</ul></li>
+	</ul></li>
+</ul>
+
+<h2>C言語でのエラーの扱い</h2>
+
+<h2>C言語のヘッダから.hscを作成</h2>
+
+<p>
+自動生成する。
+</p>
+
+<h2>例外の階層: 手動で</h2>
+
+<p>
+まずは手動で例外の階層を作る。
+</p>
+
+<h2>例外の階層: TemplateHaskell</h2>
+
+<p>
+上記をTemplateHaskellを使って書きなおす。
+</p>
