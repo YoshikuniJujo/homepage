@@ -1,0 +1,150 @@
+例外処理
+
+<p>(工事中 0%)</p>
+
+<p>
+<a href="/computer/haskell/standard/exception/codes/lecture24.hs"
+	>lecture24.hs</a>
+</p>
+
+<h2>はじめに</h2>
+
+<p>
+Haskell 2010標準の例外処理はioErrorを利用したシンプルなものだ。
+GHCでは存在型を利用したより巧妙な仕組みを用意している。
+</p>
+
+<p><a href="https://downloads.haskell.org/~ghc/latest/docs/html/libraries/base-4.8.1.0/Control-Exception.html"
+	>Control.Exception</a></p>
+
+<h2>例外の捕捉</h2>
+
+<p>
+例外を捕捉するには関数catchが使える。
+</p>
+
+<p><code>catch :: Exception e =&gt; IO a -&gt; (e -&gt; IO a) -&gt; IO a</code></p>
+
+<h3>すべての例外を捕捉</h3>
+
+<p>
+「すべての例外を捕捉」するのはあまり良い考えではない。
+簡単なのでまずはこれを見てみよう。
+例外を処理する関数を作成する。
+</p>
+
+<h2>例外を投げる</h2>
+
+<p>
+例外を投げる関数には関数throwと関数throwIOとがある。
+遅延評価と関連して両者の動作には微妙な違いがある。
+</p>
+
+<h2>例外型</h2>
+
+<p><a href="/computer/haskell/standard/exception/codes/humanError.hs"
+	>humanError.hs</a></p>
+
+<p>
+例外の型にはSomeExceptionを頂点とした階層構造がある。
+</p>
+
+<p><code>data HumanError = forall e . Exception e =&gt; HumanError e deriving Typeable</code></p>
+
+<h2>例外の階層の自動生成</h2>
+
+<p><a href="https://hackage.haskell.org/package/template-haskell-2.10.0.0/docs/Language-Haskell-TH.html"
+	>Language.Haskell.TH</a></p>
+
+<p>
+型の示す文字列の樹を与えると例外の階層構造を自動生成するテンプレートを作る。
+</p>
+
+<h3>階層構造を持たない例外型の生成</h3>
+
+<p>
+<a href="/computer/haskell/standard/exception/codes/Atomic.hs"
+	>Atomic.hs</a>
+<a href="/computer/haskell/standard/exception/codes/useAtomic.hs"
+	>useAtomic.hs</a>
+</p>
+
+<p>まずは手始めに階層構造を持たない例外型の自動生成を試す。</p>
+
+<p><code>atomicException "MyException"</code></p>
+
+<p>のようなテンプレートが</p>
+
+<p><code>newtype MyException = MyException String
+	deriving (Typeable, Show)</code></p>
+
+<p><code>instance Exception MyException</code></p>
+
+<p>のように展開されれば良い。これを作ってみよう。</p>
+
+<h3>階層の2番目となる例外型の生成</h3>
+
+<p>次は階層の2番目となる例外型を生成してみる。</p>
+
+<p><code>containerException "HumanError"</code></p>
+
+<p>が</p>
+
+<p><code>data HumanError =
+	forall e . Exception e =&gt; HumanError e deriving Typeable</code></p>
+
+<p><code>instance Show HumanError where
+	showsPrec d (HumanError e) = show d e</code></p>
+
+<p><code>instance Exception HumanError</code></p>
+
+<p><code>humanErrorToException :: Exception e =&gt; e -&gt; SomeException<br/>
+humanErrorToException = toException . HumanError</code></p>
+
+<p><code>humanErrorFromException ::
+	Exception e =&gt; SomeException -&gt; Maybe e<br/>
+humanErrorFromException se = do<br/>
+	<span class="indent1">HumanError e &lt;- fromException se</span><br/>
+	<span class="indent1">cast e</span></code></p>
+
+<p>のように展開されれば良い。</p>
+
+<h3>階層の1番下となる例外型の生成</h3>
+
+<p><code>leafException "HumanError" "ManError"</code></p>
+
+<p>は</p>
+
+<p><code>newtype ManError = ManError String deriving (Typeable, Show)</code></p>
+
+<p><code>instance Exception ManError where<br/>
+	<span class="indent1">toException = humanErrorToException</span><br/>
+	<span class="indent1">fromException = humanErrorFromException</span></code></p>
+
+<p>のように展開される。</p>
+
+<h3>階層の途中の例外型の生成</h3>
+
+<p><code>nodeException "HumanError" "NomanError"</code></p>
+
+<p>は</p>
+
+<p><code>data NomanError =
+	forall e . Exception e =&gt; NomanError e deriving Typeable</code></p>
+
+<p><code>instance Show NomanError where show (NomanError e) = show e</code></p>
+
+<p><code>instance Exception NomanError where<br/>
+	<span class="indent1">toException = humanErrorToException</span><br/>
+	<span class="indent1">fromException = humanErrorFromException</span></code></p>
+
+<p><code>humanErrorToException :: Exception e =&gt; e -&gt; SomeException<br/>
+humanErrorToException = toException . NomanError</code></p>
+
+<p><code>humanErrorFromException ::
+	Exception e =&gt; SomeException -&gt; Maybe e<br/>
+humanErrorFromException se = do<br/>
+	<span class="indent1">NomanError e &lt;- fromException se</span><br/>
+	<span class="indent1">cast e</span></code></p>
+
+<p>となる。</p>
