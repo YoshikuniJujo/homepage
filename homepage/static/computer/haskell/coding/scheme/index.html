@@ -32,6 +32,59 @@ SICPを読みながらgaucheを参考にして作る。
 ただし、途中で根本的な設計の変更が必要になったならコードを捨てるかもしれない。
 </p>
 
+<h2>SICP</h2>
+
+<p>
+ま、とりあえずはお茶でも飲みながらSICPを読む。
+前書きはとばす。
+</p>
+
+<h2>ざっと</h2>
+
+<p>
+コードは汚なくてもとりあえずSICPの例題や問題が動くところまで作る。
+一通り終わったらここに説明を書きながらコードをきれいにしていこう。
+</p>
+
+<h2>動的スコープと静的スコープ</h2>
+
+<p><a href="/computer/haskell/coding/scheme/codes/dnm_stt_scp.scm"
+	>dnm_stt_scp.scm</a></p>
+
+<p>
+とりあえず簡単なので動的スコープで作ってきたが、
+そろそろそれらの差が出るような例題が出てきた。
+1.3で関数を引数とする関数を扱うようになると
+動的スコープの問題が明らかになる。
+</p>
+
+<p><code>(define (fun f x) (f x))</code></p>
+
+<p><code>(define (outer x)<br/>
+	<span class="indent1">(define (inner y) (+ x y))</span><br/>
+	<span class="indent1">(fun inner 8))</span></code></p>
+
+<p><code>(define (outer-two z)<br/>
+	<span class="indent1">(define (inner y) (+ z y))</span><br/>
+	<span class="indent1">(fun inner 8))</span></code></p>
+
+<p><code>% runhaskell -Wall isc.hs dnm_stt_scp.scm<br/>
+isc&gt; (outer 100)<br/>
+16<br/>
+isc&gt; (outer-two 100)<br/>
+108</code></p>
+
+<p>
+静的スコープを実現するには、
+クロージャをちゃんと「クロージャ」にする必要がある。
+値の変化を考えなければ簡単だが、いちおうschemeを作っているので、
+値の変化を考える必要がある。
+そうなってくると「面倒くさい」ということだ。
+</p>
+
+<p><a href="/computer/haskell/coding/scheme/dynamic_static_scope"
+	>動的スコープと静的スコープ</a> (工事中 0%)</p>
+
 <p>
 <a href="/computer/haskell/coding"
 	>「コーディング」トップへもどる</a>
