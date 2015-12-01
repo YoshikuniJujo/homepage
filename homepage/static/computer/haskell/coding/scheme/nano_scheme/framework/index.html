@@ -21,6 +21,31 @@ Nano Scheme: 枠組み
 	>Value.hs</a>
 </p>
 
+<p>
+モジュールValueを作成する。
+nscが扱う基本的な型とエラー値とを定義する。
+</p>
+
+<p><code>module Value (Value(..), Symbol, showValue, Error(..), ErrorMessage) where</code></p>
+
+<p><code>data Value<br/>
+	<span class="indent1">= Integer Integer</span><br/>
+	<span class="indent1">| Cons Value Value | Nil</span><br/>
+	<span class="indent1">| DoExit</span><br/>
+	<span class="indent1">deriving Show</span></code></p>
+
+<p><code>type Symbol = String</code></p>
+
+<p><code>showValue :: Value -&gt; String<br/>
+showValue (Integer i) = show i<br/>
+showValue Nil = "()"<br/>
+showValue DoExit = "#&lt;closure exit&gt;"<br/>
+showValue v = show v</code></p>
+
+<p><code>data Error = Exit | Error ErrorMessage deriving Show</code></p>
+
+<p><code>type ErrorMessage = String</code></p>
+
 <h2>構文解析と字句解析</h2>
 
 <p>
@@ -28,18 +53,93 @@ Nano Scheme: 枠組み
 	>Parse.hs</a>
 </p>
 
-<h3>字句解析</h3>
-
 <p>
 何だかんだで単純な解析のルールが単純であれば字句解析と構文解析とは
 別フェーズにしたほうが簡単だ。
+このモジュールは字句解析器と構文解析器を公開する。
 </p>
+
+<p><code>module Parse (Token, tokens, parse) where</code></p>
+
+<h3>必要なモジュールのインポート</h3>
+
+<p><code>import Control.Applicative ((&lt;$&gt;))<br/>
+import Data.Char (isDigit, isAlpha, isSpace)</code></p>
+
+<p><code>import Value (Value(..), Symbol, Error(..), ErrorMessage)</code></p>
+
+<h3>トークン型</h3>
+
+<p>
+構文解析の前にトークン列として文字列を切り出しておく。
+字句解析の返り値となり構文解析の引き数となる型だ。
+</p>
+
+<p><code>data Token<br/>
+	<span class="indent1">= TkSymbol Symbol</span><br/>
+	<span class="indent1">| TkInteger Integer</span><br/>
+	<span class="indent1">| OParen | CParen</span><br/>
+	<span class="indent1">deriving Show</span></code></p>
+
+<h3>字句解析</h3>
+
+<p><code>tokens :: String -&gt; Either Error [Token]<br/>
+tokens ('(' : s) = (OParen :) &lt;$&gt; tokens s<br/>
+tokens (')' : s) = (CParen :) &lt;$&gt; tokens s<br/>
+tokens str@(c : s)<br/>
+	<span class="indent1">| isAlpha c = do</span><br/>
+		<span class="indent2">let (sm, s') = span isAlpha s</span><br/>
+		<span class="indent2">ts &lt;- tokens s'</span><br/>
+		<span class="indent2">return $ TkSymbol (c : sm) : ts</span><br/>
+	<span class="indent1">| isDigit c = do</span><br/>
+		<span class="indent2">let (ds, s') = span isDigit s</span><br/>
+		<span class="indent2">ts &lt;- tokens s'</span><br/>
+		<span class="indent2">return $ TkInteger (read $ c : ds) : ts</span><br/>
+	<span class="indent1">| isSpace c = tokens s</span><br/>
+	<span class="indent1">| otherwise = Left . Error $
+		syntaxErr ++ tokenErr ++ show str</span><br/>
+tokens _ = return []</code></p>
 
 <h3>構文解析</h3>
 
+<p><code>parse :: [Token] -&gt; Either Error [Value]<br/>
+parse [] = return []<br/>
+parse ts = do<br/>
+	<span class="indent1">(v, ts') &lt;- parse1 ts</span><br/>
+	<span class="indent1">(v :) &lt;$&gt; parse ts'</span></code></p>
+
+<p><code>parse1, parseList :: [Token] -&gt; Either Error (Value, [Token])<br/>
+parse1 (TkSymbol "exit" : ts) = return (DoExit, ts)<br/>
+parse1 (TkInteger i : ts) = return (Integer i, ts)<br/>
+parse1 ts = Left . Error $ syntaxErr ++ parseErr ++ show ts</code></p>
+
+<p><code>parseList (CParen : ts) = return (Nil, ts)<br/>
+parseList ts = do<br/>
+	<span class="indent1">(v, ts') &lt;- parse1 ts</span><br/>
+	<span class="indent1">(vs, ts'') &lt;- parseList ts'</span><br/>
+	<span class="indent1">return $ (v `Cons` vs, ts'')</span></code></p>
+
+<h2>環境</h2>
+
 <p>
-Schemeでは構文解析はとても簡単にできるはずだ。
+<a href="/computer/haskell/coding/scheme/nano_scheme/framework/codes/Environment.hs"
+	>Environment.hs</a>
 </p>
+
+<p>
+今のところ単なるスタブだ。
+</p>
+
+<p><code>module Environment (Env, env0) where</code></p>
+
+<p><code>import qualified Data.Map as M</code></p>
+
+<p><code>import Value (Value, Symbol)</code></p>
+
+<p><code>type Env = M.Map Symbol Value</code></p>
+
+<p><code>env0 :: Env<br/>
+env0 = M.fromList []</code></p>
 
 <h2>evalとapply</h2>
 
@@ -51,13 +151,6 @@ Schemeでは構文解析はとても簡単にできるはずだ。
 <h3>eval</h3>
 
 <h3>apply</h3>
-
-<h2>環境</h2>
-
-<p>
-<a href="/computer/haskell/coding/scheme/nano_scheme/framework/codes/Environment.hs"
-	>Environment.hs</a>
-</p>
 
 <h2>対話環境</h2>
 
