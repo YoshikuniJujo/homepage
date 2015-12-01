@@ -1,0 +1,93 @@
+Nano Scheme: 仕様と実装の考えかた
+
+<p>(工事中 50%)</p>
+
+<h2>簡単にするために</h2>
+
+<p>簡単にするために</p>
+
+<ul>
+<li>変数の値は変化しない
+	<ul>
+	<li>既存の変数を再定義しようとした場合には明示的にエラーとする</li>
+	</ul></li>
+<li>動的スコープにする</li>
+<li>入出力はない
+	<ul>
+	<li>最後の値を「表示」する</li>
+	</ul></li>
+<li>数値計算は整数Integerと浮動小数点数Doubleのみとする
+	<ul>
+	<li>有理数は扱わない</li>
+	</ul></li>
+</ul>
+
+<h2>実行のしかた</h2>
+
+<p>
+標準入力からコードを読みこみ標準出力に評価の結果を出力する。
+あるいはSlackのボットとして実行結果を投稿する。
+</p>
+
+<h2>サンプルコード</h2>
+
+<p>10の階乗:</p>
+
+<p><code>(define (factorial n) (if (&lt; n 1) 1 (* n (factorial (- n 1)))))</code></p>
+
+<p><code>(factorial 10)</code></p>
+
+<p><code>factorial n = if (n &lt; 1) then 1 else n * factorial (n - 1)</code></p>
+<p><code>factorial 10</code></p>
+
+<p>BMI:</p>
+
+<p><code>(define height 189.0)</code></p>
+
+<p><code>(define weight 80.0)</code></p>
+
+<p><code>(define (square x) (* x x))</code></p>
+
+<p><code>(/ weight (square (/ height 100)))</code></p>
+
+<h2>環境の実装方法</h2>
+
+<p>
+変数の値が変化しないということと動的スコープとするという2点で
+かなり簡素化できると思われる。
+単なるMapとしてしまい関数の実行時に値を追加し
+関数の終了時には単にその前の環境にもどせば良い。
+</p>
+
+<h2>モジュールの構成</h2>
+
+<p>
+動的スコープにするということはクロージャが必要ないということだ。
+つまり基本的な「値」を定義するモジュールと「環境」を定義するモジュールとを
+分けることができる。
+モジュールの構成案は
+</p>
+
+<ul>
+<li>Value: 値と基本的な演算、値の表示関数も</li>
+<li>Parse: 字句解析と構文解析</li>
+<li>Environment: 環境と環境に関する演算</li>
+<li>Eval: evalとapply</li>
+<li>Main: nsc.hs、標準入力から読み込み標準出力に書き出す
+	<ul>
+	<li>最初の開き丸括弧の前にnscという文字の連続が含まれていた場合そこまでをdropする</li>
+	</ul></li>
+</ul>
+
+<p>また開発しやすいように対話環境も用意しておこう。</p>
+
+<ul>
+<li>isc.hs: define等の効果を引きつぐことのできる対話環境</li>
+</ul>
+
+<p>
+<a href="/computer/haskell/coding/scheme/nano_scheme"
+	>「Nano Scheme」トップへもどる</a>
+<a href="/computer/haskell/coding/scheme/nano_scheme/framework"
+	>「枠組み」へ</a>
+</p>
