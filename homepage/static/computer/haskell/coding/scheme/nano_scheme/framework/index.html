@@ -1,6 +1,6 @@
 Nano Scheme: 枠組み
 
-<p>(工事中 0%)</p>
+<p>(工事中 70%)</p>
 
 <h2>はじめに</h2>
 
@@ -29,7 +29,8 @@ nscが扱う基本的な型とエラー値とを定義する。
 <p><code>module Value (Value(..), Symbol, showValue, Error(..), ErrorMessage) where</code></p>
 
 <p><code>data Value<br/>
-	<span class="indent1">= Integer Integer</span><br/>
+	<span class="indent1">= Symbol Symbol</span><br/>
+	<span class="indent1">| Integer Integer</span><br/>
 	<span class="indent1">| Cons Value Value | Nil</span><br/>
 	<span class="indent1">| DoExit</span><br/>
 	<span class="indent1">deriving Show</span></code></p>
@@ -37,10 +38,17 @@ nscが扱う基本的な型とエラー値とを定義する。
 <p><code>type Symbol = String</code></p>
 
 <p><code>showValue :: Value -&gt; String<br/>
+showValue (Symbol s) = s<br/>
 showValue (Integer i) = show i<br/>
+showValue (Cons v vs) = '(' : showCons v vs ++ ")"
 showValue Nil = "()"<br/>
 showValue DoExit = "#&lt;closure exit&gt;"<br/>
 showValue v = show v</code></p>
+
+<p><code>showCons :: Value -&gt; Value -&gt; String<br/>
+showCons v Nil = showValue v<br/>
+showCons v (Cons v' vs) = showValue v ++ " " ++ showCons v' vs<br/>
+showCons v1 v2 = showValue v1 ++ " . " ++ showValue v2</code></p>
 
 <p><code>data Error = Exit | Error ErrorMessage deriving Show</code></p>
 
@@ -54,7 +62,7 @@ showValue v = show v</code></p>
 </p>
 
 <p>
-何だかんだで単純な解析のルールが単純であれば字句解析と構文解析とは
+何だかんだで解析のルールが単純であれば字句解析と構文解析とは
 別フェーズにしたほうが簡単だ。
 このモジュールは字句解析器と構文解析器を公開する。
 </p>
@@ -109,7 +117,7 @@ parse ts = do<br/>
 	<span class="indent1">(v :) &lt;$&gt; parse ts'</span></code></p>
 
 <p><code>parse1, parseList :: [Token] -&gt; Either Error (Value, [Token])<br/>
-parse1 (TkSymbol "exit" : ts) = return (DoExit, ts)<br/>
+parse1 (TkSymbol s : ts) = return (Symbol s, ts)<br/>
 parse1 (TkInteger i : ts) = return (Integer i, ts)<br/>
 parse1 ts = Left . Error $ syntaxErr ++ parseErr ++ show ts</code></p>
 
@@ -127,19 +135,27 @@ parseList ts = do<br/>
 </p>
 
 <p>
-今のところ単なるスタブだ。
+環境の初期値と変数の参照を定義する。
 </p>
 
 <p><code>module Environment (Env, env0) where</code></p>
 
 <p><code>import qualified Data.Map as M</code></p>
 
-<p><code>import Value (Value, Symbol)</code></p>
+<p><code>import Value (Value(..), Symbol, Error(..))</code></p>
+
+<p><code>unboundErr :: ErrorMessage<br/>
+unboundErr = "*** ERROR: unbound variable: "</code></p>
 
 <p><code>type Env = M.Map Symbol Value</code></p>
 
 <p><code>env0 :: Env<br/>
-env0 = M.fromList []</code></p>
+env0 = M.fromList [<br/>
+	<span class="indent1">("exit", DoExit)</span><br/>
+	<span class="indent1">]</span></code></p>
+
+<p><code>refer :: Symbol -&gt; Env -&gt; Either Error Value<br/>
+refer s e = maybe (Left . Error $ unboundErr + s) Right (M.lookup s e)</code></p>
 
 <h2>evalとapply</h2>
 
@@ -148,15 +164,100 @@ env0 = M.fromList []</code></p>
 	>Eval.hs</a>
 </p>
 
+<p>拡張機能TupleSectionsを使う。</p>
+
+<p><code>{-# LANGUAGE TupleSections #-}</code></p>
+
+<p>関数evalを公開する。</p>
+
+<p><code>module Eval (eval) where</code></p>
+
+<p>必要なモジュールを導入する。</p>
+
+<p><code>import Control.Applicative ((&lt;$&gt;))<br/>
+import Environment (Env, refer)<br/>
+import Value (Value(..), showValue, Error(..), ErrorMessage)</code></p>
+
+<p>エラーメッセージを定義する。</p>
+
+<p><code>appErr :: ErrorMessage<br/>
+appErr = "*** ERROR: invalid application: "</code></p>
+
 <h3>eval</h3>
 
+<p>値を評価する。</p>
+
+<p><code>eval :: Value -&gt; Env -&gt; Either Error (Value, Env)<br/>
+eval (Symbol s) e = (, e) &lt;$&gt; refer s e<br/>
+eval (Cons v vs) e = uncurry (flip apply vs) =&lt;&lt; eval v e<br/>
+eval v e = Right (v, e)</code></p>
+
 <h3>apply</h3>
+
+<p>関数を適用する。</p>
+
+<p><code>apply :: Value -&gt; Value -&gt; Env -&gt; Either Error (Value, Env)<br/>
+apply DoExit Nil _ = Left Exit<br/>
+apply f as _ = Left . Error $ appErr ++ showValue (f `Cons` as)</code></p>
 
 <h2>対話環境</h2>
 
 <p>
 <a href="/computer/haskell/coding/scheme/nano_scheme/framework/codes/isc.hs"
 	>isc.hs</a>
+</p>
+
+<p>必要なモジュールを導入する。</p>
+
+<p><code>import System.IO (stdout, hFlush)</code></p>
+
+<p><code>import Value (Value, showValue, Error(..))<br/>
+import Parse (parse, tokens)<br/>
+import Eval (eval)<br/>
+import Environment (Env, env0)</code></p>
+
+<h3>関数main</h3>
+
+<p>
+対話環境だ。
+プロンプトを表示してユーザの入力を1行受けとりそれを評価して表示する。
+エラーが生じたときにはそれを表示し対話環境を続ける。
+結果がExitだったときには対話環境を抜ける。
+</p>
+
+<p><code>main :: IO ()<br/>
+main = doWhile env0 $ \e -&gt; do<br/>
+	<span class="indent1">putStr "isc&gt; " &gt;&gt; hFlush stdout</span><br/>
+	<span class="indent1">src &lt;- getLine</span><br/>
+	<span class="indent1">case (`evaluate` e) =&lt;&lt; parse =&lt;&lt; tokens src of</span><br/>
+		<span class="indent2">Right (vs, e') -&gt;</span><br/>
+			<span class="indent3">mapM_ (putStrLn . showValue) vs
+				&gt;&gt; return (Just e')</span><br/>
+		<span class="indent2">Left (Erroe em) -&gt; putStrLn em
+			&gt;&gt; return (Just e)</span><br/>
+		<span class="indent2">Left Exit -&gt; return Nothing</span></code></p>
+
+<h3>関数doWhile</h3>
+
+<p>状態を次々に変化させながらモナドを「実行」していく。</p>
+
+<p><code>doWhile :: Monad m =&gt; s -&gt; (s -&gt; m (Maybe s)) -&gt; m ()<br/>
+doWhile s act = maybe (return ()) (`doWhile` act) =&lt;&lt; act s</code></p>
+
+<h3>関数evaluate</h3>
+
+<p>リストのなかのValueを順番に評価していく。</p>
+
+<p><code>evaluate :: [Value] -&gt; Env -&gt; Either Error ([Value], Env)<br/>
+evaluate [] e = Right ([], e)<br/>
+evaluate (v : vs) e = uncurry (&lt;$&gt;) . (first . (:) *** evaluate vs)
+	=&lt;&lt; eval v e</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+対話環境を作成した。
+整数値の表示と(exit)による終了を実装した。
 </p>
 
 <p>
