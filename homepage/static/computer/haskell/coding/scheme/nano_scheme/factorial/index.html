@@ -1,0 +1,146 @@
+Nano Scheme: 階乗関数が定義できるところまで
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+階乗関数が定義できるところまで実装する。
+以下を実装する。
+</p>
+
+<ul>
+<li>define: 変数の定義</li>
+<li>lambda: 無名関数の定義</li>
+<li>define(関数): 上記2つへとdesugarされる関数定義</li>
+<li>if: 条件分岐を実現する構文</li>
+<li>&lt;: 関数「小なり」</li>
+<li>+: ついで</li>
+<li>-: nを1減らすのに使う</li>
+<li>*: 結果にnをかけるのに使う</li>
+</ul>
+
+<p>
+<a href="/computer/haskell/coding/scheme/nano_scheme/factorial/codes/Environment.hs"
+	>Environment.hs</a>
+<a href="/computer/haskell/coding/scheme/nano_scheme/factorial/codes/Parse.hs"
+	>Parse.hs</a>
+<a href="/computer/haskell/coding/scheme/nano_scheme/factorial/codes/Eval.hs"
+	>Eval.hs</a>
+<a href="/computer/haskell/coding/scheme/nano_scheme/factorial/codes/Primitive.hs"
+	>Primitive.hs</a>
+<a href="/computer/haskell/coding/scheme/nano_scheme/factorial/codes/isc.hs"
+	>isc.hs</a>
+</p>
+
+<h2>変数定義: define</h2>
+
+<h3>環境</h3>
+
+<p>
+環境に変数値を定義する関数を作る。
+Data.Map.insertのラッパーだ。
+</p>
+
+<p><code>set :: Symbol -&gt; Value -&gt; Env -&gt; Env<br/>
+set = M.insert</code></p>
+
+<h3>値構築子Syntax</h3>
+
+<p>
+Valueに値構築子Syntaxを追加する。
+Syntax (Value -&gt; Env -&gt; Either Error (Value, Env))となる。
+この段階で型ValueとEnvは相互再帰的定義となる。
+いくつかの方法があるがここではモジュールValueをEnvironmentに統合する。
+</p>
+
+<p>
+モジュールValueをEnvironmentに統合し関連する変更を各モジュールに対して行う。
+そのあとに値構築子Syntaxを追加する。
+</p>
+
+<p><code>data Value<br/>
+	<span class="indent1">= ...</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">| Syntax Symbol (Value -&gt; Env -&gt; Either Error (Value, Env))</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	</code></p>
+
+<p>
+対話環境での表示のためにSymbol型の名前を置くスロットを追加している。
+</p>
+
+<h3>変数define</h3>
+
+<p>
+新たにモジュールPrimitiveを作成しenv0をそこに移す。
+変数defineを設定する。
+</p>
+
+<p><code>module Primitive (env0) where</code></p>
+
+<p><code>import Environment (<br/>
+	<span class="indent1">Env, fromList, set,</span><br/>
+	<span class="indent1">Value(..), showValue, Error(..), ErrorMessage)</span></code></p>
+
+<p><code>syntaxErr :: ErrorMessage<br/>
+syntaxErr = "*** ERROR: Compile Error: syntax-error: "</code></p>
+
+<p><code>env0 :: Env<br/>
+env0 = fromList [<br/>
+	<span class="indent1">("exit", DoExit)</span><br/>
+	<span class="indent1">("define", Syntax "define" define)</span><br/>
+	<span class="indent1">]</span></code></p>
+
+<p><code>define :: Value -&gt; Env -&gt; Either Error (Value, Env)<br/>
+define (Cons sm@(Symbol s) (Cons v Nil)) e = Right (sm, set s v e)<br/>
+define v _ = Left . Error $ syntaxErr ++ showValue (Symbol "define" `Cons` v)</code></p>
+
+<h3>関数適用</h3>
+
+<p>
+関数applyのSyntaxに対する定義を追加する。
+</p>
+
+<p><code>apply :: ...<br/>
+apply (Syntax _ s) v e = s v e<br/>
+...</code></p>
+
+<h3>試してみる</h3>
+
+<p><code>% runghc -Wall isc.hs<br/>
+isc&gt; (define hello 999)<br/>
+hello<br/>
+isc&gt; hello<br/>
+999</code></p>
+
+<h2>無名関数: lambda</h2>
+
+<h3>作成</h3>
+
+<h4>値構築子Lambda</h4>
+
+<h4>構文lambda</h4>
+
+<h3>呼び出し</h3>
+
+<h4>関数apply</h4>
+
+<h2>関数定義: define</h2>
+
+<h2>条件分岐: if</h2>
+
+<h2>関数「小なり」: &lt;</h2>
+
+<h2>四則演算(3/4): +, -, *</h2>
+
+<p>
+<a href="/computer/haskell/coding/scheme/nano_scheme/framework"
+	>「枠組み」へもどる</a>
+<a href="/computer/haskell/coding/scheme/nano_scheme"
+	>「Nano Scheme」トップへ</a>
+</p>
