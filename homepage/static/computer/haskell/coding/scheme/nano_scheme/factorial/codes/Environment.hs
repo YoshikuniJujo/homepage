@@ -1,5 +1,5 @@
 module Environment (
-	Env, env0, refer, set,
+	Env, M.fromList, refer, set,
 	Value(..), Symbol, showValue, Error(..), ErrorMessage) where
 
 import qualified Data.Map as M
@@ -8,11 +8,6 @@ unboundErr :: ErrorMessage
 unboundErr = "*** ERROR: unbound variable: "
 
 type Env = M.Map Symbol Value
-
-env0 :: Env
-env0 = M.fromList [
-	("exit", DoExit)
-	]
 
 refer :: Symbol -> Env -> Either Error Value
 refer s e = maybe (Left . Error $ unboundErr ++ s) Right (M.lookup s e)
@@ -25,6 +20,8 @@ data Value
 	| Integer Integer
 	| Cons Value Value | Nil
 	| Syntax Symbol (Value -> Env -> Either Error (Value, Env))
+	| Subroutine Symbol (Value -> Env -> Either Error (Value, Env))
+	| Lambda Symbol Value Value
 	| DoExit
 
 type Symbol = String
@@ -35,6 +32,8 @@ showValue (Integer i) = show i
 showValue (Cons v vs) = '(' : showCons v vs ++ ")"
 showValue Nil = "()"
 showValue (Syntax n _) = "#<syntax " ++ n ++ ">"
+showValue (Subroutine n _) = "#<subr " ++ n ++ ">"
+showValue (Lambda n _ _) = "#<closure " ++ n ++ ">"
 showValue DoExit = "#<closure exit>"
 
 showCons :: Value -> Value -> String

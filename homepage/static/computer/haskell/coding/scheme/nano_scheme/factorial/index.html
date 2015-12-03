@@ -118,25 +118,250 @@ hello<br/>
 isc&gt; hello<br/>
 999</code></p>
 
+<h2>四則演算(3/4): +, -, *</h2>
+
+<h3>値構築子Subroutine</h3>
+
+<p>モジュールEnvironmentのデータ型に値構築子Subroutineを追加する。</p>
+
+<p><code>data Value<br/>
+	<span class="indent1">= Symbol Symbol</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">| Subroutine Symbol
+		(Value -&gt; Env -&gt; Either Error (Value, Env))</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span></code></p>
+
+<h3>list</h3>
+
+<p>モジュールPrimitiveに最も単純なlistを定義する。</p>
+
+<p><code>env0 = fromList [<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">("list", Subroutine "list" $ (Right .) . (,))</span><br/>
+	<span class="indent1">]</span></code></p>
+
+<h3>演算の適用</h3>
+
+<p>
+モジュールEvalに引数リストをすべて「評価」する関数evaluateを作成する。
+追加のモジュールを導入する。
+</p>
+
+<p><code>import Control.Arrow (first, (***))</code></p>
+
+<p>エラーメッセージを定義する。</p>
+
+<p><code>evaluateErr :: ErrorMessage<br/>
+evaluateErr = "*** ERROR: Compile Error: proper list required: "</code></p>
+
+<p>そして実際の関数の定義は</p>
+
+<p><code>evaluate :: Value -&gt; Env -&gt; Env -&gt; Either Error (Value, Env)<br/>
+evaluate Nil e = Right (Nil, e)<br/>
+evaluate (v `Cons` vs) e =<br/>
+	<span class="indent1">uncurry (&lt;$&gt;)
+		. (first . Cons *** evaluate vs) =&lt;&lt; eval v e</span><br/>
+evaluate v _ = Left . Error $ evaluateErr ++ showValue v</code></p>
+
+<p>となる。 valuateした引数リストに関数を適用する。</p>
+
+<p><code>apply (Subroutine _ s) vs e = uncurry s =&lt;&lt; evaluate vs e</code></p>
+
+<h3>Integerの2引数関数をNano Schemeの関数に</h3>
+
+<p>
+Integer -&gt; Integer -&gt; Integerの関数をNano SchemeのSubroutineに
+変換する関数を作成する。
+このとき(+ 3 4 5), (- 5 2 1)のように複数の引数への演算についても実装する。
+ただし(- 5)のような場合をどのように特別扱いするかについても考える必要がある。
+こういう特例のことを考えるとそれぞれ別々に定義したほうが良いような気もする。
+</p>
+
+<h3>Consをリストに変換する関数</h3>
+
+<p>上記の関数を作るよりもConsをリストに変換する関数を作ったほうが便利そうだ。</p>
+
+<h3>変数+, -, *</h3>
+
+<h4>字句解析</h4>
+
+<p>Symbolに+-*/が使えるようにモジュールParseの字句解析器を修正する。</p>
+
+<p><code>tokens str@(c : s)<br/>
+	<span class="indent1">| isSymbolChar c = do</span><br/>
+		<span class="indent2">let (sm, s') = span isSymbolChar s</span><br/>
+		<span class="indent2">ts &lt;- tokens s'</span><br/>
+		<span class="indent2">return $ TkSymbo (c : sm) : ts</span><br/>
+	<span class="indent1">| isDigit c = do</span><br/>
+	<span class="indent2">.</span><br/>
+	<span class="indent2">.</span><br/>
+	<span class="indent2">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span></code></p>
+
+<p><code>isSymbolChar :: Char -&gt; Bool<br/>
+isSymbolChar c = any ($ c) [isAlpha, (`elem` "+-*/")]</code></p>
+
+<h4>コンスをリストに変換</h4>
+
+<p>
+nscのコンスをHaskellのリストに変換する。
+モジュールPrimitiveの先頭に
+</p>
+
+<p><code>{-# LANGUAGE TupleSections #-}</code></p>
+
+<p>を追加する。モジュールApplicativeを導入する。</p>
+
+<p><code>import Control.Applicative ((&lt;$&gt;))</code></p>
+
+<p>またエラーメッセージとして</p>
+
+<p><code>prpLstErr :: ErrorMessage<br/>
+prpLstErr = "*** ERROR: Compile Error: proper list required: "</code></p>
+
+<p>
+を定義する。
+実際の関数を
+</p>
+
+<p><code>consToList :: Value -&gt; Either Error [Value]<br/>
+consToList Nil = Right []<br/>
+consToList (v `Cons` vs) = (v :) &lt;$&gt; consToList vs<br/>
+consToList v = Left . Error $ prpLstErr ++ showValue v</code></p>
+
+<p>のように定義する。</p>
+
+<h4>+</h4>
+
+<p>+はConsをリストに変換してsumで良い。</p>
+
+<p><code>env0 = fromList [<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">("+", Subroutine "+" add)</span><br/>
+	<span class="indent1">]</span></code></p>
+
+<p><code>add :: Value -&gt; Env -&gt; Either Error (Value, Env)<br/>
+add v e = (, e) . Integer . sum &lt;$&gt; (mapM toInt =&lt;&lt; consToList v)</code></p>
+
+<h4>*</h4>
+
+<p>*は+とほとんど同じように作れる。</p>
+
+<p><code>env0 = fromList [<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">("*", Subroutine "*" add)</span><br/>
+	<span class="indent1">]</span></code></p>
+
+<p><code>add :: Value -&gt; Env -&gt; Either Error (Value, Env)<br/>
+add v e = (, e) . Integer . product &lt;$&gt; (mapM toInt =&lt;&lt; consToList v)</code></p>
+
+<h4>-</h4>
+
+<p>
+-はfoldl'を使う点と引数がひとつだったときにnegateを使う点とが異なる。
+</p>
+
+<p><code>env0 = fromList [<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">("-", Subroutine "-" sub)</span><br/>
+	<span class="indent1">]</span></code></p>
+
+<p><code>sub v e = (, e) . Integer . sb &lt;$&gt; (chk =&lt;&lt; mapM toInt =&lt;&lt; consToList v)
+	<span class="indent1">where</span><br/>
+	<span class="indent1">chk [] = Left $ Error lstOneErr</span><br/>
+	<span class="indent1">chk vs = Right vs</span><br/>
+	<span class="indent1">sb [x] = negate x</span><br/>
+	<span class="indent1">sb (x : xs) = foldl' (-) x xs</span><br/>
+	<span class="indent1">sb _ = error "never occur"</span></code></p>
+
 <h2>無名関数: lambda</h2>
 
 <h3>作成</h3>
 
 <h4>値構築子Lambda</h4>
 
+<p><code>data Value<br/>
+	<span class="indent1">= Symbol Symbol</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">| Lambda Symbol Value Value</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span></code></p>
+
 <h4>構文lambda</h4>
+
+<p><code>env0 = fromList [<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">("lambda", Syntax "lambda" lambda),</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">]</span></code></p>
+
+<p><code>lambda :: Value -&gt; Enb -&gt; Either Error (Value, Env)<br/>
+lambda (Cons as bd) e = Right (Lambda "#f" as bd, e)<br/>
+lambda v _ = Left . Error $ syntaxErr ++ showValue (Symbol "lambda" `Cons` v)</code></p>
 
 <h3>呼び出し</h3>
 
+<h4>関数argument</h4>
+
+<p>
+仮引数に実引数を代入した新しい環境を作る。
+</p>
+
+<p><code>argument :: Value -&gt; Value -&gt; Env -&gt; Either Error Env<br/>
+argument (Cons (Symbol p) ps) (Cons a as) e = set p a &lt;$&gt; argument ps as e<br/>
+argument Nil Nil e = Right e<br/>
+argument (Symbol p) as e = Right $ set p as e<br/>
+argument _ _ _ = Left $ Error wrongNumberErr</code></p>
+
+<h4>関数begin</h4>
+
+<p>
+コンスのなかの値を次々に評価していき最後の値を返す。
+</p>
+
+<p><code>begin :: Value -&gt; Env -&gt; Either Error (Value, Env)<br/>
+begin (v `Cons` Nil) e = eval v e<br/>
+begin (v `Cons` vs) e = begin vs . snd =&lt;&lt; eval v e<br/>
+begin _ _ _ = Left $ Error prpLstErr</code></p>
+
 <h4>関数apply</h4>
+
+<p>
+関数applyにLambdaの場合の定義を追加する。
+</p>
+
+<p><code>apply (Lambda _ ps bd) as e = do<br/>
+	<span class="indent1">(as', e') &lt;- evaluate as e</span><br/>
+	<span class="indent1">(v, _) &lt;- begin bd
+		=&lt;&lt; argument ps as' e'</span><br/>
+	<span class="indent1">return (v, e')</span></code></p>
 
 <h2>関数定義: define</h2>
 
 <h2>条件分岐: if</h2>
 
 <h2>関数「小なり」: &lt;</h2>
-
-<h2>四則演算(3/4): +, -, *</h2>
 
 <p>
 <a href="/computer/haskell/coding/scheme/nano_scheme/framework"
