@@ -2,6 +2,45 @@ Nano Scheme: フィルタにする
 
 <p>(工事中 0%)</p>
 
+<h2>はじめに</h2>
+
+<p>
+標準入力からNano Schemeのソースコードを読みこみ結果を標準出力に出力する
+コマンドを作成する。
+</p>
+
+<h2>対話環境からモジュールを抽出</h2>
+
+<p><a href="/computer/haskell/coding/scheme/nano_scheme/filter/codes/NanoScheme.hs"
+	>NanoScheme.hs</a></p>
+
+<p>
+対話環境からモジュルNanoSchemeを抽出する。
+モジュールNanoSchemeは以下の関数を公開する。
+</p>
+
+<p><code>scheme :: String -&gt; Env -&gt; Either Error ([Value], Env)</code></p>
+
+<p><code>showValue :: Value -&gt; String</code></p>
+
+<p>また、型Errorとその値構築子も公開する。</p>
+
+<p><code>module NanoScheme (...</code></p>
+
+<p><code>...</code></p>
+
+<h2>コマンドnsc</h2>
+
+<p><a href="/computer/haskell/coding/scheme/nano_scheme/filter/codes/nsc.hs"
+	>nsc.hs</a></p>
+
+<p>フィルタとして働くnsc.hsを作成する。</p>
+
+<p><code>import NanoScheme</code></p>
+
+<p><code>main :: IO ()<br/>
+main = interact $ either show (unlines . map showValue . fst) . (`scheme` env0)</code></p>
+
 <p>
 <a href="/computer/haskell/coding/scheme/nano_scheme/bmi"
 	>「BMIを求める」へもどる</a>
