@@ -1,6 +1,6 @@
 Nano Scheme: BMIを求める
 
-<p>(工事中 0%)</p>
+<p>(工事中 50%)</p>
 
 <h2>はじめに</h2>
 
@@ -12,8 +12,105 @@ Nano SchemeでDouble型の値を扱えるようにしよう。
 </p>
 
 <p>
+<a href="/computer/haskell/coding/scheme/nano_scheme/bmi/codes/Environment.hs"
+	>Environment.hs</a>
+<a href="/computer/haskell/coding/scheme/nano_scheme/bmi/codes/Parse.hs"
+	>Parse.hs</a>
+<a href="/computer/haskell/coding/scheme/nano_scheme/bmi/codes/Primitive.hs"
+	>Primitive.hs</a>
+</p>
+
+<h2>値構築子Doubleを追加</h2>
+
+<p><code>data Value<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">| Double Double</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span></code></p>
+
+<p><code>showValue (Double d) = show d</code></p>
+
+<h2>トークンに追加</h2>
+
+<p><code>data Token<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">| TkDouble Double</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span></code></p>
+
+<h2>字句解析器の対応</h2>
+
+<p><code>tokens str@(c : s)<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">| isDigit c,
+		let (ds, s') = (c :) `first` span isNumChar s =</span><br/>
+		<span class="indent2">(&lt;$&gt; tokens s') . (:) $
+			if '.' `elem` ds</span><br/>
+			<span class="indent3">then TkDouble
+				. read $ ds ++ "0"</span><br/>
+			<span class="indent3">else TkInteger $ read ds</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	</code></p>
+
+<p><code>isNumChar :: Char -&gt; Bool<br/>
+isNumChar c = any ($ c) [isDigit, (`elem` ".")]</code></p>
+
+<h2>構文解析器の対応</h2>
+
+<p><code>parse1 (TkDouble d : ts) = return (Double d, ts)</code></p>
+
+<h2>型の変換</h2>
+
+<p>
+[Value]の中身をIntegerかDoubleに変換する関数を作成する。
+</p>
+
+<p><code>toNums :: [Value] -&gt; Either Error (Either [Integer] [Double])<br/>
+toNums [] = Right $ Left []<br/>
+toNums (Integer i : vs) =<br/>
+	<span class="indent1">either (Left . (i :)) (Right . (fromIntegral i :))
+		&lt;$&gt; toNums vs</span><br/>
+toNums (Double i : vs) =<br/>
+	<span class="indent1">either (Rgiht . (d :) . map fromIntegral)
+		(Right . (d :)) &lt;$&gt; toNums vs</span><br/>
+toNums (v : _) = Left . Error $ notNumErr ++ showValue v</code></p>
+
+<h2>+, -, *, &lt;のDoubleへの対応</h2>
+
+<p><code>add v e = ...</code></p>
+
+<p><code>mul v e = ...</code></p>
+
+<p><code>sub v e = ...</code></p>
+
+<p><code>ltt v e = ...</code></p>
+
+<h2>/の導入</h2>
+
+<p><code>divs :: Value -&gt; Env -&gt; Either Error (Value, Env)<br/>
+divs v e = ...</code></p>
+
+<h2>BMIを求める</h2>
+
+<p><code>ほげ</code></p>
+
+<h2>まとめ</h2>
+
+<p>浮動小数点数を導入した。</p>
+
+<p>
 <a href="/computer/haskell/coding/scheme/nano_scheme/factorial"
 	>「階乗の定義まで」へもどる</a>
-<a href="/computer/haskell/coding/scheme/nano_scheme"
-	>「Nano Scheme」トップへ</a>
+<a href="/computer/haskell/coding/scheme/nano_scheme/filter"
+	>「フィルタにする」へ</a>
 </p>
