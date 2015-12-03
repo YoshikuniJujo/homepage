@@ -1,6 +1,6 @@
 Nano Scheme: 階乗関数が定義できるところまで
 
-<p>(工事中 0%)</p>
+<p>(工事中 90%)</p>
 
 <h2>はじめに</h2>
 
@@ -359,13 +359,131 @@ begin _ _ _ = Left $ Error prpLstErr</code></p>
 
 <h2>関数定義: define</h2>
 
+<p>
+(define fun (lambda (x y z) (* x (+ y z))))のようなコードを
+(define (fun x y z) (* x (+ y z)))のように書けるようにする。
+単純な構文糖だ。
+</p>
+
+<p><code>define (Cons (Cons f@(Symbol n) as) bd) e = Right (f, set n (Lambda n as bd) e)</code></p>
+
 <h2>条件分岐: if</h2>
 
+<h3>ブール値</h3>
+
+<p>モジュールPrimitiveにブール値を定義する。</p>
+
+<p><code>data Value<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">| Bool Bool</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span></code></p>
+
+<p>ブール値を表示する。</p>
+
+<p><code>showValue (Bool False) = "#f"<br/>
+showValue (Bool True) = "#t"</code></p>
+
+<p>
+モジュールParseにブール値リテラルを定義する。
+トークンにブール値用の値を追加し
+</p>
+
+<p><code>data Token<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">| TkTrue | TkFalse</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span></code></p>
+
+<p>
+字句解析ルールを追加し
+</p>
+
+<p><code>tokens ('#' : 'f' : s) = (TkFalse :) &lt;$&gt; tokens s<br/>
+tokens ('#' : 't' : s) = (TkTrue :) &lt;$&gt; tokens s</code></p>
+
+<p>
+構文解析ルールを追加する。
+</p>
+
+<p><code>parse1 (TkFalse : ts) = return (Bool False, ts)<br/>
+parse1 (TkTrue : ts) = return (Bool True, ts)</code></p>
+
+<h3>構文if</h3>
+
+<p>
+構文ifはひとつめの引数を評価しそれが真ならふたつめの引数を評価しその結果を返す。
+偽であればみっつめの引数を評価しその結果を返す。関数ifsを作成し
+</p>
+
+<p><code>ifs :: Value -&gt; Env -&gt; Either Error (Value, Env)<br/>
+ifs (Cons p (Cons th (Cons el Nil))) e = eval p e &gt;&gt;= \(b, e') -&gt;<br/>
+	<span class="indent1">case b of Bool False -&gt; eval el e'; _ -&gt; eval th e'</span><br/>
+ifs v _ = Left . Error $ syntaxErr ++ showValue (Symbol "if" `Cons` v)</code></p>
+
+<p>初期の環境に追加する。</p>
+
+<p><code>env0 = fromList [<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">("if", Syntax "if" ifs),</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	</code></p>
+
 <h2>関数「小なり」: &lt;</h2>
+
+<h3>記号&lt;, =, &gt;のパース</h3>
+
+<p>字句解析器が記号&lt;, =, &gt;をシンボル文字として読みこむようにする。</p>
+
+<p><code>isSymbolChar c = any ($ c) [isAlpha, (`elem` "+-*/&lt;=&gt;")]</code></p>
+
+<h3>関数&lt;を定義</h3>
+
+<p>関数lttを定義し</p>
+
+<p><code>ltt :: Value -&gt; Env -&gt; Either Error (Value, Env)<br/>
+ltt v e = (, e) . Bool . and . (zipWith (&lt;) &lt;$&gt; id &lt;*&gt; tail)<br/>
+	<span class="indent1">&lt;$&gt; (mapM toint =&lt;&lt; consToList v)</span></code></p>
+
+<p>初期環境に追加する。</p>
+
+<p><code>env0 = [<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">("&lt;", Subroutine "&lt;" ltt),</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	</code></p>
+
+<h2>階乗関数</h2>
+
+<p><code>% runghc -Wall isc<br/>
+isc&gt; (define (factorial n) (if (&lt; n 1) 1 (* n (factorial (- n 1)))))<br/>
+factorial<br/>
+isc&gt; (factoraial 10)<br/>
+3628800</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+再帰的に階乗関数を定義するのに十分なだけの機能を追加した。
+</p>
 
 <p>
 <a href="/computer/haskell/coding/scheme/nano_scheme/framework"
 	>「枠組み」へもどる</a>
-<a href="/computer/haskell/coding/scheme/nano_scheme"
-	>「Nano Scheme」トップへ</a>
+<a href="/computer/haskell/coding/scheme/nano_scheme/bmi"
+	>「BMIを求める」へ</a>
 </p>

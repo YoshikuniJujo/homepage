@@ -2,7 +2,7 @@
 
 module Primitive (env0) where
 
-import Control.Applicative ((<$>))
+import Control.Applicative ((<$>), (<*>))
 import Data.List (foldl')
 
 import Eval (eval)
@@ -21,20 +21,27 @@ env0 = fromList [
 	("exit", DoExit),
 	("define", Syntax "define" define),
 	("lambda", Syntax "lambda" lambda),
+	("if", Syntax "if" ifs),
 	("list", Subroutine "list" $ (Right .) . (,)),
 	("+", Subroutine "+" add),
 	("*", Subroutine "*" mul),
-	("-", Subroutine "-" sub)
+	("-", Subroutine "-" sub),
+	("<", Subroutine "<" ltt)
 	]
 
-define, lambda :: Value -> Env -> Either Error (Value, Env)
+define, lambda, ifs :: Value -> Env -> Either Error (Value, Env)
 define (Cons sm@(Symbol s) (Cons v Nil)) e = do
 	(v', e') <- eval v e
 	Right (sm, set s v' e')
+define (Cons (Cons f@(Symbol n) as) bd) e = Right (f, set n (Lambda n as bd) e)
 define v _ = Left . Error $ syntaxErr ++ showValue (Symbol "define" `Cons` v)
 
 lambda (Cons as bd) e = Right (Lambda "#f" as bd, e)
 lambda v _ = Left . Error $ syntaxErr ++ showValue (Symbol "lambda" `Cons` v)
+
+ifs (Cons p (Cons th (Cons el Nil))) e = eval p e >>= \(b, e') ->
+	case b of Bool False -> eval el e'; _ -> eval th e'
+ifs v _ = Left . Error $ syntaxErr ++ showValue (Symbol "if" `Cons` v)
 
 consToList :: Value -> Either Error [Value]
 consToList Nil = Right []
@@ -55,3 +62,7 @@ sub v e = (, e) . Integer . sb <$> (chk =<< mapM toInt =<< consToList v)
 	sb [x] = negate x
 	sb (x : xs) = foldl' (-) x xs
 	sb _ = error "never occur"
+
+ltt :: Value -> Env -> Either Error (Value, Env)
+ltt v e = (, e) . Bool . and . (zipWith (<) <$> id <*> tail)
+	<$> (mapM toInt =<< consToList v)

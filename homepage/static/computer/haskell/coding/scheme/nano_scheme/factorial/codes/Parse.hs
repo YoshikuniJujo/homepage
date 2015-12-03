@@ -7,6 +7,7 @@ import Environment(Value(..), Symbol, Error(..), ErrorMessage)
 
 data Token
 	= TkSymbol Symbol
+	| TkTrue | TkFalse
 	| TkInteger Integer
 	| OParen | CParen
 	deriving Show
@@ -19,6 +20,8 @@ parseErr = "Parse error: "
 tokens :: String -> Either Error [Token]
 tokens ('(' : s) = (OParen :) <$> tokens s
 tokens (')' : s) = (CParen :) <$> tokens s
+tokens ('#' : 'f' : s) = (TkFalse :) <$> tokens s
+tokens ('#' : 't' : s) = (TkTrue :) <$> tokens s
 tokens str@(c : s)
 	| isSymbolChar c = do
 		let (sm, s') = span isSymbolChar s
@@ -33,7 +36,7 @@ tokens str@(c : s)
 tokens _ = return []
 
 isSymbolChar :: Char -> Bool
-isSymbolChar c = any ($ c) [isAlpha, (`elem` "+-*/")]
+isSymbolChar c = any ($ c) [isAlpha, (`elem` "+-*/<=>")]
 
 parse :: [Token] -> Either Error [Value]
 parse [] = return []
@@ -43,6 +46,8 @@ parse ts = do
 
 parse1, parseList :: [Token] -> Either Error (Value, [Token])
 parse1 (TkSymbol s : ts) = return (Symbol s, ts)
+parse1 (TkFalse : ts) = return (Bool False, ts)
+parse1 (TkTrue : ts) = return (Bool True, ts)
 parse1 (TkInteger i : ts) = return (Integer i, ts)
 parse1 (OParen : ts) = parseList ts
 parse1 ts = Left . Error $ syntaxErr ++ parseErr ++ show ts
