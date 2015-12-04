@@ -16,11 +16,17 @@ Nano Scheme: 整数値の表示
 	>Environment.hs</a></p>
 
 <p>
-環境やそれに関する演算を置くためのモジュールEnvironmentに型Valueを定義する。
-まずは整数値のみとする。
+環境やそれに関する演算を置くためのモジュールEnvironmentを作る。
+型Envは変数と値を対応づける辞書だ。今はまだ使わないが定義しておく。
 </p>
 
-<p><code>module Environment (Value(..)) where</code></p>
+<p><code>module Environment (Env, M.fromList, Value(..), showValue, Symbol) where</code></p>
+
+<p><code>import qualified Data.Map as M</code></p>
+
+<p><code>type Env = M.Map Symbol Value</code></p>
+
+<p>型Valueを定義する。まずは整数値のみとする。</p>
 
 <p><code>data Value =<br/>
 	<span class="indent1">Int Integer</span></code></p>
@@ -29,6 +35,10 @@ Nano Scheme: 整数値の表示
 
 <p><code>showValue :: Value -&gt; String<br/>
 showValue (Int i) = show i</code></p>
+
+<p>型SymbolはStringの別名とする。</p>
+
+<p><code>type Symbol = String</code></p>
 
 <p><code>% ghci Environment.hs<br/>
 *Environment&gt; showValue $ Int 8<br/>
@@ -41,7 +51,7 @@ showValue (Int i) = show i</code></p>
 
 <p>
 モジュールParseは関数parseを公開する。
-またモジュールEnvironのValue型の値を使用する。
+モジュールEnvironmentのValue型やモジュールMaybeのMaybe型を扱う関数を使う。
 モジュールData.Charも導入する。
 </p>
 
@@ -49,7 +59,8 @@ showValue (Int i) = show i</code></p>
 
 <p><code>import Data.Char</code></p>
 
-<p><code>import Environment</code></p>
+<p><code>import Environment<br/>
+import Maybe</code></p>
 
 <h3>型Token</h3>
 
@@ -59,7 +70,8 @@ showValue (Int i) = show i</code></p>
 </p>
 
 <p><code>data Token<br/>
-	<span class="indent1">= TkInt Integer</span></code></p>
+	<span class="indent1">= TkInt Integer</span><br/>
+	<span class="indent1">deriving Show</span></code></p>
 
 <h3>関数tokens</h3>
 
@@ -67,7 +79,15 @@ showValue (Int i) = show i</code></p>
 
 <p><code>tokens :: String -&gt; Maybe [Token]<br/>
 tokens (c : s)<br/>
-	<span class="indent1">| isDigit c = </span></code></p>
+	<span class="indent1">| isDigit c =
+		let (t, r) = span isDigit s in</span><br/>
+		<span class="indent2">(TkInt (read $ c : t) :)
+			`mapply` tokens r</span></br>
+	<span class="indent1">| isSpace c = tokens s</span>
+tokens "" = Just []<br/>
+tokens _ = Nothing</code></p>
+
+<p>(関数tokensの説明から)</p>
 
 <h3>関数parse</h3>
 

@@ -11,10 +11,8 @@ data Token
 
 tokens :: String -> Maybe [Token]
 tokens (c : s)
-	| isDigit c = let
-		(t, r) = span isDigit s
-		i = TkInt . read $ c : t in
-		(i :) `mapply` tokens r
+	| isDigit c = let (t, r) = span isDigit s in
+		(TkInt (read $ c : t) :) `mapply` tokens r
 	| isSpace c = tokens s
 tokens "" = Just []
 tokens _ = Nothing
