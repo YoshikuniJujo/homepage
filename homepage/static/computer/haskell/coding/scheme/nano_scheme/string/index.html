@@ -1,0 +1,171 @@
+文字列を扱う
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+文字列を扱えるようにする。
+ここでは用途的に文字列の表示はその文字列そのものを返すこととする。
+"で囲ったりエスケープしたりしないということだ。
+</p>
+
+<p>
+<a href="/computer/haskell/coding/scheme/nano_scheme/string/codes/Environment.hs"
+	>Environment.hs</a>
+
+<a href="/computer/haskell/coding/scheme/nano_scheme/string/codes/Parse.hs"
+	>Parse.hs</a>
+
+<a href="/computer/haskell/coding/scheme/nano_scheme/string/codes/Primitive.hs"
+	>Primitive.hs</a>
+</p>
+
+<h2>文字</h2>
+
+<h3>必要な関数</h3>
+
+<ul>
+<li>char-&gt;integer</li>
+<li>integer&gt;char</li>
+<li>char-upcase</li>
+<li>char-downcase</li>
+</ul>
+
+<h3>値構築子の追加</h3>
+
+<p><code>data Value<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">| Char Char</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span></code></p>
+
+<p><code>.<br/>
+.<br/>
+.<br/>
+showValue (Char ' ') = "#\\space"<br/>
+showValue (Char '\t') = "#\\tab"<br/>
+showValue (Char '\n') = "#\\newline"<br/>
+showValue (Char '\r') = "#\\return"<br/>
+showValue (Char c) = "#\\" ++ [c]<br/>
+.<br/>
+.<br/>
+.</code></p>
+
+<h3>字句解析</h3>
+
+<p><code>data Token<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">| TkChar Char</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span></code></p>
+
+<p><code>.<br/>
+.<br/>
+.<br/>
+tokens ('#' : 't' : s) = (TkTrue :) &lt;$&gt; tokens s<br/>
+tokens ('#' : '\\' : s) = tkChar s<br/>
+.<br/>
+.<br/>
+.</code></p>
+
+<p><code>tkChar :: String -&gt; Either Error [Token]<br/>
+tkChar s = case
+	span (not . ((||) &lt;$&gt; isSpace &lt;*&gt; (`elem` "()"))) s of<br/>
+	<span class="indent1">("space", s') -&gt;
+		(TkChar ' ' :) &lt;$&gt; tokens s'</span><br/>
+	<span class="indent1">("tab", s') -&gt;
+		(TkChar '\t' :) &lt;$&gt; tokens s'</span><br/>
+	<span class="indent1">("newline", s') -&gt;
+		(TkChar '\n' :) &lt;$&gt; tokens s'</span><br/>
+	<span class="indent1">("return", s') -&gt;
+		(TkChar '\r' :) &lt;$&gt; tokens s'</span><br/>
+	<span class="indent1">([c], s') -&gt;
+		(TkChar c :) &lt;$&gt; tokens s'</span><br/>
+	<span class="indent1">(cn, _) -&gt;
+		Left . Error $ readErr ++ unkChrErr ++ cn</span></code></p>
+
+<h3>構文解析</h3>
+
+<p><code>.<br/>
+.<br/>
+.<br/>
+parse1 (TkChar c : ts) = return (Char c, ts)<br/>
+.<br/>
+.<br/>
+.</code></p>
+
+<h3>文字を扱う関数</h3>
+
+<h4>モジュールData.Char</h4>
+
+<p><code>import Data.Char (ord, chr, toUpper, toLower)</code></p>
+
+<h4>初期環境</h4>
+
+<p><code>env0 = fromList [<br/>
+<span class="indent1">.</span><br/>
+<span class="indent1">.</span><br/>
+<span class="indent1">.</span><br/>
+<span class="indent1">("char-&gt;integer",
+	Subroutine "char-&gt;integer" char2integer),</span><br/>
+<span class="indent1">("integer-&gt;char",
+	Subroutine "integer-&gt;char" integer2char),</span><br/>
+<span class="indent1">("char-upcase",
+	Subroutine "char-upcase" charUpcase),</span><br/>
+<span class="indent1">("char-downcase",
+	Subroutine "char-downcase" charDowncase)</span><br/>
+<span class="indent1">]</span></code></p>
+
+<h4>関数定義</h4>
+
+<p><code>char2integer, integer2char :: Value -&gt; Env -&gt;
+	Either Error (Value, Env)<br/>
+char2integer (Cons (Char c) Nil) e = Right (Integer . fromIntegral $ ord c, e)
+char2integer v _ = Left . Error $ chrReqErr ++ showValue v</code></p>
+
+<p><code>integer2char (Cons (Integer i) Nil) e =
+	Right (Char . chr $ fromIntegral i, e)<br/>
+integer2char v _ = Left . Error $ intReqErr ++ showValue v</code></p>
+
+<p><code>charUpcase, charDowncase :: Value -&gt; Env -&gt;
+	Either Error (Value, Env)<br/>
+charUpcase (Cons (Char c) Nil) e = Right (Char $ toUpper c, e)<br/>
+charUpcase v _ = Left . Error $ chrReqErr ++ showValue v</code></p>
+
+<p><code>charDowncase (Cons (Char c) Nil) e = Right (Char $ toLower c, e)<br/>
+charDowncase v _ = Left . Error $ chrReqErr ++ showValue v</code></p>
+
+<h2>文字列</h2>
+
+<h3>必要な関数</h3>
+
+<p>以下の関数を用意しておけば良さそうだ。</p>
+
+<ul>
+<li>string-append: 文字列連結</li>
+<li>string-&gt;list: 文字列を文字のコンスにする</li>
+<li>list-&gt;string: 文字のコンスを文字列にする</li>
+<li>x-&gt;string: 値の文字列表現</li>
+</ul>
+
+<h3>値構築子の追加</h3>
+
+<h3>字句解析</h3>
+
+<h3>構文解析</h3>
+
+<h3>文字列を扱う関数</h3>
+
+<p>
+<a href="/computer/haskell/coding/scheme/nano_scheme/filter"
+	>「フィルタにする」へもどる</a>
+<a href="/computer/haskell/coding/scheme/nano_scheme"
+	>「Nano Scheme」トップへ</a>
+</p>
