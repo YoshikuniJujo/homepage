@@ -12,10 +12,8 @@
 <h3>問題定義</h3>
 
 <p>
-りんご屋さんがある。
-このりんご屋さんはりんごを売っている。
-ただしすこし変わったりんご屋さんでりんごの実だけではなく
-葉や花も「りんご」として売っている。
+すこし変わったりんご屋さんがある。
+りんごの実だけではなく葉や花も「りんご」として売っている。
 </p>
 
 <ul>
@@ -65,12 +63,13 @@ price = sum . map price1</p>
 <h3>商売の拡張</h3>
 
 <p>
-さて、りんご屋さんはすこし商売を広げることにした。
-りんごの枝も商品とする。
-りんごの枝はふたつに分かれその先にりんご屋さんの扱っている商品がつく。
-枝の先につくのはりんごの葉、花、実だけではなくこの枝自体もつくかもしれない。
-つまり次々と枝分かれしていくりんごの枝も商品とするということだ。
-枝分かれごとに20円を追加し葉、花、実については今までと同じ値段とする。
+商品の種類を増やす。
+りんごの枝を追加する。
+りんごの枝はふたつにわかれその先にりんごの葉、花、実がつく。
+枝の先につくのはそれだけではない。枝自体もだ。
+りんごの枝は次々と枝分かれする。
+値段は枝分かれごとに20円足す。
+葉、花、実の値段は変わらない。
 </p>
 
 <h3>型</h3>
@@ -81,19 +80,25 @@ price = sum . map price1</p>
 	<span class="indent1">deriving Show</span></code></p>
 
 <p>
-Branch Leaf FlowerやBranch Fruit (Branch ...)といった値が作れる。
+型Appleの定義に型Appleが使われている。
+再帰的な定義となっている。
+値の例を示す。
 </p>
+
+<p><code>Branch Leaf Flower</code></p>
+
+<p><code>Branch Fruit (Branch Fruit Leaf)</code></p>
 
 <h3>値段の計算</h3>
 
-<p>葉、花、実の値段については同じだ。</p>
+<p>葉、花、実の値段は同じだ。</p>
 
 <p><code>price1 :: Apple -&gt; Int<br/>
 price1 Leaf = 50<br/>
 price1 Flower = 80<br/>
 price1 Fruit = 100</code></p>
 
-<p>枝については再帰的に計算する。</p>
+<p>枝は再帰的に計算する。</p>
 
 <p><code>price1 (Branch a1 a2) = 20 + price1 a1 + price1 a2</code></p>
 
@@ -104,10 +109,10 @@ price1 Fruit = 100</code></p>
 <h3>枝から取る</h3>
 
 <p>
-葉、花、実を枝から外して並べることを考える。
+葉、花、実を枝から外して並べる。
 ひとつの枝を先のほうまでたどっていく方法と、
 根本に近いものから外していく方法とがある。
-前者を深さ優先探索と呼び後者を幅優先探索と呼ぶ。
+前者が深さ優先探索で後者が幅優先探索だ。
 </p>
 
 <h4>深さ優先探索</h4>
@@ -120,6 +125,10 @@ price1 Fruit = 100</code></p>
 <p><code>dfs :: Apple -&gt; [Apple]<br/>
 dfs (Branch a1 a2) = dfs a1 ++ dfs a2<br/>
 dfs a = [a]</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; dfs $ Branch (Branch Fruit Leaf) Flower<br/>
+[Fruit,Leaf,Flower]</code></p>
 
 <h4>幅優先探索</h4>
 
@@ -158,6 +167,10 @@ partitionEithersによってアトム(Left値)のリストと枝(Right値)のリ
 枝のリストは平坦化され状態として次の操作に渡される。
 </p>
 
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; bfs $ Branch (Branch Fruit Leaf) Flower<br/>
+[Flower,Fruit,Leaf]</code></p>
+
 <p>[このあたり説明をわかりやすくする必要あり、でなければ消すか]</p>
 
 <h2>まとめ</h2>
@@ -178,6 +191,7 @@ partitionEithersによってアトム(Left値)のリストと枝(Right値)のリ
 	<ul>
 	<li>一番小さい人形Termも数に含む</li>
 	</ul></li>
+<li>数を指定してマトリョーシカ人形を作成する関数を定義せよ</li>
 </ol>
 
 <p>

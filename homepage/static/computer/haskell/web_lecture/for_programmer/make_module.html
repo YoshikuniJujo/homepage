@@ -28,16 +28,14 @@ c = 5</code></p>
 Mainモジュール以外ではモジュール名とファイル名は合わせておく。
 </p>
 
-<p><code>Some.hs</code></p>
-
-<p><code>module Some where</code></p>
+<p><code>% cat Some.hs<br/>
+module Some where</code></p>
 
 <p><code>a, b, c :: Int<br/>
 a = 3<br/>
 b = 4 * c<br/>
-c = 5</code></p>
-
-<p><code>% ghci Some.hs<br/>
+c = 5<br/>
+% ghci Some.hs<br/>
 *Some&gt;</code></p>
 
 <h2>モジュールSomeをインポート</h2>
