@@ -1,0 +1,87 @@
+Nano Scheme: Map型
+
+<p>(工事中 0%)</p>
+
+<h2>リストを使った辞書</h2>
+
+<p>
+ペアのリストを使った辞書はPrelude.lookupを使って検索できる。
+</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; lookup 8 [(3, 5), (8, 2)]<br/>
+Just 2</code></p>
+
+<p>
+これは要素をひとつめから順に調べていくので要素数に比例した時間がかかる。
+つまり時間効率がO(n)となる。
+</p>
+
+<h2>Map型</h2>
+
+<p>
+HaskellではData.Mapという標準的なモジュールがある。
+これを使えば辞書の検索はO(log n)となる。
+ちなみにO(log n)はO(1)とO(n)のあいだではあるが中間ではない。
+O(log n)は実用上はO(1)に近い。
+</p>
+
+<p><code>Prelude&gt; :m Data.Map<br/>
+Prelude Data.Map&gt; empty<br/>
+fromList []<br/>
+Prelude Data.Map&gt; insert 3 "hello" it<br/>
+fromList [(3,"hello")]<br/>
+Prelude Data.Map&gt; insert 15 "world" it<br/>
+fromList [(3,"hello"),(15,"world")]<br/>
+Prelude Data.Map&gt; insert 8 "good-bye" it<br/>
+fromList [(3,"hello"),(8,"good-bye"),(15,"world")]<br/>
+Prelude Data.Map&gt; let d = it<br/>
+Prelude Data.Map&gt; Data.Map.lookup 8 d<br/>
+Just "good-bye"<br/>
+Prelude Data.Map&gt; Data.Map.lookup 10 d<br/>
+Nothing</code></p>
+
+<p>
+空の辞書にinsertでkeyとvalueとを追加していく。
+fromList [...]というのは関数showによるMapの文字列表現だ。
+またData.Mapモジュールの関数lookupはPreludeのlookupと名前がかぶるので
+モジュール名をつけた「修飾名」としている。
+</p>
+
+<p>fromListを使って一気に作ることもできる。</p>
+
+<p><code>Prelude Data.Map&gt; fromList [(3, "hello"), (15, "world"), (8, "good-bye")]<br/>
+fromList [(3,"hello"),(8,"good-bye"),(15,"world")]</code></p>
+
+<p>
+くりかえしになるがfromList [...]という表現は関数showによる文字列表現である。
+中身は二分木となっている。
+</p>
+
+<h2>中身</h2>
+
+<p>
+詳しくは説明しないがMap型はkey-valueペアの二分木と考えてよい。
+検索、挿入、更新、削除をO(log n)で行うことができる。
+重み平衡木というアルゴリズムを使っている。
+これは挿入や削除のさいに木の形を調整することで左右の木の大きさを
+だいたい同じくらいに保つアルゴリズムである。
+これによって時間効率をO(log n)に保っている。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+Map型の使いかたを学んだ。
+本格的なコードでは辞書にペアのリストを使う代わりにMap型を使うべきだ。
+Map型には重み平衡木というアルゴリズムが使われている。
+これもなかなか巧妙で面白いので機会があったら説明したい。
+Map型はきれいなインターフェースを持っているので中身を意識しなくても使える。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/nsc_maybe.html"
+	>「Nano Scheme: Maybe型の演算」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/nsc_integer.html"
+	>「Nano Scheme: 整数値」へ</a>
+</p>

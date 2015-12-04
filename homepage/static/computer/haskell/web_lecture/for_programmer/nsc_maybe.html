@@ -1,0 +1,74 @@
+Nano Scheme: Maybe型の演算
+
+<p>(工事中 0%)</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/integer/Maybe.hs"
+	>Maybe.hs</a></p>
+
+<h2>はじめに</h2>
+
+<p>
+Nano Schemeを作っていくなかでエラーの可能性というものを常に考えなければならない。
+構文エラーも生じうるし値の評価中にもエラーは生じうる。
+今回はエラーの可能性をMaybe型の値で表現する。
+Maybe型について以下の関数を定義しておくと便利だ。
+</p>
+
+<ul>
+<li>Just値の中身に普通の関数を適用しJust値として返す。Nothing値はNothing値とする</li>
+<li>Just値の中身にMaybe型の値を返す関数を適用する。Nothing値はNothing値とする</li>
+</ul>
+
+<p><code>% vi Maybe.hs<br/>
+module Maybe (mapply, mbind) where</code></p>
+
+<p><code>mapply :: (a -&gt; b) -&gt; Maybe a -&gt; Maybe b<br/>
+mapply = maybe Nothing . (Just .)</code></p>
+
+<p><code>mbind :: (a -&gt; Maybe b) -&gt; Maybe a -&gt; Maybe b<br/>
+mbind = maybe Nothing</code></p>
+
+<h2>試してみる</h2>
+
+<p><code>% ghci Maybe.hs<br/>
+*Maybe&gt; (+ 3) `mapply` Just 8<br/>
+Just 11<br/>
+*Maybe&gt; (+ 3) `mapply` Nothing<br/>
+Nothing</code></p>
+
+<p>mapplyはmapと似ている。</p>
+
+<p><code>*Maybe&gt; (+ 3) `map` [8]<br/>
+[11]<br/>
+*Maybe&gt; (+ 3) `map` []<br/>
+[]</code></p>
+
+<p>mbindも試してみよう。</p>
+
+<p><code>*Maybe&gt; let safeRecip x =
+	if x == 0 then Nothing else Just $ recip x<br/>
+*Maybe&gt; safeRecip `mbind` lookup 8 [(3, 5), (8, 2)]<br/>
+Just 0.5<br/>
+*Maybe&gt; safeRecip `mbind` lookup 8 [(3, 5), (8, 0)]<br/>
+Nothing<br/>
+*Maybe&gt; safeRecip `mbind` lookup 8 [(3, 5), (9, 10)]<br/>
+Nothing</code></p>
+
+<p>
+lookup関数の結果をsafeRecipに渡している。
+どちらも「失敗」の可能性のある関数でありどちらかが失敗すれば全体が失敗する。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+Maybe値を扱う関数を定義して失敗する可能性のある演算をつなげていくことができる
+ようにした。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/nsc_prelude.html"
+	>「Nano Scheme: はじめに」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/nsc_map.html"
+	>「Nano Scheme: Map型」へ</a>
+</p>

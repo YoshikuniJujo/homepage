@@ -1,0 +1,99 @@
+Nano Scheme: 整数値の表示
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+整数値の入力と表示を実装する。
+構文解析や値の評価をする関数も作成する。
+整数値はそのままの整数値に評価されるので評価関数はスタブ的なものとなる。
+</p>
+
+<h2>型Value</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/integer/Environment.hs"
+	>Environment.hs</a></p>
+
+<p>
+環境やそれに関する演算を置くためのモジュールEnvironmentに型Valueを定義する。
+まずは整数値のみとする。
+</p>
+
+<p><code>module Environment (Value(..)) where</code></p>
+
+<p><code>data Value =<br/>
+	<span class="indent1">Int Integer</span></code></p>
+
+<p>表示用の関数も用意しておこう。</p>
+
+<p><code>showValue :: Value -&gt; String<br/>
+showValue (Int i) = show i</code></p>
+
+<p><code>% ghci Environment.hs<br/>
+*Environment&gt; showValue $ Int 8<br/>
+"8"</code></p>
+
+<h2>モジュールParse</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/integer/Parse.hs"
+	>Parse.hs</a></p>
+
+<p>
+モジュールParseは関数parseを公開する。
+またモジュールEnvironのValue型の値を使用する。
+モジュールData.Charも導入する。
+</p>
+
+<p><code>module Parse (parse) where</code></p>
+
+<p><code>import Data.Char</code></p>
+
+<p><code>import Environment</code></p>
+
+<h3>型Token</h3>
+
+<p>
+字句解析の結果であり構文解析器の引数となるのがトークン列である。
+まずは整数値のトークンのみだ。
+</p>
+
+<p><code>data Token<br/>
+	<span class="indent1">= TkInt Integer</span></code></p>
+
+<h3>関数tokens</h3>
+
+<p>関数tokensは文字列をトークン列にわける。</p>
+
+<p><code>tokens :: String -&gt; Maybe [Token]<br/>
+tokens (c : s)<br/>
+	<span class="indent1">| isDigit c = </span></code></p>
+
+<h3>関数parse</h3>
+
+<h2>初期環境</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/integer/Primitive.hs"
+	>Primitive.hs</a></p>
+
+<p><code>env0 :: ...</code></p>
+
+<h2>関数scheme</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/integer/nsc.hs"
+	>nsc.hs</a></p>
+
+<p>
+Nano Scheme(以下nscとする)は複数の式を評価しその結果を1行ずつ出力することにする。
+ソースコードの文字列と環境をとって複数の値と新しい環境を返す関数schemeを考える。
+構文解析や評価中にエラーが生じる可能性を考えて返り値はMaybe型の値とする。
+</p>
+
+<p><code>scheme :: String -&gt; Env -&gt; Maybe ([Value], Env)</code></p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/nsc_map.html"
+	>「Nano Scheme: Map型」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer"
+	>「1から学ぶHaskell」トップへ</a>
+</p>
