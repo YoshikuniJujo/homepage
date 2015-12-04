@@ -1,6 +1,6 @@
 文字列を扱う
 
-<p>(工事中 0%)</p>
+<p>(工事中 50%)</p>
 
 <h2>はじめに</h2>
 
@@ -157,11 +157,112 @@ charDowncase v _ = Left . Error $ chrReqErr ++ showValue v</code></p>
 
 <h3>値構築子の追加</h3>
 
+<p><code>data Value<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">| String String</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span></code></p>
+
+<p><code>.<br/>
+.<br/>
+.<br/>
+showValue (String s) = s<br/>
+.<br/>
+.<br/>
+.</code></p>
+
 <h3>字句解析</h3>
+
+<p><code>data Token<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">| TkString String</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span></code></p>
+
+<p><code>.<br/>
+.<br/>
+.<br/>
+tokens ('"' : s) = uncurry ($) . ((&lt;$&gt;) . (:) . TkString *** tokens)
+	=&lt;&lt; tkString s<br/>
+.<br/>
+.<br/>
+.</code></p>
+
+<p><code>tkString :: String -&gt; Either Error (String, String)<br/>
+tkString ('"' : s) = Right ("", s)<br/>
+tkString ('\\' : e : s) = (&lt;$&gt; tkString s) . first . (:)<br/>
+	<span class="indent1">$ case e of 't' -&gt; '\t';
+		'n' -&gt; '\n'; 'r' -&gt; '\r'; _ -&gt; e</span><br/>
+tkString (c : s) = first (c :) &lt;$&gt; tkString s<br/>
+tkString _ = Left . Error $ readErr ++ strTrmErr</code></p>
 
 <h3>構文解析</h3>
 
+<p><code>.<br/>
+.<br/>
+.<br/>
+parse1 (TkString s : ts) = return (String s, ts)<br/>
+.<br/>
+.<br/>
+.</code></p>
+
 <h3>文字列を扱う関数</h3>
+
+<p><code>env0 = fromList [<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">("string-append",
+		Subroutine "string-append" stringAppend),</span><br/>
+	<span class="indent1">("string-&gt;list",
+		Subroutine "string-&gt;list" string2list),</span><br/>
+	<span class="indent1">("list-&gt;string",
+		Subroutine "list-&gt;string" list2string),</span><br/>
+	<span class="indent1">("x-&gt;string",
+		Subroutine "x-&gt;string" x2string)</span><br/>
+	<span class="indent1">]</span></code></p>
+
+<p><code>stringAppend :: Value -&gt; Env -&gt; Either Error (Value, Env)<br/>
+stringAppend (Cons (String str) strs) e =
+	first (sa str) &lt;$&gt; stringAppend strs e<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">sa s (String ss) = String $ s ++ ss</span><br/>
+	<span class="indent1">sa _ _ = error "never occur"</span><br/>
+stringAppend Nil e = Right (String "", e)<br/>
+stringAppend v _ = Left . Error $ strReqErr ++ showValue v</code></p>
+
+<p><code>string2list, list2string ::
+	Value -&gt; Env -&gt; Either Error (Value, Env)<br/>
+string2list (Cons (String str) Nil) e = Right (s2l str, e)<br/>
+	<span class="indent1">where
+		s2l (c : cs) = Char c `Cons` s2l cs; s2l _ = Nil</span><br/>
+string2list v _ = Left . Error $ strReqErr ++ showValue v</code></p>
+
+<p><code>list2string ...</code></p>
+
+<p><code>x2string :: Value -&gt; Env -&gt; Either Error (Value, Env)<br/>
+x2string (Cons v Nil) e = Right (String $ showValue v, e)<br/>
+x2string v _ = Left . Error $ noApplErr ++ showValue v</code></p>
+
+<h2>その他必要な関数</h2>
+
+<h3>文字比較関数</h3>
+
+<p><code>env0 = fromList [<br/>
+	<span class="indent1">...</span></code></p>
+
+<p><code>charEq :: ...<br/>
+charEq v e = ...</code></p>
+
+<p><code>toChar :: ...<br/>
+toChar (Char c) = Right c<br/>
+toChar v = Left . Error $ chrReqErr ++ showValue v</code></p>
 
 <p>
 <a href="/computer/haskell/coding/scheme/nano_scheme/filter"
