@@ -1,0 +1,63 @@
+ボットを作る: Haskellのワンライナー
+
+<p>(工事中 0%)</p>
+
+<h2>GHCでワンライナーを実行する</h2>
+
+<p>
+GHCでワンライナーを実行するにはghcの-eオプションを使う。
+</p>
+
+<p><code>% ghc -e "product [1 .. 10]"<br/>
+3628800</code></p>
+
+<p>
+標準入力からの入力を変換して標準出力に出すにはinteractを使う。
+</p>
+
+<p><code>% echo 'hello' | ghc -e 'interact $ (++ "\n") . reverse . head . lines'<br/>
+olleh
+</code></p>
+
+<h2>Hubotからワンライナーを実行する</h2>
+
+<p>
+Coffee Scriptについてほとんど知らない。
+ネット上の情報をつぎはぎして以下のようなやりかたを見つけた。
+scriptsディレクトリ以下に以下のコードを置いてみよう。
+</p>
+
+<p><code>% vi reverse.coffee<br/>
+spawn = require('child_process').spawn</code></p>
+
+<p><code>module.exports = (robot) -&gt; romot.hear /reverse/i, (msg) -&gt;<br/>
+	<span class="indent1">echo = spawn 'echo', [msg.message]</span><br/>
+	<span class="indent1">reverse = spawn 'ghc', ['-e', 'interact $ reverse . head . lines']</span><br/>
+	<span class="indent1">echo.stdout.on 'data', (data) -&gt; reverse.stdin.write(data)</span><br/>
+	<span class="indent1">reverse.stdout.on 'data', (data) -&gt; msg.send data.toString()</span></code></p>
+
+<P>
+reverseという語を含む書きこみをすると
+その行を反転させた文字列で応えてくれるはずだ。
+</p>
+
+<h2>自分で書いたコードを実行するには</h2>
+
+<p>上記のワンライナーの部分をrunghc ...でおきかえる。</p>
+
+<p><code>% mkdir haskell<br/>
+% vi haskell/reverse.hs<br/>
+main :: IO ()<br/>
+main = interact $ (++ "\n") . reverse . head . lines</code></p>
+
+<p>
+<code>ghc</code>を<code>runghc</code>とし引数リストの部分を
+<code>['haskell/reverse.hs']とする。</code>
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/bot_install.html"
+	>「ボットを作る: インストール」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer"
+	>「1から学ぶHaskell」トップへ</a>
+</p>

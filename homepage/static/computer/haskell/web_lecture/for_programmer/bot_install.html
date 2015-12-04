@@ -1,0 +1,61 @@
+ボットを作る: Hubotのインストール
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+基本的にこの章はHubotをすでにインストールして使っている人向けである。
+それでも一応Hubotのインストールについても触れておこう。
+</p>
+
+<p>
+Node.jsやnpmは適切にインストールされているものとする。
+そうでないなら「ボットを作る」の章はとばそう。
+</p>
+
+<h2>インストール</h2>
+
+<p><code>npm install -g hubot hubot-slack yo generator-hubot coffee-script</code></p>
+
+<h2>ひな形の作成</h2>
+
+<p><code>% mkdir hellobot<br/>
+% cd hellobot<br/>
+% yo hubot</code></p>
+
+<h2>テスト用のスクリプト</h2>
+
+<p>scriptsディレクトリ下に以下のスクリプトを作成する。</p>
+
+<p><code>vi scripts/helloworld.coffee<br/>
+module.exports = (root) -&gt;<br/>
+	<span class="indent1">robot.hear /HELLO$/i, (msg) -&gt;</span><br/>
+		<span class="indent2">msg.send "world"</span></code></p>
+
+<h2>動作確認</h2>
+
+<p><code>% ./bin/hubot</code></p>
+
+<p>エラーメッセージが出るがエンターキーを押す。</p>
+
+<p><code>Hubot&gt; hello<br/>
+Hubot&gt; world<br/>
+exit</code></p>
+
+<h2>Slackと連携する</h2>
+
+<p>
+SlackのIntegrationページでHubotとの連携を設定する。
+HUBOT_SLACK_TOKENをメモしておこう。
+</p>
+
+<p><code>% HUBOT_SLACK_TOKEN=xxxxxxxxxx HUBOT_SLACK_TEAM=xxxx
+	HUBOT_SLACK_BOTNAME=hubot bin/hubot --adapter slack</code></p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/bot_prelude.html"
+	>「ボットを作る: はじめに」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/bot_oneliner.html"
+	>「ワンライナー」へ</a>
+</p>

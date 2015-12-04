@@ -341,83 +341,26 @@ src="/computer/haskell/web_lecture/for_programmer/images/the_functional_language
 <h2>番外編: ボットを作ってみよう</h2>
 
 <p>
-とりあえず入力された文字列のみから返答を生成するボットを作る。
-もっと複雑なことはIOをきちんと学んだらできるよ、
-という感じでモティベーションの維持を図る。
-Hubotのインストールあたりの話題はまだ必要ないかもしれない。
-またSlackへの登録はもう一度1からやりたいがSlackに複数のチーム名を作るのは
-問題ないかな。
-たとえばiocikun2とか作ってもいいのかな。
-</p>
-
-<p>
-与えられた文字列をシードとしてランダムに返答を作る。
-それを基本としてそのうえにたとえばBMIを教えてくれるしくみを作る。
-他にもいくつかの機能をつけるってのはどうだろうか。
-["体重", "身長"]というリストと[isDigit, isDigit]
-を与えるとRead a =&gt; String -&gt; [a]として
-[178, 85]のようなリストを返してくれる関数を作っておくと便利かも。
-「最初のisDigitを満たすものの空ではない連続」を取るようにしよう。
-空白文字はさきにけずっておくか。
-</p>
-
-<p>
-BMIを返すボットをまずは作る。
-そのあとはNano Schemeボットを作ろうかな。
-@bot nsc (display "hello")のような感じかな。
-ただ、一行で全部書かなきゃならないのが問題かも...
-まあ、ワンライナーって感じでぎりぎりOKかな?
-Nano Schemeに欲しい機能は
+Slack等の管理を普段から行っていてHubotの設定等に慣れている人向けの章である。
+そうでない人はこの章はとばそう。
 </p>
 
 <ul>
-<li>整数値</li>
-<li>文字列</li>
-<li>真偽値とNil</li>
-<li>コンス</li>
-<li>変数定義</li>
-<li>関数定義</li>
-<li>関数呼び出し</li>
-<li>四則演算</li>
-<li>文字列の結合</li>
-<li>数値、文字列の表示</li>
+<li><a href="/computer/haskell/web_lecture/for_programmer/bot_prelude.html"
+	>はじめに</a> (工事中 30%)</li>
+<li><a href="/computer/haskell/web_lecture/for_programmer/bot_install.html"
+	>Hubotのインストール</a> (工事中 0%)</li>
+<li><a href="/computer/haskell/web_lecture/for_programmer/bot_oneliner.html"
+	>Haskellのワンライナー</a> (工事中 0%)</li>
+<li>Nano Scheme: はじめに</li>
+<li>Nano Scheme: 整数値の表示</li>
+<li>Nano Scheme: 四則演算</li>
+<li>Nano Scheme: 変数定義</li>
+<li>Nano Scheme: 関数定義と呼び出し</li>
 </ul>
-
-<p>あたりかな。</p>
 
 <p>参考: <a href="/computer/haskell/web_lecture/for_programmer/codes/others/conv.hs"
 	>conv.hs</a></p>
-
-<ul>
-<li><a href="/computer/web/bot/hubot"
-	>準備1: HubotのインストールとHello, Bot!</a></li>
-<li>準備2: Slackのチャットルームを作る</li>
-<li>準備3: 外部コマンドの実行: Haskellのワンライナー</li>
-<li>準備4: エコーボットの作成</li>
-<li>どんなボットにするか
-	<ul>
-	<li>入力された文字列とランダム値とから返答を作る
-		<ul>
-		<li>interact以外のIOは使いたくない</li>
-		<li>入力からハッシュ値を作りそれをランダム値的なものとして使う</li>
-		<li>正確に同じ入力からは同じ出力となる</li>
-		</ul></li>
-	<li>人工無脳
-		<ul>
-		<li>日本語での簡単な質問に答えられたら楽しそうだが...</li>
-		<li>入力が不正だったときはランダムに適当な答えを返すと面白いかも</li>
-		</ul></li>
-	<li>もっと実用的なもの
-		<ul>
-		<li>今のところ外部からの入出力は使わない</li>
-		<li>計算をする</li>
-		<li>時間を返す</li>
-		<li>関数を実行する</li>
-		<li>カレンダーを表示する、これは時間を入手する必要がある</li>
-		</ul></li>
-	</ul></li>
-<li>ボットの実装</li>
-</ul>
 
 <h2>型クラス</h2>
 
