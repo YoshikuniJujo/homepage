@@ -2,6 +2,47 @@ Nano Scheme: 変数の評価
 
 <p>(工事中 0%)</p>
 
+<h2>はじめに</h2>
+
+<p>
+値の「評価」のしくみをつくるためにまずは初期環境に適当な変数を定義し
+その変数の値を「評価」してみる。
+</p>
+
+<h2>シンボル</h2>
+
+<h3>値構築子Symbol</h3>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/evalsym/Environment.hs"
+	>Environment.hs</a></p>
+
+<p><code>data Value<br/>
+	<span class="indent1">| Symbol Symbol</span><br/>
+	<span class="indent1">= Int Integer</span><br/>
+	</code></p>
+
+<p><code>showValue (Symbol s) = s<br/>
+showValue (Int i) = show i</code></p>
+
+<h3>トークン</h3>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/evalsym/Parse.hs"
+	>Parse.hs</a></p>
+
+<h3>字句解析</h3>
+
+<h3>構文解析</h3>
+
+<h2>評価</h2>
+
+<h3>テスト用変数</h3>
+
+<p>テスト用の変数を初期環境に定義する。</p>
+
+<h3>関数eval</h3>
+
+<h3>関数evaluate</h3>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/nsc_integer.html"
 	>「Nano Scheme: 整数値の表示」へもどる</a>
