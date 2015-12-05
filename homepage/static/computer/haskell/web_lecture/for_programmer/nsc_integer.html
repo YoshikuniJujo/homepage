@@ -83,20 +83,107 @@ tokens (c : s)<br/>
 		let (t, r) = span isDigit s in</span><br/>
 		<span class="indent2">(TkInt (read $ c : t) :)
 			`mapply` tokens r</span></br>
-	<span class="indent1">| isSpace c = tokens s</span>
+	<span class="indent1">| isSpace c = tokens s</span><br/>
 tokens "" = Just []<br/>
 tokens _ = Nothing</code></p>
 
-<p>(関数tokensの説明から)</p>
+<p>
+すこし難しいだろうか?
+ひとつひとつ見ていけば理解できるはずだ。
+こつは
+</p>
+
+<ul>
+<li>分解する</li>
+<li>意味を考える</li>
+<li>具体例を入れてみる</li>
+</ul>
+
+<p>
+だ。
+これらを順番にこだわらずにいろいろとやってみることだ。
+4行目のtokens rのあたりから見ていこう。
+rはspan isDigit sでわけられた残りの部分だ。
+(... :) `mapply` tokens rは基本的にはtokens rで求まる「残りの部分のトークン」
+の先頭に...の部分を追加したものだ。
+Just内の値に追加するためにmapplyが使われている。
+...の部分はTkInt (read $ c : t)であるがこれは
+先頭の数字に残りの数字を追加したものをreadでIntegerに解釈してTkIntで
+トークンにしている。
+</p>
+
+<p>
+isSpace cの節は空白文字を読みとばしている。
+</p>
+
+<p><code>% ghci Parse.hs<br/>
+*Parse&gt; tokens "135 459 231"<br/>
+[TkInt 135,TkInt 459,TkInt 231]<br/>
+*Parse&gt; tokens "135 can't tokenize it"<br/>
+Nothing</code></p>
+
+<p>
+数字の並びをトークン列に変換することができる。
+数字と空白文字以外の文字があったときに字句解析は失敗しNothingがかえる。
+</p>
 
 <h3>関数parse</h3>
+
+<p>
+関数parseは複数の式をパースして値のリストをかえす関数だ。
+まずはひとつの式をパースする関数parse1を作る。
+</p>
+
+<p><code>parse1 :: [Token] -&gt; Maybe (Value, [Token])<br/>
+parse1 (TkInt i : ts) = Just (Int i, ts)</code></p>
+
+<p>
+まだ整数型しかないので単に整数値のトークンを整数値の値とするだけだ。
+関数parseは関数parse1をくりかえし適用する。
+</p>
+
+<p><code>parse :: [Token] -&gt; Maybe [Value]<br/>
+parse [] = Just []<br/>
+parse ts = case parse1 ts of<br/>
+	<span class="indent1">Just (v, ts') -&gt;
+		(v :) `mapply` parse ts'</span><br/>
+	<span class="indent1">_ -&gt; Nothing</span><br/>
+	</code></p>
+
+<p>
+parse1 tsがJust値を返したとき(Just (v, ts') -&gt;)、
+残りのトークンであるts'をさらにパースした結果(リスト)の先頭に
+今回の結果vを追加する。
+Just値のなかに追加するのでmapplyを使っている。
+</p>
+
+<p><code>*Parse&gt; :reload<br/>
+*Parse&gt; map showValue `mapply` (parse `mbind` tokens "123 45 678 9")<br/>
+Just ["123","45","678","9"]</code></p>
+
+<p>
+parseやtokensはMaybe値を返す関数であるのに対して
+map showValueは普通の値を返す関数だ。
+mapplyとmbindの使いわけに注意する。
+</p>
 
 <h2>初期環境</h2>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/integer/Primitive.hs"
 	>Primitive.hs</a></p>
 
-<p><code>env0 :: ...</code></p>
+<p>
+初期環境にははじめから定義されている変数が定義される。
+ゆくゆくはここにプリミティブな関数等を定義するが今のところは空となる。
+</p>
+
+<p><code>module Primitive (env0) where</code></p>
+
+<p><code>import Environment</code></p>
+
+<p><code>env0 :: Env<br/>
+env0 = fromList [<br>
+	<span class="indent1">]</span></code></p>
 
 <h2>関数scheme</h2>
 
@@ -104,16 +191,123 @@ tokens _ = Nothing</code></p>
 	>nsc.hs</a></p>
 
 <p>
+拡張機能TupleSectionsを利用するのでファイルの先頭に
+</p>
+
+<p><code>{-# LANGUAGE TupleSections #-}</code></p>
+
+<p>
+とする。
+必要なモジュールを導入する。
+</p>
+
+<p><code>import Primitive<br/>
+import Parse<br/>
+import Environment<br/>
+import Maybe</code></p>
+
+<p>
 Nano Scheme(以下nscとする)は複数の式を評価しその結果を1行ずつ出力することにする。
 ソースコードの文字列と環境をとって複数の値と新しい環境を返す関数schemeを考える。
 構文解析や評価中にエラーが生じる可能性を考えて返り値はMaybe型の値とする。
 </p>
 
-<p><code>scheme :: String -&gt; Env -&gt; Maybe ([Value], Env)</code></p>
+<p><code>scheme :: String -&gt; Env -&gt; Maybe ([Value], Env)<br/>
+scheme src e = (, e) `mapply` (parse `mbind` tokens src)</code></p>
+
+<p>
+今のところ「評価」の段階はない。
+(, e) `mapply`によって環境は引数の環境のまま結果に追加される。
+parse `mbind` tokens srcでソースコードを字句解析し構文解析している。
+</p>
+
+<p>
+関数mainではinteractを使ってString -&gt; String型の関数をIO値に変換している。
+変換される関数の中身は(`scheme` env0)によってソースコードからMaybe ([Value], Env)型
+の値を作り、Nothingなら文字列"err"を返しそうでなければ、
+タプルのひとつめ(fst)であるValue型のリストの中身のすべてを
+文字列に変換(map showValue)してそれをunlinesで一行ずつの文字列にする。
+</p>
+
+<h2>試してみる</h2>
+
+<p>
+これで数値を構文解析して表示するコマンドが作れた。
+</p>
+
+<p><code>% echo '33 45 3 921' | runghc nsc.hs<br/>
+33<br/>
+45<br/>
+3<br/>
+921</code></p>
+
+<h2>Hubot</h2>
+
+<h3>Hubot用にmain関数に手を加える。</h3>
+
+<p>nscという文字列より後ろだけを取り出す関数rmvPrfxを作る。</p>
+
+<p><code>rmvPrfx :: String -&gt; String<br/>
+rmvPrfx ('n' : 's' : 'c' : s) = s<br/>
+rmvPrfx (_ : s) = rmvPrfx s<br/>
+rmvPrfx _ = ""</code></p>
+
+<p>
+Hubotで「入力される文字列」すべてを使おうとすると処理が終わらなくなるので
+最初の1行だけを取り出す。
+head . linesを追加すれば良い。
+</p>
+
+<p><code>main = interact $ maybe "err" (unlines . map showValue . fst)<br/>
+	<span class="indent1">. (`scheme` env0) . rmvPrfx . head . lines</span></code></p>
+
+<h3>試してみる</h3>
+
+<p>
+Hubotで試してみよう。
+hellobot/haskell以下にnano_schemeディレクトリを作成しそこにモジュールファイルを
+コピーする。
+必要なcoffeeスクリプトコードをscriptsディレクトリ下に置く。
+</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/integer/nano_scheme.coffee"
+	>nano_scheme.coffee</a></p>
+
+<p><code>spawn = require('child_process').spawn</code></p>
+
+<p><code>module.exports = (robot) -&gt; robot.hear /nsc/i, (msg) -&gt;<br/>
+	<span class="indent1">echo = spawn 'echo', [msg.message]</span><br/>
+	<span class="indent1">nsc = spawn 'runghc',
+		['-ihaskell/nano_scheme', 'haskell/nano_scheme/nsc.hs']</span><br/>
+	<span class="indent1">echo.stdout.on 'data', (data) -&gt;
+		nsc.stdin.write(data)</span><br/>
+	<span class="indent1">nsc.stdout.on 'data', (data) -&gt;
+		msg.send data.toString()</span><br/>
+	</code></p>
+
+<p>Hubotを再起動して試してみよう。</p>
+
+<p><code>nsc 123 4 56</code></p>
+
+<p>のようにすると</p>
+
+<p><code>123<br/>
+4<br/>
+56</code></p>
+
+<p>Hubotがのような結果をかえしてくれるはずだ。</p>
+
+<h2>まとめ</h2>
+
+<p>
+整数値の表示のところまでできた。
+字句解析や構文解析を含む枠組のスタブ的な実装を作った。
+次は値の「評価」の部分のスタブ的な実装をしてみよう。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/nsc_map.html"
 	>「Nano Scheme: Map型」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/nsc_evalsym.html"
+	>「Nano Scheme: 変数の評価」へ</a>
 </p>
