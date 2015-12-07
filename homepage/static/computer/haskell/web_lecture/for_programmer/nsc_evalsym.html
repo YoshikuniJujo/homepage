@@ -29,23 +29,138 @@ showValue (Int i) = show i</code></p>
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/evalsym/Parse.hs"
 	>Parse.hs</a></p>
 
+<p><code>data Token<br/>
+	<span class="indent1">= TkSym Symbol</span><br/>
+	<span class="indent1">| TkInt Integer</span><br/>
+	<span class="indent1">deriving Show</span></code></p>
+
 <h3>字句解析</h3>
 
+<p>シンボルに使える文字であることを確認する関数isSymChを定義する。</p>
+
+<p><code>isSymCh :: Char -&gt; Bool<br/>
+isSymCh c = any ($ c) [isAlphaNum, (`elem` "+-*/&lt;=&gt;?")]</code></p>
+
+<p>字句解析器を拡張する。</p>
+
+<p><code>tokens (c : s)<br/>
+	<span class="indent1">| isDigit c = ...</span><br/>
+	<span class="indent1">| isSymCh c = let (t, r) = span isSymCh s in</span><br/>
+		<span class="indent2">(TkSym (c : t) :) `mapply` tokens r</span><br/>
+	<span class="indent1">| isSpace c = ...</span><br/>
+tokens "" = Just []<br/>
+tokens _ = Nothing</code></p>
+
 <h3>構文解析</h3>
+
+<p>シンボルをとりだす。</p>
+
+<p><code>parse1 (TkSym s : ts) = Just (Symbol s, ts)</code></p>
+
+<p>の行を追加する。</p>
+
+<h2>ここまでを試す</h2>
+
+<p>
+とりあえずシンボルを読みこむことができる。
+シンボルに関連づけられている値のとりだしはまだだ。
+「そのまま」表示する。
+</p>
+
+<p><code>% echo "nsc hoge" | runghc -Wall nsc.hs<br/>
+hoge</code></p>
 
 <h2>評価</h2>
 
 <h3>テスト用変数</h3>
 
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/evalsym/Primitive.hs"
+	>Primitive.hs</a></p>
+
 <p>テスト用の変数を初期環境に定義する。</p>
+
+<p><code>env0 = fromList [<br/>
+	<span class="indent1">("hoge", Int 12345)</span><br/>
+	<span class="indent1">]</span></code></p>
+
+<h3>変数値の参照</h3>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/evalsym/Environment.hs"
+	>Environment.hs</a></p>
+
+<p>変数の値を環境からとりだす関数referを定義する。</p>
+
+<p><code>refer :: Symbol -&gt; Env -&gt; Maybe Value<br/>
+refer = M.lookup</code></p>
+
+<p>
+関数referはData.Mapモジュールの関数lookupがそのまま使える。
+関数referを公開する。
+</p>
+
+<p><code>module Environment (Env, M.fromList, refer,
+	Value(..), showValue, Symbol) where</code></p>
 
 <h3>関数eval</h3>
 
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/evalsym/Eval.hs"
+	>Eval.hs</a></p>
+
+<p>
+モジュールEvalを作り評価関数を作る。
+</p>
+
+<p><code>{-# LANGUAGE TupleSections #-}</code></p>
+
+<p><code>module Eval (eval) where</code></p>
+
+<p><code>import Environment<br/>
+import Maybe</code></p>
+
+<p><code>eval :: Value -&gt; Env -&gt; Maybe (Value, Env)<br/>
+eval (Symbol s) e = (, e) `mapply` refer s e<br/>
+eval i@(Int _) e = Just (i, e)</code></p>
+
 <h3>関数evaluate</h3>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/evalsym/nsc.hs"
+	>nsc.hs</a></p>
+
+<p>
+Value型のリストの各要素を次々に評価していく関数evaluateを作る。
+まずはモジュールEvalを導入する。
+</p>
+
+<p><code>import Eval</code></p>
+
+<p>関数evaluateを定義する。</p>
+
+<p><code>evaluate :: [Value] -&gt; Env -&gt; Maybe ([Value], Env)<br/>
+evaluate [] e = Just ([], e)<br/>
+evaluate (v : vs) e = case eval v e of<br/>
+	<span class="indent1">Just (v', e') -&gt; (\(vs', e'') -&gt; (v' : vs', e'')) `mapply` evaluate vs e'</span><br/>
+	<span class="indent1">_ -&gt; Nothing</span></code></p>
+
+<p>関数schemeにevaluateの段階を追加する。</p>
+
+<p><code>scheme src e = (`evaluate` e) `mbind` (parse `mbind` tokens src)</code></p>
+
+<h2>変数の評価を試す</h2>
+
+<p><code>% echo 'nsc hoge' | runhaskell -Wall nsc.hs<br/>
+12345</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+整数値に続いてシンボルという値を追加した。
+シンボルは環境を参照して対応する値に評価される。
+「評価」の枠組みを作成した。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/nsc_integer.html"
 	>「Nano Scheme: 整数値の表示」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/nsc_calc.html"
+	>「Nano Scheme: 四則演算」へ</a>
 </p>
