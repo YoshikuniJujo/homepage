@@ -88,21 +88,81 @@ eval s@(Subr _ _) e = Just (s, e)</code></p>
 手続き部分を評価した結果で引数部分を評価するかどうかを決めるようにする。
 </p>
 
+<h3>関数eval</h3>
+
+<p>
+まずは関数evalでリスト値では関数applyが呼び出されるようにする。
+<code>eval l@(List _) e = ...</code>の行を以下でおきかえる。
+</p>
+
+<p><code>eval (List (v : vs)) e = (\(f, e') -&gt; apply f vs e') `mbind` eval v e</code></p>
+
+<p>
+リストの先頭の要素を「評価」してその結果と残りの値のリスト、
+それと更新された環境を引数として関数applyを呼んでいる。
+</p>
+
+<h3>関数apply</h3>
+
+<p><code>apply :: Value -&gt; [Value] -&gt; Env -&gt; Maybe (Value, Env)<br/>
+apply (Subr _ s) vs e = (\(as, e') -&gt; s as e') `mbind` evaluate vs e<br/>
+apply _ _ _ = Nothing</code></p>
+
+<p>
+適用するものがSubrであれば残りの値をすべて評価したうえで
+保持されている関数を適用する。
+</p>
+
 <h2>足し算を試す</h2>
 
-<h2>かけ算の追加</h2>
+<p><code>% echo 'nsc (+ 3 8)' | runghc -Wall nsc.hs<br/>
+11<br/>
+% echo 'nsc (+ (+ 3 8) (+ 5 7)' | runghc -Wall nsc.hs<br/>
+18</code></p>
 
-<h2>引き算の追加</h2>
+<h2>引き算、かけ算の追加</h2>
+
+<p>関数sub, mulを追加する。</p>
+
+<p><code>add, sub, mul :: [Value] -&gt; Env -&gt; Maybe (Value, Env)<br/>
+add ...</code></p>
+
+<p><code>sub [Int m, Int n] e = Just (Int $ m - n, e)<br/>
+sub _ _ = Nothing</code></p>
+
+<p><code>mul [Int m, Int n] e = Just (Int $ m * n, e)<br/>
+mul _ _ = Nothing</code></p>
+
+<p>変数-, *を追加する。</p>
+
+<p><code>env0 = fromList [<br/>
+	<span class="indent1">...</span><br/>
+	<span class="indent1">("-", Subr "-" sub),</span><br/>
+	<span class="indent1">("*", Subr "*" mul)</span><br/>
+	<span class="indent1">]</span></code></p>
 
 <h2>試してみる</h2>
 
 <h3>コマンドライン</h3>
 
+<p><code>% echo 'nsc (* (+ 3 8) (- 5 2))' | runghc -Wall nsc.hs<br/>
+33</code></p>
+
 <h3>Hubotで</h3>
+
+<p>Hubotを再起動して</p>
+
+<p>nsc (* (+ 3 8) (- 5 2))</p>
+
+<p>とすると</p>
+
+<p>33</p>
+
+<p>という答えが返る。</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/nsc_list.html"
 	>「Nano Scheme: リスト」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/nsc_defsym.html"
+	>「Nano Scheme: 変数の定義」へ</a>
 </p>
