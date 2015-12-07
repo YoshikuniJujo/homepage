@@ -112,7 +112,7 @@ refer = M.lookup</code></p>
 
 <p><code>{-# LANGUAGE TupleSections #-}</code></p>
 
-<p><code>module Eval (eval) where</code></p>
+<p><code>module Eval (evaluate) where</code></p>
 
 <p><code>import Environment<br/>
 import Maybe</code></p>
@@ -123,23 +123,22 @@ eval i@(Int _) e = Just (i, e)</code></p>
 
 <h3>関数evaluate</h3>
 
-<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/evalsym/nsc.hs"
-	>nsc.hs</a></p>
-
-<p>
-Value型のリストの各要素を次々に評価していく関数evaluateを作る。
-まずはモジュールEvalを導入する。
-</p>
-
-<p><code>import Eval</code></p>
-
-<p>関数evaluateを定義する。</p>
+<p>Value型のリストの各要素を次々に評価していく関数evaluateを作る。</p>
 
 <p><code>evaluate :: [Value] -&gt; Env -&gt; Maybe ([Value], Env)<br/>
 evaluate [] e = Just ([], e)<br/>
 evaluate (v : vs) e = case eval v e of<br/>
 	<span class="indent1">Just (v', e') -&gt; (\(vs', e'') -&gt; (v' : vs', e'')) `mapply` evaluate vs e'</span><br/>
 	<span class="indent1">_ -&gt; Nothing</span></code></p>
+
+<h2>モジュールMain</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/evalsym/nsc.hs"
+	>nsc.hs</a></p>
+
+<p>まずはモジュールEvalを導入する。</p>
+
+<p><code>import Eval</code></p>
 
 <p>関数schemeにevaluateの段階を追加する。</p>
 
