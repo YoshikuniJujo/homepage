@@ -1,0 +1,130 @@
+Nano Scheme: リスト
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+Scheme等のLisp系の言語はコードをまずはリスト(コンス)にまで解析し、
+そのリストの1番目の手続きを2番目以降を引数として実行する。
+そのためまずはValue型にリスト値を追加する。
+</p>
+
+<h2>リスト値を追加</h2>
+
+<p>Value型にList値を追加する。</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/list/Environment.hs"
+	>Environment.hs</a></p>
+
+<p><code>data Value<br/>
+	<span class="indent1">= Symbol Symbol</span><br/>
+	<span class="indent1">| Int Integer</span><br/>
+	<span class="indent1">| List [Value]</span></code></p>
+
+<p>表示関数にもList値を追加する。</p>
+
+<p><code>showValue :: Value -&gt; String<br/>
+showValue (Symbol s) = s<br/>
+showValue (Int i) = show i<br/>
+showValue (List vs) = "(" ++ unwords (map showValue vs) ++ ")"</code></p>
+
+<h2>トークン</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/list/Parse.hs"
+	>Parse.hs</a></p>
+
+<p>トークンに開き丸括弧と閉じ丸括弧とを追加する。</p>
+
+<p><code>data Token<br/>
+	<span class="indent1">= TkSym Symbol</span><br/>
+	<span class="indent1">| TkInt Integer</span><br/>
+	<span class="indent1">| TKOPr</span><br/>
+	<span class="indent1">| TKCPr</span><br/>
+	<span class="indent1">deriving Show</span></code></p>
+
+<h2>字句解析</h2>
+
+<p>'('と')'とをトークンにする。</p>
+
+<p><code>tokens :: String -&gt; Maybe [Token]<br/>
+tokens ('(' : s) = (TKOPr :) `mapply` tokens s<br/>
+tokens (')' : s) = (TKCPr :) `mapply` tokens s<br/>
+tokens (c : s)<br/>
+	<span class="indent1">| ...</span></code></p>
+
+<h2>構文解析</h2>
+
+<p>
+開き丸括弧を読みこんだらリストの構文解析にうつる。
+parse1とparseLとは相互再帰的に呼びあっている。
+</p>
+
+<p><code>parse1 (TkInt i : ts) = Just (Int i, ts)<br/>
+parse1 (TkOPr : ts) = (\(vs, ts') -&gt; (List vs, ts')) `mapply` parseL ts</code></p>
+
+<p>
+関数parseLの返り値の型は([Value], [Token])である。
+タプルの第1要素に値構築子Listを適用することで[Value]をValueに変換する。
+</p>
+
+<p><code>parseL :: [Token] -&gt; Maybe ([Value], [Token])<br/>
+parseL (TkCPr : ts) = Just ([], ts)<br/>
+parseL ts = case parse1 ts of<br/>
+	<span class="indent1">Just (v, ts') -&gt; (\(vs, ts'') -&gt; (v : vs, ts'')) `mapply` parseL ts'</span><br/>
+	<span class="indent1">_ -&gt; Nothing</span></code></p>
+
+<p>
+閉じ括弧を読みこんだらリストの読みこみは終了する。
+そうでないなら値をひとつ読みこみ、成功すれば残りのトークンからリストを読みこむ。
+その結果得られた値のリストに読みこんだ値を追加する。
+</p>
+
+<h2>評価</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/list/Eval.hs"
+	>Eval.hs</a></p>
+
+<p>
+本当はリストの先頭の値を残りの値に適用する。
+まだ「適用可能な値」つまり「手続き」や「特殊形式」「ラムダ」を
+定義していないので今のところは、リストの評価は何もしない。
+</p>
+
+<p><code>eval :: Value -&gt; Env -&gt; Maybe (Value, Env)<br/>
+eval (Symbol s) e = (, e) `mapply` refer s e<br/>
+eval i@(Int _) e = Just (i, e)<br/>
+eval l@(List _) e = Just (l, e)</code></p>
+
+<h2>試してみる</h2>
+
+<h3>コマンドラインで</h3>
+
+<p><code>% echo 'nsc (123 45 6)' | runghc -Wall nsc.hs<br/>
+(123 45 6)</code></p>
+
+<h3>Hubotで</h3>
+
+<p>Hubotを再起動して</p>
+
+<p><code>nsc (123 45 6)</code></p>
+
+<p>とすると</p>
+
+<p><code>(123 45 6)</code></p>
+
+<p>と答える。</p>
+
+<h2>まとめ</h2>
+
+<p>
+リストの読みこみを実装した。
+今のところは「評価」は何もしない。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/nsc_evalsym.html"
+	>「Nano Scheme: 変数の評価」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/nsc_calc.html"
+	>「Nano Scheme: 四則演算」へ</a>
+</p>
