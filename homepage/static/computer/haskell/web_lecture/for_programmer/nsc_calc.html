@@ -6,7 +6,99 @@ Nano Scheme: 四則演算
 
 <p>
 四則演算のうち加算、減算、乗算を実装する。
+本格的なSchemeではこれらの演算は3引数以上でも使えるリストに対する演算となっている。
+簡単のためここでは2項演算のみに限る。
 </p>
+
+<h2>演算を保持する値</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/calc/Environment.hs"
+	>Environment.hs</a></p>
+
+
+<p>演算を保持する値をValue型に追加する。</p>
+
+<p><code>data Value<br/>
+	<span class="indent1">= Symbol Symbol</span><br/>
+	<span class="indent1">| Int Integer</span><br/>
+	<span class="indent1">| List [Value]</span><br/>
+	<span class="indent1">| Subr Symbol ([Value] -&gt; Env -&gt; Maybe (Value, Env))</span></code></p>
+
+<p>
+表示のために名前を保持するSymbol型のスロットが用意してある。
+表示する。
+</p>
+
+<p><code>showValue (List vs) = ...<br/>
+showValue (Subr n _) = "#&lt;subr " ++ n ++ "&gt;"</code></p>
+
+<h2>初期環境</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/calc/Primitive.hs"
+	>Primitive.hs</a></p>
+
+<p>+演算子の動作を関数addとして定義する。</p>
+
+<p><code>add ::[Value] -&gt; Env -&gt; Maybe (Value, Env)<br/>
+add [Int m, Int n] e = Just (Int $ m + n, e)<br/>
+add _ _ = Nothing</code></p>
+
+<p>
+引数が2個で整数値であればそれらを足した整数値を返す。
+環境は変更しない。
+そうでなければエラーとしてNothing値を返す。
+初期環境に+演算子を追加する。
+</p>
+
+<p><code>env0 = fromList [<br/>
+	<span class="indent1">("hoge", Int 12345),</span><br/>
+	<span class="indent1">("+", Subr "+" add)</span><br/>
+	<span class="indent1">]</span></code></p>
+
+<h2>演算そのものの評価</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/calc/Eval.hs"
+	>Eval.hs</a></p>
+
+<p>
+演算そのものは初期環境で変数を束縛するという形でしか存在できない。
+「ラムダ」とは違いリテラルはないのでこれ自体が「評価」されることはない。
+よって基本的に実行されることはないがいちおう「演算そのもの」はそれ自体に
+評価されるようにしておく。
+</p>
+
+<p><code>...<br/>
+eval l@(List _) e = Just (l, e)<br/>
+eval s@(Subr _ _) e = Just (s, e)</code></p>
+
+<h2>ここまでを試してみる</h2>
+
+<p>
+とりあえず変数+に足し算という手続きを定義したのでそれを表示する。
+</p>
+
+<p><code>echo 'nsc +' | runghc -Wall nsc.hs<br/>
+#&lt;subr +&gt;</code></p>
+
+<h2>演算の適用の評価</h2>
+
+<p>
+リスト値の評価を変更し引数に手続きを適用するようにする。
+今後ifなどの「特殊形式」を実装していくことを考え、
+手続き部分を評価した結果で引数部分を評価するかどうかを決めるようにする。
+</p>
+
+<h2>足し算を試す</h2>
+
+<h2>かけ算の追加</h2>
+
+<h2>引き算の追加</h2>
+
+<h2>試してみる</h2>
+
+<h3>コマンドライン</h3>
+
+<h3>Hubotで</h3>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/nsc_list.html"
