@@ -2,9 +2,114 @@ Nano Scheme: 構文if
 
 <p>(工事中 0%)</p>
 
+<h2>はじめに</h2>
+
+<p>条件分岐が必要だ。構文ifを定義する。</p>
+
+<h2>真偽値</h2>
+
+<h3>値構築子を追加</h3>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/if/Environment.hs"
+	>Environment.hs</a></p>
+
+<p>真偽値を追加する。</p>
+
+<p><code>data Value<br/>
+	<span class="indent1">= Symbol Symbol</span><br/>
+	<span class="indent1">| Bool Bool</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span></code></p>
+
+<p>表示する。</p>
+
+<p><code>showValue (Bool False) = "#f"<br/>
+showValue (Bool True) = "#t"</code></p>
+
+<h3>トークン</h3>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/if/Parse.hs"
+	>Parse.hs</a></p>
+
+<p><code>data Token<br/>
+	<span class="indent1">= TkSym Symbol</span><br/>
+	<span class="indent1">| TkBool Bool</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	</code></p>
+
+<h3>字句解析</h3>
+
+<p><code>tokens (')' : s) = ...<br/>
+tokens ('#' : 'f' : s) = (TkBool False :) `mapply` tokens s<br/>
+tokens ('#' : 't' : s) = (TkBool True :) `mapply` tokens s<br/>
+tokens (c : s)<br/>
+...</code></p>
+
+<h3>構文解析</h3>
+
+<p><code>parse1 (TkBool b : ts) = Just (Bool b, ts)</code></p>
+
+<h3>評価</h3>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/if/Eval.hs"
+	>Eval.hs</a></p>
+
+<p><code>eval b@(Bool _) e = Just (b, e)</code></p>
+
+<h2>試してみる</h2>
+
+<p><code>% echo 'nsc #f' | runghc -Wall nsc.hs<br/>
+#f</code></p>
+
+<h2>構文if</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/if/Primitive.hs"
+	>Primitive.hs</a></p>
+
+<p>Bool値に変換する関数を作る。</p>
+
+<p><code>bool :: (Value, Env) -&gt; (Bool, Env)<br/>
+bool (Bool False, e) = (False, e)<br/>
+bool (_, e) = (True, e)</code></p>
+
+<p>関数ifsを定義する。</p>
+
+<p><code>ifs :: [Value] -&gt; Env -&gt; Maybe (Value, Env)<br/>
+ifs [p, th, el] e = (\(b, e') -&gt; if b then eval th e' else eval el e')<br/>
+	<span class="indent1">`mbind` (bool `mapply` eval p e)</span><br/>
+ifs _ _ = Nothing</code></p>
+
+<p>変数ifを定義する。</p>
+
+<p><code>env0 = fromList [<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">("if", Sntx "if" ifs),</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	</code></p>
+
+<h2>試してみる</h2>
+
+<p><code>% echo 'nsc (if #t 5 8)' | runghc -Wall nsc.hs<br/>
+5<br/>
+% echo 'nsc (if #f 5 8)' | runghc -Wall nsc.hs<br/>
+8</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+構文ifを定義した。
+</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/nsc_lambda.html"
 	>「Nano Scheme: 関数定義と呼び出し」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/nsc_ltt.html"
+	>「Nano Scheme: 演算子&lt;の定義」へ</a>
 </p>
