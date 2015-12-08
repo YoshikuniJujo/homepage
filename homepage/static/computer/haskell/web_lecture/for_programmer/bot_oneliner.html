@@ -1,6 +1,6 @@
 ボットを作る: Haskellのワンライナー
 
-<p>(工事中 0%)</p>
+<p>(工事中 30%)</p>
 
 <h2>GHCでワンライナーを実行する</h2>
 
@@ -40,8 +40,8 @@ spawn = require('child_process').spawn</code></p>
 	<span class="indent1">reverse.stdout.on 'data', (data) -&gt; msg.send data.toString()</span></code></p>
 
 <P>
-reverseという語を含む書きこみをすると
-その行を反転させた文字列で応えてくれるはずだ。
+reverseという語をふくむ書きこみをすると
+その行を反転させた文字列で答えてくれる。
 </p>
 
 <h2>自分で書いたコードを実行するには</h2>
@@ -59,6 +59,13 @@ main = interact $ (++ "\n") . reverse . head . lines</code></p>
 <p>
 <code>ghc</code>を<code>runghc</code>とし引数リストの部分を
 <code>['haskell/reverse.hs']とする。</code>
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+HaskellのワンライナーをHubotで実行させた。
+同じことをファイルに保存したソースコードでも行った。
 </p>
 
 <p>

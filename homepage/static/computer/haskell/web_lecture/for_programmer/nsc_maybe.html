@@ -1,6 +1,6 @@
 Nano Scheme: Maybe型の演算
 
-<p>(工事中 0%)</p>
+<p>(工事中 30%)</p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/integer/Maybe.hs"
 	>Maybe.hs</a></p>
@@ -8,15 +8,14 @@ Nano Scheme: Maybe型の演算
 <h2>はじめに</h2>
 
 <p>
-Nano Schemeを作っていくなかでエラーの可能性というものを常に考えなければならない。
-構文エラーも生じうるし値の評価中にもエラーは生じうる。
-今回はエラーの可能性をMaybe型の値で表現する。
-Maybe型について以下の関数を定義しておくと便利だ。
+Nano Schemeのなかではエラーの可能性がいたるところにある。
+構文エラーもあるし値の評価にもエラーがある。
+エラーの可能性をMaybe値で表す。以下の関数を定義しておく。
 </p>
 
 <ul>
-<li>Just値の中身に普通の関数を適用しJust値として返す。Nothing値はNothing値とする</li>
-<li>Just値の中身にMaybe型の値を返す関数を適用する。Nothing値はNothing値とする</li>
+<li>Just値のなかみに関数を適用しJust値として返す。Nothing値はNothing値のまま</li>
+<li>Just値のなかみにMaybe型の値を返す関数を適用する。Nothing値はNothing値のまま</li>
 </ul>
 
 <p><code>% vi Maybe.hs<br/>
@@ -55,15 +54,14 @@ Nothing<br/>
 Nothing</code></p>
 
 <p>
-lookup関数の結果をsafeRecipに渡している。
-どちらも「失敗」の可能性のある関数でありどちらかが失敗すれば全体が失敗する。
+lookup関数の結果をsafeRecipにわたす。どちらにも「失敗」の可能性がある。
+どちらかが失敗すれば全体の失敗となる。
 </p>
 
 <h2>まとめ</h2>
 
 <p>
-Maybe値を扱う関数を定義して失敗する可能性のある演算をつなげていくことができる
-ようにした。
+Maybe値を扱う関数を定義した。失敗の可能性のある演算をつなげていける。
 </p>
 
 <p>

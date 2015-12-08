@@ -1,14 +1,10 @@
 Nano Scheme: 整数値の表示
 
-<p>(工事中 0%)</p>
+<p>(工事中 30%)</p>
 
 <h2>はじめに</h2>
 
-<p>
-整数値の入力と表示を実装する。
-構文解析や値の評価をする関数も作成する。
-整数値はそのままの整数値に評価されるので評価関数はスタブ的なものとなる。
-</p>
+<p>整数値の入力と表示を実装する。</p>
 
 <h2>型Value</h2>
 
@@ -16,8 +12,8 @@ Nano Scheme: 整数値の表示
 	>Environment.hs</a></p>
 
 <p>
-環境やそれに関する演算を置くためのモジュールEnvironmentを作る。
-型Envは変数と値を対応づける辞書だ。今はまだ使わないが定義しておく。
+モジュールEnvironmentではNano Schemeで使う値や環境について定義する。
+Env型の値は変数と値を対応づける辞書だ。
 </p>
 
 <p><code>module Environment (Env, M.fromList, Value(..), showValue, Symbol) where</code></p>
@@ -26,17 +22,17 @@ Nano Scheme: 整数値の表示
 
 <p><code>type Env = M.Map Symbol Value</code></p>
 
-<p>型Valueを定義する。まずは整数値のみとする。</p>
+<p>型Valueを定義する。いまは整数値のみだ。</p>
 
 <p><code>data Value =<br/>
 	<span class="indent1">Int Integer</span></code></p>
 
-<p>表示用の関数も用意しておこう。</p>
+<p>専用の表示関数も用意する。</p>
 
 <p><code>showValue :: Value -&gt; String<br/>
 showValue (Int i) = show i</code></p>
 
-<p>型SymbolはStringの別名とする。</p>
+<p>型Symbolを型Stringの別名として定義する。</p>
 
 <p><code>type Symbol = String</code></p>
 
@@ -50,12 +46,11 @@ showValue (Int i) = show i</code></p>
 	>Parse.hs</a></p>
 
 <p>
-モジュールParseは関数parseを公開する。
-モジュールEnvironmentのValue型やモジュールMaybeのMaybe型を扱う関数を使う。
-モジュールData.Charも導入する。
+モジュールParseでは字句解析器と構文解析器を定義する。
+公開する名前のリストを設定し、必要なモジュールを導入しておく。
 </p>
 
-<p><code>module Parse (parse) where</code></p>
+<p><code>module Parse (Token) where</code></p>
 
 <p><code>import Data.Char</code></p>
 
@@ -64,10 +59,7 @@ import Maybe</code></p>
 
 <h3>型Token</h3>
 
-<p>
-字句解析の結果であり構文解析器の引数となるのがトークン列である。
-まずは整数値のトークンのみだ。
-</p>
+<p>字句解析器から構文解析器にわたされる値だ。整数値のトークンを定義する。</p>
 
 <p><code>data Token<br/>
 	<span class="indent1">= TkInt Integer</span><br/>
@@ -88,33 +80,14 @@ tokens "" = Just []<br/>
 tokens _ = Nothing</code></p>
 
 <p>
-すこし難しいだろうか?
-ひとつひとつ見ていけば理解できるはずだ。
-こつは
+1文字目が数字ならばspan isDigitで数字だけの部分tと残りrとにわける。
+read $ c : tで整数値に変換してTkIntでValue型の値とする。
+その値を残りの文字列rから作られたトークン列に追加すれば良い。
+演算子:によって追加できるがtokens rはMaybe値を返すのでmapplyを
+使ってJustのなかみに追加するようにする。
 </p>
 
-<ul>
-<li>分解する</li>
-<li>意味を考える</li>
-<li>具体例を入れてみる</li>
-</ul>
-
-<p>
-だ。
-これらを順番にこだわらずにいろいろとやってみることだ。
-4行目のtokens rのあたりから見ていこう。
-rはspan isDigit sでわけられた残りの部分だ。
-(... :) `mapply` tokens rは基本的にはtokens rで求まる「残りの部分のトークン」
-の先頭に...の部分を追加したものだ。
-Just内の値に追加するためにmapplyが使われている。
-...の部分はTkInt (read $ c : t)であるがこれは
-先頭の数字に残りの数字を追加したものをreadでIntegerに解釈してTkIntで
-トークンにしている。
-</p>
-
-<p>
-isSpace cの節は空白文字を読みとばしている。
-</p>
+<p>isSpace cの節は空白文字を読みとばしている。</p>
 
 <p><code>% ghci Parse.hs<br/>
 *Parse&gt; tokens "135 459 231"<br/>
@@ -123,22 +96,26 @@ isSpace cの節は空白文字を読みとばしている。
 Nothing</code></p>
 
 <p>
-数字の並びをトークン列に変換することができる。
-数字と空白文字以外の文字があったときに字句解析は失敗しNothingがかえる。
+数字の並びをトークン列に変換した。
+数字と空白文字以外があると字句解析は失敗しNothingとなる。
+公開する名前のリストにtokensを追加する。
 </p>
+
+<p><code>module Parse (Token, tokens) where</code></p>
 
 <h3>関数parse</h3>
 
 <p>
-関数parseは複数の式をパースして値のリストをかえす関数だ。
-まずはひとつの式をパースする関数parse1を作る。
+関数parseは複数の式をパースして値のリストをかえす。
+ひとつの式をパースする関数parse1を作る。
 </p>
 
 <p><code>parse1 :: [Token] -&gt; Maybe (Value, [Token])<br/>
-parse1 (TkInt i : ts) = Just (Int i, ts)</code></p>
+parse1 (TkInt i : ts) = Just (Int i, ts)<br/>
+parse1 [] = Nothing</code></p>
 
 <p>
-まだ整数型しかないので単に整数値のトークンを整数値の値とするだけだ。
+整数値しかないので整数値のトークンを整数値の値とするだけだ。
 関数parseは関数parse1をくりかえし適用する。
 </p>
 
@@ -152,9 +129,8 @@ parse ts = case parse1 ts of<br/>
 
 <p>
 parse1 tsがJust値を返したとき(Just (v, ts') -&gt;)、
-残りのトークンであるts'をさらにパースした結果(リスト)の先頭に
-今回の結果vを追加する。
-Just値のなかに追加するのでmapplyを使っている。
+残りのトークンであるts'をさらにパースした結果(リスト)の先頭に結果vを追加する。
+Just値のなかに追加するのでmapplyを使う。
 </p>
 
 <p><code>*Parse&gt; :reload<br/>
@@ -162,10 +138,11 @@ Just値のなかに追加するのでmapplyを使っている。
 Just ["123","45","678","9"]</code></p>
 
 <p>
-parseやtokensはMaybe値を返す関数であるのに対して
-map showValueは普通の値を返す関数だ。
-mapplyとmbindの使いわけに注意する。
+parseやtokensはMaybe値を、map showValueはふつうの値を返す。
+mapplyとmbindを使いわける。公開する名前のリストにparseを追加する。
 </p>
+
+<p><code>module Parse (Token, tokens, parse) where</code></p>
 
 <h2>初期環境</h2>
 
@@ -173,8 +150,7 @@ mapplyとmbindの使いわけに注意する。
 	>Primitive.hs</a></p>
 
 <p>
-初期環境にははじめから定義されている変数が定義される。
-ゆくゆくはここにプリミティブな関数等を定義するが今のところは空となる。
+初期環境にはじめから定義されている変数をプリミティブと呼ぶ。いまのところは空だ。
 </p>
 
 <p><code>module Primitive (env0) where</code></p>
@@ -190,16 +166,11 @@ env0 = fromList [<br>
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/integer/nsc.hs"
 	>nsc.hs</a></p>
 
-<p>
-拡張機能TupleSectionsを利用するのでファイルの先頭に
-</p>
+<p>拡張機能TupleSectionsを利用する。</p>
 
 <p><code>{-# LANGUAGE TupleSections #-}</code></p>
 
-<p>
-とする。
-必要なモジュールを導入する。
-</p>
+<p>とする。必要なモジュールを導入する。</p>
 
 <p><code>import Primitive<br/>
 import Parse<br/>
@@ -207,22 +178,26 @@ import Environment<br/>
 import Maybe</code></p>
 
 <p>
-Nano Scheme(以下nscとする)は複数の式を評価しその結果を1行ずつ出力することにする。
-ソースコードの文字列と環境をとって複数の値と新しい環境を返す関数schemeを考える。
-構文解析や評価中にエラーが生じる可能性を考えて返り値はMaybe型の値とする。
+Nano Scheme(以下nscとする)は複数の式を評価しその結果を1行ずつ出力する。
+ソースコードの文字列と環境をとって複数の値と新しい環境を返す関数schemeを作る。
+構文解析や評価中にエラーが生じる可能性がある。返り値はMaybe値だ。
 </p>
 
 <p><code>scheme :: String -&gt; Env -&gt; Maybe ([Value], Env)<br/>
 scheme src e = (, e) `mapply` (parse `mbind` tokens src)</code></p>
 
 <p>
-今のところ「評価」の段階はない。
-(, e) `mapply`によって環境は引数の環境のまま結果に追加される。
+まだ「評価」はない。
+(, e) `mapply`で引数の環境をそのまま結果に追加する。
 parse `mbind` tokens srcでソースコードを字句解析し構文解析している。
 </p>
 
+<p><code>main :: IO ()<br/>
+main = interact $ maybe "err" (unlines . map showValue . fst)<br/>
+	<span class="indent1">. (`scheme` env0)</span></code></p>
+
 <p>
-関数mainではinteractを使ってString -&gt; String型の関数をIO値に変換している。
+関数mainではinteractでString -&gt; String型の関数をIO値に変換する。
 変換される関数の中身は(`scheme` env0)によってソースコードからMaybe ([Value], Env)型
 の値を作り、Nothingなら文字列"err"を返しそうでなければ、
 タプルのひとつめ(fst)であるValue型のリストの中身のすべてを
@@ -231,15 +206,18 @@ parse `mbind` tokens srcでソースコードを字句解析し構文解析し�
 
 <h2>試してみる</h2>
 
-<p>
-これで数値を構文解析して表示するコマンドが作れた。
-</p>
+<p>数値を構文解析して表示するコマンドが作れた。</p>
 
-<p><code>% echo '33 45 3 921' | runghc nsc.hs<br/>
+<p><code>% echo '33 45 3 921' | runghc -Wall -fno-warn-tabs nsc.hs<br/>
 33<br/>
 45<br/>
 3<br/>
 921</code></p>
+
+<p>
+-Wallオプションは警告の表示を増やす。
+-fno-warn-tabsオプションはタブ文字使用の警告を抑制する。
+</p>
 
 <h2>Hubot</h2>
 
@@ -253,9 +231,8 @@ rmvPrfx (_ : s) = rmvPrfx s<br/>
 rmvPrfx _ = ""</code></p>
 
 <p>
-Hubotで「入力される文字列」すべてを使おうとすると処理が終わらなくなるので
-最初の1行だけを取り出す。
-head . linesを追加すれば良い。
+Hubotで「入力される文字列」すべてを対象にすると処理が終わらなくなる。
+最初の1行だけを取り出す。head . linesを追加する。
 </p>
 
 <p><code>main = interact $ maybe "err" (unlines . map showValue . fst)<br/>
@@ -285,24 +262,26 @@ hellobot/haskell以下にnano_schemeディレクトリを作成しそこにモ�
 		msg.send data.toString()</span><br/>
 	</code></p>
 
-<p>Hubotを再起動して試してみよう。</p>
+<p>
+-ihaskell/nano_schemeオプションでモジュールをさがすディレクトリを教える。
+Hubotを再起動して試す。
+</p>
 
 <p><code>nsc 123 4 56</code></p>
 
-<p>のようにすると</p>
+<p>のようにするとHubotは</p>
 
 <p><code>123<br/>
 4<br/>
 56</code></p>
 
-<p>Hubotがのような結果をかえしてくれるはずだ。</p>
+<p>と答える。</p>
 
 <h2>まとめ</h2>
 
 <p>
-整数値の表示のところまでできた。
+整数値の表示までできた。
 字句解析や構文解析を含む枠組のスタブ的な実装を作った。
-次は値の「評価」の部分のスタブ的な実装をしてみよう。
 </p>
 
 <p>
