@@ -2,9 +2,143 @@ Nano Scheme: 関数定義と呼び出し
 
 <p>(工事中 0%)</p>
 
+<h2>はじめに</h2>
+
+<p>
+まずはじめに(lambda (x) (* x x))のような形で無名関数を作る仕組みをつくる。
+それを変数に代入する(define f (lambda (x) (* x x)))。
+構文糖を作成し(define (f x) (* x x))で同じことができるようにする。
+</p>
+
+<h2>ラムダ</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/lambda/Environment.hs"
+	>Environment.hs</a></p>
+
+<p>
+ここではこのような「関数のようなもの」をラムダと呼んでおく。
+schemeでは環境を閉じこめるという意味でクロージャと呼んでいるが、
+今回は環境の閉じこめはしないのでクロージャとは呼べない。
+このラムダを表現する値をValue型に追加する。
+</p>
+
+<p><code>data Value<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">| Lmbd [Symbol] Value</code></p>
+
+<p>
+表示する。
+</p>
+
+<p><code>...<br/>
+showValue (Lmbd _ _) = "#&lt;lambda&gt;"</code></p>
+
+<h2>構文lambda</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/lambda/Primitive.hs"
+	>Primitive.hs</a></p>
+
+<p>
+ラムダを作成する構文lambdaを定義する。
+lambda関数を定義して
+</p>
+
+<p><code>lambda :: [Value] -&gt; Env -&gt; Maybe (Value, Env)<br/>
+lambda [ps, v] e = (\as -&gt; (Lmbd as v, e)) `mapply` symbols ps<br/>
+lambda _ _ = Nothing</code></p>
+
+<p><code>symbols :: Value -&gt; Maybe [symbol]<br/>
+symbols (List vs) = ss vs<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">ss (Symbol s : vs') = (s :) `mapply` ss vs'</span><br/>
+	<span class="indent1">ss [] = Just []</span><br/>
+	<span class="indent1">ss _ = Nothing</span><br/>
+symbols _ = Nothing</code></p>
+
+<p>lambda変数を定義する。</p>
+
+<p><code>env0 = fromList [<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">("lambda", Sntx "lambda" lambda),</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span></code></p>
+
+<h2>ラムダ自体の評価</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/lambda/Eval.hs"
+	>Eval.hs</a></p>
+
+<p>ラムダそのものは自分自身に評価される。</p>
+
+<p><code>...<br/>
+eval l@(Lmbd _ _) e = Just (l, e)</code></p>
+
+<h2>ラムダの適用</h2>
+
+<p>
+ラムダを適用するには実引数を仮引数に代入し、
+その環境内で本体部分を評価する。
+ラムダの実行後には新しく作られた環境は捨てられる。
+</p>
+
+<p><code>apply (Lmbd ps bd) vs e = (\(r, _) -&gt; (r, e)) `mapply`<br/>
+	<span class="indent1">(eval bd . foldr (uncurry set) e $ zip ps vs)</span></code></p>
+
+<h2>試してみる</h2>
+
+<p>lambdaで作ったラムダをすぐに使う例だ。</p>
+
+<p><code>echo 'nsc ((lambda (x) (* x x)) 8)' | runghc -Wall nsc.hs<br/>
+64</code></p>
+
+<p>defineで一度、変数に代入してから使う。</p>
+
+<p><code>echo 'nsc (define f (lambda (x) (* x x))) (f 9)' | runghc -Wall nsc.hs<br/>
+f<br/>
+81</code></p>
+
+<h2>関数定義を行う構文糖</h2>
+
+<p>
+関数の作成と変数への定義とを同時に行う構文糖を作成する。
+関数defineに動作を追加する。
+構文木を組み立ててevalしてしまえば簡単だ。
+</p>
+
+<p><code>define [sm@(Symbol s), v] e = ...<br/>
+define [List (sm@(Symbol _) : ps), v] e = (`eval` e) $ List [<br/>
+	<span class="indent1">Symbol "define", sm,
+		List [Symbol "lambda", List ps, v]]</span></code></p>
+
+<h2>試してみる</h2>
+
+<h3>コマンドラインで</h3>
+
+<p><code>echo 'nsc (define (f x) (* x x)) (f 9)' | runghc -Wall nsc.hs<br/>
+f<br/>
+81</code></p>
+
+<h3>Hubotで</h3>
+
+<p>Hubotを再起動して</p>
+
+<p>nsc (define (f x) (* x x)) (f 9)</p>
+
+<p>としてみよう。</p>
+
+<h2>まとめ</h2>
+
+<p>
+関数定義ができるようになった。
+</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/nsc_defsym.html"
 	>「Nano Scheme: 変数定義」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/nsc_if.html"
+	>「Nano Scheme: 構文if」へ</a>
 </p>
