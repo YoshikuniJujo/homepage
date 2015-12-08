@@ -85,8 +85,9 @@ eval l@(Lmbd _ _) e = Just (l, e)</code></p>
 ラムダの実行後には新しく作られた環境は捨てられる。
 </p>
 
-<p><code>apply (Lmbd ps bd) vs e = (\(r, _) -&gt; (r, e)) `mapply`<br/>
-	<span class="indent1">(eval bd . foldr (uncurry set) e $ zip ps vs)</span></code></p>
+<p><code>apply (Lmbd ps bd) vs e = (`mbind` evaluate vs e) $ \(as, e') -&gt;<br/>
+	<span class="indent1">(\(r, _) -&gt; (r, e')) `mapply`
+		(eval bd . foldr (uncurry set) e $ zip ps as)</span></code></p>
 
 <h2>試してみる</h2>
 
