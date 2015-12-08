@@ -2,9 +2,152 @@ Nano Scheme: 変数定義
 
 <p>(工事中 0%)</p>
 
+<h2>はじめに</h2>
+
+<p>
+以下のような形で変数を定義する。
+</p>
+
+<p><code>(define x 8)</code></p>
+
+<p>
+これは変数xを「評価」してはならないので普通の手続きではなく、
+「構文」または「特殊形式」ということになる。
+</p>
+
+<h2>構文という値</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/defsym/Environment.hs"
+	>Environment.hs</a></p>
+
+<p>
+「手続き」とほぼ同じだが「引数」が評価されることなくわたされるSntxという
+値をValue型に追加する。
+</p>
+
+<p><code>data Value<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">| Sntx Symbol
+		([Value] -&gt; Env -&gt; Maybe (Value, Env))</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	</code></p>
+
+<p>表示する。</p>
+
+<p><code>...<br/>
+showValue (Sntx n _) = "#&lt;syntax " ++ n ++ ">"<br/>
+...</code></p>
+
+<h2>環境に変数を追加</h2>
+
+<p>
+環境に変数を追加する関数setを定義する。
+これはData.Map.insertと同じものだ。
+</p>
+
+<p><code>refer :: Symbol -&gt; Env -&gt; Maybe Value<br/>
+refer = M.lookup</code></p>
+
+<p>
+公開リストに追加する。
+</p>
+
+<p><code>module Environment(<br/>
+	<span class="indent1">Env, M.fromList, refer, set,
+		Value(..), showValue, SymbolA</span></code><br/>
+) where</span></code></p>
+
+<h2>変数defineを初期環境に追加</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/defsym/Primitive.hs"
+	>Primitive.hs</a></p>
+
+<p>
+defineの動作は第2引数を評価して第1引数の変数の値として
+環境に追加することだ。
+関数evalを使うのでモジュールEvalの公開リストに追加する。
+</p>
+
+<p><code>module Eval (evaluate, eval) where</code></p>
+
+<p>モジュールPrimitiveにEvalを導入する。</p>
+
+<p><code>import Eval</code></p>
+
+<p>
+関数defineを定義する。
+</p>
+
+<p><code>define :: [Value] -&gt; Env -&gt; Maybe (Value, Env)<br/>
+define [sm@(Symbol s), v] e = (\(v', e') -&gt; (sm, set s v' e'))
+	`mapply` eval v e<br/>
+define _ _ = Nothing</code></p>
+
+<p>
+変数defineを定義する。
+</p>
+
+<p><code>env0 = fromList [<br/>
+	<span class="indent1">("define", Sntx "define" define),</span><br/>
+	<span class="indent1">...</span></code></p>
+
+<h2>構文そのものの評価</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/defsym/Eval.hs"
+	>Eval.hs</a></p>
+
+<p><code>...<br/>
+eval s@(Sntx _ _) e = Just (s, e)<br/>
+eval s@(Subr _ _) e = Just (s, e)</code></p>
+
+<h2>構文を引数に適用</h2>
+
+<p><code>...<br/>
+apply (Sntx _ s) vs e = s vs e<br/>
+apply (Subr _ s) vs e = ...<br/>
+...</code></p>
+
+<h2>試してみる</h2>
+
+<h3>コマンドラインから</h3>
+
+<p><code>% echo 'nsc (define x 15) x' | runghc -Wall nsc.hs<br/>
+x<br/>
+15<br/>
+% echo 'nsc (define x 15) (+ x (* x x))' | runghc -Wall nsc.hs<br/>
+240</code></p>
+
+<h3>Hubotで</h3>
+
+<p>Hubotを再起動する。</p>
+
+<p>nsc (define x 15) x</p>
+
+<p>とすると</p>
+
+<p>x<br/>
+15</p>
+
+<p>nsc (define x 15) (+ x (* x x))</p>
+
+<p>とすると</p>
+
+<p>x<br/>
+240</p>
+
+<h2>まとめ</h2>
+
+<p>
+変数の定義を実装した。
+</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/nsc_calc.html"
 	>「Nano Scheme: 四則演算」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/nsc_lambda.html"
+	>「Nano Scheme: 関数定義と呼び出し」へ</a>
 </p>
