@@ -1,13 +1,47 @@
 Nano Scheme: 演算子&lt;の定義
 
-<p>(工事中 0%)</p>
+<p>(工事中 30%)</p>
 
-<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/ltt/Eval.hs"
-	>Eval.hs</a></p>
+<h2>はじめに</h2>
+
+<p>演算子&lt;を追加する。</p>
+
+<h2>演算子&lt;の追加</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/ltt/Primitive.hs"
+	>Primitive.hs</a></p>
+
+<p>整数の2項演算子を追加するのは簡単だ。</p>
+
+<p><code>env0 = fromList [<br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">.</span><br/>
+	<span class="indent1">("&lt;", Subr . int2 $ (Bool .) . (&lt;))</span><br/>
+	<span class="indent1">]</span></code></p>
+
+<h2>試してみる</h2>
+
+<p><code>% echo 'nsc (define (fact n) (if (&lt; n 1) 1 (* n (fact (- n 1))))) (fact 10) | runghc -Wall -fno-warn-tabs nsc.hs<br/>
+fact<br/>
+3628800<br/>
+% echo 'nsc (define (fib a b n) (if (&lt; n 1) a (fib b (+ a b) (- n 1)))) (fib 0 1 10) (fib 0 1 100)' | runhaskell -Wall -fno-warn-tabs nsc.hs<br/>
+fib<br/>
+55<br/>
+354224848179261915075</code></p>
+
+<p>Hubotでも同じように試してみよう。</p>
+
+<h2>まとめ</h2>
+
+<p>
+演算子&lt;を追加した。
+階乗計算やフィボナッチ数列の関数が書ける。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/nsc_if.html"
 	>「Nano Scheme: 構文if」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/boollike_spec.html"
+	>「型クラス: 条件分岐をわかりにくくする」へ</a>
 </p>
