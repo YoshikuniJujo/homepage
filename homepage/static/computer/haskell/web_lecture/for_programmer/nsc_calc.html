@@ -1,13 +1,13 @@
 Nano Scheme: 四則演算
 
-<p>(工事中 0%)</p>
+<p>(工事中 30%)</p>
 
 <h2>はじめに</h2>
 
 <p>
 四則演算のうち加算、減算、乗算を実装する。
-本格的なSchemeではこれらの演算は3引数以上でも使えるリストに対する演算となっている。
-簡単のためここでは2項演算のみに限る。
+本格的なSchemeではこれらは3引数以上でも使えるリストに対する演算となっている。
+ここでは2項演算のみとする。
 </p>
 
 <h2>演算を保持する値</h2>
@@ -22,15 +22,13 @@ Nano Scheme: 四則演算
 	<span class="indent1">= Symbol Symbol</span><br/>
 	<span class="indent1">| Int Integer</span><br/>
 	<span class="indent1">| List [Value]</span><br/>
-	<span class="indent1">| Subr Symbol ([Value] -&gt; Env -&gt; Maybe (Value, Env))</span></code></p>
+	<span class="indent1">| Subr
+		([Value] -&gt; Env -&gt; Maybe (Value, Env))</span></code></p>
 
-<p>
-表示のために名前を保持するSymbol型のスロットが用意してある。
-表示する。
-</p>
+<p>表示する。</p>
 
 <p><code>showValue (List vs) = ...<br/>
-showValue (Subr n _) = "#&lt;subr " ++ n ++ "&gt;"</code></p>
+showValue (Subr _) = "#&lt;subr&gt;"</code></p>
 
 <h2>初期環境</h2>
 
@@ -44,56 +42,36 @@ add [Int m, Int n] e = Just (Int $ m + n, e)<br/>
 add _ _ = Nothing</code></p>
 
 <p>
-引数が2個で整数値であればそれらを足した整数値を返す。
-環境は変更しない。
-そうでなければエラーとしてNothing値を返す。
-初期環境に+演算子を追加する。
+引数が2個で整数値であればそれらを足した整数値を返す。環境は変更しない。
+そうでなければNothing値を返す。初期環境に+演算子を追加する。
 </p>
 
 <p><code>env0 = fromList [<br/>
 	<span class="indent1">("hoge", Int 12345),</span><br/>
-	<span class="indent1">("+", Subr "+" add)</span><br/>
+	<span class="indent1">("+", Subr add)</span><br/>
 	<span class="indent1">]</span></code></p>
 
-<h2>演算そのものの評価</h2>
+<h2>ここまでを試してみる</h2>
+
+<p>変数+に足し算という手続きを定義した。</p>
+
+<p><code>echo 'nsc +' | runghc -Wall nsc.hs<br/>
+#&lt;subr&gt;</code></p>
+
+<h2>演算の適用の評価</h2>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/calc/Eval.hs"
 	>Eval.hs</a></p>
 
 <p>
-演算そのものは初期環境で変数を束縛するという形でしか存在できない。
-「ラムダ」とは違いリテラルはないのでこれ自体が「評価」されることはない。
-よって基本的に実行されることはないがいちおう「演算そのもの」はそれ自体に
-評価されるようにしておく。
-</p>
-
-<p><code>...<br/>
-eval l@(List _) e = Just (l, e)<br/>
-eval s@(Subr _ _) e = Just (s, e)</code></p>
-
-<h2>ここまでを試してみる</h2>
-
-<p>
-とりあえず変数+に足し算という手続きを定義したのでそれを表示する。
-</p>
-
-<p><code>echo 'nsc +' | runghc -Wall nsc.hs<br/>
-#&lt;subr +&gt;</code></p>
-
-<h2>演算の適用の評価</h2>
-
-<p>
-リスト値の評価を変更し引数に手続きを適用するようにする。
-今後ifなどの「特殊形式」を実装していくことを考え、
-手続き部分を評価した結果で引数部分を評価するかどうかを決めるようにする。
+リスト値の評価は引数に手続きを適用するようにする。
+ifなどの「特殊形式」を実装することを考え、
+手続きの種類によって引数部分を評価するかどうかを決めるようにする。
 </p>
 
 <h3>関数eval</h3>
 
-<p>
-まずは関数evalでリスト値では関数applyが呼び出されるようにする。
-<code>eval l@(List _) e = ...</code>の行を以下でおきかえる。
-</p>
+<p>関数evalでリスト値では関数applyを呼び出すようにする。</p>
 
 <p><code>eval (List (v : vs)) e = (\(f, e') -&gt; apply f vs e') `mbind` eval v e</code></p>
 
@@ -105,12 +83,11 @@ eval s@(Subr _ _) e = Just (s, e)</code></p>
 <h3>関数apply</h3>
 
 <p><code>apply :: Value -&gt; [Value] -&gt; Env -&gt; Maybe (Value, Env)<br/>
-apply (Subr _ s) vs e = (\(as, e') -&gt; s as e') `mbind` evaluate vs e<br/>
+apply (Subr s) vs e = (\(as, e') -&gt; s as e') `mbind` evaluate vs e<br/>
 apply _ _ _ = Nothing</code></p>
 
 <p>
-適用するものがSubrであれば残りの値をすべて評価したうえで
-保持されている関数を適用する。
+適用するものがSubrなら残りの値をすべて評価してSubrの持つ関数を適用する。
 </p>
 
 <h2>足し算を試す</h2>
@@ -122,23 +99,63 @@ apply _ _ _ = Nothing</code></p>
 
 <h2>引き算、かけ算の追加</h2>
 
-<p>関数sub, mulを追加する。</p>
+<p>
+引き算やかけ算は足し算とほとんど同じ枠組みを共有している。
+まずは関数addからその枠組みを抽出する。
+2つの整数値をとりNano Schemeの扱う値を返す関数から、
+Subrのなかみとして使える関数に変換する関数を考えていく。
+関数addのもともとの定義を再掲する。
+</p>
 
-<p><code>add, sub, mul :: [Value] -&gt; Env -&gt; Maybe (Value, Env)<br/>
-add ...</code></p>
+<p><code>add :: [Value] -&gt; Env -&gt; Maybe (Value, Env)<br/>
+add [Int m, Int n] e = Just (Int $ m + n, e)<br/>
+add _ _ = Nothing</code></p>
 
-<p><code>sub [Int m, Int n] e = Just (Int $ m - n, e)<br/>
-sub _ _ = Nothing</code></p>
+<p>演算子+の部分を抽象化すれば良い。</p>
 
-<p><code>mul [Int m, Int n] e = Just (Int $ m * n, e)<br/>
-mul _ _ = Nothing</code></p>
+<p><code>int2 :: (Integer -&gt; Integer -&gt; Value) -&gt;
+	[Value] -&gt; Env -&gt; Maybe (Value, Env)<br/>
+int2 op [Int m, Int n] e = Just (m `op` n, e)<br/>
+int2 _ _ _ = Nothing</code></p>
+
+<p>こうすると関数addは以下のように書ける。</p>
+
+<p><code>add op vs e = int2 (\m n -&gt; Int $ m + n) op vs e</code></p>
+
+<p>引数op, vs, eは消せる。</p>
+
+<p><code>add = int2 (\m n -&gt; Int $ m + n)</code></p>
+
+<p>\m n -&gt; Int $ m + nの部分も以下のようにポイントフリースタイルに直せる。</p>
+
+<p><code>\m n -&gt; Int $ m + n<br/>
+\m n -&gt; Int . (m +) $ n<br/>
+\m -&gt; Int . (m +)<br/>
+\m -&gt; (Int .) $ (+) m<br/>
+\m -&gt; (Int .) . (+) $ m<br/>
+(Int .) . (+)</code></p>
+
+<p>
+[定石] 1変数関数fと2変数関数gとの関数合成は(f .) . gのようにできる。
+</p>
+
+<p>
+よって<code>add = int2 $ (Int .) . (+)</code>となる。
+ここまでくればわざわざ関数addを定義する必要もない。
+関数addの定義は削除して以下のように直接書ける。
+</p>
+
+<p><code>env0 = fromList [<br/>
+	<span class="indetn1">("hoge", Int 12345),</span><br/>
+	<span class="indetn1">("+", Subr . int2 $ (Int .) . (+))</span><br/>
+	<span class="indetn1">]</span></code></p>
 
 <p>変数-, *を追加する。</p>
 
 <p><code>env0 = fromList [<br/>
 	<span class="indent1">...</span><br/>
-	<span class="indent1">("-", Subr "-" sub),</span><br/>
-	<span class="indent1">("*", Subr "*" mul)</span><br/>
+	<span class="indent1">("-", Subr . int2 $ (Int .) . (-)),</span><br/>
+	<span class="indent1">("*", Subr . int2 $ (Int .) . (*))</span><br/>
 	<span class="indent1">]</span></code></p>
 
 <h2>試してみる</h2>

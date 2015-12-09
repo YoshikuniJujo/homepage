@@ -8,15 +8,15 @@ refer :: Symbol -> Env -> Maybe Value
 refer = M.lookup
 
 data Value
-	= Symbol Symbol
+	= Sym Symbol
 	| Int Integer
 	| List [Value]
-	| Subr Symbol ([Value] -> Env -> Maybe (Value, Env))
+	| Subr ([Value] -> Env -> Maybe (Value, Env))
 
 showValue :: Value -> String
-showValue (Symbol s) = s
+showValue (Sym s) = s
 showValue (Int i) = show i
+showValue (Subr _) = "#<subr>"
 showValue (List vs) = "(" ++ unwords (map showValue vs) ++ ")"
-showValue (Subr n _) = "#<subr " ++ n ++ ">"
 
 type Symbol = String

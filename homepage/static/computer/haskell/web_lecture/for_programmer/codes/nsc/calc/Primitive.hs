@@ -5,17 +5,11 @@ import Environment
 env0 :: Env
 env0 = fromList [
 	("hoge", Int 12345),
-	("+", Subr "+" add),
-	("-", Subr "-" sub),
-	("*", Subr "*" mul)
+	("+", Subr . int2 $ (Int .) . (+)),
+	("-", Subr . int2 $ (Int .) . (-)),
+	("*", Subr . int2 $ (Int .) . (*))
 	]
 
-add, sub, mul :: [Value] -> Env -> Maybe (Value, Env)
-add [Int m, Int n] e = Just (Int $ m + n, e)
-add _ _ = Nothing
-
-sub [Int m, Int n] e = Just (Int $ m - n, e)
-sub _ _ = Nothing
-
-mul [Int m, Int n] e = Just (Int $ m * n, e)
-mul _ _ = Nothing
+int2 :: (Integer -> Integer -> Value) -> [Value] -> Env -> Maybe (Value, Env)
+int2 op [Int m, Int n] e = Just (m `op` n, e)
+int2 _ _ _ = Nothing

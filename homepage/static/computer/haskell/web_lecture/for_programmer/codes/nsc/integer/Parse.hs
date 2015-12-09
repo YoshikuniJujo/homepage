@@ -1,4 +1,4 @@
-module Parse (Token, parse, tokens) where
+module Parse (Token, tokens, parse) where
 
 import Data.Char
 
@@ -25,3 +25,4 @@ parse ts = case parse1 ts of
 
 parse1 :: [Token] -> Maybe (Value, [Token])
 parse1 (TkInt i : ts) = Just (Int i, ts)
+parse1 _ = Nothing

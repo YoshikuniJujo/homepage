@@ -112,7 +112,7 @@ Nothing</code></p>
 
 <p><code>parse1 :: [Token] -&gt; Maybe (Value, [Token])<br/>
 parse1 (TkInt i : ts) = Just (Int i, ts)<br/>
-parse1 [] = Nothing</code></p>
+parse1 _ = Nothing</code></p>
 
 <p>
 整数値しかないので整数値のトークンを整数値の値とするだけだ。

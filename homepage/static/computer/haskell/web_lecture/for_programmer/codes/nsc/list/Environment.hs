@@ -8,12 +8,12 @@ refer :: Symbol -> Env -> Maybe Value
 refer = M.lookup
 
 data Value
-	= Symbol Symbol
+	= Sym Symbol
 	| Int Integer
 	| List [Value]
 
 showValue :: Value -> String
-showValue (Symbol s) = s
+showValue (Sym s) = s
 showValue (Int i) = show i
 showValue (List vs) = "(" ++ unwords (map showValue vs) ++ ")"
 

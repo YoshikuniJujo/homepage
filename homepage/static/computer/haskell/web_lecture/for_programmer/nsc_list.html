@@ -1,33 +1,35 @@
 Nano Scheme: リスト
 
-<p>(工事中 0%)</p>
+<p>(工事中 30%)</p>
 
 <h2>はじめに</h2>
 
 <p>
-Scheme等のLisp系の言語はコードをまずはリスト(コンス)にまで解析し、
-そのリストの1番目の手続きを2番目以降を引数として実行する。
-そのためまずはValue型にリスト値を追加する。
+SchemeなどのLisp系の言語はコードをリスト(コンス)に解析し、
+リストの1番目の手続きを2番目以降の引数に適用する。
+Nano Schemeの値にリスト値を追加する。
 </p>
 
 <h2>リスト値を追加</h2>
 
-<p>Value型にList値を追加する。</p>
-
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/list/Environment.hs"
 	>Environment.hs</a></p>
 
+<p>Value型にList値を追加する。</p>
+
 <p><code>data Value<br/>
-	<span class="indent1">= Symbol Symbol</span><br/>
+	<span class="indent1">= Sym Symbol</span><br/>
 	<span class="indent1">| Int Integer</span><br/>
 	<span class="indent1">| List [Value]</span></code></p>
 
-<p>表示関数にもList値を追加する。</p>
+<p>表示する。</p>
 
 <p><code>showValue :: Value -&gt; String<br/>
 showValue (Symbol s) = s<br/>
 showValue (Int i) = show i<br/>
 showValue (List vs) = "(" ++ unwords (map showValue vs) ++ ")"</code></p>
+
+<p>関数unwordsは文字列のリストをスペース区切りでひとつの文字列にまとめる。</p>
 
 <h2>トークン</h2>
 
@@ -39,8 +41,8 @@ showValue (List vs) = "(" ++ unwords (map showValue vs) ++ ")"</code></p>
 <p><code>data Token<br/>
 	<span class="indent1">= TkSym Symbol</span><br/>
 	<span class="indent1">| TkInt Integer</span><br/>
-	<span class="indent1">| TKOPr</span><br/>
-	<span class="indent1">| TKCPr</span><br/>
+	<span class="indent1">| TkOPr</span><br/>
+	<span class="indent1">| TkCPr</span><br/>
 	<span class="indent1">deriving Show</span></code></p>
 
 <h2>字句解析</h2>
@@ -48,8 +50,8 @@ showValue (List vs) = "(" ++ unwords (map showValue vs) ++ ")"</code></p>
 <p>'('と')'とをトークンにする。</p>
 
 <p><code>tokens :: String -&gt; Maybe [Token]<br/>
-tokens ('(' : s) = (TKOPr :) `mapply` tokens s<br/>
-tokens (')' : s) = (TKCPr :) `mapply` tokens s<br/>
+tokens ('(' : s) = (TkOPr :) `mapply` tokens s<br/>
+tokens (')' : s) = (TkCPr :) `mapply` tokens s<br/>
 tokens (c : s)<br/>
 	<span class="indent1">| ...</span></code></p>
 
@@ -60,11 +62,13 @@ tokens (c : s)<br/>
 parse1とparseLとは相互再帰的に呼びあっている。
 </p>
 
-<p><code>parse1 (TkInt i : ts) = Just (Int i, ts)<br/>
-parse1 (TkOPr : ts) = (\(vs, ts') -&gt; (List vs, ts')) `mapply` parseL ts</code></p>
+<p><code>...<br/>
+parse1 (TkInt i : ts) = Just (Int i, ts)<br/>
+parse1 (TkOPr : ts) = (\(vs, ts') -&gt; (List vs, ts')) `mapply` parseL ts<br/>
+...</code></p>
 
 <p>
-関数parseLの返り値の型は([Value], [Token])である。
+関数parseLの返り値の型は([Value], [Token])だ。
 タプルの第1要素に値構築子Listを適用することで[Value]をValueに変換する。
 </p>
 
@@ -88,13 +92,18 @@ parseL ts = case parse1 ts of<br/>
 <p>
 本当はリストの先頭の値を残りの値に適用する。
 まだ「適用可能な値」つまり「手続き」や「特殊形式」「ラムダ」を
-定義していないので今のところは、リストの評価は何もしない。
+定義していないので、リストの評価は何もしないことにする。
 </p>
 
 <p><code>eval :: Value -&gt; Env -&gt; Maybe (Value, Env)<br/>
 eval (Symbol s) e = (, e) `mapply` refer s e<br/>
 eval i@(Int _) e = Just (i, e)<br/>
 eval l@(List _) e = Just (l, e)</code></p>
+
+<p><code>(Int _)</code>と<code>(List _)</code>をまとめてしまおう。</p>
+
+<p><code>eval (Symbol s) e = (, e) `mapply` refer s e<br/>
+eval v e = Just (v, e)</code></p>
 
 <h2>試してみる</h2>
 
@@ -119,7 +128,7 @@ eval l@(List _) e = Just (l, e)</code></p>
 
 <p>
 リストの読みこみを実装した。
-今のところは「評価」は何もしない。
+今のところ「評価」は何もしない。
 </p>
 
 <p>
