@@ -1,13 +1,13 @@
 Nano Scheme: 関数定義と呼び出し
 
-<p>(工事中 0%)</p>
+<p>(工事中 30%)</p>
 
 <h2>はじめに</h2>
 
 <p>
-まずはじめに(lambda (x) (* x x))のような形で無名関数を作る仕組みをつくる。
-それを変数に代入する(define f (lambda (x) (* x x)))。
-構文糖を作成し(define (f x) (* x x))で同じことができるようにする。
+(lambda (x) (* x x))のように無名関数の構築子をつくる。
+(define f (lambda (x) (* x x)))とすれば関数が定義できる。
+同じことを構文糖(define (f x) (* x x))でできるようにする。
 </p>
 
 <h2>ラムダ</h2>
@@ -16,10 +16,10 @@ Nano Scheme: 関数定義と呼び出し
 	>Environment.hs</a></p>
 
 <p>
-ここではこのような「関数のようなもの」をラムダと呼んでおく。
-schemeでは環境を閉じこめるという意味でクロージャと呼んでいるが、
-今回は環境の閉じこめはしないのでクロージャとは呼べない。
-このラムダを表現する値をValue型に追加する。
+ここではこのような「関数のようなもの」をラムダと呼ぶ。
+schemeでは環境を閉じこめるという意味でクロージャと呼ぶ。
+今回は環境の閉じこめはしない。クロージャとは呼べない。
+ラムダを表現する値をValue型に追加する。
 </p>
 
 <p><code>data Value<br/>
@@ -46,7 +46,7 @@ lambda関数を定義して
 </p>
 
 <p><code>lambda :: [Value] -&gt; Env -&gt; Maybe (Value, Env)<br/>
-lambda [ps, v] e = (\as -&gt; (Lmbd as v, e)) `mapply` symbols ps<br/>
+lambda [vs, v] e = (\ps -&gt; (Lmbd ps v, e)) `mapply` symbols vs<br/>
 lambda _ _ = Nothing</code></p>
 
 <p><code>symbols :: Value -&gt; Maybe [symbol]<br/>
@@ -63,31 +63,35 @@ symbols _ = Nothing</code></p>
 	<span class="indent1">.</span><br/>
 	<span class="indent1">.</span><br/>
 	<span class="indent1">.</span><br/>
-	<span class="indent1">("lambda", Sntx "lambda" lambda),</span><br/>
+	<span class="indent1">("lambda", Sntx lambda),</span><br/>
 	<span class="indent1">.</span><br/>
 	<span class="indent1">.</span></code></p>
 
-<h2>ラムダ自体の評価</h2>
+<h2>ラムダの適用</h2>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/lambda/Eval.hs"
 	>Eval.hs</a></p>
 
-<p>ラムダそのものは自分自身に評価される。</p>
-
-<p><code>...<br/>
-eval l@(Lmbd _ _) e = Just (l, e)</code></p>
-
-<h2>ラムダの適用</h2>
-
 <p>
-ラムダを適用するには実引数を仮引数に代入し、
-その環境内で本体部分を評価する。
-ラムダの実行後には新しく作られた環境は捨てられる。
+ラムダを適用するには実引数を仮引数に代入して本体部分を評価する。
+ラムダの実行後には新しく作られた変数は捨てる。
 </p>
 
 <p><code>apply (Lmbd ps bd) vs e = (`mbind` evaluate vs e) $ \(as, e') -&gt;<br/>
-	<span class="indent1">(\(r, _) -&gt; (r, e')) `mapply`
-		(eval bd . foldr (uncurry set) e $ zip ps as)</span></code></p>
+	<span class="indent1">(\(r, _) -&gt; (r, e'))</span><br/>
+		<span class="indent2">`mapply` (eval bd . foldr (uncurry set) e
+			$ zip ps as)</span></code></p>
+
+<p>
+読みやすさのために(\(as, e') -&gt; ...) `mbind` evaluate vs eとする代わりに
+(`mbind` evaluate vs e) $ \(as, e') -&gt; ...とした。
+</p>
+
+<p>
+[定石] 2引数関数で第1引数が長くなるとき(`f` a2) $ ...のようにすると
+読みやすくなる。
+とくに第1引数が関数のときは(`f` a2) $ \aa -&gt; ...のようにできる。
+</p>
 
 <h2>試してみる</h2>
 
@@ -96,7 +100,7 @@ eval l@(Lmbd _ _) e = Just (l, e)</code></p>
 <p><code>echo 'nsc ((lambda (x) (* x x)) 8)' | runghc -Wall nsc.hs<br/>
 64</code></p>
 
-<p>defineで一度、変数に代入してから使う。</p>
+<p>defineで定義してから使う。</p>
 
 <p><code>echo 'nsc (define f (lambda (x) (* x x))) (f 9)' | runghc -Wall nsc.hs<br/>
 f<br/>
@@ -110,10 +114,10 @@ f<br/>
 構文木を組み立ててevalしてしまえば簡単だ。
 </p>
 
-<p><code>define [sm@(Symbol s), v] e = ...<br/>
-define [List (sm@(Symbol _) : ps), v] e = (`eval` e) $ List [<br/>
-	<span class="indent1">Symbol "define", sm,
-		List [Symbol "lambda", List ps, v]]</span></code></p>
+<p><code>define [sm@(Sym s), v] e = ...<br/>
+define [List (f : ps), v] e =<br/>
+	<span class="indent1">eval (List [Sym "define", f,
+		List [Sym "lambda", List ps, v]]) e</span></code></p>
 
 <h2>試してみる</h2>
 

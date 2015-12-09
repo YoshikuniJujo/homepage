@@ -1,6 +1,6 @@
 Nano Scheme: 構文if
 
-<p>(工事中 0%)</p>
+<p>(工事中 30%)</p>
 
 <h2>はじめに</h2>
 
@@ -24,8 +24,10 @@ Nano Scheme: 構文if
 
 <p>表示する。</p>
 
-<p><code>showValue (Bool False) = "#f"<br/>
-showValue (Bool True) = "#t"</code></p>
+<p><code>...<br/>
+showValue (Bool False) = "#f"<br/>
+showValue (Bool True) = "#t"<br/>
+...</code></p>
 
 <h3>トークン</h3>
 
@@ -50,14 +52,9 @@ tokens (c : s)<br/>
 
 <h3>構文解析</h3>
 
-<p><code>parse1 (TkBool b : ts) = Just (Bool b, ts)</code></p>
-
-<h3>評価</h3>
-
-<p><a href="/computer/haskell/web_lecture/for_programmer/codes/nsc/if/Eval.hs"
-	>Eval.hs</a></p>
-
-<p><code>eval b@(Bool _) e = Just (b, e)</code></p>
+<p><code>...<br/>
+parse1 (TkBool b : ts) = Just (Bool b, ts)<br/>
+...</code></p>
 
 <h2>試してみる</h2>
 
@@ -78,7 +75,7 @@ bool (_, e) = (True, e)</code></p>
 <p>関数ifsを定義する。</p>
 
 <p><code>ifs :: [Value] -&gt; Env -&gt; Maybe (Value, Env)<br/>
-ifs [p, th, el] e = (\(b, e') -&gt; if b then eval th e' else eval el e')<br/>
+ifs [p, th, el] e = (\(b, e') -&gt; eval (if b then th else el) e')<br/>
 	<span class="indent1">`mbind` (bool `mapply` eval p e)</span><br/>
 ifs _ _ = Nothing</code></p>
 
@@ -88,7 +85,7 @@ ifs _ _ = Nothing</code></p>
 	<span class="indent1">.</span><br/>
 	<span class="indent1">.</span><br/>
 	<span class="indent1">.</span><br/>
-	<span class="indent1">("if", Sntx "if" ifs),</span><br/>
+	<span class="indent1">("if", Sntx ifs),</span><br/>
 	<span class="indent1">.</span><br/>
 	<span class="indent1">.</span><br/>
 	<span class="indent1">.</span><br/>
@@ -103,9 +100,7 @@ ifs _ _ = Nothing</code></p>
 
 <h2>まとめ</h2>
 
-<p>
-構文ifを定義した。
-</p>
+<p>構文ifを定義した。</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/nsc_lambda.html"
