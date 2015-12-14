@@ -1,0 +1,35 @@
+Gentoo Linux: さくらVPSへのインストール: 一般ユーザの作成
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+SSHでのインストールを行う。
+SSHでの常識として直接rootユーザでの接続は許可しない。
+一般ユーザでログインしてsuでrootユーザとなる。
+こうするとパスワードの認証が二重となりすこしセキュリテティが向上する。
+一般ユーザを作成する。
+</p>
+
+<h2>コマンドuseradd</h2>
+
+<p><code># useradd -m -G users,wheel yoshio<br/>
+# passwd yoshio<br/>
+...</code></p>
+
+<p>
+キーボードの設定がうまくいっていないので今のところは長めの数字とアルファベットのみ
+のパスワードとする。
+</p>
+
+<h2>まとめ</h2>
+
+<p>一般ユーザをインストール用環境に追加した。</p>
+
+<p>
+<a href="/computer/gentoo/install/sakura_vps/iso_internet.html"
+	>「インターネットへの接続」へもどる</a>
+<a href="/computer/gentoo/install/sakura_vps/iso_sshd.html"
+	>「SSHDの設定」へ</a>
+</p>

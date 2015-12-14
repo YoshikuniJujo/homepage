@@ -1,0 +1,34 @@
+Gentoo Linux: さくらVPSへのインストール: SFTPでISOイメージをアップロード
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+SFTPでGentooのインストールISOイメージをアップロードする。
+</p>
+
+<h2>sftpコマンド</h2>
+
+<p>ISOイメージを保存したディレクトリに移動しておく。</p>
+
+<p><code>% sftp -P 22 vpsAAAABBBBCCCC@vps-iso1.sakura.ad.jp<br/>
+...<br/><br/>
+sftp&gt; ls<br/>
+dev iso<br/>
+sftp&gt; cd iso<br/>
+sftp&gt; put install-amd64-minimal-201XXXXX.iso<br/>
+Uploading ...<br/>
+install-amd64-minimal-201XXXXX.iso 100% 211MB ...<br/>
+sftp&gt;</code></p>
+
+<h2>まとめ</h2>
+
+<p>インストールISOイメージをアップロードした。</p>
+
+<p>
+<a href="/computer/gentoo/install/sakura_vps/iso_upload_account.html"
+	>「ISOイメージアップロード用アカウント」へもどる</a>
+<a href="/computer/gentoo/install/sakura_vps/iso_boot.html"
+	>「ISOイメージからブート」へ</a>
+</p>

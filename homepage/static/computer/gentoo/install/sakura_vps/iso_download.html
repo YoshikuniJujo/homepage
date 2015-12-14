@@ -1,0 +1,75 @@
+Gentoo Linux: さくらVPSへのインストール: ISOイメージのダウンロード
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+Gentoo GNU/Linuxのインストールにはインストール作業を行う環境に入る必要がある。
+そのためのブート可能なCDイメージをダウンロードする。
+</p>
+
+<h2>ダウンロード</h2>
+
+<p>
+<a href="https://www.gentoo.org/downloads/mirrors/"
+>Gentooのミラーサイト</a>に行きISOイメージをダウンロードする。
+日本だとjaist.ac.jpとiij.ad.jpとがある。
+AMD64用のISOイメージとする。
+</p>
+
+<ol>
+<li>releases/</li>
+<li>amd64/</li>
+<li>autobuilds/</li>
+<li>current-install-amd64-minimal/</li>
+<li>install-amd64-minimal-201XXXXX.iso</li>
+</ol>
+
+<p>
+これを書いている時点ではinstall-amd64-minimal-20150924.isoが最新だ。
+ファイルのが正しいものであるかどうかを確認するために
+install-amd64-minimal-20150924.iso.DIGESTS.ascもダウンロードしておく。
+</p>
+
+<h2>ファイルの完全性の確認</h2>
+
+<p><code>% gpg --recv-keys 0xBB572E0E2D182910<br/>
+% gpg --recv-keys 0xBB572E0E2D182910<br/>
+% gpg --verify install-amd64-minimal-201XXXXX.iso.DIGESTS.asc<br/>
+...<br/>
+主鍵のフィンガー・プリント: 13EB BDBE DE7A 1277 5DFD B1BA BB57 2E0E 2910</code></p>
+
+<p>
+フィンガー・プリントを<a href="https://www.gentoo.org/downloads/signatures/"
+>Gentoo署名ページ</a>で確認する。
+</p>
+
+<p><code>% grep -A 1 -i sha512 install-amd64-minimal-201XXXXX.iso.DIGESTS.asc
+	| grep '.iso$'<br/>
+075212e58ddec6ef04791fc90c573c45
+0b24b34ae38eccaf29cc6c17b7436148
+e4ef4f133cf48d84aa597e02117b3bda
+7086d2a7176224c208f71dba2622a913
+	install-amd64-minimal-20150924.iso<br/>
+% sha512sum install-amd64-minimal-201XXXXX.iso<br/>
+075212e58ddec6ef04791fc90c573c45
+0b24b34ae38eccaf29cc6c17b7436148
+e4ef4f133cf48d84aa597e02117b3bda
+7086d2a7176224c208f71dba2622a913
+	install-amd64-minimal-20150924.iso
+</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+インストール環境のためのブータブルなISOイメージをダウンロードし
+完全性を確認した。
+</p>
+
+<p>
+<a href="/computer/gentoo/install/sakura_vps"
+	>「さくらVPSへのインストール」トップへもどる</a>
+<a href="/computer/gentoo/install/sakura_vps/iso_upload_account.html"
+	>「ISOイメージアップロード用アカウント」へ</a>
+</p>

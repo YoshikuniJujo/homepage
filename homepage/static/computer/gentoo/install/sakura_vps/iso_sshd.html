@@ -1,0 +1,67 @@
+Gentoo Linux: さくらVPSへのインストール: SSHDの設定
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+デフォルトのままの設定でも問題はないが
+セキュリティを高めるためにポートをハイポートに設定しておく。
+</p>
+
+<h2>ポートの設定</h2>
+
+<p><code># vi /etc/ssh/sshd_config<br/>
+...<br/>
+#Port 22<br/>
+...</code></p>
+
+<p>
+#Port 22をPort 12345とする。
+12345の部分は予想されにくい数字に変える。
+そうするとほんのすこしセキュリティが向上する。
+</p>
+
+<h2>ルートパスワードの設定</h2>
+
+<p>
+ここでルートパスワードを設定する。
+</p>
+
+<p><code># passwd<br/>
+...<br/>
+# rc-service sshd start</code></p>
+
+<p>
+これでsshで接続してsuすることが可能となったはずだ。
+ストレスフリーになる。
+</p>
+
+<h2>sshで接続</h2>
+
+<p>ローカルなコンソールから以下のようにする。</p>
+
+<p></code>% ssh -p 12345 yoshio@[さくらVPSのURL]</code></p>
+
+<p>
+パスワードを入れて接続する。
+前に同じアドレスでssh接続したことがあると失敗する。
+この場合は.ssh/known_hostsから該当する行を消す。
+接続できたらsuをする。
+passwdコマンドで記号を含むパスワードに変更しておこう。
+一般ユーザでも同様にする。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+これでsshから作業できる。
+ブラウザ上のコンソールからの作業はいろいろとストレスフルなので良かった。
+</p>
+
+<p>
+<a href="/computer/gentoo/install/sakura_vps/iso_useradd.html"
+	>「一般ユーザの追加」へもどる</a>
+<a href="/computer/gentoo/install/sakura_vps/iso_ssh_rsa.html"
+	>「SSHのRSA認証」へ</a>
+</p>

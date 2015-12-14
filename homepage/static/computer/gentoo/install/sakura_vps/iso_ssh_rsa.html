@@ -1,0 +1,58 @@
+Gentoo Linux: さくらVPSへのインストール: SSH接続をRSA認証にする
+
+<h2>はじめに</h2>
+
+<p>
+パスワード認証のままでも(パスワードが適切であれば)
+そこまで脆弱というわけでもないが、
+RSAを使った認証にするとセキュリティが向上する。
+</p>
+
+<h2>RSA認証ができるようにする</h2>
+
+<p>
+ホームディレクトリにディレクトリ.ssh/を作成しchmod 700する。
+そこに自分の持っている公開鍵の中身をauthorized_keysという名前で保存し、
+chmod 600する。
+</p>
+
+<p>ローカルで</p>
+
+<p><code>% scp -p 12345 ~/.ssh/id_rsa.pub yoshio@[URL]:/home/yoshio/</code></p>
+
+<p>としssh接続(一般ユーザ)で</p>
+
+<p><code>% mkdir ~/.ssh<br/>
+% chmod 700 ~/.ssh<br/>
+% mv ~/id_rsa.pub ~/.ssh/authorized_keys<br/>
+% chmod 600 ~/.ssh/authorized_keys</code></p>
+
+<p>
+これでRSA認証ができるようになった。
+ログアウトしてログインし直してみよう。
+</p>
+
+<h2>パスワード認証ができないようにする</h2>
+
+<p>
+これだけだとまだパスワード認証ができてしまうのでsuしてから以下のようにする。
+</p>
+
+<p><code># vi /etc/ssh/sshd_config<br/>
+PermitRootLogin no<br/>
+RhostsRSAAuthentication no<br/>
+PasswordAuthentication no<br/>
+PermitEmptyPasswords no<br/>
+ChallengeResponseAuthentication no<br/>
+# rc-service sshd restart</code></p>
+
+<h2>まとめ</h2>
+
+<p>SSH接続をRSA認証にしてセキュリティを向上させた。</p>
+
+<p>
+<a href="/computer/gentoo/install/sakura_vps/iso_sshd.html"
+	>「SSHDの設定」へもどる</a>
+<a href="/computer/gentoo/install/sakura_vps"
+	>「さくらVPSへのインストール」トップへ</a>
+</p>

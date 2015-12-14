@@ -31,7 +31,7 @@ contentType fp = case takeExtension fp of
 	".scm" -> plain; ".coffee" -> plain
 	".ebuild" -> plain; ".txt" -> plain; ".mf" -> plain; ".sf" -> plain
 	".nml" -> plain; ".dat" -> plain; ".h" -> plain; ".c" -> plain
-	".md" -> plain
+	".md" -> plain; ".asc" -> plain
 	".gz" -> gz; ".tar.gz" -> targz; ".xpi" -> xpi; ".js" -> js
 	_ -> octet
 

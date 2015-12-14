@@ -1,0 +1,59 @@
+Gentoo Linux: さくらVPSへのインストール: インターネットへの接続
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+sshで接続したい。
+インターネットに接続する必要がある。
+</p>
+
+<h2>インターネット設定のチェック</h2>
+
+<p>
+インターネットの設定をチェックする。
+「サーバ設定」のページの「ネットワーク情報: IPv4」を参照する。
+</p>
+
+<ul>
+<li>アドレス: 153.XXX.YYY.ZZZ</li>
+<li>ゲートウェイ: 153.XXX.YYY.1</li>
+<li>ネットマスク: 255.255.25<b>4</b>.0</li>
+<li>プライマリDNS: 210.188.224.10</li>
+<li>プライマリDNS: 210.188.224.11</li>
+</ul>
+
+<p>
+以下のようなコマンドを実行する。
+このときbroadcastアドレスがアドレスと0.0.1.255との値理和になっていることに注意する。
+これはネットマスクが255.255.25<b>4</b>.0となっているためだ。
+</p>
+
+<p><code>% ifconfig eth0 153.XXX.YYY.ZZZ broadcast 153.XXX.YY<b>W</b>.255
+	netmask 255.255.25<b>4</b>.0<br/>
+% route add default gw 153.XXX.YYY.1<br/>
+% vi /etc/resolv.conf<br/>
+nameserver 210.188.224.10<br/>
+nameserver 210.188.224.11</code></p>
+
+<p>
+vimは、僕の環境では:が入力できないのでZZで保存・終了とした。
+</p>
+
+<p><code>% ping -c 3 google.co.jp<br/>
+...<br/>
+--- google.co.jp ping statictics ---<br/>
+3 packets transmitted, 3 received, 0% packet loss, time XXXXms<br/>
+...</code></p>
+
+<h2>まとめ</h2>
+
+<p>インストール用環境でインターネットへの接続ができた。</p>
+
+<p>
+<a href="/computer/gentoo/install/sakura_vps/iso_boot.html"
+	>「ISOイメージからのブート」へもどる</a>
+<a href="/computer/gentoo/install/sakura_vps/iso_useradd.html"
+	>「一般ユーザの作成」へ</a>
+</p>
