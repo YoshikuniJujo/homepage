@@ -9,6 +9,72 @@ Gentoo GNU/Linux: さくらVPSへのインストール: stage3
 stage3ではベースとなるシステムを書庫ファイルの展開によって作成する。
 </p>
 
+<h2>時間を合わせる</h2>
+
+<p><code># date<br/>
+# rc-service ntp-client start<br/>
+# date</code></p>
+
+<p>ハードウェアクロックも合わせておく。</p>
+
+<p><code># hwclock<br/>
+# hwclock --systohc<br/>
+# hwclock</code></p>
+
+<h2>tarballのダウンロード</h2>
+
+<p><code>cd /mnt/gentoo</code></p>
+
+<p><code># links <a href="https://www.gentoo.org/downloads/mirrors/"
+	>https://www.gentoo.org/downloads/mirrors/</a></code></p>
+
+<p>
+ミラーサイトを選び以下のようにディレクトリをたどりstage3-amd64-201XXXXX.tar.bz2
+をダウンロードする。
+</p>
+
+<ol>
+<li>releases</li>
+<li>amd64</li>
+<li>autobuilds</li>
+<li>current-stage3-amd64</li>
+</ol>
+
+<p>stage3-amd64-201XXXXX.tar.bz2.DIGESTS.ascもダウンロードしておく。</p>
+
+<h2>完全性の確認</h2>
+
+<p><code># gpg --recv-keys 0xBB572E0E2D182910<br/>
+# gpg --verify stage3-amd64-201XXXXX.tar.bz2.DIGESTS.asc</code></p>
+
+<p>
+フィンガープリントを<a href="https://www.gentoo.org/downloads/signatures/"
+>Gentoo署名ページ</a>で確認する。
+</p>
+
+<p><code># grep -A 1 -i sha512 stage3-amd64-201XXXXX.tar.bz2.DIGESTS.asc
+	| grep '.bz2$'<br/>
+# sha512sum stage3-amd64-201XXXXX.tar.bz2</code></p>
+
+<h2>解凍と展開</h2>
+
+<p><code># tar xvjpf stage3-amd64-201XXXXX.tar.bz2 --xattrs</code></p>
+
+<h2>コンパイルオプションの設定</h2>
+
+<p>CFLAGSを設定する。</p>
+
+<p><code># vi /etc/portage/make.conf<br/>
+...<br/>
+CFLAGS="-march=native -O2 -pipe"
+...</code></p>
+
+<p>並行コンパイルの数を決める。目安はコア数+1とのこと。</p>
+
+<p><code>...<br/>
+MAKEOPTS="-j3"
+...</code></p>
+
 <p>
 <a href="/computer/gentoo/install/sakura_vps/prepare_disk.html"
 	>「ディスクの準備」へもどる</a>
