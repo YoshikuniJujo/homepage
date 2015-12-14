@@ -1,0 +1,170 @@
+Gentoo GNU/Linux: さくらVPSへのインストール: ディスクの準備
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+インストール作業の第1歩としてディスクの準備がある。
+ここではパーティションの作成、LVM2の設定、ファイルシステムの作成、
+マウントまでを行う。
+</p>
+
+<h2>概要と注意点</h2>
+
+<h3>パーティション</h3>
+
+<p>
+partedを使う。
+GPTパーティションとする。
+grub用に小さなパーティションが必要となる。
+</p>
+
+<h3>LVM2</h3>
+
+<p>
+/や/bootなどはLVM2としない。
+それぞれのディレクトリ用に小さめのパーティションを用意する。
+</p>
+
+<h3>ファイルシステム</h3>
+
+<p>すべてext4とする。</p>
+
+<h3>マウント</h3>
+
+<p>
+適切なパーティションをマウントする。
+</p>
+
+<h2>パーティションの計画</h2>
+
+<p>
+まずはパーティションのわけかたとそれぞれの大きさについて計画を立てる。
+これはよく考えておいたほうが良い。
+ただしLVM2ができてからずいぶんと楽にはなった。
+以下のパーティションが必要になる。
+</p>
+
+<ul>
+<li>grub</li>
+<li>boot</li>
+<li>root</li>
+<li>swap</li>
+<li>lvm</li>
+</ul>
+
+<p>
+まずはディスク容量を確認する。
+</p>
+
+<p><code># parted /dev/vda<br/>
+(parted) print<br/>
+...<br/>
+Disk /dev/vda: 107GB<br/>
+...<br/>
+(parted) quit</code></p>
+
+<p>
+これをどうわけるか考える。
+メモリの容量もチェックしておく。
+</p>
+
+<p><code># free -h<br/>
+...<br/>
+Mem: 1.0G ...<br/>
+...</code></p>
+
+<p>
+スワップ領域はメモリの2倍くらいで良いかと思われる。
+念のため20GiBほど予備のスペースとして取っておこうかと思う。
+</p>
+
+<ul>
+<li>grub: 2MiB (1 - 3)</li>
+<li>boot: 1GiB - 3MiB (3 - 1024)</li>
+<li>root: 2GiB (1024 - 3072)</li>
+<li>swap: 2GiB (3072 - 5120)</li>
+<li>lvm: 80GiB (5120 - 87040)</li>
+<li>space: 20GiBくらい(87040 - -1)</li>
+</ul>
+
+<h2>パーティションの削除</h2>
+
+<p>GPTラベルを設定する。</p>
+
+<p><code># parted /dev/vda<br/>
+(parted) mklabel gpt<br/>
+(parted) print</code></p>
+
+<h2>パーティション作成</h2>
+
+<p><code>(parted) unit mib</code></p>
+
+<h3>grub</h3>
+
+<p><code>(parted) mkpart grub 1 3<br/>
+(parted) set 1 bios_grub on<br/>
+(parted) print</code></p>
+
+<h3>boot</h3>
+
+<p><code>(parted) mkpart boot 3 1024<br/>
+(parted) set 2 boot on<br/>
+(parted) print</code></p>
+
+<h3>root, swap, lvm, space</h3>
+
+<p><code>(parted) mkpart root 1024 3072<br/>
+(parted) mkpart swap 3072 5120<br/>
+(parted) mkpart lvm 5120 87040<br/>
+(parted) mkpart space 87040 -1<br/>
+(parted) print</code></p>
+
+<h2>LVM2の設定</h2>
+
+<p><code># modprobe dm-mod<br/>
+# pvcreate /dev/vda5<br/>
+# vgcreate vg /dev/vda5<br/>
+# lvcreate -L10G -nusr vg<br/>
+# lvcreate -L10G -nhome vg<br/>
+# lvcreate -L5G -nopt vg<br/>
+# lvcreate -L10G -nvar vg<br/>
+# lvcreate -L2G -ntmp vg</code></p>
+
+<h2>ファイルシステムの作成</h2>
+
+<p><code># mkswap /dev/vda4<br/>
+# swapon /dev/vda4<br/>
+# free -h<br/>
+# mkfs.ext4 /dev/vda2<br/>
+# mkfs.ext4 /dev/vda3<br/>
+# mkfs.ext4 /dev/vg/usr<br/>
+# mkfs.ext4 /dev/vg/home<br/>
+# mkfs.ext4 /dev/vg/opt<br/>
+# mkfs.ext4 /dev/vg/var<br/>
+# mkfs.ext4 /dev/vg/tmp</code></p>
+
+<h2>マウント</h2>
+
+<p><code># mount /dev/vda3 /mnt/gentoo/<br/>
+# mkdir /mnt/gentoo/boot<br/>
+# mkdir /mnt/gentoo/usr<br/>
+# mkdir /mnt/gentoo/home<br/>
+# mkdir /mnt/gentoo/opt<br/>
+# mkdir /mnt/gentoo/var<br/>
+# mkdir /mnt/gentoo/tmp<br/>
+# mount /dev/vda2 /mnt/gentoo/boot<br/>
+# mount /dev/vg/usr /mnt/gentoo/usr<br/>
+# mount /dev/vg/home /mnt/gentoo/home<br/>
+# mount /dev/vg/opt /mnt/gentoo/opt<br/>
+# mount /dev/vg/var /mnt/gentoo/var<br/>
+# mount /dev/vg/tmp /mnt/gentoo/tmp<br/>
+# chmod 1777 /mnt/gentoo/tmp</code></p>
+
+<p>
+<a href="/computer/gentoo/install/sakura_vps/iso_ssh_rsa.html"
+	>「SSHのRSA認証」へもどる</a>
+<a href="/computer/gentoo/install/sakura_vps/stage3.html"
+	>「stage3」へ</a>
+</p>
