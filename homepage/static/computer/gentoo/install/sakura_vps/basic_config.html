@@ -1,0 +1,59 @@
+Gentoo GNU/Linux: さくらVPSへのインストール: 基本的な設定
+
+<p>(工事中 0%)</p>
+
+<h2>tmuxの導入</h2>
+
+<p>
+コンソールを分割できるとインストール作業がしやすい。
+</p>
+
+<p><code># emerge -pv tmux<br/>
+# emerge -av tmux</code></p>
+
+<p>
+今のところはvim-syntaxはオフでインストールする。
+あとでemerge -avu --deep --newuse worldあたりでvim-syntaxがonで
+再インストールされるだろう。
+</p>
+
+<h2>vim</h2>
+
+<p><code># emrege -pv vim<br/>
+# emrege -av vim</code></p>
+
+<h2>cpuinfo2cpuflags</h2>
+
+<p><code># emerge -pv cpuinfo2cpuflags<br/>
+# emerge -av cpuinfo2cpuflags<br/>
+# cpuinfo2cpuflags-x86 &gt;&gt; /etc/portage/make.conf</code></p>
+
+<h2>USEフラグ</h2>
+
+<p>
+USEフラグを設定する。
+以下をとりあえずonにしておこう。
+</p>
+
+<p>
+clamav cracklib crypt curl ftp ipv6 mime rss sasl ssl xmpp gpm
+cscope hscolour javascript jit lua pcre perl python ruby vim-syntax
+bzip2 exif gzip imagemagick imlib jpeg jpeg2k latex mng mp3 mpeg pdf png
+postscript svg tiff xml xpm zlib cjk iconv m17n-lib nls unicode git
+modules ncurses postgres profile skey sqlite sqlite3 zsh-complition
+</p>
+
+<h2>タイムゾーンの決定</h2>
+
+<p><code># date<br/>
+# ls /usr/share/zoneinfo<br/>
+# echo "Japan" &gt; /etc/timezone<br/>
+# emerge --config sys-libs/timezone-data<br/>
+# date</code></p>
+
+<h2>ロケールの設定</h2>
+
+<p><code># vi /etc/locale.gen<br/>
+# locale-gen<br/>
+# eselect locale list<br/>
+# eselect locale set ...</code></p>
