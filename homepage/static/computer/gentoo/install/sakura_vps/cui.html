@@ -1,0 +1,31 @@
+CUI環境の調整
+
+<p>(工事中 0%)</p>
+
+<h2>sudo</h2>
+
+<p><code># vi /etc/portage/package.use/sudo<br/>
+=app-admin/sudo-1.X.XX-rX -skey<br/>
+# emerge -av sudo<br/>
+# eselect editor list<br/>
+# eselect editor set 3<br/>
+# . /etc/profile<br/>
+# visudo<br/>
+...<br/>
+%wheel ALL=(ALL) ALL<br/>
+...<br/>
+# exit<br/>
+$ sudo echo hoge</code></p>
+
+<h2>tmux</h2>
+
+<p><a href="/computer/gentoo/install/sakura_vps/config/tmux.conf.txt"
+	>.tmux.conf</a></p>
+
+<h2>zsh</h2>
+
+<p><code>% sudo emerge -av zsh<br/>
+% sudo emerge -av gentoo-zsh-completion</code></p>
+
+<p><a href="/computer/gentoo/install/sakura_vps/config/zshrc.skami3.txt"
+	>.zshrc</a></p>

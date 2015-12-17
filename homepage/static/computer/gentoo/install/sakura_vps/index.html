@@ -75,4 +75,35 @@ sshでのインストール作業が可能となる。
 	<li>タイムゾーンの設定</li>
 	<li>ロケールの設定</li>
 	</ul></li>
+<li><a href="/computer/gentoo/install/sakura_vps/kernel.html"
+	>カーネルの構築</a> (工事中 0%) (今ココ)</li>
+<li><a href="/computer/gentoo/install/sakura_vps/system_config.html"
+	>システムの設定</a> (工事中 0%)</li>
+<li><a href="/computer/gentoo/install/sakura_vps/system_tools.html"
+	>システムツールの導入</a> (工事中 0%)</li>
+<li><a href="/computer/gentoo/install/sakura_vps/bootloader.html"
+	>ブートローダの設定</a> (工事中 0%)
+	<ul>
+	<li>lvmデーモンの登録</li>
+	<li>rcのログの保存</li>
+	<li>再起動</li>
+	</ul></li>
+<li><a href="/computer/gentoo/install/sakura_vps/cui.html"
+	>CUI環境の調整</a> (工事中 0%)
+	<ul>
+	<li>sudoの導入</li>
+	<li>zshの導入</li>
+	</ul></li>
+<li><a href="/computer/gentoo/install/sakura_vps/update1.html"
+	>システムの更新</a> (工事中 0%)</li>
+<li>GHCのインストール
+	<ul>
+	<li>% sudo emerge -av layman</li>
+	<li>% sudoedit /etc/portage/make.conf</li>
+	<li>% sudo layman -L</li>
+	<li>% sudo layman -a haskell</li>
+	<li>% sudo mkdir /etc/portage/package.keywords</li>
+	<li>% sudoedit /etc/portage/package.keywords/haskell</li>
+	<li>% sudo emerge -av ghc</li>
+	</ul></li>
 </ul>

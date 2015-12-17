@@ -1,0 +1,17 @@
+システムの更新
+
+<h2>system</h2>
+
+<p><code>% sudo emerge -avu --deep --newuse system<br/>
+% sudo etc-update</code></p>
+
+<h2>world</h2>
+
+<p><code>% sudo emerge -avu --deep --newuse world<br/>
+% sudo emerge --depclean</code></p>
+
+<h2>もう一度</h2>
+
+<p><code>% sudo emerge --sync<br/>
+% sudo emerge -avu --deep --newuse system<br/>
+% sudo emerge -avu --deep --newuse world</code></p>

@@ -1,0 +1,44 @@
+ブートローダの設定
+
+<p>(工事中 0%)</p>
+
+<h2>GRUB2のインストール</h2>
+
+<pre>
+* WARNING... WARNING... WARNING...
+* Additional kernel cmdline arguments that *may* be required to boot properly...
+* With support for several ext* filesystems available, it may be needed to
+* add "rootfstype=ext3" or "rootfstype=ext4" to the list of boot parameters.
+</pre>
+
+<p><code># emerge -av grub<br/>
+# grub2-install /dev/vda<br/>
+# grub2-mkconfig -o /boot/brub/grub.cfg</code></p>
+
+<h2>lvmデーモン</h2>
+
+<p><code># rc-update add lvm boot</code></p>
+
+<h2>rcのログの保存</h2>
+
+<p><code># vi /etc/rc.conf<br/>
+...<br/>
+rc_loger="YES"
+...</code></p>
+
+<p>/var/log/rc.log</p>
+
+<h2>再起動</h2>
+
+<p><code># exit<br/>
+# reboot</code></p>
+
+<h2>パスワードによる認証を禁止</h2>
+
+<p><code># vi /etc/ssh/sshd_config<br/>
+PermitRootLogin no<br/>
+RhostsRSAAuthentication no<br/>
+PasswordAuthentication no<br/>
+PermitEmptyPasswerds no<br/>
+ChallengeResponseAuthentication no<br/>
+# rc-service sshd restart</code></p>

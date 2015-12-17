@@ -1,0 +1,88 @@
+システムの設定
+
+<p>(工事中 0%)</p>
+
+<h2>fstab</h2>
+
+<p>/etc/fstabを編集する。</p>
+
+<ul>
+<li>/dev/vda3 /</li>
+<li>/dev/vda2 /boot</li>
+<li>/dev/vg/usr /usr</li>
+<li>/dev/vg/home /home</li>
+<li>/dev/vg/opt /opt</li>
+<li>/dev/vg/var /var</li>
+<li>/dev/vg/tmp /tmp</li>
+<li>/dev/sda4 swap</li>
+</ul>
+
+<p><code>vi /etc/fstab<br/>
+/dev/vda3 / ext4 noatime 0 1<br/>
+/dev/vda2 /boot ext4 noatime 0 2<br/>
+/dev/vg/usr /usr ext4 noatime 0 2<br/>
+/dev/vg/home /home ext4 noatime 0 2<br/>
+/dev/vg/opt /opt ext4 noatime 0 2<br/>
+/dev/vg/var /var ext4 noatime 0 2<br/>
+/dev/vg/tmp /tmp ext4 noatime 0 2<br/>
+/dev/vda4 none swap sw 0 2</code></p>
+
+<h2>hostname</h2>
+
+<p><code>vi /etc/conf.d/hostname<br/>
+...<br/>
+hostname="skami3"</code></p>
+
+<p><code>vi /etc/conf.d/net<br/>
+dns_domain_lo="iocikun.jp"</code></p>
+
+<h2>hosts</h2>
+
+<p><code>vi /etc/hosts<br/>
+127.0.0.1	localhost,skami3,skami3.iocikun.jp<br/>
+::1		localhost,skami3,skami3.iocikun.jp</code></p>
+
+<h2>passwd</h2>
+
+<p><code># passwd</code></p>
+
+<h2>ネットワークの設定</h2>
+
+<p><code># emerge -av --noreplace net-misc/netifrc</code></p>
+
+<p><code># vi /etc/conf.d/net<br/>
+config_eth0="XXX.YYY.ZZZ.WWW netmask 255.255.254.0 brd XXX.YYY.ZZV.255"<br/>
+routes_eth0="default via XXX.YYY.ZZU.1"</code></p>
+
+<p><code># ln -s net.lo /etc/init.d/net.eth0<br/>
+# rc-update add net.eth0 default</code></p>
+
+<h2>SSHDの設定</h2>
+
+<p><code># vi /etc/ssh/sshd_config<br/>
+...<br/>
+Port 12345<br/>
+...</code></p>
+
+<h3>一般ユーザの追加</h3>
+
+<p><code># useradd -m -G users,wheel,portage yoshio<br/>
+# passwd yoshio</code></p>
+
+<h3>公開鍵のコピー</h3>
+
+<p>別のsshでログインして</p>
+
+<p><code>$ su<br/>
+# mkdir /mnt/gentoo/home/tatsuya/.ssh<br/>
+# cp /home/tatsuya/.ssh/authorized_keys /mnt/gentoo/home/tatsuya/.ssh/<br/>
+# exit<br/>
+$ exit</code></p>
+
+<p>chroot環境で</p>
+
+<p><code># chown yoshio:yoshio /home/yoshio/.ssh/authorized_keys</code></p>
+
+<h3>sshdデーモンをdefaultに追加</h3>
+
+<p><code># rc-update add sshd default</code></p>

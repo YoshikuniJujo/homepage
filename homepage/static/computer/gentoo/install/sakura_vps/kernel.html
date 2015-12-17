@@ -1,0 +1,105 @@
+Gentoo GNU/Linux: さくらVPSへのインストール: カーネルの構築
+
+<p>(工事中 0%)</p>
+
+<h2>カーネルのダウンロード</h2>
+
+<p><code># emerge -av gentoo-sources</code></p>
+
+<h2>カーネルの設定</h2>
+
+<h3>pciutils</h3>
+
+<p>
+ハードウェアの設定に役立つpciutilsをインストールしておく。
+</p>
+
+<p><code># emerge -av pciutils</code></p>
+
+<h3>走っているカーネルからのコンフィグ</h3>
+
+<p><code>General setup --&gt;<br/>
+	&lt;*&gt; Kernel .config support<br/>
+		[*] Enable access to .config through /proc/config.gz</code></p>
+
+<h3>virtIO</h3>
+
+<p><code>Device Drivers --&gt;<br/>
+	Virtio drivers --&gt;<br/>
+		&lt;*&gt; PCI driver for virtio devices<br/>
+		&lt;*&gt; Platform bus driver for memory mapped virtio devices</code></p>
+
+<p><code>Device Drivers --&gt;<br/>
+	Block devices --&gt;<br/>
+		&lt;*&gt; Virtio block driver</code></p>
+
+<p><code>Network device support --&gt;<br/>
+	-*- Network core driver support<br/>
+		&lt;*&gt; Virtio network driver</code></p>
+
+<p><code>Character devices --&gt;<br/>
+	&lt; &gt; Virtio console<br/>
+	&lt;*&gt; Hardware Random Number Generator Core support<br/>
+		&lt;*&gt; VirtIO Random Number Generator support</code></p>
+
+<h3>有線LANドライバの追加</h3>
+
+<p>lspciで有線LANのボードの種類を確認する。</p>
+
+<p><code># lspci | grep -i ethernet<br/>
+00:03.0 Ethernet controller: Red Hat, Inc Virtio network device<br/>
+00:04.0 Ethernet controller: Red Hat, Inc Virtio network device<br/>
+00:05.0 Ethernet controller: Red Hat, Inc Virtio network device</code></p>
+
+<p><code># lspci -k | grep -A 2 -i ethernet<br/>
+lspci: Unable to load libkmod resources: error -12<br/>
+00:03.0 Ethernet controller: Red Hat, Inc Virtio network device<br/>
+Subsystem: Red Hat, Inc Virtio network device<br/>
+Kernel driver in use: virtio-pci<br/>
+00:04.0 Ethernet controller: Red Hat, Inc Virtio network device<br/>
+Subsystem: Red Hat, Inc Virtio network device<br/>
+Kernel driver in use: virtio-pci<br/>
+00:05.0 Ethernet controller: Red Hat, Inc Virtio network device<br/>
+Subsystem: Red Hat, Inc Virtio network device<br/>
+Kernel driver in use: virtio-pci</code></p>
+
+<p><code># grep -i virtio_pci .config<br/>
+CONFIG_VIRTIO_PCI=y
+CONFIG_VIRTIO_PCI_LEGACY=y
+</code></p>
+
+<h3>アーキテクチャに特有なオプション</h3>
+
+<p>processor familyを...とする。</p>
+
+<h3>LVM2</h3>
+
+<p><code>Device Drivers --&gt;<br/>
+	Multi-device support (RAID and LVM) --&gt;<br/>
+		[*] Multiple devices driver support (RAID and LVM)<br/>
+			&lt; &gt; RAID support<br/>
+			&lt;*&gt; Device mapper support</code></p>
+
+<h2>ビルドとインストール</h2>
+
+<p><code># make &amp;&amp; make modules_iknstall<br/>
+# make install</code></p>
+
+<h2>initramfsの作成</h2>
+
+<p><code># emerge -av genkernel<br/>
+# genkernel --install initramfs<br/>
+# ls /boot/initramfs*</code></p>
+
+
+<pre>
+* WARNING... WARNING... WARNING...
+* Additional kernel cmdline arguments that *may* be required to boot properly...
+* With support for several ext* filesystems available, it may be needed to
+* add "rootfstype=ext3" or "rootfstype=ext4" to the list of boot parameters.
+</pre>
+
+
+<h2>LVM2の導入</h2>
+
+<p><code># emerge -av lvm2</code></p>
