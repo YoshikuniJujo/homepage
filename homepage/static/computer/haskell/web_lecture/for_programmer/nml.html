@@ -50,16 +50,16 @@ token s | all isSpace tx = token r<br/>
 	<span class="indent1">where (tx, r) = span (/= '&lt;') s</span></code></p>
 
 <p>
-先頭が&lt;/ならば閉じタグを切り出す。
-&lt;ならば開きタグを切り出す。
-それ以外では&lt;までをテキストとして切り出す。
-ただしテキストが空白文字だけから成るときには次のトークンを切り出す。
+先頭が&lt;/ならば次に定義する関数tagで閉じタグを、
+&lt;ならば開きタグをきりだす。
+それ以外では&lt;までをテキストとしてとる。
+ただしテキストが空白文字だけから成るときには次のトークンをきりだす。
 </p>
 
 <h4>タグの切り出し</h4>
 
 <p>
-タグを切り出す関数には最初の&lt;/や&lt;を落とした文字列がわたされる。
+タグをきりだす関数には最初の&lt;/や&lt;を落とした文字列がわたされる。
 タグは&gt;で終わる。
 関数tagの第1引数にOpenをわたすかCloseをわたすかで開きタグと閉じタグの
 どちらかが結果となる。
@@ -76,7 +76,7 @@ _ -&gt; Nothingの行は対応する&gt;のない&lt;以降が無視されるこ
 
 <p>関数Data.Char.isSpaceを使うのでモジュールの先頭に</p>
 
-<p><code>import Data.List</code></p>
+<p><code>import Data.Char</code></p>
 
 <p>を追加する。</p>
 
@@ -88,7 +88,7 @@ Just (Open "hello","world&lt;hello&gt;")</code></p>
 
 <p>
 関数tokenはトークンをひとつきりだす。
-トークン列が必要ならばData.Listモジュールのunfoldrを使う。
+トークン列をとるにはData.Listモジュールのunfoldrを使う。
 </p>
 
 <p><code>*Main&gt; :m + Data.List<br/>
@@ -97,23 +97,23 @@ Just (Open "hello","world&lt;hello&gt;")</code></p>
 
 <h2>構文解析</h2>
 
-<p>字句解析ができたのでトークン列を読み込んで樹構造を返す関数を作成しよう。</p>
+<p>トークン列を樹構造に解析する関数を作る。</p>
 
 <h3>型</h3>
 
-<p>型はData.Tree.Treeを利用する。</p>
+<p>型はData.Tree.Treeを使って</p>
 
 <p><code>type Nml = Tree String</code></p>
 
-<p>モジュールの先頭に</p>
+<p>とする。モジュールの先頭に</p>
 
 <p><code>import Data.Tree</code></p>
 
-<p>を置く。</p>
+<p>をおく。</p>
 
 <h3>関数parse</h3>
 
-<p>関数parseとparseLとは相互に再帰している。</p>
+<p>相互に再帰する関数parseとparseLを定義する。</p>
 
 <p><code>parse :: [Token] -&gt; Maybe (Nml, [Token])<br/>
 parse (Open tg : ts) = case parseL ts of<br/>
@@ -125,9 +125,9 @@ parse _ = Nothing</code></p>
 
 <p>
 関数parseは樹をひとつ読みこむ。
-Textトークンは単一要素の樹に解析される。
 Openトークンに対しては続くトークン列から複数の樹を読みこむ。
 対応するCloseトークンがあれば読みこんだ複数の樹を子とする樹を作成する。
+Textトークンは子要素をもたない樹に解析される。
 </p>
 
 <h3>関数parseL</h3>
@@ -170,10 +170,7 @@ Just (Node {rootLabel = "hello", subForest = [Node {rootLabel = "world", subFore
 
 <h2>まとめ</h2>
 
-<p>
-単純なXMLライクな構造のデコーダを作成した。
-文字列の操作や再帰的な読みこみやデータ構造の構築の例となっている。
-</p>
+<p>XMLライクな構造のデコーダを作成した。</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/adt_export.html"

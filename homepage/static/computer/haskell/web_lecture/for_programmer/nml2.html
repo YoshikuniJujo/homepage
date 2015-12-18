@@ -5,7 +5,10 @@ NML(Nano Markup Language): 2. 他の型への変換
 
 <h2>はじめに</h2>
 
-<p>NMLで表現された本のリストをHaskellのデータ構造Bookに読みこんでみよう。</p>
+<p>
+NMLで表現された本のリストをHaskellのデータ構造Bookに変換する。
+これは方向としてはデコードと考えられる。
+</p>
 
 <h2>型Book</h2>
 
@@ -56,7 +59,10 @@ books1 = "&lt;books&gt;" ++<br/>
 import Data.List<br/>
 import Nml</code></p>
 
-<p>をモジュールの先頭に追加しておく。</p>
+<p>
+をモジュールの先頭に追加する。
+サンプルをNMLとして解析してみる。
+</p>
 
 <p><code>% ghci books.hs<br/>
 *Main&gt; nml books1<br/>
@@ -99,7 +105,8 @@ book = undefined</code></p>
 <p>
 関数bookはtitleタグとauthorタグのそれぞれについてそれ自体の存在と
 その中身の存在を確認し、存在すればそれらから値をとりだしてBook型にまとめる。
-関数getTitle, getAuthorのスタブも作る。
+flip (maybe Nothing) (...)のような形はあとでモナドを学ぶと
+よりきれいな形に書きなおせる。
 </p>
 
 <p><code>book :: Nml -&gt; Maybe Book<br/>
@@ -108,10 +115,26 @@ book b@(Node "book" _) = flip (maybe Nothing) (get "title" b) $ \t -&gt;<br/>
 		<span class="indent2">Just $ Book { title = t, author = a }</span><br/>
 book _ = Nothing</code></p>
 
+<p>
+複雑なようだがやっていることは単純だ。
+次に定義する関数getを使って"title"タグ内のテキストをとりだし
+それで変数tを束縛し、"author"タグ内のテキストをとりだし
+それで変数aを束縛し、それらをBook型にまとめている。
+(maybe Nothing)を2重にすることでどちらかがNothingならば全体もNothingとなる。
+</p>
+
 <p><code>get :: String -&gt; Nml -&gt; Maybe String<br/>
-get tg (Node _ cs) = case fild ((== tg) . rootLabel) cs of<br/>
+get tg (Node _ cs) = case find ((== tg) . rootLabel) cs of<br/>
 	<span class="indent1">Just (Node _ [Node v []]) -&gt; Just v</span><br/>
 	<span class="indent1">_ -&gt; Nothing</span></code></p>
+
+<p>
+関数findは関数filterと似ているが返り値がリストではなくMaybe値となる。
+もし存在すれば条件を満たすはじめの要素を返す。
+ここでは子要素のなかからrootLabelがtgであるものをみつけだす。
+NMLの「文字列」は子要素をもたない節(Node v [])で表現される。
+つまりNode "tag" [Node "string" []]は&lt;tag&gt;string&lt;/tag&gt;を意味する。
+</p>
 
 <p><code>*Main&gt; :reload<br/>
 *Main&gt; let Just n = nml books1<br/>
@@ -144,11 +167,11 @@ Salinger"}]</code></p>
 
 <h2>モジュールBooks</h2>
 
-<p>後で使いやすいようにモジュール名をつける。先頭に</p>
+<p>モジュールにする。先頭を</p>
 
 <p><code>module Books (Books(..), booklist) where</code></p>
 
-<p>を追加する。</p>
+<p>とする。</p>
 
 <h2>まとめ</h2>
 
