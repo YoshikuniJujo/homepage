@@ -12,13 +12,10 @@ NML(Nano Markup Language): 4. 表示
 <p>モジュールNmlにスタブを作る。</p>
 
 <p><code>fromNml :: Nml -&gt; String<br/>
-fromNml = concatMap toString . addSep . toTokens</code></p>
+fromNml = concatMap toString . toTokens</code></p>
 
 <p><code>toString :: [Token] -&gt; String<br/>
 toString = undefined</code></p>
-
-<p><code>addSep :: [Token] -&gt; [Token]<br/>
-addSep = undefined</code></p>
 
 <p><code>toTokens :: Nml -&gt; [Token]<br/>
 toTokens = undefined</code></p>
@@ -39,30 +36,12 @@ toTokens (Node tg ns) = Open tg : concatMap toTokens ns ++ [Close tg]</code></p>
 
 <p>テスト用のサンプルNmlデータを定義する。</p>
 
-<p><code>sample1, sample2 :: Nml<br/>
-sample1 = Node "hello" [Node "world" []]<br/>
-sample2 = Node "hello" [Node "world" [], Node "and" [], Node "you" []]</code></p>
+<p><code>sample1, :: Nml<br/>
+sample1 = Node "hello" [Node "world" []]</code></p>
 
 <p><code>% ghci Nml.hs<br/>
 *Nml&gt; toTokens sample1<br/>
-[Open "hello",Text "world",Close "hello"]<br/>
-*Nml&gt; toTokens sample2<br/>
-[Open "hello",Text "world",Text "and",Text "you",Close "hello"]</code></p>
-
-<h2>関数addSep</h2>
-
-<p>
-Textデータが複数並んだものをそのまま文字列に変換してしまうと
-ひとつのTextデータにまとまってしまう。
-セパレータとして空開きタグを挿入する。
-</p>
-
-<p><code>addSep :: [Token] -&gt; [Token]<br/>
-addSep (t1@(Text _) : ts@(Text _ : _)) = t1 : Open "" : addSep ts<br/>
-addSep (t : ts) = t : addSep ts<br/>
-addSep _ = []</code></p>
-
-<p>Textトークンが連続する場合にはOpen ""をあいだにはさむ。</p>
+[Open "hello",Text "world",Close "hello"]</code></p>
 
 <h2>関数toString</h2>
 

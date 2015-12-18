@@ -50,9 +50,11 @@ books1 = "&lt;books&gt;" ++<br/>
 	<span class="indent1">"&lt;/book&gt;" ++</span><br/>
 	<span class="indent1">"&lt;/books&gt;"</span></code></p>
 
-<p>モジュールNmlを使うので</p>
+<p>モジュールData.Maybe, Data.List, Nmlを使うので</p>
 
-<p><code>import Nml</code></p>
+<p><code>import Data.Maybe<br/>
+import Data.List<br/>
+import Nml</code></p>
 
 <p>をモジュールの先頭に追加しておく。</p>
 
@@ -82,13 +84,7 @@ booklistNml _ = Nothing</code></p>
 関数bookはまだ作っていない。Nml -&gt; Maybe Book型の関数だ。
 mapMaybeはMaybe型を返す関数をリストの全要素に適用し、Just値だけを集める。
 構文エラーや型エラーのチェックのために対話環境で読みこんでみる。
-mapMaybeを使うためにData.Maybeをインポートする。
-関数bookのスタブも用意する。モジュールの先頭に
-</p>
-
-<p><code>import Data.Maybe</code></p>
-
-<p>を追加し関数bookのスタブを追加する。</p>
+関数bookのスタブを用意する。
 
 <p><code>book :: Nml -&gt; Maybe Book<br/>
 book = undefined</code></p>
@@ -107,85 +103,15 @@ book = undefined</code></p>
 </p>
 
 <p><code>book :: Nml -&gt; Maybe Book<br/>
-book b@(Node "book" _) = case getTitle b of<br/>
-	<span class="indent1">Just t -&gt; case getAuthor b of</span><br/>
-		<span class="indent2">Just a -&gt; Just $ Book { title = t, author = a }</span><br/>
-		<span class="indent2">_ -&gt; Nothing</span><br/>
-	<span class="indent1">_ -&gt; Nothing</span><br/>
+book b@(Node "book" _) = flip (maybe Nothing) (get "title" b) $ \t -&gt;<br/>
+	<span class="indent1">flip (maybe Nothing) (get "author" b) $ \a -&gt;</span><br/>
+		<span class="indent2">Just $ Book { title = t, author = a }</span><br/>
 book _ = Nothing</code></p>
 
-<p><code>getTitle, getAuthor :: Nml -&gt; Maybe String<br/>
-getTitle = undefined<br/>
-getAuthor = undefined</code></p>
-
-<p><code>*Main&gt; :reload<br/>
-*Main&gt;</code></p>
-
-<p>構文エラーや型エラーはない。</p>
-
-<h3>関数getTitle, getAuthor</h3>
-
-<p>
-getTitleとgetAuthorとはタグ名が"title"と"author"で違うだけだ。
-このような関数同士は違う部分を引数にしてまとめてしまおう。
-関数bookのgetTitleとgetAuthorをそれぞれ
-getValue "title"とgetValue "author"に書き換える。
-</p>
-
-<p><code>... = case getTitle b of<br/>
-	<span class="indent1">Just t -&gt; case getAuthor b of</span><br/>
-	<span class="indent1">...</span></code></p>
-
-<p>を</p>
-
-<p><code>... = case getValue "title" b of<br/>
-	<span class="indent1">Just t -&gt; case getValue "author" b of</span><br/>
-	<span class="indent1">...</span></code></p>
-
-</p>とする。スタブも</p>
-
-<p><code>getTitle, getAuthor :: Nml -&gt; Maybe String<br/>
-getTitle = undefined<br/>
-getAuthor = undefined</code></p>
-
-<p>を</p>
-
-<p><code>getValue :: String -&gt; Nml -&gt; Maybe String<br/>
-getValue = undefined</code></p>
-
-<p>とする。</p>
-
-<p><code>*Main&gt; :reload<br/>
-*Main&gt;</code></p>
-
-<h3>関数getValue</h3>
-
-<p>
-特定のタグを持つ子要素を集めてくれる関数childrenがあれば
-関数getValueは
-</p>
-
-<p><code>getValue :: String -&gt; Nml -&gt; Maybe String<br/>
-getValue t b = case children t b of<br/>
-	<span class="indent1">Node _ [Node v []] : _ -&gt; Just v</span><br/>
+<p><code>get :: String -&gt; Nml -&gt; Maybe String<br/>
+get tg (Node _ cs) = case fild ((== tg) . rootLabel) cs of<br/>
+	<span class="indent1">Just (Node _ [Node v []]) -&gt; Just v</span><br/>
 	<span class="indent1">_ -&gt; Nothing</span></code></p>
-
-<p>と書ける。</p>
-
-<p>
-children t bの値をパターンマッチして中の値をとりだしている。
-パターンNode _ [Node v []] : _は(Node _ [Node v []]) : _ということであり、
-Node _ [Node v []]の部分が一番はじめの子要素だ。
-子要素のなかには値がひとつ含まれる。
-Tree型では葉となる要素がNode v []のように表現される。
-</p>
-
-<h3>関数children</h3>
-
-<p>関数childrenは子要素のうち特定のタグを持つ要素だけを集める関数だ。</p>
-
-<p><code>children :: String -&gt; Nml -&gt; [Nml]<br/>
-children tg (Node _ cs) = filter ((== tg) . rootLabel) cs</code></p>
 
 <p><code>*Main&gt; :reload<br/>
 *Main&gt; let Just n = nml books1<br/>
@@ -208,7 +134,7 @@ Salinger"}]
 <p>文字列から直接[Book]型の値を入手する関数を作る。</p>
 
 <p><code>booklist :: String -&gt; Maybe [Book]<br/>
-booklist s = case nml s of Just bl -&gt; booklistNml bl; _ -&gt; Nothing</code></p>
+booklist s = maybe Nothing booklistNml . nml</code></p>
 
 <p><code>*Main&gt; :reload<br/>
 *Main&gt; booklist books1<br/>

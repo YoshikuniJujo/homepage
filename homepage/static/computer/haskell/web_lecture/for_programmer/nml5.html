@@ -99,18 +99,15 @@ encodeBooksは1行にだらだらと出力する。
 fromNml = toString 0 . addSep . toTokens</code></p>
 
 <p><code>toString :: Int -&gt; [Token] -&gt; String<br/>
-toString i (Open "" : ts) =<br/>
-	<span class="indent1">replicate i '\t' ++ "&lt;&gt;\n" ++
-		toString i ts</span><br/>
-toString i (Open tg : ts) =<br/>
-	<span class="indent1">replicate i '\t' ++ "&lt;" ++ tg ++
+toString i (Open tg : Text tx : Close tg' : ts) = replicate i '\t' ++<br/>
+	<span class="indent1">"&lt;" ++ tg ++ "&gt;" ++ tx ++ "&lt;/" ++ tg' ++ "&gt;\n" ++</span><br/>
+toString i (Open tg : ts) = replicate i '\t' ++<br/>
+	<span class="indent1">"&lt;" ++ tg ++
 		"&gt;\n" ++ toString (i + 1) ts</span><br/>
-toString i (Close tg : ts) =<br/>
-	<span class="indent1">replicate (i - 1) '\t' ++ "&lt;/" ++ tg ++
-		"&gt;\n" ++ toString (i - 1) ts<br/>
-toString i (Text tx : ts) =<br/>
-	<span class="indent1">replicate i '\t' ++ tx ++ "\n" ++
-		toString i ts<br/>
+toString i (Close tg : ts) = replicate (i - 1) `\t` ++<br/>
+	<span class="indent1">"&lt;/" ++ tg ++ "&gt;\n" ++ toString (i - 1) ts<br/>
+toString i (Text tx : ts) = replicate i '\t' ++<br/>
+	<span class="indent1">tx ++ "\n" ++ toString i ts<br/>
 toString _ _ = ""</code></p>
 
 <p>
@@ -123,20 +120,16 @@ toString _ _ = ""</code></p>
 <p><code>% cat booklist.dat | runghc encodeBooks.hs<br/>
 &lt;books&gt;<br/>
 	<span class="indent1">&lt;book&gt;</span><br/>
-		<span class="indent2">&lt;title&gt;</span><br/>
-			<span class="indent3">The Old Man and the Sea</span><br/>
-		<span class="indent2">&lt;/title&gt;</span><br/>
-		<span class="indent2">&lt;author&gt;</span><br/>
-			<span class="indent3">Ernest Hemingway</span><br/>
-		<span class="indent2">&lt;/author&gt;</span><br/>
+		<span class="indent2">&lt;title&gt;The Old Man
+			and the Sea&lt;/title&gt;</span><br/>
+		<span class="indent2">&lt;author&gt;Ernest
+			Hemingway&lt;/author&gt;</span><br/>
 	<span class="indent1">&lt;/book&gt;</span><br/>
 	<span class="indent1">&lt;book&gt;</span><br/>
-		<span class="indent2">&lt;title&gt;</span><br/>
-			<span class="indent3">The Catcher in the Rye</span><br/>
-		<span class="indent2">&lt;/title&gt;</span><br/>
-		<span class="indent2">&lt;author&gt;</span><br/>
-			<span class="indent3">J. D. Salinger</span><br/>
-		<span class="indent2">&lt;/author&gt;</span><br/>
+		<span class="indent2">&lt;title&gt;The
+			Catcher in the Rye&lt;/title&gt;</span><br/>
+		<span class="indent2">&lt;author&gt;J. D.
+			Salinger&lt;/author&gt;</span><br/>
 	<span class="indent1">&lt;/book&gt;</span><br/>
 &lt;/books&gt;</code></p>
 
