@@ -1,3 +1,136 @@
 CRC-32
 
 <p>(工事中 0%)</p>
+
+<p><a href="/computer/haskell/coding/error_detection/crc32/crc32.hs"
+	>crc32.hs</a></p>
+
+<h2>計算方法</h2>
+
+<p><a href="/computer/programming/algorithm/error_detection/crc"
+	>巡回冗長検査(CRC)</a></p>
+
+<h3>テーブルを作る</h3>
+
+<ol>
+<li>はじめにtにeを代入する</li>
+<li>3から6を8回くりかえす</li>
+<li>tを最下位ビットbと残りrにわける</li>
+<li>rを右シフトする</li>
+<li>bが0ならばrをtとする</li>
+<li>bが1ならばrとわる数'とをxorしてtとする</li>
+</ol>
+
+<p>
+eに0から255までを代入し結果をテーブルに保存する。
+</p>
+
+<h3>CRCを求める</h3>
+
+<ol>
+<li>tに2 ^ n - 1を代入する</li>
+<li>tを先頭8ビットeと残りrにわける</li>
+<li>rを8ビット右シフトする</li>
+<li>8ビット読みだしeとのxorをとりe'とする
+	<ul>
+	<li>ただし、読みこめなければtが結果となる</li>
+	</ul></li>
+<li>e'に対応する値をテーブルから読みこみsとする</li>
+<li>sとrとをxorしtに代入する</li>
+<li>2へもどる</li>
+</ol>
+
+<h2>コード</h2>
+
+<h3>必要なモジュール</h3>
+
+<p><code>import Control.Arrow<br/>
+import Data.Array<br/>
+import Data.Bits<br/>
+import Data.Bool<br/>
+import Data.Word<br/>
+import qualified Data.ByteString.Lazy as LBS</code></p>
+
+<h3>テーブルの作成</h3>
+
+<h4>補助関数</h4>
+
+<p>最下位ビットと残りのビット列とにわける。</p>
+
+<p><code>popBit :: Bits a =&gt; a -&gt; (Bool, a)<br/>
+popBit n = (n `testBit` 0, n `shiftR` 1)</code></p>
+
+<h4>1ビットぶんの計算</h4>
+
+<p><code>crc1 :: Word32 -&gt; Word32<br/>
+crc1 = uncurry (bool id (`xor` 0xedb88320)) . popBit</code></p>
+
+<p>
+最下位ビットが0ならば残りのビット列そのままとし、
+1ならば残りのビット列と定数値とをxorする。
+</p>
+
+<h4>8ビットぶんの計算</h4>
+
+<p><code>crc8 :: Word8 -&gt; Word32<br/>
+crc8 n = iterate crc1 (fromIntegral n) !! 8</code></p>
+
+<p>
+返り値は8ビットを読みこんだときの続くビット列に対する「変換」を表す。
+</p>
+
+<h4>テーブルの作成</h4>
+
+<p><code>table :: Array Word8 Word32<br/>
+table = listArray (0, 255) $ map crc8 [0 .. 255]</code></p>
+
+<h3>CRCを求める</h3>
+
+<h4>補助関数</h4>
+
+<p><code>popByte :: (Integral a, Bits a) =&gt; a -&gt; (Word8, a)<br/>
+popByte n = (fromIntegral n, n `shiftR` 8)</code></p>
+
+<h4>1バイトぶんの計算</h4>
+
+<p><code>step :: Word32 -&gt; Word8 -&gt; Word32<br/>
+step n b = uncurry xor . (first $ (table !) . (`xor` b)) $ popByte n</code></p>
+
+<p>
+「変換」を下位8ビットと残りのビット列とにわける。
+下位8ビットと読みこんだ1バイトとをxorする。
+それに対応する「変換」をテーブルから読みこみ残りのビット列とのxorをとる。
+これが新しい「変換」となる。
+</p>
+
+<h4>バイト列に対する計算</h4>
+
+<p><code>crc :: LBS.ByteString -&gt; Word32<br/>
+crc = complement . LBS.foldl' step 0xffffffff</code></p>
+
+<p>
+「変換」の初期値はすべてのビットが1の4バイトの値である。
+またCRCは最後に補数をとる。
+</p>
+
+<h3>CRCをチェックする</h3>
+
+<p>
+CRCのチェックはCRCを求めて同値性を比較しても良いがもっとスマートなやりかたがある。
+もとデータの末尾にCRCの値を追加したもののCRCをとると定数になるという性質を利用する。
+</p>
+
+<h4>補助関数</h4>
+
+<p><code>word32ToBytes :: Word32 -&gt; [Word8]<br/>
+word32ToBytes = wtl (4 :: Int)<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">wtl i | i &lt; 1 = const []</span><br/>
+	<span class="indent1">wtl i = uncurry (:) . (wtl (i - 1) `second`) . popByte</span></code></p>
+
+<p>Word32の値をリトルエンディアンでバイト値のリストにする。</p>
+
+<h4>チェック</h4>
+
+<p><code>check :: LBS.ByteString -&gt; Word32 -&gt; Bool<br/>
+check bs n = crc (bs `LBS.append` (LBS.pack $ word32ToBytes n)) == 0x2144df1c</code></p>
