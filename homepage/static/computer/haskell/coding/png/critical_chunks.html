@@ -60,6 +60,60 @@ IDATが複数の場合はなかみを連結したひとつのIDATと同じよう
 
 <p>とりあえずIDATチャンクの内容を読み出す。</p>
 
+<h3>importリストなど</h3>
+
+<p><code>{-# LANGUAGE OverloadedStrings, PackageImports #-}</code></p>
+
+<p><code>import Control.Applicative ((&lt;$&gt;))<br/>
+import Control.Arrow ((***))<br/>
+import "monads-tf" Control.Monad.State (runState, put, get)<br/>
+import Data.List (unfoldr)<br/>
+import Data.Bits (Bits, (.|.), shiftL)<br/>
+import Data.Bool (bool)<br/>
+import qualified Data.ByteString as BS<br/>
+import qualified Data.ByteString.Lazy as LBS<br/>
+import System.IO (openBinaryFile, IOMode(..))<br/>
+import System.Environment (getArgs)</code></p>
+
+<p><code>import CRC (check)</code></p>
+
+<h3>PNGシグネチャのチェック</h3>
+
+<p><code>signature :: BS.ByteString -&gt; Maybe BS.ByteString<br/>
+signature = uncurry (flip $ bool Nothing) . ((== sig) *** Just) . BS.splitAt 8<br/>
+	<span class="indent1">where sig = "\x89PNG\r\n\SUB\n"</span></code></p>
+
+<h3>チャンクの読みこみ</h3>
+
+<p><code>type Chunk = (BS.ByteString, BS.ByteString)</code></p>
+
+<p><code>chunk :: Bs.ByteString -&gt; Maybe (Maybe Chunk, BS.ByteString)<br/>
+chunk "" = Nothing<br/>
+chunk bs<br/>
+	<span class="indent1">| check (LBS.fromStrict td) c =
+		Just (Just std, r)</span><br/>
+	<span class="indent1">| otherwise = Just (Nothing, r)</span><br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">((td, std, c), r) =
+		(`runState` bs) $ do</span><br/>
+		<span class="indent2">l &lt; - st $ BS.splitAt 4</span><br/>
+		<span class="indent2">td_ &lt; - st $ BS.splitAt $ 4 + be l</span><br/>
+		<span class="indent2">c_ &lt; - st $ BS.splitAt 4</span><br/>
+		<span class="indent2">return (td_, BS.splitAt 4 td_, be c_)</span>
+	<span class="indent1">st = (uncurry (=&lt;&lt;)
+		. (const . return *** put) =&lt;&lt;) . (&lt;$&gt; get)</span><br/>
+	<span class="indent1">be :: (Bits n, Num n) =&gt;
+		BS.ByteString -&gt; n</span><br/>
+	<span class="indent1">be = BS.foldl'
+		(\n w -&gt; n `shiftL` 8 .|. fromIntegral w) 0</span><br/>
+	<span class="indent1"></span></code></p>
+
+<h3>IDATの読みだし</h3>
+
+<p><code>idat :: BS.ByteString -&gt; Maybe BS.ByteString<br/>
+idat = (BS.concat . map snd . filter ((== "IDAT") . fst) &lt;$&gt;)<br/>
+	<span class="indent1">. (sequence . unfoldr chunk =&lt;&lt;) . signature</span></code></p>
+
 <h2>パレットを使わない</h2>
 
 <p>
