@@ -1,0 +1,72 @@
+PNG: 必須チャンクの解析
+
+<p>(工事中 0%)</p>
+
+<h2>チャンクに関する概要</h2>
+
+<p><a href="/computer/web/rfc/rfc2083/memo"
+	>PNGに関するメモ</a></p>
+
+<p>ひとつのチャンクは以下のような構成となる。</p>
+
+<ul>
+<li>Length: 4バイト、ビッグエンディアン</li>
+<li>Chunk Type: 4バイト</li>
+<li>Chunk Data</li>
+<li>CRC: 4バイト、ビッグエンディアン</li>
+</ul>
+
+<h2>必須チャンクの概要</h2>
+
+<p>PNGの必須チャンクには以下のものがある。</p>
+
+<ul>
+<li>IHDR</li>
+<li>PLTE</li>
+<li>IDAT</li>
+<li>IEND</li>
+</ul>
+
+<p>
+PLTEチャンクはパレットを使わない場合には不要だ。
+</p>
+
+<ul>
+<li>IHDR</li>
+<li>IDAT</li>
+<li>IEND</li>
+</ul>
+
+<p>
+これらのチャンクは必ずこの順に並ぶ。
+IHDRとIENDはひとつのみだがIDATは複数あって良い。
+IDATが複数の場合はなかみを連結したひとつのIDATと同じように解釈できる。
+</p>
+
+<h2>IDATチャンクの読み出し</h2>
+
+<p>
+<a href="/computer/haskell/coding/png/codes/random/readIdat.hs"
+	>readIdat.hs</a>
+<a href="/computer/haskell/coding/png/codes/random/CRC.hs"
+	>CRC.hs</a>
+</p>
+
+<p>
+モジュールCRCについては
+<a href="/computer/haskell/coding/error_detection/crc32"
+>CRC-32のコードの説明</a>を参照する。
+</p>
+
+<p>とりあえずIDATチャンクの内容を読み出す。</p>
+
+<h2>パレットを使わない</h2>
+
+<p>
+まずはパレットを使わないもののみを扱うこととする。
+IHDRをきちんと読みこみパレットを使用しているものに関してはエラーとする。
+そのあとIDATチャンクを探す。
+IDATチャンクが続くあいだなかみを結合していく。
+IENDチャンクを探す。
+IDATチャンクのなかみは単にバイト列として返すことにする。
+</p>
