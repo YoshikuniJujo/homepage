@@ -1,0 +1,27 @@
+RFC 1951: メモ
+
+<p>(工事中 0%)</p>
+
+<h2>例となるPNGファイル</h2>
+
+<p><a href="/computer/web/rfc/rfc2083/samples/small.png"
+	>small.png</a></p>
+
+<h2>IDAT部分を読み出す</h2>
+
+<p><a href="/computer/haskell/coding/png/critical_chunks.html"
+	>PNG: 必須チャンクの解析</a></p>
+
+<p>
+<a href="/computer/web/rfc/rfc1950/memo/codes/ReadIdat.hs"
+	>ReadIdat.hs</a>
+<a href="/computer/web/rfc/rfc1950/memo/codes/CRC.hs"
+	>CRC.hs</a>
+</p>
+
+<p><code>% ghci ReadIdat.hs<br/>
+ReadIdat&gt; :m + System.IO<br/>
+ReadIdat System.IO&gt; cnt &lt;-
+	BS.hGetContents =&lt;&lt; openBinaryFile "small.png" ReadMode<br/>
+ReadIdat System.IO&gt; idat cnt<br/>
+Just "x\156c``dbfaec\231...\139OHLJ\ACK\NUL\194O\DC3W"</code></p>
