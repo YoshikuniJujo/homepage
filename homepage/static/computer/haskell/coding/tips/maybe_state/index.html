@@ -1,0 +1,301 @@
+MaybeモナドとStateモナドの合成
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+MaybeモナドとStateモナドの合成について書こうと思ったのだけど話がそれた。
+あとでちゃんと分類しなおす必要がある。
+</p>
+
+<h2>例題</h2>
+
+<p>
+仮想的なファイルの仕様を作成しそれに対するエンコーダ・デコーダを作る。
+デコーダは特定のインプットに対して「失敗」するような仕様とする。
+</p>
+
+<h3>仕様</h3>
+
+<p>名前は「YjChunks形式」とする。</p>
+
+<ul>
+<li>8バイトのマジックナンバー
+	<ul>
+	<li>ランダムに生成することにする</li>
+	<li>replicateM_ 8 randomIO :: IO [Word8]</li>
+	<li>[36,126,0,146,225,214,211,98]</li>
+	<li>"$~\NUL\146\225\214\211b"</li>
+	</ul></li>
+<li>続く複数のチャンク</li>
+<li>仕様に含まれないバイト列</li>
+</ul>
+
+<p>チャンク</p>
+
+<p>数値はリトルエンディアンとする。</p>
+
+<ul>
+<li>4バイトの「長さ」</li>
+<li>4バイトのデータタイプ(大文字アルファベット)</li>
+<li>CRC-32</li>
+</ul>
+
+<p>
+空のDENDチャンク以降はraw dataとする。
+CRCの計算にはチャンクタイプ領域も含むものとする。
+</p>
+
+<h2>CRCの計算</h2>
+
+<p>
+<a href="/computer/haskell/coding/error_detection/crc32"
+	>「Haskell: コーディング: CRC-32」</a>
+<a href="/computer/haskell/coding/tips/maybe_state/codes/CRC.hs"
+	>CRC.hs</a>
+</p>
+
+<h3>モジュール宣言とインポート</h3>
+
+<p><code>module CRC (check, calc) where</code></p>
+
+<p><code>import Control.Applicative ((&lt;$&gt;))<br/>
+import Control.Arrow (first, (&&&))<br/>
+import Data.Array (Array, (!), listArray)<br/>
+import Data.Bits (complement, xor, shiftR, testBit)<br/>
+import Data.Bool (bool)<br/>
+import Data.Word (Word8, Word32)<br/>
+import qualified Data.ByteString as BS (ByteString, foldl')</code></p>
+
+<h3>テーブルの定義</h3>
+
+<p><code>table :: Array Word8 Word32<br/>
+table = listArray (0, 255) . (&lt;$&gt; [0 .. 255]) . ((!! 8) .) . iterate $<br/>
+	<span class="indent1">uncurry (bool id $ xor 0xedb88320)
+		. ((`testBit` 0) &amp;&amp;&amp; (`shiftR` 1))</span></code></p>
+
+<h3>CRC-32の計算</h3>
+
+<p><code>calc :: BS.ByteString -&gt; Word32<br/>
+calc = complement . BS.foldl' (flip st) 0xffffffff<br/>
+	<span class="indent1">where st b = uncurry xor
+			. first ((table !) . (xor b))</span><br/>
+		<span class="indent2">. (fromIntegral
+				&amp;&amp;&amp; (`shiftR` 8))</span></code></p>
+
+<h3>CRC-32のチェック</h3>
+
+<p><code>check :: BS.ByteString -&gt; Bool<br/>
+check = ((== 0x2144df1c) . calc</code></p>
+
+<h2>モジュールYjChunks</h2>
+
+<p><a href="/computer/haskell/coding/tips/maybe_state/codes/YjChunks.hs"
+	>YjChunks.hs</a></p>
+
+<p>
+デコーダ・エンコーダを作る。
+共通で使えるYjChunks型をモジュールYjChunksに定義しておく。
+</p>
+
+<h3>モジュール宣言など</h3>
+
+<p><code>{-# LANGUAGE OverloadedStrings #-}</code></p>
+
+<p><code>module YjChunks
+	(YjChunks, YjChunk, yjChunk, encode, magic, dend) where</code></p>
+
+<p><code>import qualified Data.ByteString as BS</code></p>
+
+<h3>型の定義</h3>
+
+<p><code>type YjChunks = [YjChunk]</code></p>
+
+<p><code>data YjChuk = YjChunk {
+	<span class="indent1">typ :: BS.ByteString,</span><br/>
+	<span class="indent1">dat :: BS.ByteString</span><br/>
+	<span class="indent1">} deriving (Show, Eq)</span></code></p>
+
+<h3>構築関数</h3>
+
+<p>引き数をチェックする型構築子を作成する。</p>
+
+<p><code>yjChunk :: BS.ByteString -&gt; BS.ByteString -&gt; Maybe YjChunk<br/>
+yjChunk "DEND" d | not $ BS.null d = Nothing<br/>
+yjChunk t d<br/>
+	<span class="indent1">| BS.length t == 4 = Just $ YjChunk t d</span><br/>
+	<span class="indent1">| otherwise = Nothing</span></code></p>
+
+<h3>エンコード</h3>
+
+<p>
+チェックサムを求める関数とチャンクを受けとり
+チェックサムを末尾に追加したバイト列表現を生成する。
+</p>
+
+<p><code>encode :: (BS.ByteString -&gt; BS.ByteString) -&gt; YjChunk -&gt; (Int, BS.ByteString)<br/>
+encode cs yc = (BS.length $ dat yc, bs `BS.append` cs bs)<br/>
+	<span class="indent1">where bs = typ yc `BS.append` dat yc</span></code></p>
+
+<h3>マジックナンバー</h3>
+
+<p><code>magic :: BS.ByteString<br/>
+magic = "$~\NUL\146\225\214\211b"</code></p>
+
+<h3>終端子</h3>
+
+<p><code>dend :: YjChunk<br/>
+Just dend = yjChunk "DEND" ""</code></p>
+
+<h2>YjChunksファイルの作成</h2>
+
+<p><a href="/computer/haskell/coding/tips/maybe_state/codes/encode.hs"
+	>encode.hs</a></p>
+
+<p>
+チャンクタイプ(4バイトの大文字列)とバイト列のペアのリストから
+YjChunksファイルを作成する。
+DENDを最後に付加する。
+またその後に適当なバイト列をappendしても良い。
+</p>
+
+<h3>インポートなど</h3>
+
+<p><code>{-# LANGUAGE OverloadedStrings #-}</code></p>
+
+<p><code>import Control.Applicative ((&lt;$&gt;))<br/>
+import Control.Arrow (first)<br/>
+import Data.Bits (shiftR)<br/>
+import qualified Data.ByteString as BS</code></p>
+
+<p><code>import qualified YjChunks as Yc<br/>
+import CRC (calc)</code></p>
+
+<h3>関数encode1</h3>
+
+<p><code>encode1 :: Yc.YjChunk -&gt; BS.ByteString<br/>
+encode1 = uncurry BS.append . first (le 4) . Yc.encode (le 4 . calc)<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">le 0 _ = ""</span><br/>
+	<span class="indent1">le c n = BS.cons (fromIntegral n) $
+		le (c - 1 :: Int) (n `shiftR` 8)</span></code></p>
+
+<h3>関数encode</h3>
+
+<p><code>encode :: Yc.YjChunks -&gt; BS.ByteString<br/>
+encode = (Yc.magic `BS.append`) . BS.concat . map encode1
+	. (++ [Yc.dend])</code></p>
+
+<h3>サンプル</h3>
+
+<p><code>sample :: BS.ByteString<br/>
+Just sample = encode &lt;$&gt;
+	mapM (uncurry Yc.yjChunk) [("YSJJ", "hello")]</code></p>
+
+<h3>ファイルへの書きこみ</h3>
+
+<p>サンプルをファイルに書きこむ。</p>
+
+<p><code>main :: IO ()<br/>
+main = BS.writeFile "hello.yjcs" sample</code></p>
+
+<h2>テスト用のYjChunksファイル</h2>
+
+<p><a href="/computer/haskell/coding/tips/maybe_state/samples/hello.yjcs"
+	>hello.yjcs</a></p>
+
+<p>以下のコマンドでテスト用のYjChunksファイルが生成される。</p>
+
+<p><code>% runghc encode.hs</code></p>
+
+<h2>YjChunksファイルの解析</h2>
+
+<p><a href="/computer/haskell/coding/tips/maybe_state/codes/decode.hs"
+	>decode.hs</a></p>
+
+<h3>モジュールのインポートなど</h3>
+
+<p><code>{-# LANGUAGE PackageImports #-}</code></p>
+
+<p><code>import Control.Applicative ((&lt;$&gt;), (&lt;*&gt;))<br/>
+import Control.Arrow ((***))<br/>
+import "monads-tf" Control.Monad.State (StateT, runStateT, gets, put)<br/>
+import Data.Bits ((.|.), shiftL)<br/>
+import Data.Bool (bool)<br/>
+import qualified Data.ByteString as BS<br/>
+import System.IO (openBinaryFile, IOMode(..))<br/>
+import System.IO.Unsafe (unsafePerformIO)</code></p>
+
+<p><code>import YjChunks (YjChunks, YjChunk, yjChunk, magic, dend)<br/>
+import CRC (check)</code></p>
+
+<h3>サンプルの用意</h3>
+
+<p>対話環境から試しやすいようにサンプルデータを用意しておく。</p>
+
+<p><code>sample :: BS.ByteString<br/>
+sample = unsafePerformIO $<br/>
+	<span class="indetn1">BS.hGetContents =&lt;&lt;
+		openBinaryFile "openBinaryFile" ReadMode</span></code></p>
+
+<h3>関数untilM</h3>
+
+<p>
+DENDチャンクで終了させるために条件を満たしたら直前までを返す関数を作成する。
+</p>
+
+<p><code>untilM :: (Monad m, Functor m) =&gt;
+	(a -&gt; Bool) -&gt; m a -&gt; m [a]<br/>
+untilM p m = bool (return []) &lt;$&gt;
+	((&lt;$&gt; untilM p m) . (:)) &lt;*&gt; not . p =&lt;&lt; m</code></p>
+
+<h3>関数item</h3>
+
+<p>
+ByteStringを解析していくうえでよく出てくる操作を関数にする。
+指定されたバイト数とりだしてそれを変換するという構造だ。
+</p>
+
+<p><code>item :: Int -&gt; (BS.ByteString -&gt; Maybe a) -&gt;
+	StateT BS.ByteString Maybe a<br/>
+item l f = gets (BS.splitAt l) &gt;&gt;=<br/>
+	<span class="indent1">uncurry (flip . maybe $ fail "error")
+		. (f *** (. return) . (&gt;&gt;) . put)</span></code></p>
+
+<h3>関数chunk</h3>
+
+<p>チャンクをひとつ読みこむ関数だ。</p>
+
+<p><code>chunk :: StateT BS.ByteString Maybe YjChunk<br/>
+chunk = item 4 (Just . le) &gt;&gt;= \l -&gt; item (l + 8) $ \tdc -&gt;<br/>
+	<span class="indent1">if not $ check tdc then Nothing else</span><br/>
+	<span class="indent2">let (t, dc) = BS.splitAt 4 tdc in
+		yjChunk t $ BS.take l dc</span><br/>
+	<span class="indent1">where le = (. BS.uncons) $</span><br/>
+	<span class="indent2">maybe 0 (uncurry (.|.)
+		. (fromIntegral *** (`shiftL` 8) . le))</span></code></p>
+
+<h3>関数decode</h3>
+
+<p>マジックナンバーを読みこんだあとDENDまで複数のチャンクを読みこむ。</p>
+
+<p><code>decode :: BS.ByteString -&gt; Maybe (YjChunks, BS.ByteString)<br/>
+decode = runStateT $<br/>
+	<span class="indent1">item 8 (bool Nothing (Just ()) . (== magic))
+		&gt;&gt; untilM (== dend) chunk</span></code></p>
+
+<h3>試してみる</h3>
+
+<p><code>% ghci decode.hs<br/>
+*Main&gt; decode sample<br/>
+Just ([YjChunk {typ ="YSJJ", dat = "hello"}],"")</code></p>
+
+<p>読みこめた。</p>
+
+<h2>まとめ</h2>
+
+<p>
+StateT BS.ByteString Maybeモナドがまずはポイントだ。
+また、関数itemでよく使う構造を抽象した。
+</p>
