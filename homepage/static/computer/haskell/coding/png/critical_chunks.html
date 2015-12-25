@@ -58,63 +58,80 @@ IDATが複数の場合はなかみを連結したひとつのIDATと同じよう
 >CRC-32のコードの説明</a>を参照する。
 </p>
 
-<p>(!!! 以降のコードの説明を修正する必要がある !!!)</p>
-
 <p>とりあえずIDATチャンクの内容を読み出す。</p>
 
-<h3>importリストなど</h3>
+<h3>モジュール宣言など</h3>
 
 <p><code>{-# LANGUAGE OverloadedStrings, PackageImports #-}</code></p>
 
-<p><code>import Control.Applicative ((&lt;$&gt;))<br/>
+<p><code>module ReadIdat (idat) where</code></p>
+
+<p><code>import Control.Applicative ((&lt;$&gt;), (&lt;*&gt;))<br/>
 import Control.Arrow ((***))<br/>
-import "monads-tf" Control.Monad.State (runState, put, get)<br/>
-import Data.List (unfoldr)<br/>
+import Control.Moand (when)<br/>
+import "monads-tf" Control.Monad.State (StateT, evalStateT, put, gets)<br/>
 import Data.Bits (Bits, (.|.), shiftL)<br/>
 import Data.Bool (bool)<br/>
-import qualified Data.ByteString as BS<br/>
-import qualified Data.ByteString.Lazy as LBS<br/>
-import System.IO (openBinaryFile, IOMode(..))<br/>
-import System.Environment (getArgs)</code></p>
+import qualified Data.ByteString as BS</code></p>
 
 <p><code>import CRC (check)</code></p>
 
-<h3>PNGシグネチャのチェック</h3>
+<h3>マジックナンバーや型シグネチャ</h3>
 
-<p><code>signature :: BS.ByteString -&gt; Maybe BS.ByteString<br/>
-signature = uncurry (flip $ bool Nothing) . ((== sig) *** Just) . BS.splitAt 8<br/>
-	<span class="indent1">where sig = "\x89PNG\r\n\SUB\n"</span></code></p>
-
-<h3>チャンクの読みこみ</h3>
+<p><code>magic :: BS.ByteString<br/>
+magic = "\x89PNG\r\n\SUB\n"</code></p>
 
 <p><code>type Chunk = (BS.ByteString, BS.ByteString)</code></p>
 
-<p><code>chunk :: Bs.ByteString -&gt; Maybe (Maybe Chunk, BS.ByteString)<br/>
-chunk "" = Nothing<br/>
-chunk bs<br/>
-	<span class="indent1">| check (LBS.fromStrict td) c =
-		Just (Just std, r)</span><br/>
-	<span class="indent1">| otherwise = Just (Nothing, r)</span><br/>
-	<span class="indent1">where</span><br/>
-	<span class="indent1">((td, std, c), r) =
-		(`runState` bs) $ do</span><br/>
-		<span class="indent2">l &lt; - st $ BS.splitAt 4</span><br/>
-		<span class="indent2">td_ &lt; - st $ BS.splitAt $ 4 + be l</span><br/>
-		<span class="indent2">c_ &lt; - st $ BS.splitAt 4</span><br/>
-		<span class="indent2">return (td_, BS.splitAt 4 td_, be c_)</span>
-	<span class="indent1">st = (uncurry (=&lt;&lt;)
-		. (const . return *** put) =&lt;&lt;) . (&lt;$&gt; get)</span><br/>
-	<span class="indent1">be :: (Bits n, Num n) =&gt;
-		BS.ByteString -&gt; n</span><br/>
-	<span class="indent1">be = BS.foldl'
-		(\n w -&gt; n `shiftL` 8 .|. fromIntegral w) 0</span><br/>
-	<span class="indent1"></span></code></p>
+<p><code>iend :: Chunk<br/>
+iend = ("IEND", "")</code></p>
 
-<h3>IDATの読みだし</h3>
+<h3>関数untilM</h3>
+
+<p>条件を満たす前までをとりだす関数を作る。</p>
+
+<p><code>untilM :: (Monad m, Functor m) =&gt;
+	(a -&gt; Bool) -&gt; m a -&gt; m [a]<br/>
+untilM p m = bool (return []) &lt;$&gt;
+	((&lt;$&gt; untilM p m) . (:)) &lt;*&gt; not . p =&lt;&lt; m</code></p>
+
+<h3>関数item</h3>
+
+<p>
+バイト列から指定されたバイト数とりだし値に変換する。
+不正な値であることはNothingで表し、この場合全体の処理が終わる。
+</p>
+
+<p><code>item :: Int -&gt;
+	(BS.ByteString -&gt; Maybe a) -&gt; StateT BS.ByteString Maybe a<br/>
+item l f = gets (BS.splitAt l) &gt;&gt;=<br/>
+	<span class="indent1">uncurry (flip . maybe $ fail "error")
+		. (f *** (. return) . (&gt;&gt;) . put)</span></code></p>
+
+<h3>関数chunk</h3>
+
+<p>チャンクをひとつ読みこむ。</p>
+
+<p><code>chunk :: StateT BS.ByteString Maybe Chunk<br/>
+chunk = do
+	<span class="indent1">td &lt;- (`item` Just) . (4 +)
+		=&lt;&lt; item 4 (Just . BS.foldl' be 0)</span><br/>
+	<span class="indent1">cs &lt;- item 4 $ Just . BS.foldl' be 0</span><br/>
+	<span class="indent1">when (not $ check td cs) $ fail "error"</span><br/>
+	<span class="indent1">return $ BS.splitAt 4 td</span><br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">be :: (Bits n, Num n) =&gt;
+		n -&gt; Wrod8 -&gt; n</span><br/>
+	<span class="indent1">be = curry $
+		uncurry (.|.) . ((`shiftL` 8) *** fromIntegral)</span></code></p>
+
+<h3>関数idat</h3>
 
 <p><code>idat :: BS.ByteString -&gt; Maybe BS.ByteString<br/>
-idat = (BS.concat . map snd . filter ((== "IDAT") . fst) &lt;$&gt;)<br/>
-	<span class="indent1">. (sequence . unfoldr chunk =&lt;&lt;) . signature</span></code></p>
+idat = ((BS.concat . map snd . filter ((== "IDAT") . fst) &lt;$&gt;) .)
+		. evalStateT $<br/>
+	<span class="indent1">item 8 (bool Nothing (Just ()) . (== magic))
+		&gt;&gt; untilM (== iend) chunk</span></code></p>
 
 <h2>パレットを使わない</h2>
 

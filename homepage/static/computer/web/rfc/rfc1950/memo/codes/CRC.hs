@@ -8,15 +8,15 @@ import Data.Array (Array, (!), listArray)
 import Data.Bits (Bits, complement, xor, shiftR, testBit)
 import Data.Bool (bool)
 import Data.Word (Word8, Word32)
-import qualified Data.ByteString.Lazy as LBS (ByteString, pack, append, foldl')
+import qualified Data.ByteString as BS (ByteString, pack, append, foldl')
 
-check :: LBS.ByteString -> Word32 -> Bool
-check = curry $ (== 0x2144df1c) . crc . uncurry LBS.append . second w2bs
-	where w2bs = (LBS.pack .) . flip curry (4 :: Int) . unfoldr $ \(i, n) ->
+check :: BS.ByteString -> Word32 -> Bool
+check = curry $ (== 0x2144df1c) . crc . uncurry BS.append . second w2bs
+	where w2bs = (BS.pack .) . flip curry (4 :: Int) . unfoldr $ \(i, n) ->
 		bool Nothing (Just . second (i - 1 ,) $ popByte n) (i > 0)
 
-crc :: LBS.ByteString -> Word32
-crc = complement . LBS.foldl' st 0xffffffff
+crc :: BS.ByteString -> Word32
+crc = complement . BS.foldl' st 0xffffffff
 	where st n b = uncurry xor . (first $ (table !) . (`xor` b)) $ popByte n
 
 popByte :: (Integral a, Bits a) => a -> (Word8, a)
