@@ -1,6 +1,6 @@
 RFC 1950: メモ
 
-<p>(工事中 0%)</p>
+<p>(工事中 5%)</p>
 
 <h2>例となるPNGファイル</h2>
 
@@ -22,6 +22,93 @@ RFC 1950: メモ
 <p><code>% ghci ReadIdat.hs<br/>
 ReadIdat&gt; :m + System.IO<br/>
 ReadIdat System.IO&gt; cnt &lt;-
-	hGetContents =&lt;&lt; openBinaryFile "small.png" ReadMode<br/>
+	BS.hGetContents =&lt;&lt; openBinaryFile "small.png" ReadMode<br/>
 ReadIdat System.IO&gt; idat cnt<br/>
 Just "x\156c``dbfaec\231...\139OHLJ\ACK\NUL\194O\DC3W"</code></p>
+
+<h2>構造</h2>
+
+<h3>全体の構造</h3>
+
+<ul>
+<li>CMF: 1バイト</li>
+<li>FLG: 1バイト</li>
+<li>DICTID: 4バイト (FLG.FDICTがセットされているとき)</li>
+<li>compressed data</li>
+<li>ADLER32</li>
+</ul>
+
+<p>
+small.pngの例ではCMF = 0x78, FLG = 0x9c, ADLER32 = 0xc24f1357となっている。
+</p>
+
+<h3>CMF</h3>
+
+<ul>
+<li>CM: bits 0 to 3</li>
+<li>CINFO: bits 4 to 7</li>
+</ul>
+
+<p>CMF = 0x78でウィンドウサイズが32Kのdeflate圧縮となる。</p>
+
+<h4>CM</h4>
+
+<p>
+CM = 8でwindow sizeが32Kまでのdeflate圧縮を示す。
+CM = 15は予約されている。
+</p>
+
+<h4>CINFO</h4>
+
+<p>
+CM = 8ではこの領域はLZ77 window sizeの2を底とした対数値から8を引いたものだ。
+7までしか許されない。
+この値が7の場合window sizeは2 ^ (7 + 8) = 2 ^ 5 * 2 ^ 10 = 32Kとなる。
+</p>
+
+<h3>FLG</h3>
+
+<ul>
+<li>FCHECK: bits 0 to 4</li>
+<li>FDICT: bit 5</li>
+<li>FLEVEL: bits 6 to 7</li>
+</ul>
+
+<h4>FCHECK</h4>
+
+<p>
+チェックビットだ。
+(CMF * 256 + FLG) `mod` 31 == 0となる。
+small.pngの例では0x789c = 30876 = 996 * 31となっている。
+</p>
+
+<h4>FDICT</h4>
+
+<p>
+このフラグがセットされているとき辞書の識別子DICTがFLGバイトの直後に来る。
+DICTは使用する辞書のAdler-32チェックサムとなっている。
+</p>
+
+<h4>FLEVEL</h4>
+
+<ul>
+<li>0: 圧縮に最速のアルゴリズムを使った</li>
+<li>1: 圧縮に速いアルゴリズムを使った</li>
+<li>2: 圧縮にデフォルトのアルゴリズムを使った</li>
+<li>3: 圧縮率最大で最も遅いアルゴリズムを使った</li>
+</ul>
+
+<p>
+CINFO = 0x9cのときbit 6 = 0, bit 7 = 1なので
+「2: デフォルトのアルゴリズム」となる。
+</p>
+
+<h3>ADLER32</h3>
+
+<p>
+解凍データのAdler-32チェックサムだ。
+</p>
+
+<p>
+解凍したデータを示しながら調べていくのでさきにdeflate/inflateを調べる。
+</p>
