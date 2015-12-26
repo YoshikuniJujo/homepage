@@ -28,8 +28,83 @@ Just "x\156c``dbfaec\231...\139OHLJ\ACK\NUL\194O\DC3W"</code></p>
 
 <h2>zlib</h2>
 
+<p><a href="/computer/haskell/coding/png/codes/random/zlib.hs"
+	>zlib.hs</a></p>
+
 <p>
 IDATの中身は<a href="/computer/web/rfc/rfc1950"
 >RFC 1950</a>のzlib形式となっている。
 RFC 1950ではdeflate圧縮されたデータにヘッダとフッタを追加している。
+フッタは解凍されたデータのチェックサムとなっているのでdeflate形式に
+ついて学んでから扱うことにする。
 </p>
+
+<h3>拡張機能とモジュールのインポート</h3>
+
+<p><code>{-# LANGUAGE OverloadedStrings, PackageImports #-}</code></p>
+
+<p><code>import Control.Applicative<br/>
+import Control.Arrow<br/>
+import "monads-tf" Control.Monad.State<br/>
+import Data.Bits<br/>
+import Data.Word<br/>
+import qualified Data.ByteString as BS</code></p>
+
+<p><code>import ReadIdat</code></p>
+
+<h3>型の定義</h3>
+
+<p><code>data Cmf = Deflate Int | CmfRaw Word8 deriving Show</code></p>
+
+<p><code>data FLvl = FLvl Word8 deriving Show</code></p>
+
+<p><code>data FDct = FDct Adler32 deriving Show</code></p>
+
+<p><code>data Adler32 = Adler32 Word32 deriving Show</code></p>
+
+<h3>関数cmf</h3>
+
+<p><code>cmf :: BS.ByteString -&gt; Maybe (Cmf, Word8)<br/>
+cmf bs = case BS.uncons bs of<br/>
+	<span class="indent1">Just (w, "")</span><br/>
+		<span class="indent2">| w .&amp;. 0x0f == 8 -&gt;
+			Just (Deflate $ 2 ^ (w `shiftR` 4 + 8), w)</span><br/>
+		<span class="indent2">| otherwise -&gt;
+			Just (CmfRaw w, w)</span><br/>
+	<span class="indent1">_ -&gt; Nothing</span></code></p>
+
+<h3>関数flg</h3>
+
+<p><code>flg :: Word16 -&gt; BS.ByteString -&gt; Maybe (Bool, FLvl)<br/>
+flg c bs = case BS.uncons bs of<br/>
+	<span class="indent1">Just (w, "") -&gt;
+		case (c `shiftL` 8 .|. fromIntegral w) `mod` 31 of</span><br/>
+		<span class="indent2">0 -&gt;
+			Just (w `testBit` 5, FLvl $ w `shiftR` 6)</span><br/>
+		<span class="indent2">_ -&gt; Nothing</span><br/>
+	<span class="indent1">_ -&gt; Nothing</span></code></p>
+
+<h3>関数header</h3>
+
+<p><code>header :: StateT BS.ByteString Maybe (Cmf, FLvl, Maybe FDct)<br/>
+header = do
+	<span class="indent1">(c, w) &lt;- item 1 cmf</span><br/>
+	<span class="indent1">(b, l) &lt;- item 1 . flg $ fromIntegral w</span><br/>
+	<span class="indent1">md &lt;- if b</span><br/>
+		<span class="indent2">then (Just &lt;$&gt;) . item 4</span><br/>
+			<span class="indent3">$ ((Just . FDct . Adler32) . 
+				. flip BS.foldl' 0 . curry</span><br/>
+			<span class="indent3">$ uncurry (.|.)
+				. ((`shiftL` 8) *** fromIntegral)</span><br/>
+		<span class="indent2">else return Nothing</span><br/>
+	<span class="indent1">return (c, l, md)</span></code></p>
+
+<h3>試してみる</h3>
+
+<p><code>% ghci zlib.hs<br/>
+*Main&gt; :m + System.IO<br/>
+*Main System.IO&gt; cnt &lt;- BS.hGetContents =&lt;&lt;
+	openBinaryFile "small.png" ReadMode<br/>
+*Main System.IO&gt; runStateT header =&lt;&lt; idat cnt<br/>
+Just ((Deflate 32768,FLvl 2,Nothing),
+	"c``dbface\231\224d\224\226...\141\139OHLJ\ACK\NUL\194O\DC3W"</code></p>
