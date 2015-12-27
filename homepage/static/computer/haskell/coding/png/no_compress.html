@@ -1,0 +1,114 @@
+無圧縮のひとつのブロック、ひとつのIDATからなる画像の生成
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+PNGファイル形式について学ぶうえでひとつのmilestoneとして
+無圧縮、ひとつのdeflateブロック、ひとつのIDATから成るPNGファイルを作成する。
+色は8ビットのグレイスケールとする。
+</p>
+
+<h2>入力ファイルの形式</h2>
+
+<p>
+1行目に(width)x(height)とし2行目からは
+ピクセルデータを16進数2桁で表現する。
+</p>
+
+<p><code>5x5<br/>
+ffffffffff<br/>
+ffff00ffff<br/>
+ff000000ff<br/>
+ffff00ffff<br/>
+ffffffffff</code></p>
+
+<h2>出力ファイルの構造</h2>
+
+<ul>
+<li>IHDR</li>
+<li>IDAT</li>
+<li>IEND</li>
+</ul>
+
+<h2>IHDR</h2>
+
+<p>
+グレイスケールで決めうちなのであまりこったことをする必要はないが、
+いちおう代数的データ型を作成してそこからChunkに変換する形にする。
+</p>
+
+<h2>IEND</h2>
+
+<p>Chunkデータとして定義する。</p>
+
+<h2>IDAT</h2>
+
+<p>
+[[Word8]]のデータをByteStringに変換しそれをdeflate無圧縮形式に変換する。
+zlibのヘッダとフッタをつける。
+Chunkデータとする。
+</p>
+
+<h2>コード</h2>
+
+<h3>[Chunk]型とPNG形式</h3>
+
+<p>
+[Chunk]型の値とPNG形式のByteStringとの相互変換関数を作成する。
+<a href="/computer/web/rfc/rfc2083/samples/small.png"
+>small.png</a>で試しながら作成する。
+</p>
+
+<p>
+<a href="/computer/haskell/coding/png/codes/simple/CRC.hs"
+	>CRC.hs</a>
+<a href="/computer/haskell/coding/png/codes/simple/Chunks.hs"
+	>Chunks.hs</a>
+</p>
+
+<p>コードのリファクタリングやコードの説明は今はしない。</p>
+
+<h3>IHDR内部のcodec</h3>
+
+<p>IHDRの中身のcodecをする。</p>
+
+<p>
+<a href="/computer/haskell/coding/png/codes/simple/IHDR.hs"
+	>IHDR.hs</a>
+</p>
+
+<h3>zlibのヘッダのcodec</h3>
+
+<p>
+<a href="/computer/haskell/coding/png/codes/simple/Zlib.hs"
+	>Zlib.hs</a>
+</p>
+
+<p></p>
+
+<h3>deflate無圧縮のcodec</h3>
+
+<p>
+<a href="/computer/haskell/coding/png/codes/simple/Codec.hs"
+	>Codec.hs</a>
+</p>
+
+<h3>テキストファイルからのPNGの生成</h3>
+
+<p>
+<a href="/computer/haskell/coding/png/codes/simple/fromText.hs"
+	>fromText.hs</a>
+</p>
+
+<h3>例</h3>
+
+<p>
+<a href="/computer/haskell/coding/png/codes/simple/circle.txt"
+	>circle.txt</a>
+<a href="/computer/haskell/coding/png/codes/simple/circle.png"
+	>circle.png</a>
+</p>
+
+<p><code>% runghc fromText.hs circle.txt</code></p>
