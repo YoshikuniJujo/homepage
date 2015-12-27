@@ -7,21 +7,46 @@ RFC 1951: メモ
 <p><a href="/computer/web/rfc/rfc2083/samples/small.png"
 	>small.png</a></p>
 
-<h2>IDAT部分を読み出す</h2>
+<h2>IDAT部分を読み出しzlibのヘッダを解析</h2>
 
 <p><a href="/computer/haskell/coding/png/critical_chunks.html"
 	>PNG: 必須チャンクの解析</a></p>
+
+<p><a href="/computer/haskell/coding/png/idat.html"
+	>PNG: IDATの解析</a></p>
 
 <p>
 <a href="/computer/web/rfc/rfc1950/memo/codes/ReadIdat.hs"
 	>ReadIdat.hs</a>
 <a href="/computer/web/rfc/rfc1950/memo/codes/CRC.hs"
 	>CRC.hs</a>
+<a href="/computer/haskell/coding/png/codes/random/zlib.hs"
+	>zlib.hs</a>
 </p>
 
-<p><code>% ghci ReadIdat.hs<br/>
+<p><code>% ghci zlib.hs<br/>
 ReadIdat&gt; :m + System.IO<br/>
 ReadIdat System.IO&gt; cnt &lt;-
 	BS.hGetContents =&lt;&lt; openBinaryFile "small.png" ReadMode<br/>
-ReadIdat System.IO&gt; idat cnt<br/>
-Just "x\156c``dbfaec\231...\139OHLJ\ACK\NUL\194O\DC3W"</code></p>
+ReadIdat System.IO&gt; runStateT header =&lt;&lt; idat cnt<br/>
+Just ((Deflate 32768,FLvl 2,Nothing),
+	"c``dbface\231\224d\224\226...\141\139OHLJ\ACK\NUL\194O\DC3W"</code></p>
+
+<h2>無圧縮</h2>
+
+<p>
+無圧縮のブロックひとつから成るdeflateフォーマットによるデータを作成し
+それをzlib形式としPNGファイルにして表示してみる。
+画像はわかりやすいようにグレイスケールの左から右へのグラデーションとしよう。
+画像サイズは見えるレベルで小さなものとする。
+16x16くらいがよさそうだ。
+0, 15, 31 ... 255のデータをたてに16重ねれば良いだろう。
+</p>
+
+<p>
+無圧縮のブロックひとつから成るdeflate形式のデータは以下のようになる。
+</p>
+
+<p>
+0x01 (長さ2バイト) (長さの補数2バイト) (データ)
+</p>
