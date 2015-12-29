@@ -10,6 +10,11 @@ PNGファイル形式について学ぶうえでひとつのmilestoneとして
 色は8ビットのグレイスケールとする。
 </p>
 
+<p>
+<a href="/computer/web/rfc/rfc2083/samples/small.png"
+>small.png</a>で試しながら作成する。
+</p>
+
 <h2>入力ファイルの形式</h2>
 
 <p>
@@ -53,31 +58,238 @@ Chunkデータとする。
 
 <h2>コード</h2>
 
-<h3>ツール</h3>
+<h3>モジュールBits</h3>
 
 <p>
 <a href="/computer/haskell/coding/png/codes/simple/Bits.hs"
 	>Bits.hs</a>
+</p>
+
+<p>ビット演算をする関数を作る。</p>
+
+<h4>モジュール宣言など</h4>
+
+<p><code>{-# LANGUAGE OverloadedStrings, TupleSections #-}</code></p>
+
+<p><code>module Bits (<br/>
+	<span class="indent1">Bits, complement, (.&amp;.), (.|.), xor,
+		shiftL, shiftR, testBit,</span><br/>
+	<span class="indent1">popBit, popBits, popByte,</span><br/>
+	<span class="indent1">beToByteString, beFromByteString,</span><br/>
+	<span class="indent1">leToByteString ) where</span></code></p>
+
+<p><code>import Control.Applicative ((&lt;$&gt;), (&lt;*&gt;))<br/>
+import Control.Arrow ((&amp;&amp;&amp;), (***))<br/>
+import Data.Bits (Bits, complement, testBit,
+	(.&amp;.), (.|.), xor, shiftL, shiftR)<br/>
+import Data.Word (Word8)<br/>
+import qualified Data.ByteString as BS (ByteString, cons, foldl')</code></p>
+
+<h4>バイト列との相互変換</h4>
+
+<p>ビッグエンディアンでの相互変換関数を定義する。</p>
+
+<p><code>beToByteString :: (Integral a, Bits a) =&gt;
+	Int -&gt; a -&gt; BS.ByteString<br/>
+beToByteString = btb "" where<br/>
+	<span class="indent1">btb s 0 _ = s</span><br/>
+	<span class="indent1">btb s c n = btb (BS.cons (fromIntegral n) s)
+		(c - 1) (n `shiftR` 8)</span></code></p>
+
+<p><code>beFromByteString ::
+	(Num a, Bits a) =&gt; BS.ByteString -&gt; a<br/>
+beFromByteString =<br/>
+	<span class="indent1">BS.foldl' (curry $ uncurry (.|.)
+		. ((`shiftL` 8) *** fromIntegral)) 0</span></code></p>
+
+<p>リトルエンディアンではとりあえずバイト列への変換関数のみ定義する。</p>
+
+<p><code>leToByteString :: (Integral a, Bits a) =&gt;
+	Int -&gt; a -&gt; BS.ByteString<br/>
+leToByteString 0 = const ""<br/>
+leToByteString c =<br/>
+	<span class="indent1">BS.cons &lt;$&gt; fromIntegral &lt;*&gt;
+		leToByteString (c - 1) . (`shiftR` 8)</span></code></p>
+
+<h4>ビットやバイトをpopする</h4>
+
+<p><code>popByte :: (Integral a, Bits a) =&gt; a -&gt; (Word8, a)<br/>
+popByte = fromIntegral &amp;&amp;&amp; (`shiftR` 8)</code></p>
+
+<p><code>popBits :: Bits n =&gt; n -&gt; Int -&gt; ([Bool], n)<br/>
+popBits n c = (&lt;$&gt; [0 .. c - 1]) . testBit &amp;&amp;&amp;
+	(`shiftR` c) $ n</code></p>
+
+<p><code>popBit :: Bits a =&gt; a -&gt; (Bool, a)<br/>
+popBit = (`testBit` 0) &amp;&amp;&amp; (`shiftR` 1)</code></p>
+
+<h3>モジュールItem</h3>
+
+<p>
 <a href="/computer/haskell/coding/png/codes/simple/Item.hs"
 	>Item.hs</a>
 </p>
 
-<h3>[Chunk]型とPNG形式</h3>
+<h4>モジュール宣言など</h4>
+
+<p><code>{-# LANGUAGE OverloadedStrings, PackageImports #-}</code></p>
+
+<p><code>module Item (item, byte, untilM) where</code></p>
+
+<p><code>import Control.Applicative ((&lt;$&gt;), (&lt;*&gt;))<br/>
+import Control.Arrow ((***))<br/>
+import "monads-tf" Control.Monad.State (StateT, gets, put)<br/>
+import Data.Bool (bool)<br/>
+import qualified Data.ByteString as BS (ByteString, uncons, splitAt)</code></p>
+
+<h4>関数item</h4>
+
+<p>バイト列から指定したバイト数だけとりだしそれを変換する関数だ。</p>
+
+<p><code>item :: Int -&gt; (BS.ByteString -&gt; Maybe a) -&gt;
+	StateT BS.ByteString Maybe a<br/>
+item l f = gets (BS.splitAt l) &gt;&gt;=<br/>
+	<span class="indent1">uncurry (flip . maybe $ fail "error")
+		. (f *** (. return) . (&gt;&gt;) . put)</span></code></p>
+
+<h4>関数byte</h4>
+
+<p>上記のitemにあたえると1バイトをそのまま読みこむ関数となる関数だ。</p>
+
+<p><code>byte :: BS.ByteString -&gt; Maybe Word8<br/>
+byte bs = case BS.uncons bs of Just (w, "") -&gt; Just w; _ -&gt; Nothing</code></p>
+
+<h4>関数untilM</h4>
+
+<p><code>untilM :: (Monad m, Functor m) =&gt;
+	(a -&gt; Bool) -&gt; m a -&gt; m [a]<br/>
+untilM p m = bool (return []) &lt;$&gt;
+	((&lt;$&gt; untilM p m) . (:)) &lt;*&gt; not .p =&lt;&lt; m</code></p>
+
+<h3>モジュールCRC</h3>
+
+<p><a href="/computer/haskell/coding/png/codes/simple/CRC.hs"
+	>CRC.hs</a></p>
+
+<h4>モジュール宣言など</h4>
+
+<p><code>{-# LANGUAGE TupleSectionss #-}</code></p>
+
+<p><code>import Control.Applicative ((&lt;$&gt;))<br/>
+import Control.Arrow (first, second(<br/>
+import Data.Array (Array, (!), listArray)<br/>
+import Data.Bool (bool)<br/>
+import Data.Word (Word8, Word32)<br/>
+import qualified Data.ByteString as BS (ByteString, append, foldl')</code></p>
+
+<p><code>import Bits (complement, xor, leToByteString, popBit, popByte)</code></p>
+
+<h4>関数table</h4>
+
+<p>それぞれのバイトに対する変換を配列にキャッシュする。</p>
+
+<p><code>table :: Array Word8 Word32<br/>
+table = listArray (0, 255) . (&lt;$&gt; [0 .. 255]) $ (!! 8)<br/>
+	<span class="indent1">. iterate
+		(uncurry (bool id (`xor` 0xedb88320)) . popBit)</span></code></p>
+
+<h4>関数calc</h4>
+
+<p>CRCを計算する。</p>
+
+<p><code>calc :: BS.ByteString -&gt; Word32<br/>
+calc = complement . BS.foldl' (flip st) 0xffffffff<br/>
+	<span class="indent1">where st b = uncurry xor
+		. first ((table !) . (`xor` b)) . popByte</span></code></p>
+
+<h4>関数check</h4>
+
+<p>CRCを確認する。</p>
+
+<p><code>check :: BS.ByteString -&gt; Word32 -&gt; Bool<br/>
+check = curry $<br/>
+	<span class="indent1">(== 0x2144df1c) . calc
+		. uncurry BS.append . second (leToByteString 4)</span></code></p>
+
+<h3>モジュールChunk</h3>
 
 <p>
 [Chunk]型の値とPNG形式のByteStringとの相互変換関数を作成する。
-<a href="/computer/web/rfc/rfc2083/samples/small.png"
->small.png</a>で試しながら作成する。
 </p>
 
-<p>
-<a href="/computer/haskell/coding/png/codes/simple/CRC.hs"
-	>CRC.hs</a>
-<a href="/computer/haskell/coding/png/codes/simple/Chunks.hs"
-	>Chunks.hs</a>
-</p>
+</p><a href="/computer/haskell/coding/png/codes/simple/Chunks.hs"
+	>Chunks.hs</a></p>
 
-<p>コードのリファクタリングやコードの説明は今はしない。</p>
+<h4>モジュール宣言など</h4>
+
+<p><code>{-# LANGUAGE
+	TupleSections, OverloadedStrings, PackageImports #-}</code></p>
+
+<p><code>module Chunks (Chunks, Chunk(..), frPng, toPng, idat) where</code></p>
+
+<p><code>import Control.Applicative ((&lt;$&gt;))<br/>
+import "monads-tf" Control.Monad.State (evalStateT, unless)<br/>
+import Data.Bool (bool)<br/>
+import qualified Data.ByteString as BS (<br/>
+	<span class="indent1">ByteString,
+		length, append, concat, splitAt)</span></code></p>
+
+<p><code>import CRC (check, calc)<br/>
+import Item (item, untilM)<br/>
+import Bits (beFromByteString, beToByteString)</code></p>
+
+<h4>定数</h4>
+
+<p><code>magic :: BS.ByteString<br/>
+magic = "\x89PNG\r\n\SUB\n"</code></p>
+
+<h4>型の定義</h4>
+
+<p>PNGファイルは複数のチャンクから成る。</p>
+
+<p><code>type Chunks = [Chunk]</code></p>
+
+<p>Chunkが持つ情報はチャンクの種類と中身である。</p>
+
+<p><code>data Chuk = Chunk {
+	typ :: BS.ByteString, dat :: BS.ByteString }<br/>
+	<span class="indent1">deriving (Show, Eq)</span></code></p>
+
+<h4>IDATチャンクのとりだし</h4>
+
+<p>複数のIDATチャンクをとりだし中身を結合する。</p>
+
+<p><code>idat :: Chunks -&gt; BS.ByteString<br/>
+idat = BS.concat . map dat . filter ((== "IDAT") . typ)</code></p>
+
+<h4>エンコード</h4>
+
+<p>チャンクの集まりをバイト列に変換する。</p>
+
+<p><code>encode :: Chunks -&gt; BS.ByteString<br/>
+encode cs = (magic `BS.append`) . BS.concat
+	. (&lt;$&gt; cs ++ [Chunk "IEND" ""]) $<br/>
+	<span class="indent1">\c -&gt; BS.concat [</span><br/>
+		<span class="indent2">beToByteString 4 . BS.length $ dat c,
+			typ c,</span><br/>
+		<span class="indent2">beToByteString 4 . calc $
+			typ c `BS.append` dat c ]</span></code></p>
+
+<h4>デコード</h4>
+
+<p>バイト列からチャンクの集まりにする。</p>
+
+<p><code>decode :: BS.ByteString -&gt; Maybe Chunks<br/>
+decode = evalStateT $ item 8 (bool Nothing (Just ()) . (== magic)) &gt;&gt;<br/>
+	<span class="indent1">untilM (== Chunk "IEnD" "") chunk</span><br/>
+	<span class="indent1">where chunk = do</span><br/>
+		<span class="indent2">td &lt;- (`item` Just) . (4 +)
+			=&lt;&lt; item 4</span><br/>
+		<span class="indent2">cs &lt;- item 4 $
+			Just . beFromByteString</span><br/>
+		<span class="indent2">unless (check td cs) $ fail "error"</span><br/>
+		<span class="indent2">return . uncurry Chunk $ BS.splitAt 4 td</span><br/>
+		<span class="indent2"></span></code></p>
 
 <h3>IHDR内部のcodec</h3>
 
@@ -88,6 +300,78 @@ Chunkデータとする。
 	>IHDR.hs</a>
 </p>
 
+<h4>モジュール宣言など</h4>
+
+<p><code>{-# LANGUAGE
+	TupleSections, OverloadedStrings, PackageImports #-}</code></p>
+
+<p><code>module IHDR (
+	<span class="indent1">IHDR(..), ColorType(..),
+		HasColor(..), HasAlpha(..), decode, encode</span><br/>
+	<span class="indent1">) where</span></code></p>
+
+<p><code>import "monads=tf" Control.Monad.State (evalStateT, replicateM)<br/>
+import Data.Word (Word8)<br/>
+import qualified Data.ByteString as BS (concat)</code></p>
+
+<p><code>import Chunks (Chunks(..))<br/>
+import Item (item, byte)<br/>
+import Bits ((.|.), shiftL, popBits, beFromByteString, beToByteString)</code></p>
+
+<h4>型の定義</h4>
+
+<p><code>data IHDR = IHDR {<br/>
+	<span class="indent1">width :: Int,
+		height :: Int, bitDepth :: Word8,</span><br/>
+	<span class="indent1">compMethod :: Word8,
+		filterMethod :: Word8, ilaceMethod :: Word8</span><br/>
+	<span class="indent1">} deriving Show</span></code></p>
+
+<p><code>data ColorType = PaletteColor | NoPalette HasColor HasAlpha
+	deriving Show</code></p>
+
+<p><code>data HasColor = Grayscale | HasColor deriving (Show, Enum)</code></p>
+
+<p><code>data HasAlpha = NoAlpha | HasAlpha deriving (Show, Enum)</code></p>
+
+<h4>エンコード</h4>
+
+<p><code>encode :: IHDR -&gt; Chunk<br/>
+encode h = Chunk { typ = "IHDR", dat = BS.concat [<br/>
+	<span class="indent1">beToByteString 4 $ width h,
+		beToByteString 4 $ height h,</span><br/>
+	<span class="indent1">beToByteString 1 $ bitDepth h,</span><br/>
+	<span class="indent1">beToByteString 1
+		(ct $ colorType h :: Word8),</span><br/>
+	<span class="indent1">beToByteString 1 $ compMethod h,</span><br/>
+	<span class="indent1">beToByteString 1 $ filterMethod h,</span><br/>
+	<span class="indent1">beToByteString 1 $ ilaceMethod h ]</span><br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">ct PaletteColor = 3</span><br/>
+	<span class="indent1">ct (NoPalette hc ha) =</span><br/>
+		<span class="indent2">fromIntegral $ fromEnum hc `shiftL` 1 .|.
+			fromEnum ha `shiftL` 2</span></span><br/>
+	</code></p>
+
+<h4>デコード</h4>
+
+<p><code>decode :: Chunk -&gt; Maybe IHDR<br/>
+decode (Chunk "IHDR" bs) = (`evalStateT` bs) $ do<br/>
+	<span class="indent1">[w, h] &lt;- replicateM 2 .
+		item 4 $ Just . beFromByteString</span><br/>
+	<span class="indent1">d &lt;- item 1 byte</span><br/>
+	<span class="indent1">c &lt;- item 1 $ (ct =&lt;&lt;) . byte</span><br/>
+	<span class="indent1">[cm, f, i] &lt;- replicateM 3 $ item 1 byte</span><br/>
+	<span class="indent1">return $ IHDR w h d c cm f i</span><br/>
+	<span class="indent1">where ct w = case w `popBits` 3 of</span><br/>
+		<span class="indent2">([True, True, False], 0) -&gt;
+			Just PaletteColor</span><br/>
+		<span class="indent2">([False, hc, ha], 0) -&gt; Just $</span><br/>
+			<span class="indent3">NoPallete (toEnum $ fromEnum hc)
+				(toEnum $ fromEnum ha)</span><br/>
+		<span class="indent2">_ -&gt; Nothing</span><br/>
+decode _ = Nothing</code></p>
+
 <h3>zlibのヘッダのcodec</h3>
 
 <p>
@@ -95,7 +379,69 @@ Chunkデータとする。
 	>Zlib.hs</a>
 </p>
 
-<p></p>
+<h4>モジュール宣言など</h4>
+
+<p><code>{-# LANGUAGE
+	TupleSections, OverloadedStrings, PackageImports #-}</code></p>
+
+<p><code>module Zlib
+	(Header, Cmf(..), FLvl(..), FDct(..), encode, decode) where</code></p>
+
+<p><code>import Control.Applicative ((&lt;$&gt;), (&lt;*&gt;))<br/>
+import Control.Arrow ((&amp;&amp;&amp;))<br/>
+import Control.Monad (replicateM, guard)<br/>
+import "monads-tf" Control.Monad.State (runStateT)<br/>
+import Data.Word (Word8, Word16, Word32)<br/>
+import qualified Data.ByteString as BS (ByteString, singleton, append)</code></p>
+
+<p><code>import Bits
+	(beFromByteString, testBit, shiftL, shiftR, (.&amp;.), (.|.))<br/>
+import Item (item, byte)</code></p>
+
+<h4>型の定義</h4>
+
+<p><code>type Header = (Cmf, FLvl, Maybe FDct)</code></p>
+
+<p><code>data Cmf = Deflate Int | CmfRaw Word8 deriving Show</code></p>
+
+<p><code>data FLvl = Flvl Word8 deriving Show</code></p>
+
+<p><code>data FDct = FDct Word32 deriving Show</code></p>
+
+<h4>エンコード</h4>
+
+<p><code>encode :: Header -&gt; BS.ByteString<br/>
+encode (cm, FLvl l, Nothing) = uncurry ((. BS.singleton . flg) . BS.append)<br/>
+	<span class="indent1">(BS.singleton &amp;&amp;&amp;
+		fromIntegral $ cmf cm :: (BS.ByteString, Word16))</span><br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">cmf (Deflate s) =
+		(log2 s - 8) `shiftL` 4 .|. 8</span><br/>
+	<span class="indent1">cmf (CmfRaw w) = w</span><br/>
+	<span clsas="indent1">flg w = (.|.) &lt;$&gt; id &lt;*&gt;
+		fromIntegral . (31 -)</span><br/>
+		<span class="indent2">. (`mod` 31) . (w `shiftL` 8 .|.)
+			. fromIntegral $ l `shiftL` 6</span><br/>
+		<span class="indent2">log2 n | n &lt; 2 = 0;
+			log2 n = 1 + log2 (n `div` 2)</span><br/>
+encode _ = error "Zlib.encode: not implemented"</code></p>
+
+<h4>デコード</h4>
+
+<p><code>decode :: BS.ByteString -&gt; Maybe (Header, BS.ByteString)<br/>
+decode = runStaetT $ do<br/>
+	<span class="indent1">[c, f] &lt;- replicateM 2 $ item 1 byte</span><br/>
+	<span class="indent1">guard $ (== (0 :: Word16)) . (`mod` 31) $</span><br/>
+		<span class="indent2">fromIntegral c `shiftL` 8 .|.
+			fromIntegral f</span><br/>
+	<span class="indent1">md &lt;- if f `testBit` 5</span><br/>
+		<span class="indent2">then (Just &lt;$&gt;) . item 4 $
+			(Just . FDct) . beFromByteString</span><br/>
+		<span class="indent2">else return Nothing</span><br/>
+	<span class="indent1">return . (, FLvl $ f `shiftR` 6, md) $
+		if c .&amp;. 0x0f == 8</span><br/>
+		<span class="indent2">then Deflate $ 2 ^ (c `shiftR` 4 + 8)
+			else CmfRaw c</span></code></p>
 
 <h3>deflate無圧縮のcodec</h3>
 
@@ -104,12 +450,138 @@ Chunkデータとする。
 	>Codec.hs</a>
 </p>
 
+<h4>モジュール宣言など</h4>
+
+<p><code>{-# LANGUAGE OverloadedStrings #-}</code></p>
+
+<p><code>import Control.Applicative ((&lt;$&gt;), (&lt;*&gt;))<br/>
+import Data.List (foldl')<br/>
+import Data.Word (Word32)<br/>
+import qualified Data.ByteString as BS (<br/>
+	<span class="indent1">
+		ByteString, length, cons, append, map, foldl')</span></code></p>
+
+<p><code>import qualified Zlib as Z
+	(Header, Cmf(..), FLvl(..), encode, decode)<br/>
+import qualified IHDR as H (<br/>
+	<span class="indent1">IHDR(..), ColorType(..), HasColor(..),
+		HasAlpha(..), encode, decode)</span><br/>
+import qualified Chunks as C (Chunk(..), idat, encode, decode)<br/>
+import Bits (complement, (.|.), shiftL, leToByteString, beToByteString)</code></p>
+
+<h4>関数uncons</h4>
+
+<p>
+base-4.8.0.0以前にはData.List.unconsがないのでここで定義する。
+ghcのバージョンでいうとたぶん7.10あたりから関数unconsがある。
+</p>
+
+<p><code>uncons :: [a] -&gt; Maybe (a, [a])<br/>
+uncons (x : xs) = Just (x, xs); uncons _ = Nothing</code></p>
+
+<h4>型の定義</h4>
+
+<p>ここではbodyにはzlib形式のヘッダをとったものを入れる。</p>
+
+<p><code>data PNG = PNG {
+	header :: H.IHDR,
+	zlib :: Z.Header,
+	body :: BS.ByteString }<br/>
+	<span class="indent1">deriving Show</span></code></p>
+
+<h4>エンコード</h4>
+
+<p><code>encode :: PNG -&gt; BS.ByteString<br/>
+encode p = C.encode . (H.encode (header p) :) . (: []) . C.Chunk "IDAT" $<br/>
+	<span class="indent1">Z.encode (Zlib p)
+		`BS.append` body p</span></code></p>
+
+<h4>デコード</h4>
+
+<p><code>decode :: BS.ByteString -&gt; Maybe PNG<br/>
+decode = ((\(h, d) -&gt; uncurry . PNG &lt;$&gt; H.decode h &lt;*&gt;
+	Z.decode (C.idat d)) =&lt;&lt;)<br/>
+	<span class="indent1">. (uncons =&lt;&lt;) . C.decode</span></code></p>
+
+<h4>イメージの生成</h4>
+
+<p><code>image :: Int -&gt; Int -&gt; [BS.ByteString] -&gt; PNG<br/>
+image w h i = PNG {<br/>
+	<span class="indent1">header = H.IHDR {</span><br/>
+		<span class="indent2">H.width = w, H.height = h,
+			H.bitDepth = 8,</span><br/>
+		<span class="indent2">H.colorType =
+			H.NoPalette H.Grayscale H.NoAlpha</span><br/>
+		<span class="indent2">H.compMethod = 0,
+			H.filterMethod = 0, ilaceMethod = 0 },</span><br/>
+	<span class="indent1">zlib = (Z.Deflate 32768, Z.FLvl 0, Nothing),</span><br/>
+	<span class="indent1">body = noCompress . foldl' BS.append "" $
+		map (0 `BS.cons`) i }</span></code></p>
+
+<p><code>noCompress :: BS.ByteString -&gt; BS.ByteString<br/>
+noCompress s = BS.cons 0x01 . (`BS.append` BS.append s (adler32 s))<br/>
+	<span class="indent1">. (BS.append
+		&lt;$&gt; id &lt;*&gt; BS.map complement)</span><br/>
+	<span class="indent1">. leToByteString 2 $ BS.length s</span></code></p>
+
+<p><code>adler32 :: BS.ByteString<br/>
+adler32 = ((beToByteString 4 . uncurry ((. (`shiftL` 16)) . (.|.))) .)<br/>
+	<span class="indent1">. flip BS.foldl' (1, 0) $ \(a, b) x -&gt;</span><br/>
+		<span class="indent2">let a' = (a + fromIntegral x) `mod` c in
+			(a', (b + a') `mod` c)</span><br/>
+	<span class="indent1">where c = 65521 :: Word32</span></code></p>
+
 <h3>テキストファイルからのPNGの生成</h3>
 
 <p>
 <a href="/computer/haskell/coding/png/codes/simple/fromText.hs"
 	>fromText.hs</a>
 </p>
+
+<h4>モジュール宣言など</h4>
+
+<p><code>{-# LANGUAGE OverloadedStrigs, TupleSections #-}</code></p>
+
+<p><code>import Control.Applicative ((&lt;$&gt;))<br/>
+import qualified Data.ByteString as BS (ByteString, cons, writeFile)<br/>
+import Text.Read (readMaybe)<br/>
+import System.Environment (getArgs)<br/>
+import System.FilePath (replaceExtension)<br/>
+import Numeric (readHex)</code></p>
+
+<p><code>import Codec (encode, image)</code></p>
+
+<h4>演算子-&lt;.&gt;</h4>
+
+<p>
+filepath-1.4.0.0から追加された演算子-&lt;.&gt;が便利そうだ。
+当環境は1.3.x.x以前を使っているので定義しておく。
+</p>
+
+<p><code>(-&lt;.&gt;) :: FilePath -&gt; String -&gt; FilePath<br/>
+(-&lt;.&gt;) = replaceExtension</code></p>
+
+<h4>入力の処理</h4>
+
+<p><code>input :: [String] -&gt; Maybe ((Int, Int)), [BS.ByteString])<br/>
+input (s : i) = (, map bs i) &lt;$&gt; readMaybe ('(' : s ++ ")")<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">bs (d1 : d2 : ds) =
+		fst (head $ readHex [d1, d2])</span><br/>
+	<span class="indent1">bs _ = ""</span><br/>
+input _ = Nothing</code></p>
+
+<h4>関数main</h4>
+
+<p><code>main :: IO ()<br/>
+main = do<br/>
+	<span class="indent1">fp : _ &lt;- getArgs</span><br/>
+	<span class="indent1">maybe (return ())
+		(BS.writeFile (fp -&lt;.&gt; "png"))</span><br/>
+	<span class="indent2">. (encode
+		. uncurry (uncurry image) &lt;$&gt;)</span><br/>
+	<span class="indent2">. input
+		. lines =&lt;&lt; readFile fp</span></code></p>
 
 <h3>例</h3>
 
@@ -118,6 +590,8 @@ Chunkデータとする。
 	>circle.txt</a>
 <a href="/computer/haskell/coding/png/codes/simple/circle.png"
 	>circle.png</a>
+<img src="/computer/haskell/coding/png/codes/simple/circle.png"
+	alt="circle.png"/>
 </p>
 
 <p>
@@ -125,6 +599,17 @@ Chunkデータとする。
 	>haskell.txt</a>
 <a href="/computer/haskell/coding/png/codes/simple/haskell.png"
 	>haskell.png</a>
+<img src="/computer/haskell/coding/png/codes/simple/haskell.png"
+	alt="haskell.png"/>
+</p>
+
+<p>
+<a href="/computer/haskell/coding/png/codes/simple/tiny_haskell.txt"
+	>tiny_haskell.txt</a>
+<a href="/computer/haskell/coding/png/codes/simple/tiny_haskell.png"
+	>tiny_haskell.png</a>
+<img src="/computer/haskell/coding/png/codes/simple/tiny_haskell.png"
+	alt="tiny_haskell.png"/>
 </p>
 
 <p><code>% runghc fromText.hs circle.txt<br/>
