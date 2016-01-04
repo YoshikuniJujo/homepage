@@ -1,0 +1,30 @@
+重み平衡木: 集合の例
+
+<p>(工事中 0%)</p>
+
+<p>
+<a href="/computer/haskell/algorithm/weight_balanced_tree/set/codes/SetL.hs"
+	>SetL.hs</a>
+<a href="/computer/haskell/algorithm/weight_balanced_tree/set/codes/SetT.hs"
+	>SetT.hs</a>
+<a href="/computer/haskell/algorithm/weight_balanced_tree/set/codes/randomNth.hs"
+	>randomNth.hs</a>
+</p>
+
+<h2>リストでの集合の実装</h2>
+
+<p>
+集合の主な機能は要素の追加、要素の削除、要素が集合内に存在することの確認である。
+また要素の追加の初期値として空集合が必要だ。
+リストで集合を表現した場合、空集合、追加、削除、存在確認は
+それぞれ[]、(:)、filter . (/=)、elemとなる。
+この場合実行効率はそれぞれO(1)、O(1)、O(n)、O(n)だ。
+要素の削除や存在確認にかかる時間は集合に含まれる要素の数が多くなると
+それに比例して大きくなってしまう。
+</p>
+
+<h3>重複しないn番目のランダム値</h3>
+
+<p>
+例として重複しないn番目のランダム値を求めてみよう。
+</p>
