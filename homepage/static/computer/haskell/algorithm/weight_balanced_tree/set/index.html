@@ -7,8 +7,8 @@
 	>SetL.hs</a>
 <a href="/computer/haskell/algorithm/weight_balanced_tree/set/codes/SetT.hs"
 	>SetT.hs</a>
-<a href="/computer/haskell/algorithm/weight_balanced_tree/set/codes/randomNth.hs"
-	>randomNth.hs</a>
+<a href="/computer/haskell/algorithm/weight_balanced_tree/set/codes/nth.hs"
+	>nth.hs</a>
 </p>
 
 <h2>リストでの集合の実装</h2>
@@ -23,8 +23,521 @@
 それに比例して大きくなってしまう。
 </p>
 
-<h3>重複しないn番目のランダム値</h3>
+<h3>リストによる集合のモジュール</h3>
+
+<p><code>module SetL (Set, empty, member, insert, delete) where</code></p>
+
+<p><code>type Set a = [a]</code></p>
+
+<p><code>empty :: Set a<br/>
+empty = []</code></p>
+
+<p><code>member :: Eq a =&gt; a -&gt; Set a -&gt; Bool<br/>
+member = elem</code></p>
+
+<p><code>insert :: a -&gt; Set a -&gt; Set a<br/>
+insert = (:)</code></p>
+
+<p><code>delete :: Eq a =&gt; a -&gt; Set a -&gt; Set a<br/>
+delete = filter . (/=)</code></p>
 
 <p>
-例として重複しないn番目のランダム値を求めてみよう。
+空集合は空リストであり、関数memberはelemの別名だ。
+要素の挿入は単純にリストの先頭への要素の追加とする。
+要素の削除は削除する値以外の値から成るリストの作成である。
+</p>
+
+<h3>重複しないn番目の値</h3>
+
+<p>
+例として重複しないn番目の値を求める。
+ファイルnth.hsに関数を定義していこう。
+重複をチェックするために集合を保持しておく必要がある。
+まずはリストによる集合のモジュールを導入する。
+</p>
+
+<p><code>import qualified SetL as L</code></p>
+
+<p>
+重複のないn番目を求める関数nthLを定義する。
+</p>
+
+<p><code>nthL :: Eq a =&gt; L.Set a -&gt; [a] -&gt; Int -&gt; Maybe a<br/>
+nthL s (x : xs) n<br/>
+	<span class="indent1">| x `L.member` s = nthL s xs n</span><br/>
+	<span class="indent1">| n &lt; 1 = Just x</span><br/>
+	<span class="indent1">| otherwise =
+		nthL (L.insert x s) xs (n - 1)</span><br/>
+nthL _ _ _ = Nothing</code></p>
+
+<p>
+変数sに今までに出現した値が保存されている。
+もしもリストの先頭の値xがsに含まれていれば(x `L.member` s)、
+xは無視される(nthL s xs n)。
+xがsに含まれずnが1より小(n &lt; 1)ならばxが求める値である。
+どちらでもなければxをsに追加(L.insert x s)しnを1減らして再帰的にnthLを呼び出す。
+試してみよう。
+</p>
+
+<p><code>% ghci nth.hs<br/>
+*Main&gt; nthL L.empty "Hello, world!" 7<br/>
+'r'<br/>
+*Main&gt; "Hello, world!" !! 9<br/>
+'r'</code></p>
+
+<p>
+2回目の'l'と'o'がカウントされないので7文字目の'w'ではなく2文字あとの'r'が返される。
+</p>
+
+<h3>実行効率</h3>
+
+<p>
+関数L.memberはリストの要素を順にたどっていくので時間効率はO(n)となる。
+関数nthLは要素をひとつ走査するたびにL.memberを行うので時間効率はO(n^2)だ。
+実行時間を求める関数と長いリストを使ってこれを確認してみよう。
+まずは必要なモジュールを導入する。
+</p>
+
+<p><code>import System.Random<br/>
+import Data.Time</code></p>
+
+<p>
+実行時間を求める関数は単純に値の表示の前後の時間の差を求めることにする。
+ghcの機能を使ってプロファイルを求めることもできるが今回はしない。
+また、引数xはtime関数に与えられる前に評価されていないものとする。
+</p>
+
+<p><code>time :: Show a =&gt; a -&gt; IO ()<br/>
+time x = do<br/>
+	<span class="indent1">t0 &lt;- getCurrentTime</span><br/>
+	<span class="indent1">print x</span><br/>
+	<span class="indent1">t1 &lt;- getCurrentTime</span><br/>
+	<span class="indent1">print $ t1 `diffUTCTime` t0</span></code></p>
+
+<p>
+時間の計測用のmain関数を作る。
+</p>
+
+<p><code>main :: IO ()<br/>
+main = do<br/>
+	<span class="indent1">time (nthL L.empty (randoms $ mkStdGen 8) 10000
+		:: Maybe Int)</span><br/>
+	<span class="indent1">time (nthL L.empty (randoms $ mkStdGen 8) 20000
+		:: Maybe Int)</span><br/>
+	<span class="indent1">time (nthL L.empty (randoms $ mkStdGen 8) 40000
+		:: Maybe Int)</span><br/>
+	<span class="indent1">time (nthL L.empty (randoms $ mkStdGen 8) 80000
+		:: Maybe Int)</span></code></p>
+
+<p>コンパイルして実行する。</p>
+
+<p><code>% ghc -Wall nth.hs<br/>
+% ./nth<br/>
+Just (-1935099869)<br/>
+0.663362s<br/>
+Just (-65105102)<br/>
+2.589716s<br/>
+Just 2091415055<br/>
+10.228787s<br/>
+Just (-37343952)<br/>
+40.843141s</code></p>
+
+<p>
+僕の環境ではうえのような結果となった。
+リストの長さが2倍になると実行時間が4倍になる。
+理論値O(n^2)と矛盾しない。
+</p>
+
+<h2>重み平衡木での集合の実装</h2>
+
+<p>
+集合にはもっと効率的な実装方法がある。
+二分探索木だ。
+たとえば0から14までの並びではじめから順に6に到達するためには
+0から6まで7つの値を調べる必要がある。
+しかしこれらの数字が以下のような二分木に保存されていたとすると
+7より小さい、3より大きい、5より大きい、6と等しい、
+のように4回の比較で6に到達することができる。
+</p>
+
+<p><img
+src="/computer/haskell/algorithm/weight_balanced_tree/set/images/bst_15.svg"
+alt="[0から14の完全にバランスのとれた二分探索木]"/></p>
+
+<p>
+並びを前から順に調べていくことを線形探索と呼び、
+このようにAより大きいBより小さいのように範囲を半分ずつに削っていく探しかたを
+二分探索と呼ぶ。
+線形探索は平均して並びの長さnに比例した時間がかかるのに対して
+二分探索では1回の比較ごとに範囲が半分となるのでlog nに比例した時間ですむ。
+nが大きくなったときにこの差は顕著になる。
+</p>
+
+<p>
+線形探索ではnが1000倍になれば1000倍の時間がかかるが
+二分探索では10倍の時間ですむ。
+線形探索ではnが1000000倍になれば1000000倍の時間がかかるが
+二分探索では20倍の時間ですむ。
+</p>
+
+<p>
+二分探索木を使った集合の表現について見ていこう。
+</p>
+
+<h3>二分探索木の条件</h3>
+
+<p>
+二分探索木は以下のような形である。
+</p>
+
+<p><img
+src="/computer/haskell/algorithm/weight_balanced_tree/set/images/bst_wikipedia.svg"
+alt="[Wikipediaでの二分探索木の例]" /></p>
+
+<p>
+ノードは0から2個の子ノードを持つことができる。
+また、あるノードnの左の子に含まれる値はすべてnの値より小さく
+右の子に含まれる値はすべてnの値より大きい。
+</p>
+
+<h3>値の検索</h3>
+
+<p>ある値xが二分探索木に含まれるかどうかは以下のようにして確認できる。</p>
+
+<ol>
+<li>値xとノードの値とを比較する</li>
+<li>同じならば値xはその木に含まれる</li>
+<li>値xがノードの値より小さければ左の木にうつり1へ</li>
+<li>値xがノードの値より大きければ右の木にうつり1へ</li>
+<li>3、4でそれぞれ左、右の木が存在しなければ値は木に含まれない</li>
+</ol>
+
+<h3>値の挿入</h3>
+
+<p>
+上記の検索と同様のアルゴリズムで見つけた位置に値を挿入したうえで
+木を再構築していく。
+</p>
+
+<h3>不均衡な木</h3>
+
+<p>
+上記の挿入アルゴリズムで木を構築していくとしばしば不均衡な木ができあがる。
+極端な場合として値が小さい(大きい)順に挿入されていったとする。
+この場合右(左)の枝のみがのびていくので結局のところ単なるリストと同じ
+構造となりこのような木に対する探索は線形探索と変わらなくなる。
+</p>
+
+<h3>木の回転によって均衡を保つ</h3>
+
+<p>
+厳密な話ではなく感覚的な理解を目指す。
+数学的な証明は行わない。
+</p>
+
+<p>
+操作の効率を保つためには木の均衡を保つ必要がある。
+重み平衡木では左右の木のそれぞれの要素数の比がある程度を越えたところで
+木を「回転」させることで均衡を保つ。
+以下の4種類の回転によって木の不均衡を一定以下に保つことができる。
+</p>
+
+<ul>
+<li>左回転</li>
+<li>右回転</li>
+<li>左二重回転</li>
+<li>右二重回転</li>
+</ul>
+
+<h3>左回転</h3>
+
+<p>
+<img
+src="/computer/haskell/algorithm/weight_balanced_tree/set/images/rotateL_1.svg"
+alt="[左回転前の木]" />
+<img
+src="/computer/haskell/algorithm/weight_balanced_tree/set/images/rotateL_2.svg"
+alt="[左回転後の木]" />
+</p>
+
+<p>
+図の小文字はノードを大文字はサブツリーを示すものとする。
+</p>
+
+<p>
+木の左回転は上の左の木を右の木に変換することだ。
+もともとの木の右の子であったdが親となり、
+dの左の子だったCはもともとの木の根の右の子となる。
+こうすることで木の左側を重くすることができる。
+</p>
+
+<p>
+ここで左右の木の重さの比を3以下に保つことを考える。
+A, C, Eのそれぞれの重さをwa, wc, weとする。
+このとき左回転が必要になるのは3 * wa &lt; wc + we + 1のときだ。
+左回転の結果として左右の木の重さはそれぞれwa + wc + 1, weとなる。
+</p>
+
+<p>
+たとえばwa = 4, wc = 7, we = 5のときwc + we + 1 = 13はwaの3倍を越えるので
+左回転が必要となる。
+回転の結果左の木の重さはwa + wc + 1 = 12となり右の木の重さはwe = 5となるので
+左右の木の重さの比は3以下に保たれる。
+</p>
+
+<p>右回転は左右を逆にして考えればよい。</p>
+
+<h3>左二重回転</h3>
+
+<p>
+左回転の図における別の例を考えてみよう。
+もしもwa = 4, wc = 9, we = 3だったとする。
+左右の木の重さの比が3を越えるので左回転をしてみよう。
+回転後の左の木の重さはwa + wc + 1 = 14となり右の木の重さはwe = 3となる。
+今度は左の木が重くなりすぎてしまった。
+このようにCの位置にある木の重さが大きいときには
+普通の回転では均衡を保つことができない。
+</p>
+
+<p>
+このようなときノードd以下の木を右回転したうえで全体を左回転することで
+均衡を保つことができる。
+簡単に言うとCの位置の木を小さくしておくことでCの位置の木の移動による
+影響を小さくして左の枝が大きくなりすぎることをふせぐということだ。
+</p>
+
+<h3>回転によって保たれる均衡</h3>
+
+<p>
+左右の木の重さの比を3以下に保つために
+左右の木の重さの比が3を越えたときに木の回転が必要になる。
+そして重いほうの木の内側の木の重さが外側の木の重さの2倍以上ならば
+2重回転が必要になる。
+</p>
+
+<h3>コード</h3>
+
+<h4>モジュール宣言</h4>
+
+<p><code>module SetT (Set, empty, member, insert, delete) where</code></p>
+
+<h4>モジュールの導入</h4>
+
+<p>単にタプルの操作としてのモジュールArrowの使用だ。</p>
+
+<p><code>import Control.Arrow (second)</code></p>
+
+<h4>型とスマート構築子、スマート取得子の定義</h4>
+
+<p><code>type Set a = WBT a</code></p>
+
+<p><code>data WBT a = Empty | Bin {<br/>
+	<span class="indent1">_weight :: Int,</span><br/>
+	<span class="indent1">_value :: a,</span><br/>
+	<span class="indent1">left :: (WBT a),</span><br/>
+	<span class="indent1">right :: (WBT a)</span><br/>
+	<span class="indent1">} deriving Show</span></code></p>
+
+<p><code>empty :: WBT a<br/>
+empty = Empty</code></p>
+
+<p><code>weight :: WBT a -&gt; Int<br/>
+weight Empty = 0<br/>
+weight t = _weight t</code></p>
+
+<p><code>bin :: a -&gt; WBT a -&gt; WBT a -&gt; WBT a<br/>
+bin x l r = Bin (weight l + weight r + 1) x l r</code></p>
+
+<p>
+emptyは空集合を作成する。
+関数weightはEmptyにも対応した取得子だ。
+関数binは重さを自動計算するノードの構築子である。
+</p>
+
+<h4>値の検索</h4>
+
+<p><code>member :: Ord a =&gt; a -&gt; WBT a -&gt; Bool<br/>
+member x (Bin _ x0 l r)<br/>
+	<span class="indent1">| x &lt; x0 = member x l</span><br/>
+	<span class="indent1">| x &gt; x0 = member x r</span><br/>
+	<span class="indent1">| otherwise = True</span><br/>
+member _ _ = False</code></p>
+
+<p>
+現在のノードの値よりも小さければ左の木を大きければ右の木を探索する。
+同じならば値は見つかったのでTrueだ。
+Emptyに到達したなら値は存在しないということでFalseとなる。
+</p>
+
+<h4>定数の定義</h4>
+
+<p><code>delta, ratio :: Int<br/>
+delta = 3<br/>
+ratio = 2</code></p>
+
+<p>
+左右の木の重さの比がdeltaを越えたら回転を行う。
+さらに重いほうの木の内側の子の重さが外側の子の重さのratio倍以上ならば
+二重回転とする。
+deltaとratioの組として正しいのは(3, 2)または(4, 2)のみでかつ
+(3, 2)のほうが効率が良いらしい。
+</p>
+
+<h4>均衡を回復する関数</h4>
+
+<p><code>balance :: WBT a -&gt; WBT a<br/>
+balance Empty = Empty<br/>
+balance t@(Bin _ x l r)<br/>
+	<span class="indent1">| weight l + weight r &lt; 2 = t</span><br/>
+	<span class="indent1">| weight r &gt; delta * weight l =</span><br/>
+		<span class="indent2">if
+			weight (left r) &gt;= ratio * weight (right r)</span><br/>
+			<span class="indent3">then rotateL $
+				bin x l (rotateR r)</span><br/>
+			<span class="indent3">else rotateL t</span><br/>
+	<span class="indent1">| weight l &gt; delta * weight r =</span><br/>
+		<span class="indent2">if
+			weight (right l) &gt;= ratio * weight (left l)</span><br/>
+			<span class="indent3">then rotateR $
+				bin x (rotateL l) r</span><br/>
+			<span class="indent3">else rotateR t</span><br/>
+	<span class="indent1">| otherwise = t</span></code></p>
+
+<p>
+関数balanceはそれぞれの場合について回転をするかどうかやどの回転をするかを
+ふるいわけしている。
+</p>
+
+<p><code>rotateL, rotateR :: WBT a -&gt; WBT a<br/>
+rotateL (Bin _ x lx (Bin _ y ly ry)) = bin y (bin x lx ly) ry<br/>
+rotateL _ = error "rotateL: can't rotate"</code></p>
+
+<p><code>rotateR (Bin _ x (Bin _ y ly ry) rx) = bin y ly (bin x ry rx)<br/>
+rotateR _ = error "rotateR: can't rotate"</code></p>
+
+<h4>値の挿入</h4>
+
+<p><code>insert :: Ord a =&gt; a -&gt; WBT a -&gt; WBT a<br/>
+insert x Empty = bin x Empty Empty<br/>
+insert x t@(Bin _ x0 l r)<br/>
+	<span class="indent1">| x &lt; x0 =
+		balance $ bin x0 (insert x l) r</span><br/>
+	<span class="indent1">| x &gt; x0 =
+		balance $ bin x0 l (insert x r)</span><br/>
+	<span class="indent1">| otehrwise = t</span></code></p>
+
+<p>
+xがノードの値よりも小さければ左の大きければ右のノードにうつり再帰的にinsertする。
+値を挿入したあとはつねに関結balanceで均衡を回復しておく。
+</p>
+
+<h4>値の削除</h4>
+
+<p><code>delete :: Ord a =&gt; a -&gt; WBT a -&gt; WBT a<br/>
+delete _ Empty = Empty<br/>
+delete x (Bin _ x0 l r)<br/>
+	<span class="indent1">| x &lt; x0 =
+		balance $ bin x0 (delete x l) r</span><br/>
+	<span class="indent1">| x &gt; x0 =
+		balance $ bin x0 l (delete x r)</span><br/>
+	<span class="indent1">| otherwise = glue l r</span></code></p>
+
+<p>
+削除する値がノードの値より小さければ左の大きければ右のノードにうつり再帰的に
+deleteを行う。
+ノードの値が削除する値だったときには関数glueで左右の木を融合させてひとつの木にする。
+</p>
+
+<p><code>glue :: WBT a -&gt; WBT a -&gt; WBT a<br/>
+glue Empty r = r<br/>
+glue l Empty = l<br/>
+glue l r<br/>
+	<span class="indent1">| weight l &gt; weight r =</span><br/>
+		<span class="indent2">let (m, l') = deleteFindMax l in
+			balance $ bin m l' r</span><br/>
+	<span class="indent1">| otherwise =</span><br/>
+		<span class="indent2">let (m, r') = deleteFindMin r in
+			balance $ bin m l r'</span></code></p>
+
+<p>
+左の木が右の木よりも重ければ左の木を最大値とそれ以外にわけて
+最大値を根とする木を構築する。
+そうでなければ右の木を最小値とそれ以外にわけて同じようにする。
+</p>
+
+<p><code>deleteFindMin, deleteFindMax :: WBT -&gt; (a, WBT a)<br/>
+deleteFindMin (Bin _ x Empty r) = (x, r)<br/>
+deleteFindMin (Bin _ x l r) =
+	(balance . flip (bin x) r) `second` deleteFindMin l<br/>
+deleteFindMin _ = error "deleteFindMin: Empty"</code></p>
+
+<p>
+左の子が空になるまで木をたどっていきそこの値と右の木を取り出す。
+もどりながら木の再構築と均衡の回復をしていく。
+</p>
+
+<p><code>deleteFindMax (Bin _ x l Empty) = (x, l)<br/>
+deleteFindMax (Bin _ x l r) =
+	(balance . bin x l) `second` deleteFindMax r<br/>
+deleteFindMax _ = error "deleteFindMax: Empty"</code></p>
+
+<p>
+右の子が空になるまで木をたどっていきそこの値と左の木を取り出す。
+もどりながら木の再構築と均衡の回復をしていく。
+</p>
+
+<h3>実行効率のチェック</h3>
+
+<p>
+nth.hsに重み平衡木を使った実装のテストを追加していく。
+まずはモジュールの導入だ。
+</p>
+
+<p><code>import qualified SetT as T</code></p>
+
+<p>
+重み平衡木を使うnthTを作成する。
+nthLのLをTにすれば良い。
+またEqをOrdにする必要がある。
+</p>
+
+<p><code>nthT :: Ord a =&gt; T.Set a -&gt; [a] -&gt; Int -&gt; Maybe a<br/>
+nthT s (x : xs) n<br/>
+	<span class="indent1">| x `T.member` s = nthT s xs n</span><br/>
+	<span class="indent1">| n &lt; 1 = Just x</span><br/>
+	<span class="indent1">| otherwise = nth (T.insert x s) xs (n - 1)</span><br/>
+nthT _ _ _ = Nothing</code></p>
+
+<p>main関数に木を使った版のテストを追加する。</p>
+
+<p><code>main :: IO ()<br/>
+main = do<br/>
+	<span class="indent1">...</span><br/>
+	<span class="indent1">time (nthT T.empty (randoms $ mkStdGen 8) 10000
+		:: Maybe Int)</span><br/>
+	<span class="indent1">time (nthT T.empty (randoms $ mkStdGen 8) 20000
+		:: Maybe Int)</span><br/>
+	<span class="indent1">time (nthT T.empty (randoms $ mkStdGen 8) 40000
+		:: Maybe Int)</span><br/>
+	<span class="indent1">time (nthT T.empty (randoms $ mkStdGen 8) 80000
+		:: Maybe Int)</span></code></p>
+
+<p>コンパイルして実行する。</p>
+
+<p><code>
+...<br/>
+Just (-1935099869)<br/>
+0.061622s<br/>
+Just (-65105102)<br/>
+0.142313s<br/>
+Just 2091415055<br/>
+0.300382s<br/>
+Just (-37343952)<br/>
+0.662469s</code></p>
+
+<p>
+40000番目を求めるテストではリストを使ったときの10秒と比較して30倍の効率だ。
+80000番目を求めるテストだとリストを使ったときの40秒と比較すると
+効率は60倍になる。
+この差はn番目のnが大きくなればなるほど開いていくことになる。
 </p>
