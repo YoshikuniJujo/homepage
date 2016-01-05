@@ -2,4 +2,289 @@
 
 <p>(工事中 0%)</p>
 
+<p>
+<a href="/computer/haskell/algorithm/weight_balanced_tree/map/codes/dups.hs"
+	>dups.hs</a>
+<a href="/computer/haskell/algorithm/weight_balanced_tree/map/codes/MapL.hs"
+	>MapL.hs</a>
+<a href="/computer/haskell/algorithm/weight_balanced_tree/map/codes/MapT.hs"
+	>MapT.hs</a>
+</p>
+
+<h2>問題定義</h2>
+
+<p>
+リストのなかの値の重複の最大値を求める。
+たとえば"Hello, world!"では重複は'o'の2個と'l'の3個だ。
+よって重複の最大値は3となる。
+どの値が最終的に最大の重複となるかはリストを読みこんでいる途中ではわからない。
+よって、その時点までにそれぞれの値が出てきた回数を保持しておく必要がある。
+そのために要素をキーとして数値をバリューとする辞書を使う。
+</p>
+
 <h2>リストでの辞書の実装</h2>
+
+<p>
+タプルのリストを辞書として利用することができる。
+</p>
+
+<p><code>module MapL (Map, empty, lookup, insert, delete) where</code></p>
+
+<p><code>type Map k a = [(k, a)]</code></p>
+
+<p><code>empty :: Map k a<br/>
+empty = []</code></p>
+
+<p><code>-- lookup :: Eq k =&gt; k -&gt; Map k a -&gt; Maybe a<br/>
+-- lookup = ...</code></p>
+
+<p><code>insert :: k -&gt; a -&gt; Map k a -&gt; Map k a<br/>
+insert = curry (:)</code></p>
+
+<p><code>delete :: Eq k =&gt; k -&gt; Map k a -&gt; Map k a<br/>
+delete = filter . (. fst) . (/=)</code></p>
+
+<p>
+関数lookupはPreludeに定義ずみのものをそのまま使う。
+この実装では時間効率が検索にO(n)、挿入にO(1)、削除にO(n)となる。
+</p>
+
+<h2>重複の最大値</h2>
+
+<p>
+あとで必要になるモジュールをさきに導入しておこう。
+ファイルdups.hsに書きこんでいく。
+</p>
+
+<p><code>import Data.Maybe<br/>
+import Data.Time<br/>
+import System.Random</code></p>
+
+<p>うえで定義したモジュールMapLを導入する。</p>
+
+<p><code>import qualified MapL as L</code></p>
+
+<p>関数dupsLはリストに含まれる重複の最大値を求める。</p>
+
+<p><code>dupsL :: Eq a =&gt; L.Map a Int -&gt; Int -&gt; [a] -&gt; Int<br/>
+dupsL d mx (x : xs) = dupsL (L.insert x t d) (max mx t) xs<br/>
+	<span class="indent1">where t = fromMaybe 0 (x `L.lookup` d) + 1</span><br/>
+ddupsL _ mx _ = mx</code></p>
+
+<p>
+変数dにそれぞれの要素の出現回数がmxにはその最大値がそれぞれ保存されている。
+fromMaybe 0によって要素が登録されていないときに0とするようにしている。
+実行時間を表示する関数を作っておく。
+</p>
+
+<p><code>time :: Show a =&gt; a -&gt; IO ()<br/>
+time x = do<br/>
+	<span class="indent1">t0 &lt;- getCurrentTime</span><br/>
+	<span class="indent1">print x</span><br/>
+	<span class="indent1">t1 &lt;- getCurrentTime</span><br/>
+	<span class="indent1">print $ t1 `diffUTCTime` t0</span></code></p>
+
+<p>時間計測用の関数mainを作る。</p>
+
+<p><code>main :: IO ()<br/>
+main = do<br/>
+<span class="indent1">time . dupsL L.empty 0 $
+	take 10000 (random $ mkStdGen 8 :: [Int])</span><br/>
+<span class="indent1">time . dupsL L.empty 0 $
+	take 20000 (random $ mkStdGen 8 :: [Int])</span><br/>
+<span class="indent1">time . dupsL L.empty 0 $
+	take 40000 (random $ mkStdGen 8 :: [Int])</span><br/>
+<span class="indent1">time . dupsL L.empty 0 $
+	take 80000 (random $ mkStdGen 8 :: [Int])</span></code></p>
+
+<p>コンパイルし実行してみる。</p>
+
+<p><code>% ghc -Wall dups.hs<br/>
+% ./dups<br/>
+1<br/>
+0.987537s<br/>
+1<br/>
+5.378706s<br/>
+1<br/>
+18.488102s<br/>
+2<br/>
+98.121301s</code></p>
+
+<p>要素数が80000だと1分半ほどかかってしまう。</p>
+
+<h2>重み平衡木による辞書の実装</h2>
+
+<h3>モジュール宣言など</h3>
+
+<p><code>module MapT (Map, empty, lookup, insert, delete) where</code></p>
+
+<p><code>import Prelude hiding (lookup)</code></p>
+
+<p><code>import Control.Arrow (second)</code></p>
+
+<h3>型とスマート構築子、スマート取得子</h3>
+
+<p><code>data Map k a = Empty | Bin {<br/>
+	<span class="indent1">_weight :: Int,</span><br/>
+	<span class="indent1">_key :: k,</span><br/>
+	<span class="indent1">_value :: a,</span><br/>
+	<span class="indent1">left :: (Map k a),</span><br/>
+	<span class="indent1">right :: (Map k a),</span><br/>
+	<span class="indent1">} deriving Show</span></code></p>
+
+<p><code>empty :: Map k a<br/>
+empty = Empty</code></p>
+
+<p><code>weight :: Map k a -&gt; Int<br/>
+weight Empty = 0<br/>
+weight t = _weight t</code></p>
+
+<p><code>bin :: k -&gt; a -&gt; Map k a -&gt; Map k a -&gt; Map k a<br/>
+bin k x l r = Bin (weight l + weight r + 1) k x l r</code></p>
+
+<h3>検索</h3>
+
+<p><code>lookup :: Ord k =&gt; k -&gt; Map k a -&gt; Maybe a<br/>
+lookup k (Bin _ k 0 x l r)<br/>
+	<span class="indent1">| k &lt; k0 = lookup k l</span><br/>
+	<span class="indent1">| k &gt; k0 = lookup k r</span><br/>
+	<span class="indent1">| otherwise = Just x</span><br/>
+lookup _ _ = Nothing</code></p>
+
+<h3>均衡</h3>
+
+<h4>定数</h4>
+
+<p><code>delta, ratio :: Int<br/>
+delta = 3<br/>
+ratio = 2</code></p>
+
+<h4>関数balance</h4>
+
+<p><code>balance :: Map k a -&gt; Map k a<br/>
+balance Empty = Empty<br/>
+balance t@(Bin _ k x l r)<br/>
+	<span class="indent1">| weight l + weight r &lt; 2 = t</span><br/>
+	<span class="indent1">| weight r &gt; delta * weight l =</span><br/>
+		<span class="indent2">if weight (left r) &gt;=
+			ratio * weight (right r)</span><br/>
+			<span class="indent3">then rotateL $
+				bin k x l (rotateR r)</span><br/>
+			<span class="indent3">else rotateL t</span><br/>
+	<span class="indent1">| weight l &gt; delta * weight r =</span><br/>
+		<span class="indent2">if weight (right l) &gt;=
+			ratio * weight (left l)</span><br/>
+			<span class="indent3">then rotateR $
+				bin k x (rotateL l) r</span><br/>
+			<span class="indent3">else rotateR t</span><br/>
+	<span class="indent1">| otherwise = t</span></code></p>
+
+<h4>回転関数</h4>
+
+<p><code>rotateL, rotateR :: Map k a -&gt; Map k a<br/>
+roatteL (Bin _ j x lx (Bin _ k y ly ry)) = bin k y (bin j x lx ly) ry<br/>
+rotateL _ = error "rotateL: can't rotate"</code></p>
+
+<p><code>rotateR (Bin _ j x (Bin _ k y ly ry) rx) = bin k y ly (bin j x ry rx)<br/>
+rotateR _ = error "rotateR: can't rotate"</code></p>
+
+<h3>挿入</h3>
+
+<p><code>insert :: Ord k =&gt; k -&gt; a -&gt; Map k a -&gt; Map k a<br/>
+insert k x Empty = bin k x Empty Empty<br/>
+insert k x t@(Bin _ k0 x0 l r)<br/>
+	<span class="indent1">| k &lt; k0 =
+		balance $ bin k0 x0 (insert k x l) r</span><br/>
+	<span class="indent1">| k &gt; k0 =
+		balance $ bin k0 x0 l (insert k x r)</span><br/>
+	<span class="indent1">| otherwise = t</span></code></p>
+
+<h3>削除</h3>
+
+<p><code>delete :: Ord k =&gt; k -&gt; Map k a -&gt; Map k a<br/>
+delete _ Empty = Empty<br/>
+delete k (Bin _ k0 x0 l r)<br/>
+	<span class="indent1">| k &lt; k0 =
+		balance $ bin k0 x0 (delete k l) r</span><br/>
+	<span class="indent1">| k &gt; k0 =</span><br/>
+		balance $ bin k0 x0 l (delete k r)</span><br/>
+	<span class="indent1">| otherwise = glue l r</span></code></p>
+
+<p><code>glue :: Map k a -&gt; Map k a -&gt; Map k a<br/>
+glue Empty r = r<br/>
+glue l Empty = l<br/>
+glue l r<br/>
+	<span class="indent1">| weight l &gt; weight r =</span><br/>
+		<span class="indent2">let ((k, x), l') = popMax l in
+			balance $ bin k x l' r</span><br/>
+	<span class="indent1">| otherwise =
+		let ((k, x), r') = popMin r in
+			balance $ bin k x l r'</span></code></p>
+
+<p><code>popMin, popMax :: Map k a -&gt; ((k, a), Map k a)<br/>
+popMin (Bin _ k x Empty r) = ((k, x), r)<br/>
+popMin (Bin _ k x l r) =
+	(balance . flip (bin k x) r) `second` popMin l<br/>
+popMin _ = error "popMin: Empty"</code></p>
+
+<p><code>popMax (Bin _ k x l Empty) = ((k, x), l)<br/>
+popMax (Bin _ k x l r) =
+	(balance . flip (bin k x) l) `second` popMax<br/>
+popMax _ = error "popMax: Empty"</code></p>
+
+<h2>重み平衡木による辞書を使う</h2>
+
+<p><code>dupsT :: Ord a =&gt; T.Map a Int -&gt; Int -&gt; [a] -&gt; Int<br/>
+dupsT d mx (x : xs) = dupsT (T.insert x t d) (max mx t) xs<br/>
+	<span class="indent1">where t = fromMaybe 0 (x `T.lookup` d) + 1</span><br/>
+dupsT _ mx _ = mx</code></p>
+
+<p>関数mainに重み平衡木を使った版を追加する。</p>
+
+<p><code>main :: IO ()<br/>
+main = do<br/>
+	<span class="indent1">...</span><br/>
+	<span class="indent1">time . dupsT T.empty 0 $
+		take 10000 (randoms $ mkStdGen 8 :: [Int])</span><br/>
+	<span class="indent1">time . dupsT T.empty 0 $
+		take 20000 (randoms $ mkStdGen 8 :: [Int])</span><br/>
+	<span class="indent1">time . dupsT T.empty 0 $
+		take 40000 (randoms $ mkStdGen 8 :: [Int])</span><br/>
+	<span class="indent1">time . dupsT T.empty 0 $
+		take 80000 (randoms $ mkStdGen 8 :: [Int])</span><br/>
+	<span class="indent1">time . dupsT T.empty 0 $
+		take 160000 (randoms $ mkStdGen 8 :: [Int])</span><br/>
+	<span class="indent1">time . dupsT T.empty 0 $
+		take 320000 (randoms $ mkStdGen 8 :: [Int])</span></code></p>
+
+<p>試してみる。</p>
+
+<p><code>% ghc -Wall dups.hs<br/>
+% ./dups<br/>
+1<br/>
+0.987537s<br/>
+1<br/>
+5.378706s<br/>
+1<br/>
+18.488102s<br/>
+2<br/>
+98.121301s<br/>
+1<br/>
+0.094019s<br/>
+1<br/>
+0.208396s<br/>
+1<br/>
+0.465867s<br/>
+2<br/>
+1.003503s<br/>
+2<br/>
+2.149177s<br/>
+2<br/>
+4.584583s<br/>
+</code></p>
+
+<p>
+80000要素で比較すると
+リストを使った辞書で100秒かかるところを木を使った辞書では1秒ですむ。
+100倍の効率化ができた。
+</p>
