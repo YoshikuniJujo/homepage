@@ -329,23 +329,21 @@ A, C, Eのそれぞれの重さをwa, wc, weとする。
 
 <h4>型とスマート構築子、スマート取得子の定義</h4>
 
-<p><code>type Set a = WBT a</code></p>
-
-<p><code>data WBT a = Empty | Bin {<br/>
+<p><code>data Set a = Empty | Bin {<br/>
 	<span class="indent1">_weight :: Int,</span><br/>
 	<span class="indent1">_value :: a,</span><br/>
-	<span class="indent1">left :: (WBT a),</span><br/>
-	<span class="indent1">right :: (WBT a)</span><br/>
+	<span class="indent1">left :: (Set a),</span><br/>
+	<span class="indent1">right :: (Set a)</span><br/>
 	<span class="indent1">} deriving Show</span></code></p>
 
-<p><code>empty :: WBT a<br/>
+<p><code>empty :: Set a<br/>
 empty = Empty</code></p>
 
-<p><code>weight :: WBT a -&gt; Int<br/>
+<p><code>weight :: Set a -&gt; Int<br/>
 weight Empty = 0<br/>
 weight t = _weight t</code></p>
 
-<p><code>bin :: a -&gt; WBT a -&gt; WBT a -&gt; WBT a<br/>
+<p><code>bin :: a -&gt; Set a -&gt; Set a -&gt; Set a<br/>
 bin x l r = Bin (weight l + weight r + 1) x l r</code></p>
 
 <p>
@@ -356,7 +354,7 @@ emptyは空集合を作成する。
 
 <h4>値の検索</h4>
 
-<p><code>member :: Ord a =&gt; a -&gt; WBT a -&gt; Bool<br/>
+<p><code>member :: Ord a =&gt; a -&gt; Set a -&gt; Bool<br/>
 member x (Bin _ x0 l r)<br/>
 	<span class="indent1">| x &lt; x0 = member x l</span><br/>
 	<span class="indent1">| x &gt; x0 = member x r</span><br/>
@@ -385,7 +383,7 @@ deltaとratioの組として正しいのは(3, 2)または(4, 2)のみでかつ
 
 <h4>均衡を回復する関数</h4>
 
-<p><code>balance :: WBT a -&gt; WBT a<br/>
+<p><code>balance :: Set a -&gt; Set a<br/>
 balance Empty = Empty<br/>
 balance t@(Bin _ x l r)<br/>
 	<span class="indent1">| weight l + weight r &lt; 2 = t</span><br/>
@@ -408,7 +406,7 @@ balance t@(Bin _ x l r)<br/>
 ふるいわけしている。
 </p>
 
-<p><code>rotateL, rotateR :: WBT a -&gt; WBT a<br/>
+<p><code>rotateL, rotateR :: Set a -&gt; Set a<br/>
 rotateL (Bin _ x lx (Bin _ y ly ry)) = bin y (bin x lx ly) ry<br/>
 rotateL _ = error "rotateL: can't rotate"</code></p>
 
@@ -417,7 +415,7 @@ rotateR _ = error "rotateR: can't rotate"</code></p>
 
 <h4>値の挿入</h4>
 
-<p><code>insert :: Ord a =&gt; a -&gt; WBT a -&gt; WBT a<br/>
+<p><code>insert :: Ord a =&gt; a -&gt; Set a -&gt; Set a<br/>
 insert x Empty = bin x Empty Empty<br/>
 insert x t@(Bin _ x0 l r)<br/>
 	<span class="indent1">| x &lt; x0 =
@@ -433,7 +431,7 @@ xがノードの値よりも小さければ左の大きければ右のノード�
 
 <h4>値の削除</h4>
 
-<p><code>delete :: Ord a =&gt; a -&gt; WBT a -&gt; WBT a<br/>
+<p><code>delete :: Ord a =&gt; a -&gt; Set a -&gt; Set a<br/>
 delete _ Empty = Empty<br/>
 delete x (Bin _ x0 l r)<br/>
 	<span class="indent1">| x &lt; x0 =
@@ -448,15 +446,14 @@ deleteを行う。
 ノードの値が削除する値だったときには関数glueで左右の木を融合させてひとつの木にする。
 </p>
 
-<p><code>glue :: WBT a -&gt; WBT a -&gt; WBT a<br/>
+<p><code>glue :: Set a -&gt; Set a -&gt; Set a<br/>
 glue Empty r = r<br/>
 glue l Empty = l<br/>
 glue l r<br/>
-	<span class="indent1">| weight l &gt; weight r =</span><br/>
-		<span class="indent2">let (m, l') = deleteFindMax l in
+	<span class="indent1">| weight l &gt; weight r =
+		let (m, l') = popMax l in
 			balance $ bin m l' r</span><br/>
-	<span class="indent1">| otherwise =</span><br/>
-		<span class="indent2">let (m, r') = deleteFindMin r in
+	<span class="indent1">| otherwise = let (m, r') = popMin r in
 			balance $ bin m l r'</span></code></p>
 
 <p>
@@ -465,21 +462,21 @@ glue l r<br/>
 そうでなければ右の木を最小値とそれ以外にわけて同じようにする。
 </p>
 
-<p><code>deleteFindMin, deleteFindMax :: WBT -&gt; (a, WBT a)<br/>
-deleteFindMin (Bin _ x Empty r) = (x, r)<br/>
-deleteFindMin (Bin _ x l r) =
-	(balance . flip (bin x) r) `second` deleteFindMin l<br/>
-deleteFindMin _ = error "deleteFindMin: Empty"</code></p>
+<p><code>popMin, popMax :: Set -&gt; (a, Set a)<br/>
+popMin (Bin _ x Empty r) = (x, r)<br/>
+popMin (Bin _ x l r) =
+	(balance . flip (bin x) r) `second` popMin l<br/>
+popMin _ = error "popMin: Empty"</code></p>
 
 <p>
 左の子が空になるまで木をたどっていきそこの値と右の木を取り出す。
 もどりながら木の再構築と均衡の回復をしていく。
 </p>
 
-<p><code>deleteFindMax (Bin _ x l Empty) = (x, l)<br/>
-deleteFindMax (Bin _ x l r) =
-	(balance . bin x l) `second` deleteFindMax r<br/>
-deleteFindMax _ = error "deleteFindMax: Empty"</code></p>
+<p><code>popMax (Bin _ x l Empty) = (x, l)<br/>
+popMax (Bin _ x l r) =
+	(balance . bin x l) `second` popMax r<br/>
+popMax _ = error "popMax: Empty"</code></p>
 
 <p>
 右の子が空になるまで木をたどっていきそこの値と左の木を取り出す。
