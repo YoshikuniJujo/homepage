@@ -55,8 +55,177 @@ B木のオーダーを3にしたものだ。B木の説明はここではしな�
 子が0個や1個のノードが増えるとその木を使った探索は線形探索に近づいていくからだ。
 </p>
 
-<p>[ここに2-3木の例を置く]</p>
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/bbtree.svg"
+	alt="[2-3木の例]" /></p>
 
-<h3>要素はノードに置く</h3>
+<p>
+分岐が2のときにノードはひとつの要素を持つ。
+その要素と比較して小さいものを左の木に、大きいものを右の木に持つ。
+分岐が3のときにノードはふたつの要素を持つ。
+小さいほうの要素より小さいものを左の木に、
+ふたつの要素のあいだとなるものをまん中の木に、
+大きいほうの要素より大きいものを右の木に持つ。
+また図では省略したが末端の値の下にも本当は枝がのびていて
+高さ0の木がそれぞれぶらさがっている。
+</p>
 
-<h2>多相型版</h2>
+<h3>検索</h3>
+
+<p>
+検索は2分探索木とほとんど同じだ。
+検索する値とノードの要素の大小関係によって進む枝を選べばいい。
+</p>
+
+<h3>追加</h3>
+
+<h4>末端への追加</h4>
+
+<p>
+検索と同様の手順で値を追加するところを決める。
+末端の値は空の木をぶらさげていることを考慮すると末端に値を追加するということは
+高さ0の木を高さ1の木に変換するということだ。
+</p>
+
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/addToNull.svg"
+	alt="[空の木に値を追加する図]" /></p>
+
+<p>
+末端の木への要素への追加には対称性を考えると3通りの可能性がある。
+(1)値がひとつの末端への追加、(2)値がふたつの末端の左への追加、
+(3)値がふたつの末端の中央への追加だ。
+</p>
+
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/addToBottom1.svg"
+	alt="[値がひとつの末端への追加]" /></p>
+
+<p>
+値がひとつの末端の左側に新しい値を追加すると上の図のようになる。
+高さ0の木(空の木:N)が高さ1の木に変換される。
+この不均衡な2分木を3分木にすることで均衡を回復する。
+</p>
+
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/flattenBottom1.svg"
+	alt="[値がひとつの末端の均衡回復]" /></p>
+
+<p>
+つぎにすでに値がふたつある末端への値の追加だ。
+まずは(2)の左への追加だ。
+値がふたつある末端の左に値を追加すると以下のようになる。
+</p>
+
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/addToBottom2.svg"
+	alt="[値がふたつの末端の左への追加]" /></p>
+
+<p>木の高さをそろえる。</p>
+
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/flattenBottom2.svg"
+	alt="[値がふたつの末端の左への追加後の高さをそろえる]" /></p>
+
+<p>
+3つの値を含み4つの空の木を持つ4分岐の木となる。
+BB木では4分岐は許されていないので木の高さを1段高くする。
+上図の緑の値を上に持ち上げれば良い。
+</p>
+
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/levelupBottom2.svg"
+	alt="[値がふたつの末端の左への追加後に木を高くする]" /></p>
+
+<p>
+次に(3)の2つの値を含む末端の中間への値の追加を見ていこう。
+</p>
+
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/addToBottom3.svg"
+	alt="[値がふたつの末端の中央への追加]" /></p>
+
+<p>
+木の高さをそろえる。
+</p>
+
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/flattenBottom3.svg"
+	alt="[値がふたつの末端の中央への追加後の高さをそろえる]" /></p>
+
+<p>木を一段高くする。</p>
+
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/levelupBottom3.svg"
+	alt="[値がふたつの末端の中央への追加後に木を高くする]" /></p>
+
+<p>
+見てきたように末端への値の追加は末端の木を2分岐から3分岐にするか、
+または木の高さを1から2にするという結果となる。
+</p>
+
+<h4>上に向かって木を変形していく</h4>
+
+<p>
+末端において木の高さが1のままであれば単にその部分をおきかえるだけですむ。
+木の高さが高くなったときには変形は上向きに連鎖していく。
+末端で見たのと同じ変換が次々に上へと向かっていく。
+</p>
+
+<p>
+(1) 変形されるノードが値ひとつ(2分岐のノード)のときを考える。
+</p>
+
+<p>左の子ノードが1段高くなる。</p>
+
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/addToNode1.svg"
+	alt="[値がひとつのノードの左が高くなる]" /></p>
+
+<p>高さをそろえる。</p>
+
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/flattenNode1.svg"
+	alt="[値がひとつのノードの左が高くなったのを平坦化]" /></p>
+
+<p>この場合、変形はこのレベルで終わる。</p>
+
+<p>
+(2) 変形されるノードが値ふたつ(3分岐のノード)で左の木が高くなるときを考える。
+</p>
+
+<p>3分岐のノードの左の子が高くなる。</p>
+
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/addToNode2.svg"
+	alt="[値がふたつのノードの左が高くなる]" /></p>
+
+<p>木の高さをそろえる。</p>
+
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/flattenNode2.svg"
+	alt="[値がふたつのノードの左が高くなったのを平坦化の図]" /></p>
+
+<p>木を1段高くする。</p>
+
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/levelupNode2.svg"
+	alt="[値がふたつのノードの左が高くなった結果全体が高くなるの図]" /></p>
+
+<p>
+木が高くなったのでさらに上のレベルへと変形が連鎖していく。
+</p>
+
+<p>
+(3) 変形されるノードが値ふたつ(3分岐のノード)で中央の木が高くなるときを考える。
+</p>
+
+<p>3分岐のノードの中央の子が高くなる。</p>
+
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/addToNode3.svg"
+	alt="[値がふたつのノードの中央が高くなるの図]" /></p>
+
+<p>高さをそろえる。</p>
+
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/flattenNode3.svg"
+	alt="[値がふたつのノードの中央が高くなったのを平坦化の図]" /></p>
+
+<p>1段高くする。</p>
+
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/levelupNode3.svg"
+	alt="[値がふたつのノードの中央が高くなった結果全体が高くなるの図]" /></p>
+
+<p>木が高くなったので上のレベルへと連鎖していく。</p>
+
+<p>
+木が高くなっていく連鎖が根まで到達すると木全体が1段高くなる。
+</p>
+
+<h3>削除</h3>
+
+<h3>多相型版</h3>
