@@ -2,13 +2,6 @@ BB木
 
 <p>(工事中 0%)</p>
 
-<p>
-<a href="/computer/haskell/algorithm/2-3_tree/bb_tree/codes/SetBM.hs"
-	>SetBM.hs</a>
-<a href="/computer/haskell/algorithm/2-3_tree/bb_tree/codes/SetB.hs"
-	>SetB.hs</a>
-</p>
-
 <h2>はじめに</h2>
 
 <p>
@@ -343,17 +336,161 @@ BB木では4分岐は許されていないので木の高さを1段高くする�
 左の子の高さが低くなったものは隣や上からの融通の操作を続ける。
 </p>
 
-<h2>変数名の規則</h2>
+<h2>単相的な集合</h2>
 
-<p>[ここから書き始めること]</p>
+<p><a href="/computer/haskell/algorithm/2-3_tree/bb_tree/codes/SetBM.hs"
+	>SetBM.hs</a></p>
+
+<h3>変数名の規則</h3>
+
+<p>値や木の変数名をその位置によって統一的な変数名で示すことにする。</p>
 
 <p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/var22.svg"
 	alt="[2-2の変数名規則の図]" /></p>
 
+<p>
+2分岐のときのトップレベルの要素をdとし左右の木をそれぞれl, rとする。
+左の木が2分岐ならばその要素はaとし左右の木をそれぞれk, mとする。
+右の木も同様に2分岐ならばその要素をgとし左右の木をq, sとする。
+</p>
+
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/var23.svg"
+	alt="[2-3の変数名規則の図]" /></p>
+
+<p>
+左の木が3分岐のときその要素をa, bとし子どもの木をk, l', mとする。
+右の木についても3分岐のときには要素をg, hとし子どもの木をq, r', sとする。
+</p>
+
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/var32.svg"
+	alt="[3-2の変数名規則の図]" /></p>
+
+<p>
+上のレベルの木が3分岐のときその要素をc, fとする。
+真ん中の木をoとし、2分岐であれば要素をdとし子どもの木をn, pとする。
+</p>
+
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/var33.svg"
+	alt="[3-3の変数名規則の図]" /></p>
+
+<p>
+前ん中の木が3分岐であれば要素をd, eとし子どもの木をn, o', pとする。
+</p>
+
+<p><img	src="/computer/haskell/algorithm/2-3_tree/bb_tree/images/varChanged.svg"
+	alt="[変更前後の変数名の図]" /></p>
+
+<p>
+上記の規則とは別に木l, o, rが変化したとき変化後の値をl', o', r'とする。
+</p>
+
+<h3>モジュール宣言など</h3>
+
+<p><code>{-# LANGUAGE TupleSections #-}</code></p>
+
+<p>(a ,)のようなタプルの部分適用が可能になる。</p>
+
+<p><code>module SetBM (Set, empty, member, insert, delete) where</code></p>
+
+<p>集合の型、空集合、検索、追加、削除を公開する。</p>
+
+<h3>型の定義</h3>
+
+<p><code>type Set = Tree ()</code></p>
+
+<p><code>data Tree a = Zero a | Succ (Tree (Node a)) deriving Show<br/>
+data Node a = Nd2 a Int a | Nd3 a Int a Int a deriving Show</code></p>
+
+<p>
+まずは単相的な型の集合とする。
+要素はInt型のみを扱うことにする。
+構築子Succを適用するごとにNodeが入れ子になっていく。
+高さの異なる木を同じTree型とすることができるがそれぞれの木のなかでは
+どの枝も同じ高さとなることが保証される。
+</p>
+
+<p>[あとでここに具体例と詳しい説明を置く]</p>
+
+<h3>空集合</h3>
+
+<p><code>empty :: Tree ()<br/>
+empty = Zero ()</code></p>
+
+<p>
+空集合は高さ0の木である。
+</p>
+
+<h3>型クラス</h3>
+
+<p><code>class IsNode a where<br/>
+	<span class="indent1">memberN :: Int -&gt; a -&gt; Bool</span><br/>
+	<span class="indent1">insertN :: Int -&gt; a -&gt; Either a (a, Int, a)</span><br/>
+	<span class="indent1">deleteN :: Int -&gt; Node a -&gt; Either (Node a) a</span><br/>
+	<span class="indent1">popMaxN :: Node a -&gt; (Int, Either (Node a) a)</span><br/>
+	</code></p>
+
+<p>
+Node (Node (Node ...))のような型に対する演算が必要となる。
+不定数の型構築子Nodeがネストする型に対する演算は普通の関数では表現できない。
+よってaがIsNodeクラスのインスタンスであるという前提でNode aに対する演算を定義する
+という方法をとる。
+memberNは値の検索である。
+</p>
+
+<p>
+insertNは値の追加である。
+結果として高さが変わらないときと高くなるときとがある。
+高くなるときは必ず2分岐でありかつより上に変形が伝播したときに分解されることが
+あるのではじめから分解された形で返すことにした。
+</p>
+
+<p>
+deleteNは値の削除である。
+結果として木の高さが変わらないかまたはあるいは低くなる。
+</p>
+
+<p>
+popMaxNは最大値とそれを削除した木を返す。
+木は低くなるときもある。
+これはdeleteNが途中のノードから値を削除するときに使われる。
+</p>
+
+<h3>ユニット型はNodeである</h3>
+
+<p>ユニット型を空の木として枝の先端として使う。</p>
+
+<p><code>class IsNode a where<br/>
+	<span class="indent1">memberN _ _ = False</span><br/>
+	<span class="indent1">insertN v _ = Right ((), v, ())</span><br/>
+	<span class="indent1">deleteN v t@(Nd2 _ d _)</span><br/>
+		<span class="indent2">| v == d = Right ()</span><br/>
+		<span class="indent2">| otherwise = Left t</span><br/>
+	<span class="indent1">deleteN v t@(Nd3 _ c _ f _)</span><br/>
+		<span class="indent2">| v == c = Left $ Nd2 () f ()</span><br/>
+		<span class="indent2">| v == f = Left $ Nd2 () c ()</span><br/>
+		<span class="indent2">| otherwise = Left t</span><br/>
+	<span class="indent1">popMaxN (Nd2 _ d _) = (d, Right ())</span><br/>
+	<span class="indent1">popMaxN (Nd3 _ c _ f _) = (f, Left $ Nd2 () c ())</span>
+	</code></p>
+
+<p>
+空集合は何を検索してもFalseとなる。
+空の木に値を追加すると必ず木は高く(0から1)なり左右に空の木を持つ木となる。
+値の削除は存在しない値を削除しようとするともとの木を返すことにする。
+実際に削除が行われるときには2分岐の木だと木の高さは低く(1から0)となる。
+3分岐の木であれば2分岐の木となり高さは変わらない。
+最大値のとりだしも削除と似たようなものだ。
+</p>
+
+<p>[ここから書き始めること]</p>
+
 <p>[コードの解説n]は実際の内容を考えながらちゃんとしたタイトルにつけかえる。</p>
 
-<h2>[コードの解説2]</h2>
+<h3>[コードの解説2]</h3>
 
-<h2>[コードの解説3]</h2>
+<h3>[コードの解説3]</h3>
 
 <h2>多相型版</h2>
+
+<p><a href="/computer/haskell/algorithm/2-3_tree/bb_tree/codes/SetB.hs"
+	>SetB.hs</a></p>
