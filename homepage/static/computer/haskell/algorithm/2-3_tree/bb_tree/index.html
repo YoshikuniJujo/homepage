@@ -423,10 +423,10 @@ empty = Zero ()</code></p>
 <h3>型クラス</h3>
 
 <p><code>class IsNode a where<br/>
-	<span class="indent1">memberN :: Int -&gt; a -&gt; Bool</span><br/>
-	<span class="indent1">insertN :: Int -&gt; a -&gt; Either a (a, Int, a)</span><br/>
-	<span class="indent1">deleteN :: Int -&gt; Node a -&gt; Either (Node a) a</span><br/>
-	<span class="indent1">popMaxN :: Node a -&gt; (Int, Either (Node a) a)</span><br/>
+	<span class="indent1">mem :: Int -&gt; a -&gt; Bool</span><br/>
+	<span class="indent1">ins :: Int -&gt; a -&gt; Either a (a, Int, a)</span><br/>
+	<span class="indent1">del :: Int -&gt; Node a -&gt; Either (Node a) a</span><br/>
+	<span class="indent1">mx :: Node a -&gt; (Int, Either (Node a) a)</span><br/>
 	</code></p>
 
 <p>
@@ -450,7 +450,7 @@ deleteNは値の削除である。
 </p>
 
 <p>
-popMaxNは最大値とそれを削除した木を返す。
+mxは最大値とそれを削除した木を返す。
 木は低くなるときもある。
 これはdeleteNが途中のノードから値を削除するときに使われる。
 </p>
@@ -460,17 +460,17 @@ popMaxNは最大値とそれを削除した木を返す。
 <p>ユニット型を空の木として枝の先端として使う。</p>
 
 <p><code>class IsNode a where<br/>
-	<span class="indent1">memberN _ _ = False</span><br/>
-	<span class="indent1">insertN v _ = Right ((), v, ())</span><br/>
-	<span class="indent1">deleteN v t@(Nd2 _ d _)</span><br/>
+	<span class="indent1">mem _ _ = False</span><br/>
+	<span class="indent1">ins v _ = Right ((), v, ())</span><br/>
+	<span class="indent1">del v t@(Nd2 _ d _)</span><br/>
 		<span class="indent2">| v == d = Right ()</span><br/>
 		<span class="indent2">| otherwise = Left t</span><br/>
-	<span class="indent1">deleteN v t@(Nd3 _ c _ f _)</span><br/>
+	<span class="indent1">del v t@(Nd3 _ c _ f _)</span><br/>
 		<span class="indent2">| v == c = Left $ Nd2 () f ()</span><br/>
 		<span class="indent2">| v == f = Left $ Nd2 () c ()</span><br/>
 		<span class="indent2">| otherwise = Left t</span><br/>
-	<span class="indent1">popMaxN (Nd2 _ d _) = (d, Right ())</span><br/>
-	<span class="indent1">popMaxN (Nd3 _ c _ f _) = (f, Left $ Nd2 () c ())</span>
+	<span class="indent1">mx (Nd2 _ d _) = (d, Right ())</span><br/>
+	<span class="indent1">mx (Nd3 _ c _ f _) = (f, Left $ Nd2 () c ())</span>
 	</code></p>
 
 <p>
@@ -482,7 +482,27 @@ popMaxNは最大値とそれを削除した木を返す。
 最大値のとりだしも削除と似たようなものだ。
 </p>
 
+<h3>検索</h3>
+
+<p><code>instance IsNode a =&gt; IsNode (Node a) where<br/>
+	<span class="indent1">mem v (Nd2 l d r)</span><br/>
+		<span class="indent2">| v &lt; d = mem v l</span><br/>
+		<span class="indent2">| v == d = True</span><br/>
+		<span class="indent2">| otherwise = mem v r</span><br/>
+	<span class="indent1">mem v (Nd3 l c o f r)</span><br/>
+		<span class="indent2">| v &lt; c = mem v l</span><br/>
+		<span class="indent2">| v == c = True</span><br/>
+		<span class="indent2">| v &lt; f = mem v o</span><br/>
+		<span class="indent2">| v == f = True</span><br/>
+		<span class="indent2">| otherwise = mem v r</span></code></p>
+
+<p>[ここに関数memの説明を書く]</p>
+
 <p>[ここから書き始めること]</p>
+
+<h3>追加</h3>
+
+<h3>削除</h3>
 
 <p>[コードの解説n]は実際の内容を考えながらちゃんとしたタイトルにつけかえる。</p>
 
