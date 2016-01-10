@@ -496,13 +496,105 @@ mxは最大値とそれを削除した木を返す。
 		<span class="indent2">| v == f = True</span><br/>
 		<span class="indent2">| otherwise = mem v r</span></code></p>
 
-<p>[ここに関数memの説明を書く]</p>
-
-<p>[ここから書き始めること]</p>
+<p>
+検索する値とノードの値とを比較し進む枝を選ぶ。
+</p>
 
 <h3>追加</h3>
 
+<p><code><span class="indent1">ins v t@(Nd2 l d r)</span><br/>
+		<span class="indent2">| v &lt; d = Left $ case ins v l of</span><br/>
+			<span class="indent3">Left l' -&gt; Nd2 l' d r</span><br/>
+			<span class="indent3">Right (k, a, m) -&gt; Nd3 k a m d r</span><br/>
+		<span class="indent2">| v == d = Left t</span><br/>
+		<span class="indent2">| otherwise = Left $ case ins v r of</span><br/>
+			<span class="indent3">Left r' -&grt; Nd2 l d r'</span><br/>
+			<span class="indent3">Right (q, g, s) -&gt; Nd3 l d q g s</span></code></p>
+
+<p>
+2分岐の木に対してはノードの値との大小によって左右のどちらの枝に追加するかを決める。
+追加された結果として木の高さが変わらなければ単純におきかえればよい。
+結果として木の高さが高くなる場合には3分岐の木にかえる。
+</p>
+
+<p><code><span class="indent1">ins v t@(Nd3 l c o f r)</span><br/>
+	<span class="indent2">| v &lt; c = case ins v l of</span><br/>
+		<span class="indent3">Left l' -&gt; Left $ Nd3 l' c o f r</span><br/>
+		<span class="indent3">Right (k, a, m) -&gt; Right (Nd2 k a m, c, Nd2 o f r)</span><br/>
+	<span class="indent2">| v == c = Left t</span><br/>
+	<span class="indent2">| v &lt; f = case ins v o of</span><br/>
+		<span class="indent3">Left o' -&gt; Left $ Nd3 l c o' f r</span><br/>
+		<span class="indent3">Right (n, d, p) -&gt; Right (Nd2 l c n, d, Nd2 p f r)</span><br/>
+	<span class="indent2">| v == f = Left t</span><br/>
+	<span class="indent2">| otherwise = case ins v r of</span><br/>
+		<span class="indent3">Left r' -&gt; Left $ Nd3 l c o f r'</span><br/>
+		<span class="indent3">Right (q, g, s) -&gt; Right (Nd2 l c o, f, Nd2 q g s)</span></code></p>
+
+<p>
+3分岐の木に対しては下の木が高くなったときには全体の木を2分岐の木として高くする。
+実際には分解された形として返す。
+</p>
+
 <h3>削除</h3>
+
+<p><code><span class="indent1">del v (Nd2 l d r)</span><br/>
+		<span class="indent2">| v &lt;= d = case if v &lt; d then (d, del v l) else mx l of</span><br/>
+			<span class="indent3">(d', Left l') -&gt; Left $ Nd2 l' d' r</span><br/>
+			<span class="indent3">(d', Right l') -&gt; case r of</span><br/>
+				<span class="indent4">Nd2 q g s -&gt; Right $ Nd3 l' d' q g s</span><br/>
+				<span class="indent4">Nd3 q g r' h s -&gt; Left $ Nd2 (Nd2 l' d' q) g (Nd2 r' h s)</span><br/>
+		<span class="indent2">| otherwise = case del v r of</span><br/>
+			<span class="indent3">Left r' -&gt; Left $ Nd2 l d r'</span><br/>
+			<span class="indent3">Right r' -&gt; case l of</span><br/>
+				<span class="indent4">Nd2 k a m -&gt; Right $ Nd3 k a m d r'</span><br/>
+				<span class="indent4">Nd3 k a l' b m -&gt; Left $</span><br/>
+					<span class="indent5">Nd2 (Nd2 k a l') b (Nd2 m d r')</span></code></p>
+
+<p>
+ノードの値と一致した場合は左の木の最大値をとりだす。
+一致しないときは左か右から値を削除する。
+木が低くなったら2分岐を3分岐にして木の高さを低くする。
+</p>
+
+<p><code><span class="indent1">del v (Nd3 l c o f r)</span><br/>
+		<span class="indent2">| v &lt;= c = Left $ case if v &lt; c then (c, del v l) else mx l of</span><br/>
+			<span class="indent3">(c', Left l') -&gt; Nd3 l' c' o f r</span><br/>
+			<span class="indent3">(c', Right l') -&gt; case o of</span><br/>
+				<span class="indent4">Nd2 n d p -&gt; Nd2 (Nd3 l' c' n d p) f r</span><br/>
+				<span class="indent4">Nd3 n d o' e p -&gt;</span><br/>
+					<span class="indent5">Nd3 (Nd2 l' c' n) d (Nd2 o' e p) f r</span><br/>
+	<span class="indent2">| v &lt;= f = Left $ case if v &lt; f then (f, del v o) else mx o of</span><br/>
+		<span class="indent3">(f', Left o') -&gt; Nd3 l c o' f' r</span><br/>
+		<span class="indent3">(f', Right o') -&gt; case l of</span><br/>
+			<span class="indent4">Nd2 k a m -&gt; Nd2 (Nd3 k a m c o') f' r</span><br/>
+			<span class="indent4">Nd3 k a l' b m -&gt;</span><br/>
+				<span class="indent5">Nd3 (Nd2 k a l') b (Nd2 m c o') f r</span><br/>
+	<span class="indent2">| otherwise = Left $ case del v r of</span><br/>
+		<span class="indent3">Left r' -&gt; Nd3 l c o f r'</span><br/>
+		<span class="indent3">Right r' -&gt; case o of</span><br/>
+			<span class="indent4">Nd2 n d p -&gt; Nd2 l c (Nd3 r d p f r')</span><br/>
+			<span class="indent4">Nd3 n d o' e p -&gt;</span><br/>
+				<span class="indent5">Nd3 l c (Nd2 n d o') e (Nd2 p f r')</span></code></p>
+
+<p>
+木が低くなったときに隣りから融通するか上から融通するかだ。
+全体が低くなることはない。
+</p>
+
+<p><code><span class="indent1">mx (Nd2 l d r) = case mx r of</span><br/>
+		<span class="indent2">(u, Left r') -&gt; (u, Left $ Nd2 l d r')</span><br/>
+		<span class="indent2">(u, Right r') -&gt; (u ,) $ case l of</span><br/>
+			<span class="indent3">Nd2 k a m -&gt; Right $ Nd3 k a m d r'</span><br/>
+			<span class="indent3">Nd3 k a l' b m -&gt; Left $ Nd2 (Nd2 k a l') b (Nd2 m d r')</span><br/>
+	<span class="indent1">mx (Nd3 l c o f r) = case mx r of</span><br/>
+		<span class="indent2">(u, Left r') -&gt; (u, Left $ Nd3 l c o f r')</span><br/>
+		<span class="indent2">(u, Right r') -&gt; (u ,) . Left $ case o of</span><br/>
+			<span class="indent3">Nd2 n d p -&gt; Nd2 l c (Nd3 n d p f r')</span><br/>
+			<span class="indent3">Nd3 n d o' e p -&gt; Nd3 l c (Nd2 n d o') e (Nd2 p f r')</span></code></p>
+
+<p>一番右の値を削除している。</p>
+
+<p>[ここから書き始めること]</p>
 
 <p>[コードの解説n]は実際の内容を考えながらちゃんとしたタイトルにつけかえる。</p>
 
