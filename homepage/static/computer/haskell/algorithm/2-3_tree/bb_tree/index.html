@@ -1,6 +1,6 @@
 BB木
 
-<p>(工事中 0%)</p>
+<p>(工事中 70%)</p>
 
 <h2>はじめに</h2>
 
@@ -508,7 +508,7 @@ mxは最大値とそれを削除した木を返す。
 			<span class="indent3">Right (k, a, m) -&gt; Nd3 k a m d r</span><br/>
 		<span class="indent2">| v == d = Left t</span><br/>
 		<span class="indent2">| otherwise = Left $ case ins v r of</span><br/>
-			<span class="indent3">Left r' -&grt; Nd2 l d r'</span><br/>
+			<span class="indent3">Left r' -&gt; Nd2 l d r'</span><br/>
 			<span class="indent3">Right (q, g, s) -&gt; Nd3 l d q g s</span></code></p>
 
 <p>
@@ -751,9 +751,9 @@ Node v aのaの部分の要素がvである必要があるという条件をv ~ 
 			<span class="indent3">(d', Left l') -&gt; Left $ Nd2 l' d' r</span><br/>
 			<span class="indent3">(d', Right l') -&gt; case r of</span><br/>
 				<span class="indent4">Nd2 q g s -&gt; Right $ Nd3 l' d' q g s</span><br/>
-				<span class="indent4">Nd3 q g r' h s -&g; Left $</span><br/>
+				<span class="indent4">Nd3 q g r' h s -&gt; Left $</span><br/>
 					<span class="indent5">Nd2 (Nd2 l' d' q) g (Nd2 r' h s)</span><br/>
-		<span class="indent2">| otherswise = case del v r of</span></br/>
+		<span class="indent2">| otherswise = case del v r of</span><br/>
 			<span class="indent3">Left r' -&gt; Left $ Nd2 l d r'</span><br/>
 			<span class="indent3">Right r' -&gt; case l of</span><br/>
 				<span class="indent4">Nd2 k a m -&gt; Right $ Nd3 k a m d r'</span><br/>
@@ -835,7 +835,80 @@ delete _ t = t</code></p>
 >重み平衡木</a>を使ったときと比較してみる。
 </p>
 
-<p>...ほげぇほげぇ...</p>
+<p><code>import Data.Time<br/>
+import System.Random</code></p>
+
+<p><code>import qualified SetT as T<br/>
+import qualified SetB as B</code></p>
+
+<p><code>time :: Show a =&gt; a -&gt; IO ()<br/>
+time x = do<br/>
+	<span class="indent1">t0 &lt;- getCurrentTime</span><br/>
+	<span class="indent1">print x</span><br/>
+	<span class="indent1">t1 &lt;- getCurrentTime</span><br/>
+	<span class="indent1">print $ t1 `diffUTCTime` t0</span><br/>
+	</code></p>
+
+<p><code>nthT :: Ord a =&gt; T.Set a -&gt; [a] -&gt; Int -&gt; Maybe a<br/>
+nthT s (x : xs) n<br/>
+	<span class="indent1">| x `T.member` s = nthT s xs n</span><br/>
+	<span class="indent1">| n &lt; 1 = Just x</span><br/>
+	<span class="indent1">| otherwise = nthT (T.insert x s) xs (n - 1)</span><br/>
+nthT _ _ _ = Nothing</code></p>
+
+<p><code>nthB :: Ord a =&gt; B.Set a -&gt; [a] -&gt; Int -&gt; Maybe a<br/>
+nthB s (x : xs) n<br/>
+	<span class="indent1">| x `B.member` s = nthB s xs n</span><br/>
+	<span class="indent1">| n &lt; 1 = Just x</span><br/>
+	<span class="indent1">| otherwise = nthB (T.insert x s) xs (n - 1)</span><br/>
+nthB _ _ _ = Nothing</code></p>
+
+<p><code>main :: IO ()<br/>
+main = do<br/>
+	<span class="indent1">time (nthT T.empty (randoms $ mkStdGen 8) 10000 :: Maybe Int)</span><br/>
+	<span class="indent1">time (nthT T.empty (randoms $ mkStdGen 8) 20000 :: Maybe Int)</span><br/>
+	<span class="indent1">time (nthT T.empty (randoms $ mkStdGen 8) 40000 :: Maybe Int)</span><br/>
+	<span class="indent1">time (nthT T.empty (randoms $ mkStdGen 8) 80000 :: Maybe Int)</span><br/>
+	<span class="indent1">time (nthT T.empty (randoms $ mkStdGen 8) 160000 :: Maybe Int)</span><br/>
+	<span class="indent1">time (nthT T.empty (randoms $ mkStdGen 8) 320000 :: Maybe Int)</span><br/>
+	<span class="indent1">putStrLn ""</span><br/>
+	<span class="indent1">time (nthB B.empty (randoms $ mkStdGen 8) 10000 :: Maybe Int)</span><br/>
+	<span class="indent1">time (nthB B.empty (randoms $ mkStdGen 8) 20000 :: Maybe Int)</span><br/>
+	<span class="indent1">time (nthB B.empty (randoms $ mkStdGen 8) 40000 :: Maybe Int)</span><br/>
+	<span class="indent1">time (nthB B.empty (randoms $ mkStdGen 8) 80000 :: Maybe Int)</span><br/>
+	<span class="indent1">time (nthB B.empty (randoms $ mkStdGen 8) 160000 :: Maybe Int)</span><br/>
+	<span class="indent1">time (nthB B.empty (randoms $ mkStdGen 8) 320000 :: Maybe Int)</span><br/>
+	</code></p>
+
+<p>コンパイルして実行する。</p>
+
+<p><code>% ghc -Wall nth.hs<br/>
+% ./nth<br/>
+Just (-1935099869)<br/>
+0.074699s<br/>
+Just (-65105102)<br/>
+0.141298s<br/>
+Just 2091415055<br/>
+0.322952s<br/>
+Just (-37343952)<br/>
+0.683569s<br/>
+Just 921951543<br/>
+1.495717s<br/>
+Just 1766916110<br/>
+3.240157s<br/>
+<br/>
+Just (-1935099869)<br/>
+0.066297s<br/>
+Just (-65105102)<br/>
+0.16743s<br/>
+Just 2091415055<br/>
+0.385219s<br/>
+Just (-37343952)<br/>
+0.879732s<br/>
+Just 921951543<br/>
+2.005283s<br/>
+Just 1766916110<br/>
+4.518721s</code></p>
 
 <p>
 ランダムな順に値が追加されるときには重み平衡木のほうが効率がよい。
@@ -845,7 +918,51 @@ delete _ t = t</code></p>
 そこで木のかたよりを多くするために小さいほうから順に要素を追加するようにする。
 </p>
 
-<p>...ぴよぉぴよぉ...</p>
+<p><code>main :: IO ()<br/>
+main = do<br/>
+	<span class="indent1">time (nthT T.empty [0 ..] 10000 :: Maybe Int)</span><br/>
+	<span class="indent1">time (nthT T.empty [0 ..] 20000 :: Maybe Int)</span><br/>
+	<span class="indent1">time (nthT T.empty [0 ..] 40000 :: Maybe Int)</span><br/>
+	<span class="indent1">time (nthT T.empty [0 ..] 80000 :: Maybe Int)</span><br/>
+	<span class="indent1">time (nthT T.empty [0 ..] 160000 :: Maybe Int)</span><br/>
+	<span class="indent1">time (nthT T.empty [0 ..] 320000 :: Maybe Int)</span><br/>
+	<span class="indent1">putStrLn ""</span><br/>
+	<span class="indent1">time (nthB B.empty [0 ..] 10000 :: Maybe Int)</span><br/>
+	<span class="indent1">time (nthB B.empty [0 ..] 20000 :: Maybe Int)</span><br/>
+	<span class="indent1">time (nthB B.empty [0 ..] 40000 :: Maybe Int)</span><br/>
+	<span class="indent1">time (nthB B.empty [0 ..] 80000 :: Maybe Int)</span><br/>
+	<span class="indent1">time (nthB B.empty [0 ..] 160000 :: Maybe Int)</span><br/>
+	<span class="indent1">time (nthB B.empty [0 ..] 320000 :: Maybe Int)</span></code></p>
+
+<p>コンパイルして実行する。</p>
+
+<p><code>% ghc -Wall nth2.hs<br/>
+% ./nth2<br/>
+Just 10000<br/>
+0.046424s<br/>
+Just 20000<br/>
+0.104799s<br/>
+Just 40000<br/>
+0.212439s<br/>
+Just 80000<br/>
+0.469341s<br/>
+Just 160000<br/>
+0.975118s<br/>
+Just 320000<br/>
+2.231024s<br/>
+<br/>
+Just 10000<br/>
+0.039411s<br/>
+Just 20000<br/>
+0.091543s<br/>
+Just 40000<br/>
+0.180194s<br/>
+Just 80000<br/>
+0.395703s<br/>
+Just 160000<br/>
+0.835138s<br/>
+Just 320000<br/>
+1.777087s</code></p>
 
 <p>
 このように木のかたよりの発生する回数を増やすとBinary B-Treeのほうが効率が良くなる。
@@ -859,3 +976,11 @@ delete _ t = t</code></p>
 <p>値用のフィールドを追加すれば良い。</p>
 
 <h2>まとめ</h2>
+
+<p>
+型レベルで平衡が保証される探索木を実装した。
+これはB木(B-tree)のオーダーを3にしたものでありBB木(Binary B-tree)と呼ばれる。
+ランダムな挿入に関しては重み平衡木のほうが効率が良いが、
+ソートずみの値を挿入していくことにより木のかたよりの頻度が高くなると
+重み平衡木よりも効率が良くなるようだ。
+</p>
