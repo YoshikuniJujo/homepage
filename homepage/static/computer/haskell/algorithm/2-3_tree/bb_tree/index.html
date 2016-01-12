@@ -594,6 +594,31 @@ mxは最大値とそれを削除した木を返す。
 
 <p>一番右の値を削除している。</p>
 
+<h3>木を扱う関数</h3>
+
+<p>Node型に対する関数のラッパーとして木を扱う関数を定義する。</p>
+
+<p><code>member :: IsNode a =&gt; Int -&gt; Tree a -&gt; Bool<br/>
+member v (Zero n) = mem v n<br/>
+member v (Succ t) = member v t</code></p>
+
+<p><code>insert :: IsNode a =&gt; Int -&gt; Tree a -&gt; Tree a<br/>
+insert v (Zero n) = case ins v n of<br/>
+	<span class="indent1">Left n' -&gt; Zero n'</span><br/>
+	<span class="indent1">Right (l, d, r) -&gt; Succ . Zero $ Nd2 l d r</span><br/>
+insert v (Succ t) = Succ $ insert v t</code></p>
+
+<p><code>delete :: IsNode a =&gt; Int -&gt; Tree a -&gt; Tree a<br/>
+delete v (Succ (Zero n)) = case del v n of<br/>
+	<span class="indent1">Left n' -&gt; Succ $ Zero n'</span><br/>
+	<span class="indent1">Right n' -&gt; Zero n'</span><br/>
+delete v (Succ t) = Succ $ delete v t<br/>
+delete _ t = t</code></p>
+
+<p>
+SuccをはがしていきZeroのところまできたらNodeを扱う関数を適用している。
+</p>
+
 <h2>多相型版</h2>
 
 <h3>TypeFamilies</h3>
@@ -616,7 +641,7 @@ TypeFamilies拡張についてはあとで説明を追加する予定だ。
 
 <h3>型定義</h3>
 
-<p><code>type Set v = Tree v ()</code></p>
+<p><code>type Set v = Tree v (Tip v)</code></p>
 
 <p><code>data Tree v a = Zero a | Succ (Tree v (Node v a)) deriving Show<br/>
 data Node v a = Nd2 a v a | Nd3 a v a v a deriving Show<br/>
@@ -636,13 +661,22 @@ empty = Zero Tip</code></p>
 <p>
 空の木、つまり高さが0の木を定義する。
 要素vに対して多相的に対応したTip vを使う。
-<?p>
+</p>
 
 <h3>型クラス</h3>
 
 <p><code>class IsNode a where<br/>
-	<span class="indent1"></span><br/>
+	<span class="indent1">type Elem a</span><br/>
+	<span class="indent1">mem :: Elem a -&gt; a -&gt; Bool</span><br/>
+	<span class="indent1">ins :: Elem a -&gt; a -&gt; Either a (a, Elem a, a)</span><br/>
+	<span class="indent1">del :: Elem a -&gt; Node (Elem a) a -&gt; Either (Node (Elem a) a) a</span><br/>
+	<span class="indent1">mx :: Node (Elem a) a -&gt; (Elem a, Either (Node (Elem a) a) a)</span><br/>
 	</code></p>
+
+<p>
+型族を使ってIsNodeクラスのインスタンスであるa型に対して要素の型を指定できる。
+メンバ関数ではInt型ではなくElem a型を指定する。
+</p>
 
 <h3>Tip型はNodeだ</h3>
 
@@ -660,6 +694,151 @@ empty = Zero Tip</code></p>
 	<span class="indent1">mx (Nd2 _ d _) = (d, Right Tip)</span><br/>
 	<span class="indent1">mx (Nd3 _ c _ f _) = (f, Left $ Nd2 Tip c Tip)</span></code></p>
 
-<p></p>
+<p>
+空の木(高さ0の木)にユニット型ではなく要素の型を指定できるTip型を使う。
+type Elem (Tip v) = vでTip vの要素はv型であると指定している。
+</p>
 
-<p>[ここから書き始めること]</p>
+<h3>検索</h3>
+
+<p><code>instance (Ord v, IsNode a, v ~ Elem a) =&gt; IsNode (Node v a) where<br/>
+	<span class="indent1">type Elem (Node v a) = v</span><br/>
+	<span class="indent1">mem v (Nd2 l d r)</span><br/>
+		<span class="indent2">| v &lt; d = mem v l</span><br/>
+		<span class="indent2">| v == d = True</span><br/>
+		<span class="indent2">| otherwise = mem v r</span><br/>
+	<span class="indent1">mem v (Nd3 l c o f r)</span><br/>
+		<span class="indent2">| v &lt; c = mem v l</span><br/>
+		<span class="indent2">| v == c = True</span><br/>
+		<span class="indent2">| v &lt; f = mem v o</span><br/>
+		<span class="indent2">| v == f = True</span><br/>
+		<span class="indent2">| otherwise = mem v r</span></code></p>
+
+<p>
+Node v aのaの部分の要素がvである必要があるという条件をv ~ Elem aで表している。
+</p>
+
+<h3>追加</h3>
+
+<p><code><span class="indent1">ins v t@(Nd2 l d r)</span><br/>
+		<span class="indent2">| v &lt; d = Left $ case ins v l of</span><br/>
+			<span class="indent3">Left l' -&gt; Nd2 l' d r</span><br/>
+			<span class="indent3">Right (k, a, m) -&gt; Nd3 k a m d r</span><br/>
+		<span class="indent2">| v == d = Left t</span><br/>
+		<span class="indent2">| otherwise = Left $ case ins v r of</span><br/>
+			<span class="indent3">Left r' -&gt; Nd2 l d r'</span><br/>
+			<span class="indent3">Right (q, g, s) -&gt; Nd3 l d q g s</span><br/>
+	<span class="indent1">ins v t@(Nd3 l c o f r)</span><br/>
+		<span class="indent2">| v &lt; c = case ins v l of</span><br/>
+			<span class="indent3">Left l' -&gt; Left $ Nd3 l' c o f r</span><br/>
+			<span class="indent3">Right (k, a, m) -&gt; Right (Nd2 k a m, c, Nd2 o f r)</span><br/>
+		<span class="indent2">| v == c = Left t</span><br/>
+		<span class="indent2">| v &lt; f = case ins v o of</span><br/>
+			<span class="indent3">Left o' -&gt; Left $ Nd3 l c o' f r</span><br/>
+			<span class="indent3">Right (n, d, p) -&gt; Right (Nd2 l c n, d, Nd2 p f r)</span><br/>
+		<span class="indent2">| v == f = Left t</span><br/>
+		<span class="indent2">| otherwise = case ins v r of</span><br/>
+			<span class="indent3">Left r' -&gt; Left $ Nd3 l c o f r'</span><br/>
+			<span class="indent3">Right (q, g, s) -&gt; Right (Nd2 l c o, f, Nd2 q g s)</span><br/>
+		</code></p>
+
+<p>単相型のバージョンと同じだ。</p>
+
+<h3>削除</h3>
+
+<p><code><span class="indent1">del v (Nd2 l d r)</span><br/>
+		<span class="indent2">| v &lt;= d = case if v &lt; d then (d, del v l) else mx l of</span><br/>
+			<span class="indent3">(d', Left l') -&gt; Left $ Nd2 l' d' r</span><br/>
+			<span class="indent3">(d', Right l') -&gt; case r of</span><br/>
+				<span class="indent4">Nd2 q g s -&gt; Right $ Nd3 l' d' q g s</span><br/>
+				<span class="indent4">Nd3 q g r' h s -&g; Left $</span><br/>
+					<span class="indent5">Nd2 (Nd2 l' d' q) g (Nd2 r' h s)</span><br/>
+		<span class="indent2">| otherswise = case del v r of</span></br/>
+			<span class="indent3">Left r' -&gt; Left $ Nd2 l d r'</span><br/>
+			<span class="indent3">Right r' -&gt; case l of</span><br/>
+				<span class="indent4">Nd2 k a m -&gt; Right $ Nd3 k a m d r'</span><br/>
+				<span class="indent4">Nd3 k a l' b m -&gt; Left $</span><br/>
+				<span class="indent5">Nd2 (Nd2 k a l') b (Nd2 m d r')</span><br/>
+	<span class="indent1">del v (Nd3 l c o f r)</span><br/>
+		<span class="indent2">| v &lt;= c = Left $ case if v &lt; c then (c, del v l) else mx l of</span><br/>
+			<span class="indent3">(c', Left l') -&gt; Nd3 l' c' o f r</span><br/>
+			<span class="indent3">(c', Right l') -&gt; case o of</span><br/>
+				<span class="indent4">Nd2 n d p -&gt; Nd2 (Nd3 l' c' n d p) f r</span><br/>
+				<span class="indent4">Nd3 n d o' e p -&gt;</span><br/>
+					<span class="indent5">Nd3 (Nd2 l' c' n) d (Nd2 o' e p) f r</span><br/>
+		<span class="indent2">| v &lt;= f = Left $ case if v &lt; f then (f, del v o) else mx o of</span><br/>
+			<span class="indent3">(f', Left o') -&gt; Nd3 l c o' f' r</span><br/>
+			<span class="indent3">(f', Right o') -&gt; case l of</span><br/>
+				<span class="indent4">Nd2 k a m -&gt; Nd2 (Nd3 k a m c o') f' r</span><br/>
+				<span class="indent4">Nd3 k a l' b m -&gt;</span><br/>
+					<span class="indent5">Nd3 (Nd2 k a l') b (Nd2 m c o') f r</span><br/>
+		<span class="indent2">| otherwise = Left $ case del v r of</span><br/>
+			<span class="indent3">Left r' -&gt; Nd3 l c o f r'</span><br/>
+			<span class="indent3">Right r' -&gt; case o of</span><br/>
+				<span class="indent4">Nd2 n d p -&gt; Nd2 l c (Nd3 n d p f r')</span><br/>
+				<span class="indent4">Nd3 n d o' e p -&gt;</span><br/>
+					<span class="indent5">Nd3 l c (Nd2 n d o') e (Nd2 p f r')</span></code></p>
+
+<p>
+単相型のバージョンと同じだ。
+最大値をとりだす関数mxも同じだ。
+</p>
+
+<p><code><span class="indent1">mx (Nd2 l d r) = case mx r of</span><br/>
+		<span class="indent2">(u, Left r') -&gt; (u, Left $ Nd2 l d r')</span><br/>
+		<span class="indent2">(u, Right r') -&gt; (u ,) $ case l of</span><br/>
+			<span class="indent3">Nd2 k a m -&gt; Right $ Nd3 k a m d r'</span><br/>
+			<span class="indent3">Nd3 k a l' b m -&gt; Left $ Nd2 (Nd2 k a l') b (Nd2 m d r')</span><br/>
+	<span class="indent1">mx (Nd3 l c o f r) = case mx r of</span><br/>
+		<span class="indent2">(u, Left r') -&gt; (u, Left $ Nd3 l c o f r')</span><br/>
+		<span class="indent2">(u, Right r') -&gt; (u ,) . Left $ case o of</span><br/>
+			<span class="indent3">Nd2 n d p -&gt; Nd2 l c (Nd3 n d p f r')</span><br/>
+			<span class="indent3">Nd3 n d o' e p -&gt; Nd3 l c (Nd2 n d o') e (Nd2 p f r')</span><br/>
+</code></p>
+
+<h3>Treeを扱う関数</h3>
+
+<p><code>member :: (Ord v, IsNode a, v ~ Elem a) =&gt; v -&gt; Tree v a -&gt; Bool<br/>
+member v (Zero n) = mem v n<br/>
+member v (Succ t) = member v t</code></p>
+
+<p><code>insert :: (Ord v, IsNode a, v ~ Elem a) =&gt; v -&gt; Tree v a -&gt; Tree v a<br/>
+insert v (Zero n) = case ins v n of<br/>
+	<span class="indent1">Left n' -&gt; Zero n'</span><br/>
+	<span class="indent1">Right (l, d, r) -&gt; Succ . Zero $ Nd2 l d r</span><br/>
+insert v (Succ t) = Succ $ insert v t</code></p>
+
+<p><code>delete :: (Ord v, IsNode a, v ~ Elem a) =&gt; v -&gt; Tree v a -&gt; Tree v a<br/>
+delete v (Succ (Zero n)) = case del v n of<br/>
+	<span class="indent1">Left n' -&gt; Succ $ Zero n'</span><br/>
+	<span class="indent1">Right n' -&gt; Zero n'</span><br/>
+delete v (Succ t) = Succ $ delete v t
+delete _ t = t</code></p>
+
+<p>
+要素の型がOrdクラスのインスタンスであることとNodeの要素が下のNodeの要素と
+型が等しいという型制約がつく。
+</p>
+
+<h2>時間効率の比較</h2>
+
+<p>
+<a href="/computer/haskell/algorithm/weight_balanced_tree/set"
+>重み平衡木</a>を使ったときと比較してみる。
+</p>
+
+<p>...ほげぇほげぇ...</p>
+
+<p>
+ランダムな順に値が追加されるときには重み平衡木のほうが効率がよい。
+これはBB木がどのような順で値が追加されても木の変形の回数があまり変わらないのに対して
+重み平衡木ではランダムな順で値が追加されると木がかたよる頻度が少なくなり
+木の変形を行う回数が減るためと考えられる。
+そこで木のかたよりを多くするために小さいほうから順に要素を追加するようにする。
+</p>
+
+<p>...ぴよぉぴよぉ...</p>
+
+<p>
+このように木のかたよりの発生する回数を増やすとBinary B-Treeのほうが効率が良くなる。
+</p>
