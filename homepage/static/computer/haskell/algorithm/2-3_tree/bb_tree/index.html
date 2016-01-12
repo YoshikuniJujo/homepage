@@ -606,4 +606,60 @@ TypeFamilies拡張についてはあとで説明を追加する予定だ。
 <p><a href="/computer/haskell/algorithm/2-3_tree/bb_tree/codes/SetB.hs"
 	>SetB.hs</a></p>
 
+<h3>モジュール宣言など</h3>
+
+<p><code>{-# LANGUAGE TupleSections, TypeFamilies #-}</code></p>
+
+<p>TypeFamilies拡張が必要になる。<p>
+
+<p><code>module SetB (Set, empty, member, insert, delete) where</code></p>
+
+<h3>型定義</h3>
+
+<p><code>type Set v = Tree v ()</code></p>
+
+<p><code>data Tree v a = Zero a | Succ (Tree v (Node v a)) deriving Show<br/>
+data Node v a = Nd2 a v a | Nd3 a v a v a deriving Show<br/>
+data Tip v = Tiv deriving Show</code></p>
+
+<p>
+要素をInt型ではなく多相的な型変数vとする。
+また、空の木を表現するのにユニット型ではなくそれぞれの
+型vに対応できるTip型を定義する。
+</p>
+
+<h3>空の木</h3>
+
+<p><code>empty :: Tree v (Tip v)<br/>
+empty = Zero Tip</code></p>
+
+<p>
+空の木、つまり高さが0の木を定義する。
+要素vに対して多相的に対応したTip vを使う。
+<?p>
+
+<h3>型クラス</h3>
+
+<p><code>class IsNode a where<br/>
+	<span class="indent1"></span><br/>
+	</code></p>
+
+<h3>Tip型はNodeだ</h3>
+
+<p><code>instance Eq v =&gt; IsNode (Tip v) where<br/>
+	<span class="indent1">type Elem (Tip v) = v</span><br/>
+	<span class="indent1">mem _ _ = False</span><br/>
+	<span class="indent1">ins v _ = Right (Tip, v, Tip)</span><br/>
+	<span class="indent1">del v t@(Nd2 _ d _)</span><br/>
+		<span class="indent2">| v == d = Right Tip</span><br/>
+		<span class="indent2">| otherwise = Left t</span><br/>
+	<span class="indent1">del v t@(Nd3 _ c _ f _)</span><br/>
+		<span class="indent2">| v == c = Left $ Nd2 Tip f Tip</span><br/>
+		<span class="indent2">| v == f = Left $ Nd2 Tip c Tip</span><br/>
+		<span class="indent2">| otherwise = Left t</span><br/>
+	<span class="indent1">mx (Nd2 _ d _) = (d, Right Tip)</span><br/>
+	<span class="indent1">mx (Nd3 _ c _ f _) = (f, Left $ Nd2 Tip c Tip)</span></code></p>
+
+<p></p>
+
 <p>[ここから書き始めること]</p>
