@@ -11,8 +11,7 @@
 
 <p>
 極座標上では点は原点からの距離dとX軸からの角度rで(d, r)のように表せる。
-これは指でさしながら「こっちの方向に100m行ったところ」
-のように示すということだ。
+指でさしながら「こっちの方向に100m行ったところ」のように示すということだ。
 </p>
 
 <h2>型シノニム</h2>
@@ -38,7 +37,8 @@
 原点とその点を通る線上にあり原点からの距離が同じ向きでn倍となるような点を求める。
 </p>
 
-<p>[ここに点(8, 5)を3倍にする図を入れる]</p>
+<p><img	src="/computer/haskell/web_lecture/for_programmer/images/cartesian.svg"
+	alt="[点(8, 5)を3倍にする図]" /></p>
 
 <p>x, yのそれぞれをn倍すれば良いので</p>
 
@@ -78,7 +78,8 @@ point1 = (8, 5)</code></p>
 原点とその点を通る線上にあり原点からの距離が同じ向きでn倍となるような点を求める。
 </p>
 
-<p>[ここに点(6, pi / 3)を3倍にする図を入れる]</p>
+<p><img	src="/computer/haskell/web_lecture/for_programmer/images/polar.svg"
+	alt="[点(10, pi / 6)を3倍にする図]" /></p>
 
 <p>原点からの距離だけn倍すれば良い。</p>
 
@@ -87,11 +88,11 @@ point1 = (8, 5)</code></p>
 <h4>例</h4>
 
 <p><code>point2 :: Polar<br/>
-point2 = (6, pi / 3)</code></p>
+point2 = (10, pi / 3)</code></p>
 
 <p><code>*Main&gt; :reload<br/>
 *Main&gt; mulP point2 3<br/>
-(18,1.0471975511965976)</code></p>
+(30,0.5235987755982988)</code></p>
 
 <h3>どっちがどっち</h3>
 
