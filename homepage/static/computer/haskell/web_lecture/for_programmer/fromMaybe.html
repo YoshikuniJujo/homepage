@@ -26,6 +26,12 @@ Prelude Data.Maybe&gt; fromMaybe 0 Nothing<br/>
 Prelude Data.Maybe&gt; fromMaybe ' ' (Just 'c')<br/>
 'c'</code></p>
 
+<p>
+最後の例でデフォルト値となっているのは空白文字だ。
+Haskellでは文字と文字列とは区別される。
+「文字」は必ずひとつの文字である。
+</p>
+
 <h3>定義</h3>
 
 <p>Maybe型の値がJust値ならばなかの値xを、そうでなければ第1引数の値dを返す。</p>

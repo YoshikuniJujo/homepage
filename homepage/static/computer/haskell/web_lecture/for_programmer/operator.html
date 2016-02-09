@@ -61,6 +61,15 @@ Prelude&gt; (+ 8) 3
 (+ 8)は(+)の第2引数に値8を与えたものだ。引数に8を足す。
 </p>
 
+<p>部分適用によって作られた関数に名前をつけてみよう。</p>
+
+<p><code>Prelude&gt; let addTo3 = (3 +)<br/>
+Prelude&gt; addTo3 8<br/>
+11<br/>
+Prelude&gt; let add8 = (+ 8)<br/>
+Prelude&gt; add8 3<br/>
+11</code></p>
+
 <h3>演算子化した関数への部分適用</h3>
 
 <p><code>Prelude&gt; (`mod` 4) 15<br/>
@@ -174,6 +183,7 @@ f x y=l x+l y</code></p>
 	<ul>
 	<li>税率の単位は%とする</li>
 	<li>演算子(*)、(+)と関数divを使う</li>
+	<li>整数のみを使って定義しよう</li>
 	</ul></li>
 </ol>
 
