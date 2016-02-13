@@ -147,7 +147,7 @@ parseL ts = flip (maybe ([], ts)) (parse ts) $ \(n, r) -&gt;<br/>
 <p>字句解析器と構文解析器を関数nmlにまとめる。</p>
 
 <p><code>nml :: String -&gt; Maybe Nml<br/>
-nml s = maybe Nothing (Just . fst) . parse . unfoldr token</code></p>
+nml = maybe Nothing (Just . fst) . parse . unfoldr token</code></p>
 
 <p>Data.List.unfoldrを使っているのでモジュールの先頭に</p>
 
