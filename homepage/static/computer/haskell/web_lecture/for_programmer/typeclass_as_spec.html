@@ -63,6 +63,9 @@
 
 <h2>倉庫</h2>
 
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/intStorage.hs"
+	>intStorage.hs</a></p>
+
 <p>
 整数を格納する倉庫を考えよう。
 整数を格納する、整数を取り出すの2つの仕事ができる。
@@ -71,11 +74,87 @@
 1つとして扱うかも倉庫の種類による。
 </p>
 
+<h2>型クラスIntStorage</h2>
+
 <p>
-与えられたすべての整数に対してある演算をする必要がある。
-順番は問わないし同じ値に対しての演算は1回のみでもいいし2回してもいいとする。
-また、入力される整数は10個ずつ送られ、そのたびに出力を返すことにする。
+型クラスIntStorageを以下のように定義する。
 </p>
+
+<p><code>class IntStorage s where<br/>
+	<span class="indent1">empty :: s</span><br/>
+	<span class="indent1">store :: Int -&gt; s -&gt; s</span><br/>
+	<span class="indent1">derive :: s -&gt; Maybe (Int, s)</span></code></p>
+
+<p>
+空の倉庫として値emptyが定義される。
+整数をたくわえる関数storeと
+整数をとりだす関数deriveとが定義されればそれを整数の倉庫と考えることができる。
+</p>
+
+<p>
+これらのクラス関数は「倉庫」として使える型の持つべきインターフェース、
+「仕様」と考えることができる。
+</p>
+
+<h2>仕様のうえで</h2>
+
+<p>
+倉庫の実装を考えるまえに型クラスIntStorageによってあたえられた
+仕様のうえでコードを書いてみよう。
+</p>
+
+<h3>値をたくわえる</h3>
+
+<p>
+適当に値をたくわえた倉庫をつくる。
+</p>
+
+<p><code>stored :: IntStorage s =&gt; s<br/>
+stored = let<br/>
+	<span class="indent1">s1 = store 8 empty</span><br/>
+	<span class="indent1">s2 = store 5 s1</span><br/>
+	<span class="indent1">s3 = store 2 s2</span><br/>
+	<span class="indent1">s4 = store 10 s3</span><br/>
+	<span class="indent1">s5 = store 3 s4 in</span><br/>
+	<span class="indent1">s5</span></code></p>
+
+<p>
+空の倉庫に8, 5, 2, 10, 3と5個の整数をたくわえた。
+順にたくわえていっている感じを出すためにあえてletを使った
+変数への束縛を行った。
+</p>
+
+<h3>値をとりだす</h3>
+
+<p>
+倉庫から値を3つとりだしてみる。
+これもわかりやすさのためにあえてどろくさい書きかたとする。
+</p>
+
+<p><code>derive3 :: IntStorage s =&gt; s -&gt; Maybe [Int]<br/>
+derive3 s = case derive s of<br/>
+	<span class="indent1">Just (l, s1) -&gt; case derive s1 of</span><br/>
+	<span class="indent2">Just (m, s2) -&gt; case derive s2 of</span><br/>
+	<span class="indent3">Just (n, s3) -&gt; Just [l, m, n]</span><br/>
+	<span class="indent3">_ -&gt; Nothing</span><br/>
+	<span class="indent2">_ -&gt; Nothing</span><br/>
+	<span class="indent1">_ -&gt; Nothing</span></code></p>
+
+<p>
+関数deriveは値をとりだせればJust値をかえす。
+Just値ならばさらに次の値をとりだす。
+同じことをもう1回行い最後にとりだした値l, m, nをリストにして返す。
+</p>
+
+<h2>実際の倉庫</h2>
+
+<h3>単純なリスト</h3>
+
+<h3>ソートされた集合</h3>
+
+<h3>リストによるキュー</h3>
+
+<h3>奇数をさきに</h3>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/newtype.html"
