@@ -1,0 +1,156 @@
+クラス関数のデフォルト定義
+
+<p>(工事中 60%)</p>
+
+<!--
+<h2>計画</h2>
+
+<ul>
+<li>基本の定義から導ける関数であるが</li>
+<li>別に定義したほうが効率的な</li>
+</ul>
+
+<p>関数を考える。</p>
+
+<ul>
+<li>何らかの値に収束していくような関数はどうかな</li>
+<li>で、結果は普通にわかるので直接定義することも可能みたいな</li>
+<li>正負反転をくりかえすかわりに偶奇判定をさせるとか</li>
+<li>あるいは乗算の回数を減らす例とか?</li>
+</ul>
+
+<p>
+真面目に計算もできるが近道もあるような計算のような感じなんだが、
+何かないだろうか。
+</p>
+
+<p>
+あるいは「普通はこう」なのだけど「この型では特別こう」みたいな関数とか。
+</p>
+
+<p>
+型クラスGrowableにおけるgrowingSumってのはどうだろうか。
+つまりmからnまでの和を(n - m + 1) * (m + n) / 2で置き換えられるという話だ。
+型クラス宣言に型クラス制約をつけるって話題をさきに扱う必要があるか?
+</p>
+
+<p>
+それを避けるために値newbornと関数maturedを用意すればいいかな。
+関数growの返り値をMaybe値にすればよさそうだ。
+</p>
+
+<p><code>class Growable g where<br/>
+	<span class="indent1">grow :: g -&gt; Maybe g</span><br/>
+	<span class="indent1">growingSum :: g -&gt; g</span><br/><br/>
+	<span class="indent1">growingSum = ...</span></code></p>
+-->
+
+<h2>成長する</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/grow.hs"
+	>grow.hs</a></p>
+
+<p>
+成長することと足し合わせることができるという性質を表す型クラスGrowableを
+考えよう。
+</p>
+
+<p><code>class Growable g where<br/>
+	<span class="indent1">grow :: g -&gt; Maybe g</span><br/>
+	<span class="indent1">add :: g -&gt; g -&gt; g</span></code></p>
+
+<p>
+関数growはすでに成長しきった値に対してはNothingを返すものとする。
+ある値を成長しきるまで成長させてそのあいだの値を足し合わせる関数が書ける。
+</p>
+
+<p><code>growingSum :: Growable g =&gt; g -&gt; g<br/>
+growingSum g = case grow g of<br/>
+	<span class="indent1">Just g' -&gt; g `add` growingSum g'</span><br/>
+	<span class="indent1">_ -&gt; g</span></code></p>
+
+<p>
+整数型をこのクラスのインスタンスにしてみよう。
+ここでは100に達したら成熟したものと考える。
+</p>
+
+<p><code>instance Growable Int where<br/>
+	<span class="indent1">grow n</span><br/>
+	<span class="indent2">| n &lt; 100 = Just $ n + 1</span><br/>
+	<span class="indent2">| otherwise = Nothing</span><br/>
+	<span class="indent1">add = (+)</span></code></p>
+
+<p>このようにすると関数growingSumをInt型の値に対して適用することができる。</p>
+
+<p><code>% ghci grow.hs<br/>
+*Main&gt; growingSum 0 :: Int<br/>
+5050<br/>
+*Main&gt; growingSum 25 :: Int<br/>
+4750</code></p>
+
+<h2>もっと効率的に</h2>
+
+<p>
+整数においてはgrowingSumは与えられた値から100まで1刻みで増加させていった総和だ。
+これはもっと効率的に計算できる。
+しかしgrowingSumを整数用にカスタマイズすることはできない。
+以下のようにgrowingSumをクラス関数にしてしまおう。
+</p>
+
+<p><code>class Growable g where<br/>
+	<span class="indent1">grow :: g -&gt; Maybe g</span><br/>
+	<span class="indent1">add :: g -&gt; g -&gt; g</span><br/>
+	<span class="indent1">growingSum :: g -&gt; g</span></code></p>
+
+<p>
+このようにすることで整数におけるgrowingSumを別個に定義することができる。
+しかし、整数以外の値に対してはもともとのgrowingSumを使いたいとする。
+このようなときデフォルト定義を使うことができる。
+class宣言のスコープのなかに関数growingSumのデフォルトの定義を置く。
+</p>
+
+<p><code><span class="indent1">growingSum g = case grow g of</span><br/>
+	<span class="indent2">Just g' -&gt; g `add` growingSum g'</span><br/>
+	<span class="indent2">_ -&gt; g</span><br/>
+	</code></p>
+
+<p>
+こうしておくとgrowingSumは明示的に定義されないかぎりデフォルトの定義が使われる。
+デフォルトの定義のままで試してみよう。
+</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; growingSum 0 :: Int<br/>
+5050<br/>
+*Main&gt; growingSum 25 :: Int<br/>
+4750</code></p>
+
+<p>
+それでは整数用の特別な定義でおきかえてみる。
+Growableクラスへの型Intのインスタンス宣言のスコープ内に以下を書く。
+</p>
+
+<p><code><span class="indent1">growingSum n = (100 - n + 1) * (100 + n) `div` 2</span></code></p>
+
+<p>このようにするとIntに対しては特別な定義が使われるようになる。</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; growingSum 0 :: Int<br/>
+5050<br/>
+*Main&gt; growingSum 25 :: Int<br/>
+4750</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+クラス関数にはデフォルト定義を与えることができる。
+デフォルト定義のあるクラス関数は定義を省略することもできるし、
+効率等の関係で定義しなおすこともできる。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/typeclass_as_spec.html"
+	>「仕様としての型クラス」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/typeclass_eq.html"
+	>「型クラス: Eq」へ</a>
+</p>
