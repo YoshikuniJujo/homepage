@@ -1,6 +1,128 @@
 構文: newtype
 
-<p>(工事中 0%)</p>
+<p>(工事中 80%)</p>
+
+<h2>組み合わせる</h2>
+
+<p>
+2つの値を組み合わせるという「性質」について考えてみよう。
+以下のような型クラスを考える。
+</p>
+
+<p><code>class Composable a where<br/>
+	<span class="indent1">compose :: a -&gt; a -&gt; a</span></code></p>
+
+<h2>整数を組み合わせる</h2>
+
+<p>
+2つの整数を組み合わせる方法にまずは加算が思いつく。
+以下のようなインスタンス宣言となるだろう。
+</p>
+
+<p><code>instance Composable Int where<br/>
+	<span class="indent1">compose x y = x + y</span></code></p>
+
+<p>
+整数を組み合わせるのには乗算も考えられる。
+</p>
+
+<p><code>instance Composable Int where<br/>
+	<span class="indent1">compose x y = x * y</span></code></p>
+
+<p>
+この2つはもちろん両立させることができない。
+</p>
+
+<h2>新しい型を</h2>
+
+<p>
+このような場合には新しい型を作ってやればいい。
+加算用の型Addを定義してComposableにする。
+</p>
+
+<p><code>data Add = Add Int deriving Show</code></p>
+
+<p><code>instance Composable Add where<br/>
+	<span class="indent1">compose (Add x) (Add y) = Add $ x + y</span></code></p>
+
+<p>
+乗算用の型Mulを定義してComposableにする。
+</p>
+
+<p><code>data Mul = Mul Int deriving Show</code></p>
+
+<p><code>instance Composable Mul where<br/>
+	<span class="indent1">compose (Mul x) (Mul y) = Mul $ x * y</span></code></p>
+
+<p>これで2通りの組み合わせ方法で整数値をComposableのインスタンスにできた。</p>
+
+<h2>単なるラッパー</h2>
+
+<p>
+型Addや型Mulは型Intに対する単なるラッパーである。
+中身は型Intそのものであるのに処理系はいちいちラップ・アンラップの作業を行う。
+効率が悪い。
+</p>
+
+<p>新しい型が古い型の単なるラッパーであるような場合に特別な書きかたがある。</p>
+
+<p><code>newtype Add = Add Int deriving Show</code></p>
+
+<p><code>newtype Mul = Mul Int deriving Show</code></p>
+
+<p>
+予約語dataの代わりにnewtypeを使う。
+このようにすると処理系は型AddやMulが単なるラッパーであることを理解して、
+裸のままのIntを使うようになる。
+</p>
+
+<h2>newtype構文が必要な理由</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/newtypeDiff.hs"
+	>newtypeDiff.hs</a></p>
+
+<p>
+dataによって作られた型が単なるラッパーであることを機械的に判断することは簡単だ。
+それならばわざわざnewtype構文など作る必要はなく、
+機械的な最適化を行えばいいはずだ。
+</p>
+
+<p>
+これが問題となるのはdataによって定義された型とnewtypeによって定義された型で
+動作が異なってくる場合があるからだ。
+以下のコードを読みこんでみよう。
+</p>
+
+<p><code>data DT = DT Int deriving Show</code></p>
+
+<p><code>newtype NT = NT Int deriving Show</code></p>
+
+<p><code>checkDT :: DT -&gt; String<br/>
+checkDT (DT _) = "OK!"</code></p>
+
+<p><code>checkNT :: NT -&gt; String<br/>
+checkNT (NT _) = "OK!"</code></p>
+
+<p><code>% ghci newtypeDiff.hs<br/>
+*Main&gt; checkDT undefined<br/>
+"*** Exception: Prelude.undefined<br/>
+*Main&gt; checkNT undefined<br/>
+"OK!"</code></p>
+
+<p>
+関数checkDTではまずは値と(DT _)とのマッチが試される。
+値はundefined値であるためエラーが発生する。
+NT型は型チェックのあとはInt型と同じように扱われる。
+よって関数checkNTでは(NT _)というパターンマッチは実質的には(_)と等しく
+エラーは発生しない。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+ひとつの型に対して2つ以上のやりかたでインスタンス化を行いたいときは
+newtype構文によってラッパーとなる型を作ってやればいい。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/boollike_complex_types.html"

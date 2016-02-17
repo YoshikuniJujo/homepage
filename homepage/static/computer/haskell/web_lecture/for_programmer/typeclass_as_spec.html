@@ -1,7 +1,8 @@
 仕様としての型クラス: 実装と仕様をわける
 
-<p>(工事中 10%)</p>
+<p>(工事中 70%)</p>
 
+<!--
 <h2>修正が必要</h2>
 
 <p>
@@ -44,6 +45,8 @@
 <li>倉庫から別の型の倉庫に値をうつしかえる関数moveってのはどうだろうか</li>
 <li>シンプルで良いかもしれない</li>
 </ul>
+
+-->
 
 <!--
 <p>
@@ -150,11 +153,125 @@ Just値ならばさらに次の値をとりだす。
 
 <h3>単純なリスト</h3>
 
+<p>
+まずは整数のリストを整数の倉庫として使う例だ。
+普通に考えると以下のようなインスタンス宣言になりそうだ。
+</p>
+
+<p><code>instance IntStorage [Int] where<br/>
+	<span class="indent1">...</span></code></p>
+
+<p>
+これはHaskellでは許されない。
+以下のような書きかたとの整合性がとれないからだ。
+</p>
+
+<p><code>instance IntStorage [a] where<br/>
+	<span class="indent1">...</span></code></p>
+
+<p>このようなときはnewtypeによって型をラップする。</p>
+
+<p><code>newtype ListInt = LI [Int] deriving Show</code></p>
+
+<p><code>instance IntStorage ListInt where<br/>
+	<span class="indent1">empty = LI []</span><br/>
+	<span class="indent1">store n (LI s) = LI $ n : s</span><br/>
+	<span class="indent1">derive (LI (n : s)) = Just (n, LI s)</span><br/>
+	<span class="indent1">derive _ = Nothing</span><br/>
+	</code></p>
+
+<p>試してみよう。</p>
+
+<p><code>% ghci intStorage.hs<br/>
+*Main&gt; stored :: ListInt<br/>
+LI [3,10,2,5,8]<br/>
+*Main&gt; derive3 it<br/>
+Just [3,10,2]</code></p>
+
 <h3>ソートされた集合</h3>
+
+<p>
+標準ライブラリにあるSetを使ってみよう。
+これは集合としての演算を効率的に行えるデータ構造であり、
+内部的に値はソートして格納される。
+</p>
+
+<p><code>import qualified Data.Set as S</code></p>
+
+<p><code>newtype SetInt = SI (S.Set Int) deriving Show</code></p>
+
+<p><code>instance IntStorage SetInt where<br/>
+	<span class="indent1">empty = SI S.empty</span><br/>
+	<span class="indent1">store n (SI s) = SI $ S.insert n s</span><br/>
+	<span class="indent1">derive (SI s)</span><br/>
+	<span class="indent2">| S.null s = Nothing</span><br/>
+	<span class="indent2">| otherwise = Just (n, SI s')</span><br/>
+	<span class="indent2">where (n, s') = S.deleteFindMin s</span><br/>
+	</code></p>
+
+<p>試してみよう。</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; stored :: SetInt<br/>
+SI (fromList [2,3,5,8,10])<br/>
+*Main&gt; derive3 it<br/>
+Just [2,3,5]</code></p>
 
 <h3>リストによるキュー</h3>
 
+<p>
+リストのペアを使うことで簡易的なキューを作ることができる。
+</p>
+
+<p><code>data QueueInt = QI [Int] [Int] deriving Show</code></p>
+
+<p><code>instance IntStorage QueueInt where<br/>
+	<span class="indent1">empty = QI [] []</span><br/>
+	<span class="indent1">store n (QI f r) = QI f (n : r)</span><br/>
+	<span class="indent1">derive (QI (n : f) r) = Just (n, QI f r)</span><br/>
+	<span class="indent1">derive (QI _ r@(_ : _)) = derive $ QI (reverse r) []</span><br/>
+	<span class="indent1">derive _ = Nothing</span></code></p>
+
+<p>試してみよう。</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; stored :: QueueInt<br/>
+QI [] [3,10,2,5,8]<br/>
+*Main&gt; derive3 it<br/>
+Just [8,5,2]</code></p>
+
 <h3>奇数をさきに</h3>
+
+<p>今度は奇数からさきにとりだされる倉庫を考えてみよう。</p>
+
+<p><code>data OddEven = OE [Int] [Int] deriving Show</code></p>
+
+<p><code>instance IntStorage OddEven where<br/>
+	<span class="indent1">empty = OE [] []</span><br/>
+	<span class="indent1">store n (OE os es)</span><br/>
+	<span class="indent2">| odd n = OE (n : os) es</span><br/>
+	<span class="indent2">| otherwise = OE os (n : es)</span><br/>
+	<span class="indent1">derive (OE (o : os) es) = Just (o, OE os es)</span><br/>
+	<span class="indent1">derive (OE _ (e : es)) = Just (e, OE [] es)</span><br/>
+	<span class="indent1">derive _ = Nothing</span><br/>
+	</code></p>
+
+<p>試してみる。</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; stored :: OddEven<br/>
+OE [3,5] [10,2,8]<br/>
+*Main&gt; derive3 it<br/>
+Just [3,5,10]</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+仕様としての型クラスについて見てきた。
+クラス関数によってインターフェースが示される。
+インスタンス宣言によって実装が示される。
+型を変えることで実装を選ぶことができる。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/newtype.html"
