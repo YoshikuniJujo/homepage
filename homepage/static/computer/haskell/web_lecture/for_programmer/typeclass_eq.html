@@ -2,9 +2,30 @@
 
 <p>(工事中 0%)</p>
 
+<h2>はじめに</h2>
+
 <p>
-<a href="/computer/haskell/web_lecture/for_programmer/typeclass_default.html"
-	>「クラス関数のデフォルト定義」へもどる</a>
+「ふたつの値が等しいかどうかを判定できる」という性質を示す型クラスEqが
+定義されている。
+</p>
+
+<h2>型クラスの定義</h2>
+
+<p><code>class Eq a where<br/>
+	<span class="indent1">(==), (/=) :: a -&gt; a -&gt; Bool</span><br/><br/>
+	<span class="indent1">x == y = not (x /= y)</span><br/>
+	<span class="indent1">x /= y = not (x == y)</span><br/>
+	</code></p>
+
+<p>
+クラス関数として等号(==)と不等号(/=)とがある。
+お互いによってデフォルトの定義がされている。
+これはどちらを定義してもいいということだ。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/drink_size.html"
+	>「ドリンクのサイズの例」へもどる</a>
 <a href="/computer/haskell/web_lecture/for_programmer"
 	>「1から学ぶHaskell」トップへ</a>
 </p>
