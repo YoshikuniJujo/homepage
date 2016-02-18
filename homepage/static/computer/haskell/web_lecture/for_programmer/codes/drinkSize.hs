@@ -15,3 +15,7 @@ instance Ord Size where
 	Grande <= _ = True
 	_ <= Grande = False
 	_ <= _ = True
+
+instance Bounded Size where
+	minBound = Short
+	maxBound = Venti

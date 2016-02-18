@@ -2,9 +2,37 @@
 
 <p>(工事中 0%)</p>
 
+<h2>列挙する</h2>
+
 <p>
-<a href="/computer/haskell/web_lecture/for_programmer/typeclass_ord.html"
-	>「型クラス: Ord」へもどる</a>
+型クラスEnumは「列挙できる」という性質を表す。
+型クラスEnumのインスタンスにすると[x .. y]のような列挙が可能になる。
+ちなみに[x .. y ]はenumFromTo x yの構文糖だ。
+型クラスの定義は以下のようになっている。
+</p>
+
+<p><code>class Enum a where<br/>
+	<span class="indent1">succ :: a -&gt; a</span><br/>
+	<span class="indent1">pred :: a -&gt; a</span><br/>
+	<span class="indent1">toEnum :: Int -&gt; a</span><br/>
+	<span class="indent1">fromEnum :: a -&gt; Int</span><br/>
+	<span class="indent1">enumFrom :: a -&gt; [a]</span><br/>
+	<span class="indent1">enumFromThen :: a -&gt; a -&gt; [a]</span><br/>
+	<span class="indent1">enumFromTo :: a -&gt; a -&gt; [a]</span><br/>
+	<span class="indent1">enumFromToThen :: a -&gt; a -&gt; a -&gt; [a]</span><br/><br/>
+
+	<span class="indent1">succ = toEnum . (+ 1) . fromEnum</span><br/>
+	<span class="indent1">pred = toEnum . (subtract 1) . fromEnum</span><br/>
+	<span class="indent1">enumFrom x = map toEnum [fromEnum x ..]</span><br/>
+	<span class="indent1">enumFromThen x y = map toEnum [fromEnum x, fromEnum y ..]</span><br/>
+	<span class="indent1">enumFromTo x y = map toEnum [fromEnum x .. fromEnum y]</span><br/>
+	<span class="indent1">enumFromThenTo x1 x2 y = map toEnum [fromEnum x1, fromEnum x2 .. fromEnum y]</span></code></p>
+
+<p>最低限必要な定義はtoEnumとfromEnumである。</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/typeclass_bounded.html"
+	>「型クラス: Bounded」へもどる</a>
 <a href="/computer/haskell/web_lecture/for_programmer"
 	>「1から学ぶHaskell」トップへ</a>
 </p>

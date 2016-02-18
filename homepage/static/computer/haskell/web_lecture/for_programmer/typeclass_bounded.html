@@ -1,0 +1,33 @@
+型クラス: Bounded
+
+<p>(工事中 0%)</p>
+
+<h2>範囲がある</h2>
+
+<p>
+型クラスBoundedは「範囲がある」ということを表す。
+以下のように定義されている。
+</p>
+
+<p><code>class Bounded a where<br/>
+	<span class="indent1">minBound, maxBound :: a</span></code></p>
+
+<h2>ドリンクのサイズ</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/drinkSize.hs"
+	>drinkSize.hs</a></p>
+
+<p>
+ドリンクのサイズでは以下のような定義になるだろう。
+</p>
+
+<p><code>instance Bounded Size where<br/>
+	<span class="indent1">minBound = Short</span><br/>
+	<span class="indent1">maxBound = Venti</span></code></p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/typeclass_ord.html"
+	>「型クラス: Ord」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/typeclass_enum.html"
+	>「型クラス: Enum」へ</a>
+</p>
