@@ -1,6 +1,6 @@
 型クラス: Eq
 
-<p>(工事中 0%)</p>
+<p>(工事中 70%)</p>
 
 <h2>はじめに</h2>
 
@@ -22,6 +22,28 @@
 お互いによってデフォルトの定義がされている。
 これはどちらを定義してもいいということだ。
 </p>
+
+<h2>ドリンクのサイズ</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/drinkSize.hs"
+	>drinkSize.hs</a></p>
+
+<p>ドリンクのサイズを等値比較を可能にしてみよう。</p>
+
+<p><code>instance Eq Size where<br/>
+	<span class="indent1">Short == Short = True</span><br/>
+	<span class="indent1">Tall == Tall = True</span><br/>
+	<span class="indent1">Grande == Grande = True</span><br/>
+	<span class="indent1">Venti == Venti = True</span><br/>
+	<span class="indent1">_ == _ = False</span></code></p>
+
+<p><code>% ghci drinkSize.hs<br/>
+*Main&gt; Short == Short<br/>
+True<br/>
+*Main&gt; Venti == Grande<br/>
+False<br/>
+*Main&gt; Venti /= Grande<br/>
+True</code></p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/drink_size.html"
