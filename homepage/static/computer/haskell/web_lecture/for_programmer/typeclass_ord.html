@@ -1,0 +1,80 @@
+型クラス: Ord
+
+<p>(工事中 70%)</p>
+
+<h2>大小比較</h2>
+
+<p>
+型クラスOrdは「大小比較が可能」という性質を表す。
+以下のように定義されている。
+</p>
+
+<p><code>class Eq a =&gt; Ord a where<br/>
+	<span class="indent1">compare :: a -&gt; a -&gt; Ordering</span><br/>
+	<span class="indent1">(&lt;), (&lt;=), (&gt;=), (&gt;) :: a -&gt; a -&gt; Bool</span><br/>
+	<span class="indent1">max, min :: a -&gt; a -&gt; a</span><br/><br/>
+
+	<span class="indent1">compare x y</span><br/>
+	<span class="indent2">| x == y = EQ</span><br/>
+	<span class="indent2">| x &gt;= y = LT</span><br/>
+	<span class="indent2">| otherwise = GT</span><br/><br/>
+
+	<span class="indent1">x &lt;= y = compare x y /= GT</span><br/>
+	<span class="indent1">x &lt; y = compare x y == LT</span><br/>
+	<span class="indent1">x &gt;= y = compare x y /= LT</span><br/>
+	<span class="indent1">x &gt; y = compare x y == GT</span><br/><br/>
+
+	<span class="indent1">max x y</span><br/>
+	<span class="indent2">| x &lt;= y = y</span><br/>
+	<span class="indent2">| otherwise = x</span><br/>
+	<span class="indent1">min x y</span><br/>
+	<span class="indent2">| x &lt;= y = x</span><br/>
+	<span class="indent2">| otherwise = y</span></code></p>
+
+<p>
+関数compareまたは演算子(&lt;=)のどちらかを定義すれば他はデフォルト定義が使える。
+`Eq a =&gt;'はクラス制約である。
+クラス宣言にクラス制約をつけると型変数に特定のクラスに属していることという
+制約をつけることができる。
+この場合は
+「大小比較するためには、すくなくとも等値比較できる必要がある」ということだ。
+</p>
+
+<h2>ドリンクのサイズ</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/drinkSize.hs"
+	>drinkSize.hs</a></p>
+
+<p><code>instance Ord Size where<br/>
+	<span class="indent1">Short &lt;= _ = True</span><br/>
+	<span class="indent1">_ &lt;= Short = False</span><br/>
+	<span class="indent1">Tall &lt;= _ = True</span><br/>
+	<span class="indent1">_ &lt;= Tall = False</span><br/>
+	<span class="indent1">Grande &lt;= _ = True</span><br/>
+	<span class="indent1">_ &lt;= Grande = False</span><br/>
+	<span class="indent1">_ &lt;= _ = True</span></code></p>
+
+<p>
+すべてのサイズはShort以上なのでShort &lt;= _はTrueだ。
+次に左辺にはもうShortは来ないので_ &lt;= ShortはFalseとなる。
+ここでShortは左右のどちらかに来るパターンは網羅した。
+すると残りのすべてのサイズはTall以上なのでTall &lt;= _はTrueだ。
+次に左辺にはもうTallは来ないので_ &lt;= TallはFalseとなる。
+Grandeについても同様だ。
+最後の_ &lt;= _は残りのVenti &lt;= Ventiを処理する。
+</p>
+
+<p>試してみる。</p>
+
+<p><code>% ghci drinkSize.hs<br/>
+*Main&gt; Tall &lt; Grande<br/>
+True<br/>
+*Main&gt; compare Short Venti<br/>
+LT</code></p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/typeclass_eq.html"
+	>「型クラス: Eq」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/typeclass_enum.html"
+	>「型クラス: Enum」へ</a>
+</p>
