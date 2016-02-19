@@ -1,0 +1,110 @@
+構文: infix
+
+<p>(工事中 70%)</p>
+
+<h2>結合力</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/infix.hs"
+	>infix.hs</a></p>
+
+<p>
+Haskellでは演算子が自分で定義できる。
+それだけではなく0から9までで演算子の結合力を指定できる。
+また同一の結合力の場合に結合性を指定するために「左」「右」「無」の
+3名りの結合性を指定できる。
+</p>
+
+<h2>演算子の定義</h2>
+
+<h3>結合力</h3>
+
+<p><code>(.+.), (.*.) :: Int -&gt; Int -&gt; Int<br/>
+(.+.) = (+)<br/>
+(.*.) = (*)</code></p>
+
+<p><code>% ghci infix.hs<br/>
+*Main&gt; 3 .+. 5 .*. 8<br/>
+64</code></p>
+
+<p>
+デフォルトでは左結合で結合力は9となる。
+(.+.)の結合力を下げてみよう。
+以下を追加する。
+</p>
+
+<p><code>infixl 6 .+.</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; 3 .+. 5 .*. 8<br/>
+43</code></p>
+
+<h2>結合性</h2>
+
+<p><code>(.-.) :: Int -&gt; Int -&gt; Int<br/>
+(.-.) = (-)</code></p>
+
+<p>infix構文では複数の演算子を指定できる。</p>
+
+<p><code>infixl 6 .+., .-.</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; 10 .-. 5 .-. 3<br/>
+2</code></p>
+
+<p>
+次は右結合を試してみよう。
+infixlをinfixrにしてみる。
+</p>
+
+<p><code>infixr 6 .+., .-.</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; 10 .-. 5 .-. 3<br/>
+8</code></p>
+
+<p>
+無結合ではどうなるだろうか。
+infixrをinfixにする。
+</p>
+
+<p><code>infix 6 .+., .-.</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; 10 .-. 5 .-. 3<br/>
+<br/>
+&lt;interactive&gt;:X:1:<br/>
+Precedence parsing error<br/>
+<span class="indent1">cannot mix `.-.' [infix 6] and ...</span></code></p>
+
+<p>
+無結合の場合同じ結合力の演算子がとなりあっているとエラーとなる。
+明示的に括弧でくくってやる必要がある。
+</p>
+
+<h2>値構築演算子</h2>
+
+<p>値構築演算子についても結合力を指定できる。</p>
+
+<p><code>data A = B :+: B deriving Show</code></p>
+
+<p><code>data B = Int :*: Int deriving Show</code></p>
+
+<p><code>infixl 6 :+:<br/>
+infixl 7 :*:</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; 3 :*: 5 :+: 7:*: 10<br/>
+3 :*: 5 :+: 7:*: 10</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+自分で定義した演算子や値構築演算子に結合力や結合性を指定できる。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/typeclass_ord.html"
+	>「型クラス: Ord」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/diff_list.html"
+	>「アルゴリズム: 差分リスト」へ</a>
+</p>
