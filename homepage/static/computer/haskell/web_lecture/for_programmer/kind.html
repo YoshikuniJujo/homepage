@@ -1,0 +1,102 @@
+種類(kind)とは
+
+<p>(工事中 70%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+型レベルプログラミングの世界は深くて広い。
+入口には「この門をくぐる者は一切の希望を捨てよ」と書いてある。
+僕自身、門のむこうには行ったことがない。
+おそらく、その門をくぐる前に知っておく必要のある知識のうちのひとつが
+種類(kind)である。
+ここではごく簡単な説明だけとしておく。
+</p>
+
+<h2>種類(kind)とは</h2>
+
+<p>
+種類(kind)とは型の型だ。
+型にも型がありその型の型のことを種類(kind)とよぶ。
+</p>
+
+<h2>コードには出てこない</h2>
+
+<p>
+言語拡張を使わないかぎりコードのなかに種類(kind)が出てくることはない。
+対話環境から見ることはできる。
+</p>
+
+<p>
+値の型は:tで見ることができる。
+</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; :t True<br/>
+True :: Bool<br/>
+Prelude&gt; :t Just 'a'<br/>
+Just False :: Maybe Char</code></p>
+
+<p>
+型の種類(kind)は:kで見ることができる。
+</p>
+
+<p><code>Prelude&gt; :k Bool<br/>
+Bool :: *<br/>
+Prelude&gt; :k Int<br/>
+Int :: *<br/>
+Prelude&gt; :k Char<br/>
+Char :: *</code></p>
+
+<p>
+Bool, Int, Charといった型の種類は*(star)であることがわかる。
+*(star)以外の種類の型についても見ていこう。
+</p>
+
+<p><code>Prelude&gt; :k Maybe<br/>
+Maybe :: * -&gt; *<br/>
+Prelude&gt; :k []<br/>
+[] :: * -&gt; *<br/>
+Prelude&gt; :k Either<br/>
+Either :: * -&gt; * -&gt; *</code></p>
+
+<p>
+Maybe, []といった型の種類は* -&gt; *だ。
+Eitherは* -&gt; * -&gt; *という種類であることがわかる。
+どういうことだろうか。
+</p>
+
+<p><code>Prelude&gt; :k Either<br/>
+Either :: * -&gt; * -&gt; *<br/>
+Prelude&gt; :k Either Bool<br/>
+Either Bool :: * -&gt; *<br/>
+Prelude&gt; :k Either Bool Char<br/>
+Either Bool Char :: *</code></p>
+
+<p>
+(* -&gt; * -&gt; *)型のEitherに*型のBoolをあたえると(* -&gt; *)型の型となる。
+さらに(* -&gt; *)型のEither Boolに*型のCharをあたえると*型の型となる。
+関数適用と同じことが型レベルでも行われているということだ。
+</p>
+
+<p>
+(* -&gt; *)型の型は引数をひとつあたえて*型の型にしなければ値を型づけすることは
+できない。
+たとえばx :: Maybeのような型づけはできない。
+x :: Maybe Intのように型引数をとって*型の型にする必要がある。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+値と同じように型にも型があり、それを種類(kind)とよぶ。
+種類には*, * -&gt; *, * -&gt; * -&gt; *, ...などがある。
+値を型づけするためには型引数を必要なだけあたえて種類を*にまでする必要がある。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/deriving.html"
+	>「構文: deriving」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/kind_class.html"
+	>「種類(* -&gt; *)に対する型クラス」へ</a>
+</p>
