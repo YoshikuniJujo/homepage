@@ -1,0 +1,98 @@
+モノイドとは
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+「特定の演算ができる」というように表される性質がいくつかある。
+そのうちのひとつがモノイドである。
+</p>
+
+<h2>モノイドとは</h2>
+
+<p>
+ある演算・と値eがあったとき以下の法則を満たせばそれはモノイドである。
+</p>
+
+<ul>
+<li>(a ・ b) ・ c = a ・ (b ・ c)</li>
+<li>e ・ a = a</li>
+<li>a ・ e = a</li>
+</ul>
+
+<p>
+たとえば整数は演算を加算としてeを0とすればモノイドであり、
+また演算を乗算としてeを1としてもモノイドとなる。
+</p>
+
+<p>
+リストは演算を(++)としてeを[]とすればモノイドとなる。
+</p>
+
+<p>
+左結合でも右結合でも結果が変わらない演算があり、
+その演算に対して相手の値を変化させない値が選べれば、
+それがモノイドだ。
+</p>
+
+<h2>型クラスMonoid</h2>
+
+<p>型クラスMonoidの定義は以下のようになっている。</p>
+
+<p><code>class Monoid a where<br/>
+	<span class="indent1">mempty :: a</span><br/>
+	<span class="indent1">mappend :: a -&gt; a -&gt; a</span><br/>
+	<span class="indent1">mconcat :: [a] -&gt; a</span><br/><br/>
+	<span class="indent1">mconcat = foldr mappend mempty</span></code></p>
+
+<p>
+クラス関数mconcatにはデフォルトの定義がある。
+型によっては効率化のためにmconcatを別に定義するときがあるので
+関数mconcatはクラス関数となっている。
+本質的には値memptyと関数mappendだけを考えればいい。
+</p>
+
+<h2>リスト</h2>
+
+<p>リストでは以下のようにモノイドにできる。</p>
+
+<ul>
+<li>(a ++ b) ++ c == a ++ (b ++ c)</li>
+<li>[] ++ a == a</li>
+<li>a ++ [] == a</li>
+</ul>
+
+<p>インスタンス宣言は以下のようになる。</p>
+
+<p><code>instance Monoid [a] where<br/>
+	<span class="indent1">mempty = []</span><br/>
+	<span class="indent1">mappend = (++)</span></code></p>
+
+<h2>ブール値</h2>
+
+<p>
+ブール値では&amp;&amp;演算と||演算の2通りでモノイドにすることができる。
+どちらがより本質的ということもないのでnewtypeで新しい型にしてから
+Monoidのインスタンスにする。
+</p>
+
+<h3>演算&amp;&amp;</h3>
+
+<p>ブール値は以下のようにモノイドにできる。</p>
+
+<ul>
+<li>(a &amp;&amp; b) &amp;&amp; c == a &amp;&amp; (b &amp;&amp; c)</li>
+<li>True &amp;&amp; a == a</li>
+<li>a &amp;&amp; True == a</li>
+</ul>
+
+<h3>演算||</h3>
+
+<p>ブール値は以下のようにモノイドにできる。</p>
+
+<ul>
+<li>(a || b) || c == a || (b || c)</li>
+<li>False || a == a</li>
+<li>a || False == a</li>
+</ul>
