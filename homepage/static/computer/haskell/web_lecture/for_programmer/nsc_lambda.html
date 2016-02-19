@@ -49,7 +49,7 @@ lambda関数を定義して
 lambda [vs, v] e = (\ps -&gt; (Lmbd ps v, e)) `mapply` symbols vs<br/>
 lambda _ _ = Nothing</code></p>
 
-<p><code>symbols :: Value -&gt; Maybe [symbol]<br/>
+<p><code>symbols :: Value -&gt; Maybe [Symbol]<br/>
 symbols (List vs) = ss vs<br/>
 	<span class="indent1">where</span><br/>
 	<span class="indent1">ss (Symbol s : vs') = (s :) `mapply` ss vs'</span><br/>
