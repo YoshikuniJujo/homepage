@@ -16,6 +16,12 @@ instance Ord Size where
 	_ <= Grande = False
 	_ <= _ = True
 
+instance Show Size where
+	show Short = "Short"
+	show Tall = "Tall"
+	show Grande = "Grande"
+	show Venti = "Venti"
+
 instance Bounded Size where
 	minBound = Short
 	maxBound = Venti

@@ -2,6 +2,112 @@
 
 <p>(工事中 0%)</p>
 
+<h2>表示可能</h2>
+
+<p>
+型クラスShowは「対話環境などで表示可能」という性質を表す。
+クラス関数にはshow, showsPrec, showListがある。
+最低限必要な定義は関数showまたは関数showsPrecだ。
+</p>
+
+<h2>関数show</h2>
+
+<p><code>show :: a -&gt; String</code></p>
+
+<p>
+これは簡単だ。
+表示したい値から文字列を返す関数を定義してやればいい。
+</p>
+
+<h3>ドリンクのサイズ</h3>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/drinkSize.hs"
+	>drinkSize.hs</a></p>
+
+<p><code>instance Show Size where<br/>
+	<span class="indent1">show Short = "Short"</span><br/>
+	<span class="indent1">show Tall = "Tall"</span><br/>
+	<span class="indent1">show Grande = "Grande"</span><br/>
+	<span class="indent1">show Venti = "Venti"</span></code></p>
+
+<p><code>% ghci drinkSize.hs<br/>
+*Main&gt; Short<br/>
+Short<br/>
+*Main&gt; Grande<br/>
+Grande</code></p>
+
+<h2>関数showsPrec</h2>
+
+<p><code>type ShowS = String -&gt; String<br/>
+showsPrec :: Int -&gt; a -&gt; ShowS</code></p>
+
+<p>関数showsPrecは関数showに2つの要素が追加されている。</p>
+
+<ul>
+<li>差分リストによる効率化と</li>
+<li>値構築演算子の優先順位の処理</li>
+</ul>
+
+<p>だ。</p>
+
+<h3>差分リストによる効率化</h3>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/leftList.hs"
+	>leftList.hs</a></p>
+
+<p>
+関数showと関数showsPrecのひとつめの違いとして「差分リストによる効率化」を見る。
+showsPrecはshowに`sPrec'がついた形だがこの`s'の部分だ。
+通常とは左右をひっくりかえした形になっている左リストを考えてみよう。
+</p>
+
+<p><code>data LL a = Nil | Cons (LL a) a</code></p>
+
+<h4>関数showで定義</h4>
+
+<p>
+これを「表示可能」にするのだが、まずはクラス関数showのほうで定義してみよう。
+</p>
+
+<p><code>instance Show a =&gt; Show (LL a) where<br/>
+	<span class="indent1">show (Cons ll x) = "Cons (" ++ show ll ++ ") " ++ show x</span><br/>
+	<span class="indent1">show _ = "Nil"</span></code></p>
+
+<p>試してみよう。</p>
+
+<p><code>% ghci leftList.hs<br/>
+*Main&gt; Cons (Cons (Cons Nil 8) 5) 3<br/>
+Cons (Cons (Cons (Nil) 8) 5) 3</code></p>
+
+<h4>右結合に</h4>
+
+<p>
+関数showを使った定義ではこのリストが大きくなったときに効率の低下が起きる。
+show (Cons ll x) = "Cons (" ++ show ll ++ ") " ++ show xの行のshow llは
+左結合でどんどん深くなっていく。効率が悪い。
+差分リストを利用することで効率を改善しよう。
+</p>
+
+<p><code>instance Show a =&gt; Show (LL a) where<br/>
+	<span class="indent1">showsPrec _ (Cons ll x) =</span><br/>
+	<span class="indent2">("Cons (" ++) . showsPrec 11 ll . (") " ++) . showsPrec 11 x</span><br/>
+	<span class="indent1">showsPrec _ _ = ("Nil" ++)</span><br/>
+	</code></p>
+
+<p>
+数字の11は今のところ無視してほしい。
+(++)でつなぐかわりに差分リストを(.)で結合している。
+これによって文字列の結合自体はつねに右結合となる。
+</p>
+
+<h3>値構築演算子の優先順位の処理</h3>
+
+<h4>関数showParen</h4>
+
+<h4>左リストの例、再び</h4>
+
+<h2>関数showList</h2>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/diff_list.html"
 	>「アルゴリズム: 差分リスト」へもどる</a>
