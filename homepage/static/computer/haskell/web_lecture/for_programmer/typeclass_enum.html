@@ -30,6 +30,87 @@
 
 <p>最低限必要な定義はtoEnumとfromEnumである。</p>
 
+<h2>それぞれのクラス関数</h2>
+
+<h3>関数succ, pred</h3>
+
+<p>関数succは次の値をpredは前の値を返す。</p>
+
+<h3>関数toEnum, fromEnum</h3>
+
+<p>
+関数toEnumはInt型の値からその型への変換を、
+fromEnumはその型からInt型の値への変換を行う。
+この2つを定義しておけば他のクラス関数にはデフォルト定義を使える。
+</p>
+
+<h3>関数enumFrom, enumFromThen</h3>
+
+<p>
+[x ..]のような表現はenumFrom xに脱糖される。
+xからはじまって、xの次、xの次の次と続いていくリストを生成する。
+問題の型が無限に続く場合と範囲が決まっている場合とで動作は異なる。
+</p>
+
+<p>
+[x, y ..]のような表現はenumFromThen x yに脱糖される。
+xからはじまってy - x刻みで次々に値を生成していく。
+これも値が無限に続く場合と範囲が決まっている場合とで動作が変わる。
+</p>
+
+<h3>関数enumFromTo, enumFromThenTo</h3>
+
+<p>
+[x .. y]のような表現はenumFromTo x yに脱糖される。
+xからyまでの1ずつ増加していくリストとなる。
+</p>
+
+<p>
+[x, y .. z]のような表現はenumFromThenTo x y zに脱糖される。
+xから(y - x)刻みでzを越えない値までのリストとなる。
+</p>
+
+<h2>型クラスBoundedのインスタンスについて</h2>
+
+<p>
+enumFromやenumFromThenについてはデフォルトの定義が無限に続く型用のものだ。
+以下のように上書きする必要がある。
+</p>
+
+<p><code>enumFrom x = enumFromTo x maxBound<br/>
+enumFromThen x y = enumFromThenTo x y maxBound</code></p>
+
+<h2>ドリンクのサイズ</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/drinkSize.hs"
+	>drinkSize.hs</a></p>
+
+<p>
+型Sizeを型クラスEnumのインスタンスにする。
+</p>
+
+<p><code>instance Enum Size where<br/>
+	<span class="indent1">toEnum 0 = Short</span><br/>
+	<span class="indent1">toEnum 1 = Tall</span><br/>
+	<span class="indent1">toEnum 2 = Grande</span><br/>
+	<span class="indent1">toEnum 3 = Venti</span><br/>
+	<span class="indent1">toEnum _ = error "bad argument"</span><br/>
+	<span class="indent1">fromEnum Short = 0</span><br/>
+	<span class="indent1">fromEnum Tall = 1</span><br/>
+	<span class="indent1">fromEnum Grande = 2</span><br/>
+	<span class="indent1">fromEnum Venti = 3</span><br/>
+	<span class="indent1">enumFrom x = enumFromTo x maxBound</span><br/>
+	<span class="indent1">enumFromThen x = enumFromThenTo x y maxBound</span><br/>
+	</code></p>
+
+<p>試してみる。</p>
+
+<p><code>% ghci drinkSize.hs<br/>
+*Main&gt; [Short ..]<br/>
+[Short, Tall, Grande, Venti]<br/>
+*Main&gt; [Short, Grande ..]<br/>
+[Short, Grande]</code></p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/typeclass_bounded.html"
 	>「型クラス: Bounded」へもどる</a>

@@ -1,6 +1,6 @@
 型クラス: Bounded
 
-<p>(工事中 40%)</p>
+<p>(工事中 70%)</p>
 
 <h2>範囲がある</h2>
 
@@ -24,6 +24,14 @@
 <p><code>instance Bounded Size where<br/>
 	<span class="indent1">minBound = Short</span><br/>
 	<span class="indent1">maxBound = Venti</span></code></p>
+
+<p>試してみる。</p>
+
+<p><code>% ghci drinkSize.hs<br/>
+*Main&gt; minBound :: Size<br/>
+Short<br/>
+*Main&gt; maxBound :: Size<br/>
+Venti</code></p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/typeclass_show.html"
