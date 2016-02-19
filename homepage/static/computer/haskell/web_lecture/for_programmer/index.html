@@ -392,31 +392,7 @@ Slack等の管理を普段から行っていてHubotの設定に慣れている�
 	>Nano Scheme: 演算子&lt;の定義</a> (工事中 30%)</li>
 </ul>
 
-<p>参考: <a href="/computer/haskell/web_lecture/for_programmer/codes/others/conv.hs"
-	>conv.hs</a></p>
-
 <h2>型クラス</h2>
-
-<p>
-[方針] はじめは「型クラスとは」から始めようかと思ったが、
-むしろ自分で型クラスを作っていくなかでそれらの説明を随時していくほうが
-わかりやすい気がする。
-まずは型クラスをひとつつくり、それに対するインスタンスとなる型を作る。
-そのなかで構文や型クラスの意味を説明していこう。
-すでにすこしだけ書いた
-「<a href="/computer/haskell/web_lecture/for_programmer/whats_type_class.html"
-	>型クラスとは</a> (工事中 30%)」や
-「<a href="/computer/haskell/web_lecture/for_programmer/touch_type_class.html"
-	>型クラスに触れる</a> (工事中 50%)」は
-随時入れていく説明の参考にする。
-「<a href="/computer/haskell/web_lecture/for_programmer/make_type_class.html"
-	>型クラスを作る</a> (工事中 10%)」は分解した。
-</p>
-
-<p>
-型クラスにおける型引数に型変数しか使えないあたり
-(FlexibleInstancesやOverlappingInstances)についての考察が必要だ。
-</p>
 
 <ul>
 <li><a href="/computer/haskell/web_lecture/for_programmer/boollike_spec.html"
@@ -436,13 +412,7 @@ Slack等の管理を普段から行っていてHubotの設定に慣れている�
 <li><a href="/computer/haskell/web_lecture/for_programmer/typeclass_default.html"
 	>クラス関数のデフォルト定義</a> (工事中 60%)</li>
 <li><a href="/computer/haskell/web_lecture/for_programmer/drink_size.html"
-	>スタバのドリンクのサイズの例</a> (工事中 70%)
-	<ul>
-	<li>自作の型を既存の型クラスのインスタンスにする</li>
-	<li>スタバのドリンクのサイズの例</li>
-	<li>derivingできる型クラスのすべてに対して手動でインスタンスにする</li>
-	<li>そのあと、これ全部derivingでできます、って感じか</li>
-	</ul></li>
+	>スタバのドリンクのサイズの例</a> (工事中 70%)</li>
 <li><a href="/computer/haskell/web_lecture/for_programmer/typeclass_eq.html"
 	>型クラス: Eq</a> (工事中 70%)</li>
 <li><a href="/computer/haskell/web_lecture/for_programmer/typeclass_ord.html"
@@ -456,16 +426,9 @@ Slack等の管理を普段から行っていてHubotの設定に慣れている�
 <li><a href="/computer/haskell/web_lecture/for_programmer/typeclass_bounded.html"
 	>型クラス: Bounded</a> (工事中 70%)</li>
 <li><a href="/computer/haskell/web_lecture/for_programmer/typeclass_enum.html"
-	>型クラス: Enum</a> (工事中 20%)</li>
-<li>derivingの説明
-	<ul>
-	<li>derivingできる型クラスの一覧
-		<ul>
-		<li>Eq, Ord, Enum, Ix, Bounded, Show, Read</li>
-		</ul></li>
-	<li>Ix以外をざっくりと説明する</li>
-	</ul></li>
-<li>..</li>
+	>型クラス: Enum</a> (工事中 70%)</li>
+<li><a href="/computer/haskell/web_lecture/for_programmer/deriving.html"
+	>構文: deriving</a> (工事中 70%)</li>
 </ul>
 
 <h2>確認のための例題: オートマトンの例</h2>
@@ -606,6 +569,14 @@ Slack等の管理を普段から行っていてHubotの設定に慣れている�
 
 <h2>メモ</h2>
 
+<p>
+型クラスにおける型引数に型変数しか使えないあたり
+(FlexibleInstancesやOverlappingInstances)についての考察が必要だ。
+</p>
+
+<p>参考: <a href="/computer/haskell/web_lecture/for_programmer/codes/others/conv.hs"
+	>conv.hs</a></p>
+
 <ul>
 <li>let ... in ...の説明をもうすこし考える
 	<ul>
@@ -615,6 +586,12 @@ Slack等の管理を普段から行っていてHubotの設定に慣れている�
 <li>TypeFamiliesについても中級編あたりで</li>
 <li><a href="/computer/haskell/web_lecture/for_programmer/memo_type.html"
 	>型についての再考</a></li>
+<li><a href="/computer/haskell/web_lecture/for_programmer/whats_type_class.html"
+	>型クラスとは</a> (工事中 30%)</li>
+<li><a href="/computer/haskell/web_lecture/for_programmer/touch_type_class.html"
+	>型クラスに触れる</a> (工事中 50%)</li>
+<li><a href="/computer/haskell/web_lecture/for_programmer/make_type_class.html"
+	>型クラスを作る</a> (工事中 10%)</li>
 <li><a href="/computer/haskell/web_lecture/for_programmer/typeclass_read.html"
 	>型クラス: Read</a> (工事中 0%)
 	<ul>

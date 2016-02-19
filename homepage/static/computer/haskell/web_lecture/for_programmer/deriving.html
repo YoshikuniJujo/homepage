@@ -1,0 +1,36 @@
+構文: deriving
+
+<p>(工事中 70%)</p>
+
+<h2>決まりきった</h2>
+
+<p>
+型クラスのなかには新しい型を定義したときに自動的に
+そのインスタンスにすることができるものがある。
+これらはだいたいにおいて決まりきったコードになるからだ。
+以下がそのリストだ。
+</p>
+
+<p>Eq, Ord, Bounded, Enum, Show, Read, Ix</p>
+
+<p>
+Ixは配列のキーにするための型クラスである。
+配列については今のところは学ばないので忘れよう。
+型クラスRead以外は詳細を学んだ。
+型クラスReadは型クラスShowの逆と考えればいい。
+Stringからその型への変換を行う。
+型を定義するときにderivingに続けてこれらの型クラス名のリストを続けてやれば
+「よきにはから」ってくれる。
+ドリンクのサイズについては以下のようにすれば今までの
+インスタンス宣言はすべて不要となる。
+</p>
+
+<p><code>data Size = Short | Tall | Grande | Venti<br/>
+	<span class="indent1">deriving (Eq, Ord, Bounded, Enum, Show, Read)</span></code></p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/typeclass_enum.html"
+	>「型クラス: Enum」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer"
+	>「1から学ぶHaskell」トップへ</a>
+</p>
