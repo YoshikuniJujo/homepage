@@ -1,6 +1,6 @@
 型クラス: Show
 
-<p>(工事中 40%)</p>
+<p>(工事中 70%)</p>
 
 <h2>表示可能</h2>
 
@@ -102,15 +102,142 @@ show (Cons ll x) = "Cons (" ++ show ll ++ ") " ++ show xの行のshow llは
 
 <h3>値構築演算子の優先順位の処理</h3>
 
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/showBinding.hs"
+	>showBinding.hs</a></p>
+
+<p>以下のようなデータ型がある。</p>
+
+<p><code>data A = B :+: B</code></p>
+
+<p><code>data B = Int :+: Int</code></p>
+
+<p><code>infixl 6 :+:<br/>
+infixl 7 :*:</code></p>
+
+<p>
+これらを演算子の結合力を考慮して不要な括弧なしで表示したい。
+以下のようにすれば良い。
+</p>
+
+<p><code>instance Show A where<br/>
+	<span class="indent1">showsPrec d (b :+: c)</span><br/>
+	<span class="indent2">| d &gt; 6 = ("(" ++)</span><br/>
+	<span class="indent3">. showsPrec 7 b . (" :+: " ++) . showsPrec 7 c</span><br/>
+	<span class="indent3">. (")" ++)</span><br/>
+	<span class="indent2">| otherwise = showsPrec 7 b . (" :+: " ++) . showsPrec 7 c</span></code></p>
+
+<p><code>instance Show B where<br/>
+	<span class="indent1">showsPrec d (m :*: n)</span><br/>
+	<span class="indent2">| d &gt; 7 = ("(" ++)</span><br/>
+	<span class="indent3">. showsPrec 8 m . (" :*: " ++) . showsPrec 8 n</span><br/>
+	<span class="indent3">. (")" ++)</span><br/>
+	<span class="indent2">| otherwise = showsPrec 8 m . (" :*: " ++) . showsPrec 8 n</span></code></p>
+
+<p>
+showsPrecの第1引数dは「今いる環境の結合力」を示している。
+dが問題としている演算子の結合力よりも大きければ括弧が必要となり、
+そうでなければ括弧は不要だ。
+内側の値に対するshowsPrecは問題としている演算子の結合力に1足したものを
+変数dとして与える。
+</p>
+
 <h4>関数showParen</h4>
 
+<p>
+showsPrecを書きやすくするための関数showParenが定義されている。
+これを使うとより簡単に書くことができる。
+</p>
+
+<p><code>instance Show A where<br/>
+	<span class="indent1">showsPrec d (b :+: c) = showParen (d &gt; 6) $</span><br/>
+	<span class="indent2">showsPrec 7 b . (" :+: " ++) . showsPrec 7 c</span></code></p>
+
+<p><code>instance Show B where<br/>
+	<span class="indent1">showsPrec d (m :*: n) = showParen (d &gt; 7) $</span><br/>
+	<span class="indent2">showsPrec 8 m . (" :+: " ++) . showsPrec 8 n</span></code></p>
+
+<p>
+関数showParenは第1引数にBool値をとりその値によって続くShowS型の値の
+前後に丸括弧をつけるかどうかを決める。
+</p>
+
+<!--
 <h4>左リストの例、再び</h4>
+-->
+
+<h4>関数shows</h4>
+
+<p>
+また、関数showと関数showsPrecの中間的な関数として関数showsもある。
+これはクラス関数ではないので再定義はできないが以下のように定義されている。
+</p>
+
+<p><code>shows = showsPrec 0</code></p>
 
 <h2>関数showList</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/showList.hs"
+	>showList.hs</a></p>
+
+<p>
+クラス関数showListはほぼStringの表示のために存在する関数だ。
+このトリックによってString(文字のリスト)は
+</p>
+
+<p><code>['H', 'e', 'l', 'l', 'o']</code></p>
+
+<p>ではなく</p>
+
+<p><code>"Hello"</code></p>
+
+<p>
+と表示される。
+まずリストの表示の定義を見てみよう。
+</p>
+
+<p><code>instance Show a =&gt; Show [a] where<br/>
+	<span class="indent1">showsPrec _ = showList</span></code></p>
+
+<p>
+クラス関数showsPrecが関数showListによって定義されている。
+このshowListはa型の値に対するshowListである。
+クラス関数showListにはデフォルト定義があり、以下のように定義されている。
+</p>
+
+<p><code>showList [] = ("[]" ++)<br/>
+showList (x : xs) = ("[" ++) . shows x . sl xs<br/>
+	<span class="indent1">where</span><br/>
+	<span class="indent1">sl [] = ("]" ++)</span><br/>
+	<span class="indent1">sl (y : ys) = ("," ++) . shows y . sl ys</span></code></p>
+
+<p>
+たとえば[1, 2, 3]であれば"[1,2,3]"のように表示するような定義である。
+つまり、デフォルトの定義のままであればこのように「リストっぽく」表示する。
+このクラス関数showListはCharに対してはデフォルト定義ではなく
+「文字列っぽく」表示されるように上書きされている。
+よってaがCharの場合には関数showSPrecつまりshowListは[a]について
+「文字列っぼい」表示となる。
+</p>
+
+<h2>まとめ</h2>
+
+<p>クラスShowは</p>
+
+<ul>
+<li>文字列の結合の効率</li>
+<li>値構築演算子の結合力を考慮</li>
+<li>文字のリストを文字列として扱う</li>
+</ul>
+
+<p>
+という事情によっていろいろと複雑になっている。
+本質的にはクラス関数showが理解できればいいが、
+これらのための工夫をひとつひとつ解き明かしていく作業も楽しく勉強になる。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/diff_list.html"
 	>「アルゴリズム: 差分リスト」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer/typeclass_bounded.html"
-	>「型クラス: Bounded」へ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/typeclass_read.html"
+	>「型クラス: Read」へ</a>
 </p>
