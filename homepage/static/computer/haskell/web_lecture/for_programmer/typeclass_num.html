@@ -37,6 +37,46 @@ Haskellでは「数」に関する型クラスがいくつもある。
 ここでは基本となる型クラスNumについてだけ見ていこう。
 </p>
 
+<h2>型クラスNum</h2>
+
+<p>型クラスNumは以下のように定義されている。</p>
+
+<p><code>class Num a where<br/>
+	<span class="indent1">(+), (-), (*) :: a -&gt; a -&gt; a</span><br/>
+	<span class="indent1">negate :: a -&gt; a</span><br/>
+	<span class="indent1">abs :: a -&gt; a</span><br/>
+	<span class="indent1">signum :: a -&gt; a</span><br/>
+	<span class="indent1">fromInteger :: Integer -&gt; a</span><br/><br/>
+
+	<span class="indent1">x - y = x + negate y</span><br/>
+	<span class="indent1">negate x = 0 - x</span></code></p>
+
+<p>
+加算、減算、乗算が定義される。
+関数negateは正負を反転する。
+関数absは絶対値を返す。
+関数signumは値の符号を返す。
+正なら1を負なら-1を0なら0を返す。
+関数fromIntegerはIntegerからの変換関数だ。
+これによって整数リテラルがそれぞれの数値に変換される。
+</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; :t 18<br/>
+18 :: Num a =&gt; a</code></p>
+
+<p>
+整数リテラルは多相的だ。
+18のように書くと型クラスNumのインスタンスである型の値となる。
+</p>
+
+<h2>数値型を作る</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/range.hs"
+	>range.hs</a></p>
+
+<p>誤差範囲の計算の例。</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/deriving.html"
 	>「構文: deriving」へもどる</a>
