@@ -1,6 +1,6 @@
 型クラス: Num
 
-<p>(工事中 10%)</p>
+<p>(工事中 60%)</p>
 
 <h2>はじめに</h2>
 
@@ -70,12 +70,71 @@ Prelude&gt; :t 18<br/>
 18のように書くと型クラスNumのインスタンスである型の値となる。
 </p>
 
-<h2>数値型を作る</h2>
+<h2>誤差の範囲</h2>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/range.hs"
 	>range.hs</a></p>
 
-<p>誤差範囲の計算の例。</p>
+<p>
+誤差つきの計算の例を見ていこう。
+まずは誤差のある値の型を作成する。
+</p>
+
+<p><code>data Range = Range Double Double deriving Show</code></p>
+
+<p>
+誤差の範囲を最小値と最大値とで表現している。
+型Rangeを型クラスNumのインスタンスにする。
+</p>
+
+<p><code>instance Num Range where</code></p>
+
+<p>足し算は最小値と最大値とをそれぞれ足し合わせればいい。</p>
+
+<p><code><span class="indent1">Range a b + Range c d = Range (a + c) (b + d)</span></code></p>
+
+<p>かけ算は最小値と最大値の4通りのくみあわせのなかから最小と最大をとりだす。</p>
+
+<p><code><span class="indent1">Range a b * Range c d = Range (minimum f) (maximum f)</span><br/>
+	<span class="indent2">where f = [a * c, a * d, b * c, b * d]</span></code></p>
+
+<p>関数negateでは最大値と最小値とがいれかわる。</p>
+
+<p><code><span class="indent1">negate (Range a b) = Range (- b) (- a)</span></code></p>
+
+<p>絶対値は範囲が0をまたぐときは最小値が0となる。</p>
+
+<p><code><span class="indent1">abs (Range a b)</span><br/>
+	<span class="indent2">| b &lt; 0 = Range (- b) (- a)</span><br/>
+	<span class="indent2">| a &lt; 0 = Range 0 (max (- a) b)</span><br/>
+	<span class="indent2">| otherwise = Range a b</span></code></p>
+
+<p>関数signumは最小値、最大値のそれぞれのsignumとした。</p>
+
+<p><code>signum (Range a b) = Range (signum a) (signum b)</code></p>
+
+<p>整数値からは誤差0.5の値として変換する。</p>
+
+<p><code><span class="indent1">fromInteger n = Range (fromInteger n - 0.5)
+	Range (fromInteger n + 0.5)</span></code></p>
+
+<p>
+これで型Rangeを型クラスNumのインスタンスとすることができた。
+試してみよう。
+</p>
+
+<p><code>% ghci range.hs<br/>
+*Main&gt; (35 + 23 - 50) * 8 :: Range<br/>
+Range 48.75 80.75</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+数値に関する型クラスはいくつかにわかれている。
+そのうちのもっとも基本的な型クラスNumについて学んだ。
+型クラスNumのインスタンスにすると加算、減算、乗算ができるほか、
+整数リテラルによってリテラル表記が可能となる。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/deriving.html"

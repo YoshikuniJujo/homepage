@@ -1,11 +1,11 @@
 モノイドとは
 
-<p>(工事中 0%)</p>
+<p>(工事中 60%)</p>
 
 <h2>はじめに</h2>
 
 <p>
-「特定の演算ができる」というように表される性質がいくつかある。
+「特定の性質をもつ演算ができる」というように表される性質がいくつかある。
 そのうちのひとつがモノイドである。
 </p>
 
@@ -22,6 +22,9 @@
 </ul>
 
 <p>
+これをモノイド則とよぶ。
+ひとつめの規則が結合則であり、
+値を変化させない特別な値eを単位元とよぶ。
 たとえば整数は演算を加算としてeを0とすればモノイドであり、
 また演算を乗算としてeを1としてもモノイドとなる。
 </p>
@@ -53,6 +56,24 @@
 本質的には値memptyと関数mappendだけを考えればいい。
 </p>
 
+<p>
+また、型クラスMonoidのインスタンスを作るときは以下のモノイド則が満たされるように
+注意する必要がある。
+</p>
+
+<ul>
+<li>(x `mappend` y) `mappend` z == x `mappend` (y `mappend` z)</li>
+<li>mempty `mappend` x == x</li>
+<li>x `mappend` mempty == x</li>
+</ul>
+
+<p>
+モノイド則を満たさなければ、型クラスMonoidのインスタンスであっても、
+それはモノイドではない。
+そのようなインスタンスを作ることは数学的な正しさを損うものであり、
+バグを導くので避けるべきだ。
+</p>
+
 <h2>リスト</h2>
 
 <p>リストでは以下のようにモノイドにできる。</p>
@@ -68,6 +89,51 @@
 <p><code>instance Monoid [a] where<br/>
 	<span class="indent1">mempty = []</span><br/>
 	<span class="indent1">mappend = (++)</span></code></p>
+
+<h2>数値型</h2>
+
+<p>数値型では足し算とかけ算の両方に対してモノイドとなる。</p>
+
+<h3>足し算</h3>
+
+<p>足し算に対しては以下のようにモノイドとなる。</p>
+
+<ul>
+<li>(a + b) + c == a + (b + c)</li>
+<li>0 + a == a</li>
+<li>a + 0 == a</li>
+</ul>
+
+<p>
+足し算に関してのモノイドとしてData.Monoidモジュールで型Sumが定義されている。
+</p>
+
+<p><code>newtype Sum a = Sum { getSum :: a }</code></p>
+
+<p>
+数値型のラッパーだ。
+このラッパーは以下のように型クラスMonoidのインスタンスになる。
+</p>
+
+<p><code>instance Num a =&gt; Monoid (Sum a) where<br/>
+	<span class="indent1">mempty = Sum 0</span><br/>
+	<span class="indent1">Sum x `mappend` Sum y = Sum $ x + y</span></code></p>
+
+<h3>かけ算</h3>
+
+<p>数値型はかけ算に対しても以下のようにモノイドとなる。</p>
+
+<ul>
+<li>(a * b) * c == a * (b * c)</li>
+<li>1 * a == a</li>
+<li>a * 1 == a</li>
+</ul>
+
+<p>同様にData.MonoidにProduct型が定義されている。</p>
+
+<p><code>instance Num a =&gt; Monoid (Product a) where<br/>
+	<span class="indent1">mempty = Product 1</span><br/>
+	<span class="indent1">Product x `mappend` Product y = Product $ x * y</span></code></p>
 
 <h2>ブール値</h2>
 
@@ -87,6 +153,16 @@ Monoidのインスタンスにする。
 <li>a &amp;&amp; True == a</li>
 </ul>
 
+<p>論理積について型Allが定義されている。</p>
+
+<p><code>newtype All = All { getAll :: Bool }</code></p>
+
+<p>型Allは以下のように型クラスMonoidのインスタンスになる。</p>
+
+<p><code>instance Monoid All where<br/>
+	<span class="indent1">mempty = All True</span><br/>
+	<span class="indent1">All x `mappend` All y = All $ x &amp;&amp; y</span></code></p>
+
 <h3>演算||</h3>
 
 <p>ブール値は以下のようにモノイドにできる。</p>
@@ -96,3 +172,27 @@ Monoidのインスタンスにする。
 <li>False || a == a</li>
 <li>a || False == a</li>
 </ul>
+
+<p>型Anyは以下のように型クラスMonoidのインスタンスになる。</p>
+
+<p><code>instance Monoid Any where<br/>
+	<span class="indent1">mempty = Any False</span><br/>
+	<span class="indent1">Any x `mappend` Any y = Any $ x || y</span></code></p>
+
+<h2>まとめ</h2>
+
+<p>
+結合則を満たす演算があり、その演算に対して単位元が存在するような値の集合を
+モノイドとよぶ。
+Haskellでは型クラスMonoidが用意されていて、
+いくつかのインスタンスが定義されている。
+自分で型クラスMonoidのインスタンスを作成するときは
+モノイド則を満たすようにする必要がある。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/kind.html"
+	>「種類(* -&gt; *)に対する型クラス」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer"
+	>「1から学ぶHaskell」トップへ</a>
+</p>
