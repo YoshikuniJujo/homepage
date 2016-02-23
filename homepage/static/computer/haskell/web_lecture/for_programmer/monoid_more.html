@@ -1,0 +1,71 @@
+もっとモノイド
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+モジュールData.Monoidには定義されていないが最大、最小を求める演算も
+ある条件下ではモノイドとなる。
+</p>
+
+<h2>Max型</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/monoid_more.hs"
+	>monoid_more.hs</a></p>
+
+<p>Max型を定義する。</p>
+
+<p><code>newtype Max a = Max { getMax = a }</code></p>
+
+<p>単位元をその型における最小値とすることで関数maxによるモノイドができる。</p>
+
+<ul>
+<li>(a `max` b) `max` c == a `max` (b `max` c)</li>
+<li>minBound `max` a == a</li>
+<li>a `max` minBound == a</li>
+</ul>
+
+<p>型クラスMonoidのインスタンスにする。</p>
+
+<p><code>instance (Ord a, Bounded a) =&gt; Monoid (Max a) where<br/>
+	<span class="indent1">mempty = Max minBound</span><br/>
+	<span class="indent1">mappend (Max x) (Max y) = Max $ x `max` y</span></code></p>
+
+<h2>リストをひとつの値にたたみこむ</h2>
+
+<p>リストをひとつの値にたたみこむ関数の多くはmconcatにまとめられる。</p>
+
+<p><code>concat :: [[a]] -&gt; [a]<br/>
+concat = mconcat</code></p>
+
+<p><code>and, or :: [Bool] -&gt; Bool<br/>
+and = getAll . mconcat . map All<br/>
+or = getAny . mconcat . map Any</code></p>
+
+<p><code>sum, product :: Num a =&gt; [a] -&gt; a<br/>
+sum = getSum . mconcat . map Sum<br/>
+product = getProduct . mconcat . map Product</code></p>
+
+<p><code>maxim :: (Ord a, Bounded a) =&gt; [a] -&gt; a<br/>
+maxim = getMax . mconcat . map Max</code></p>
+
+<p>
+getSomeやmap Someはnewtypeによるラッパ型との相互変換である。
+つまりどの関数も本質的にmconcatによって抽象されていることがわかる。
+Monoidにする方法が1通りしかないリストについてはラッパは不要であり、
+concatはそのままmconcatで定義できる。
+</p>
+
+<h2>課題</h2>
+
+<ol>
+<li>関数minを演算とするモノイドを定義せよ</li>
+</ol>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/monoid.html"
+	>「モノイドとは」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer"
+	>「1から学ぶHaskell」トップへ</a>
+</p>
