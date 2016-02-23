@@ -1,0 +1,124 @@
+ログの記録
+
+<p>(工事中 60%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+モノイドの使用例を示す。
+ここまでの知識だとなかなか適切な例がないのでややこじつけ的な例となる。
+</p>
+
+<h2>関数適用</h2>
+
+<p>
+関数合成しながら値をためていくことを考える。
+具体的には
+</p>
+
+<ul>
+<li>処理のログ</li>
+<li>処理にかかる時間</li>
+</ul>
+
+<p>
+を演算の結果以外にためていく例を考えよう。
+</p>
+
+<h3>関数適用のログ</h3>
+
+<p>
+関数を合成するときにログを記録していくことを考える。
+結果として「ログの文字列」と「演算の結果」がほしい。
+</p>
+
+<h3>処理にかかる時間</h3>
+
+<p>
+関数を適用するときにかかる時間を記録する。
+結果として「かかる時間」と「演算の結果」がほしい。
+</p>
+
+<h3>共通の枠組み</h3>
+
+<p>
+関数適用のログは文字列を結合していけばいい。
+処理にかかる時間は整数値を加算していけばいい。
+これらには型クラスMonoidのクラス関数mappendの枠組みが使える。
+</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/monoid_log.hs"
+	>monoid_log.hs</a></p>
+
+<p>
+モジュールData.Monoidには型クラスMonoidといくつかのインスタンスが定義されている。
+</p>
+
+<p><code>import Data.Monoid</code></p>
+
+<p>型Funはためていく値の型mと(a -&gt; b)型の関数から成る。</p>
+
+<p><code>data Fun m a b = Fun m (a -&gt; b)</code></p>
+
+<p>
+関数applyはFun型の値の持つ関数を値に適用し、ためてきた値とともに返す。
+</p>
+
+<p><code>apply :: Fun m a b -&gt; a -&gt; (m, b)<br/>
+apply (Fun m f) x = (m, f x)</code></p>
+
+<p>
+関数dotはFun型の値の持つ関数を関数合成し、ためている値をmappendで結合する。
+</p>
+
+<p><code>dot :: Monoid m =&gt; Fun m b c -&gt; Fun m a b -&gt; Fun m a c<br/>
+Fun m f `dot` Fun n g = Fun (m `mappend` n) (f . g)</code></p>
+
+<p>
+関数funはふつうの関数を空の値を追加して型Funの値に変換する。
+</p>
+
+<p><code>fun :: Monoid m =&gt; (a -&gt; b) -&gt; Fun m a b<br/>
+fun f = Fun mempty f</code></p>
+
+<p>
+関数putはふつうの関数にためていく値を追加して型Funの値に変換する。
+</p>
+
+<p><code>put :: (a -&gt; b) -&gt; m -&gt; Fun m a b<br/>
+put f m = Fun m f</code></p>
+
+<h2>ログをとりながら</h2>
+
+<p>
+ログをとりながら演算した結果を文字列として返す。
+</p>
+
+<p><code>% ghci monoid_log.hs<br/>
+*Main&gt; fun show `dot` put (* 2) "double; " `dot` put (+ 3) "add 3; " `apply` 8<br/>
+("double; add 3; ", "22")</code></p>
+
+<h2>処理速度を計算しながら</h2>
+
+<p>
+かけ算にかかる時間が4で足し算にかかる時間が3だとする。
+</p>
+
+<p><code>*Main&gt; fun show `dot` put (* 2) (Sum 4) `dot` put (+ 3) (Sum 3) `apply` 8<br/>
+(Sum {getSum = 7}, "22")</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+関数合成しながら適用の結果以外に値をためていくという枠組みを
+型クラスMonoidを利用して抽象化した。
+ログと処理にかかる時間とでは「値を結合してためていく」という枠組みが共通している。
+このように抽象的な関数を使うことで共通した性質を持つものをまとめることができる。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/monoid.html"
+	>「モノイドとは」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer"
+	>「1から学ぶHaskell」トップへ</a>
+</p>
