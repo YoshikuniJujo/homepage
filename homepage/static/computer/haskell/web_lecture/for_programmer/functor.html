@@ -1,0 +1,110 @@
+ファンクターとは
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+型の種類(kind)を思い出してみよう。
+*, * -&gt; *, * -&gt; * -&gt; *, ...などがある。
+IntやChar、Boolなどは種類*の型だ。
+それに対して[]やMaybeなどは種類* -&gt; *の型だ。
+つまり種類*の型であるIntやBoolなどを引数にとって
+</p>
+
+<ul>
+<li>[] Int</li>
+<li>Maybe Bool</li>
+</ul>
+
+<p>
+などのようにして使う。
+型クラスFunctorは[]やMaybeなどの種類が* -&gt; *であるような型に対する型クラスである。
+</p>
+
+<h2>関数map</h2>
+
+<p>
+ここまで学んできたら、もうすでに関数mapについてはよくわかっていると思う。
+</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; map (* 10) [3, 5, 8, 2]<br/>
+[30,50,80,20]<br/>
+Prelude&gt; :m Data.Char<br/>
+Prelude Data.Char&gt; map toUpper "Haskell"<br/>
+"HASKELL"</code></p>
+
+<p>
+リストの中身の各要素に関数を適用している。
+</p>
+
+<h2>関数mmap</h2>
+
+<p>
+Maybe値は要素数が0または1のリストと考えることもできる。
+そうするとMaybe値に対するmapとして以下のような関数が定義できる。
+</p>
+
+<p><code>mmap :: (a -&gt; b) -&gt; Maybe a -&gt; Maybe b<br/>
+mmap f (Just x) = Just $ f x<br/>
+mmap _ _ = Nothing</code></p>
+
+<p><code>ghci functor.hs<br/>
+*Main&gt; mmap (* 10) (Just 8)<br/>
+Just 80<br/>
+*Main&gt; mmap (* 10) Nothing<br/>
+Nothing</code></p>
+
+<h2>関数tmap</h2>
+
+<p>
+Tree型の値についてもmapと同じような関数が定義できる。
+木の形は変えずにすべての要素に関数を適用する。
+</p>
+
+<p><code>import Data.Tree</code></p>
+
+<p><code>tmap :: (a -&gt; b) -&gt; Tree a -&gt; Tree b<br/>
+tmap f (Node x sf) = Node (f x) $ map (tmap f) sf</code></p>
+
+<p>
+Nodeの第1引数は要素であり第2引数は木のリストである。
+tmap fはひとつの木の要素すべてに関数fを適用する関数だ。
+よってmap (tmap f)はリストに含まれるすべての木の要素すべてに関数fを適用する。
+</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; tmap (* 10) $ Node 3 [Node 4 [], Node 5 []]<br/>
+Node {rootLabel = 30, subForest = [Node {rootLabel = 40, subForest = []},
+	Node {rootLabel = 50, subForest = []}]}</code></p>
+
+<p>
+木の構造は変わらずになかの値だけ10倍になっているのがわかる。
+</p>
+
+<h2>...</h2>
+
+<p>...</p>
+
+<h2>型クラスFunctor</h2>
+
+<p><code>class Functor f where<br/>
+	<span class="indent1">fmap :: (a -&gt; b) -&gt; f a -&gt; f b</span></code></p>
+
+<h2>ファンクタ則</h2>
+
+<ul>
+<li>fmap id == id</li>
+<li>fmap (f . g) == fmap f . fmap g</li>
+</ul>
+
+<h2>予定</h2>
+
+<p>
+リスト、Maybe、Treeの例を挙げたら型クラスFunctorとファンクタ則の説明をする。
+その後、中身ではなく「形式」であるという説明のうえで、
+他のいくつかのファンクタを紹介する。
+そして、fmapを使った関数を紹介し、
+全然違うものでも同じように抽象され、それが有用であることを示す。
+</p>
