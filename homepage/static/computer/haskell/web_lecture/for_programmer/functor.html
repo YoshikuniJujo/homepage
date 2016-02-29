@@ -41,6 +41,9 @@ Prelude Data.Char&gt; map toUpper "Haskell"<br/>
 
 <h2>関数mmap</h2>
 
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/various_maps.hs"
+	>various_maps.hs</a></p>
+
 <p>
 Maybe値は要素数が0または1のリストと考えることもできる。
 そうするとMaybe値に対するmapとして以下のような関数が定義できる。
@@ -79,25 +82,66 @@ tmap fはひとつの木の要素すべてに関数fを適用する関数だ。
 Node {rootLabel = 30, subForest = [Node {rootLabel = 40, subForest = []},
 	Node {rootLabel = 50, subForest = []}]}</code></p>
 
-<p>
-木の構造は変わらずになかの値だけ10倍になっているのがわかる。
-</p>
-
-<h2>...</h2>
-
-<p>...</p>
+<p>木の構造は変わらずになかの値だけ10倍になっているのがわかる。</p>
 
 <h2>型クラスFunctor</h2>
+
+<p>
+リスト、Maybe値、木の3つにそれぞれ関数map、mmap、tmapを定義した。
+これらはどれもコンテナの構造を変えずになかの値すべてに同じ変換を行う関数だ。
+型は以下のようになっている。
+</p>
+
+<p><code>map :: (a -&gt; b) -&gt; [] a -&gt; [] b<br/>
+mmap :: (a -&gt; b) -&gt; Maybe a -&gt; Maybe b<br/>
+tmap :: (a -&gt; b) -&gt; Tree a -&gt; Tree b</code></p>
+
+<p>これらの共通の枠組みをとりだすと以下のようになる。</p>
+
+<p><code>(a -&gt; b) -&gt; m a -&gt; m b</code></p>
+
+<p>
+このようなmap関数を定義できるような性質を型クラスFunctorとして抽象できる。
+</p>
 
 <p><code>class Functor f where<br/>
 	<span class="indent1">fmap :: (a -&gt; b) -&gt; f a -&gt; f b</span></code></p>
 
 <h2>ファンクタ則</h2>
 
+<p>
+残念ながら型だけですべてが表現できるわけではない。
+Functorクラスの値が本当にファンクタであるためには以下の法則を満たす必要がある。
+</p>
+
 <ul>
 <li>fmap id == id</li>
 <li>fmap (f . g) == fmap f . fmap g</li>
 </ul>
+
+<p>
+これはfmapがコンテナの構造を変化させないことを保証する(ここ厳密に証明できるか?)。
+ひとつめは、関数idをすべての値に適用した場合に全体の値が変化しないということだ。
+ふたつめは、全体に関数fとgを合成することと、
+「全体に関数fを適用」と「全体に関数gを適用」することが同じであることを示す。
+この法則はfmapがコンテナの構造を変化させなければ成り立つはずだ。
+</p>
+
+<h2>コンテナでないようなFunctor</h2>
+
+<p>
+型クラスFunctorは中身すべてに同じ関数を適用できるようなコンテナとしての性質を表す。
+同様に関数fmapを中身すべてに同じ関数を適用する関数だ。
+しかし、実はこれは厳密には正しくない。
+コンテナであろうと何であろうとファンクタ則を満たすような関数fmapを定義できれば
+それは中身にかかわらずファンクタだ。
+</p>
+
+<h2>...</h2>
+
+<p>(ここにコンテナでないようなファンクタの例を挙げる)</p>
+
+<p>...</p>
 
 <h2>予定</h2>
 
@@ -107,4 +151,15 @@ Node {rootLabel = 30, subForest = [Node {rootLabel = 40, subForest = []},
 他のいくつかのファンクタを紹介する。
 そして、fmapを使った関数を紹介し、
 全然違うものでも同じように抽象され、それが有用であることを示す。
+</p>
+
+<p>
+コンテナ的でないようなファンクタには何があるかな?
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/monoid_more.html"
+	>「もっとモノイド」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer"
+	>「1から学ぶHaskell」トップへ</a>
 </p>
