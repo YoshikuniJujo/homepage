@@ -1,6 +1,6 @@
 ファンクターとは
 
-<p>(工事中 0%)</p>
+<p>(工事中 50%)</p>
 
 <h2>はじめに</h2>
 
@@ -127,6 +127,66 @@ Functorクラスの値が本当にファンクタであるためには以下の�
 この法則はfmapがコンテナの構造を変化させなければ成り立つはずだ。
 </p>
 
+<h3>リストについて確認</h3>
+
+<p>リストでは関数fmapは以下のように定義される。</p>
+
+<p><code>fmap = map</code></p>
+
+<p>関数mapは以下のように定義される。</p>
+
+<p><code>map f (x : xs) = f x : map f xs<br/>
+map _ _ = []</code></p>
+
+<h4>fmap id == id</h4>
+
+<p>
+ファンクタ則のひとつめを見てみよう。
+引数が空リストのとき
+</p>
+
+<p><code>map id [] == id []<br/>
+=&gt; [] == []</code></p>
+
+<p>
+となり成り立つ。
+また、map id xs == id xsのとき
+</p>
+
+<p><code>map id (x : xs)<br/>
+=&gt; id x : map f xs<br/>
+=&gt; x : map f xs<br/>
+=&gt; x : id xs<br/>
+=&gt; x : xs</code></p>
+
+<p>
+となる。
+数学的帰納法によりmap id xs == id xsはすべてのxsで成り立つ。
+</p>
+
+<h4>fmap (f . g) == fmap f . fmap g</h4>
+
+<p>引数が空リストのとき</p>
+
+<p><code>map (f . g) [] == map f (map g [])<br/>
+=&gt; [] == []</code></p>
+
+<p>
+で成り立つ。
+map (f . g) xs == map f (map g xs)のとき
+</p>
+
+<p><code>map f (map g (x : xs))<br/>
+=&gt; map f (g x : map g xs)<br/>
+=&gt; f (g x) : map f (map g xs)<br/>
+=&gt; f (g x) : map (f . g) xs<br/>
+=&gt; (f . g) x : map (f . g) xs<br/>
+=&gt; map (f . g) (x : xs)</code></p>
+
+<p>
+数学的帰納法により任意のxsでmap (f . g) xs == map f (map g xs)は成り立つ。
+</p>
+
 <h2>コンテナでないようなFunctor</h2>
 
 <p>
@@ -137,29 +197,97 @@ Functorクラスの値が本当にファンクタであるためには以下の�
 それは中身にかかわらずファンクタだ。
 </p>
 
-<h2>...</h2>
+<h3>整数値に対する二項演算</h3>
 
-<p>(ここにコンテナでないようなファンクタの例を挙げる)</p>
-
-<p>...</p>
-
-<h2>予定</h2>
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/functor_op.hs"
+	>functor_op.hs</a></p>
 
 <p>
-リスト、Maybe、Treeの例を挙げたら型クラスFunctorとファンクタ則の説明をする。
-その後、中身ではなく「形式」であるという説明のうえで、
-他のいくつかのファンクタを紹介する。
-そして、fmapを使った関数を紹介し、
-全然違うものでも同じように抽象され、それが有用であることを示す。
+コンテナでなくてもファンクタであるという例だ。
+整数値に対する二項演算を見ていこう。
 </p>
 
+<h4>型Opの定義</h4>
+
 <p>
-コンテナ的でないようなファンクタには何があるかな?
+型クラスFunctorのインスタンスにするために
+型Int -&gt; Int -&gt; aをラップして型Opを作る。
+ラップを外すための関数opもあわせて定義する。
+</p>
+
+<p><code>newtype Op a = Op { op :: Int -&gt; Int -&gt; a }</code></p>
+
+<h4>ファンクターにする</h4>
+
+<p>
+演算子に2個の引数をあたえたあとに関数を適用するという形で
+型Opをファンクターにする。
+</p>
+
+<p><code>instance Functor Op where<br/>
+	<span class="indent1">fmap f (Op o) = Op $ \x y -&gt; f $ x `o` y</span></code></p>
+
+<p>ファンクター則を満たしていることを確認しよう。</p>
+
+<p><code>fmap id (Op o)<br/>
+=&gt; Op $ \x y -&gt; id $ x `o` y<br/>
+=&gt; Op $ \x y -&gt; x `o` y<br/>
+=&gt; Op o<br/>
+=&gt; id (Op o)</code></p>
+
+<p><code>fmap f (fmap g (Op o))<br/>
+=&gt; fmap f (Op $ \x y -&gt; g $ o x y)<br/>
+=&gt; Op $ \x' y' -&gt; f $ (\x y -&gt; g $ o x y) x' y'<br/>
+=&gt; Op $ \x' y' -&gt; f $ g $ o x' y'<br/>
+=&gt; Op $ \x' y' -&gt; (f . g) $ o x' y'<br/>
+=&gt; fmap (f . g) (Op o)</code></p>
+
+<p>
+よってファンクタ則を満たしている。
+型クラスFunctorのインスタンスでかつファンクタ則を満たしているので、
+型Opはファンクタである。
+</p>
+
+<h4>二項演算の例</h4>
+
+<p>二項演算をいくつか定義する。</p>
+
+<p><code>add :: Op Int<br/>
+add = Op (+)</code></p>
+
+<p><code>comp :: Op Ordering<br/>
+comp = Op compare</code></p>
+
+<p><code>dividable :: Op Bool<br/>
+dividable = (== 0) `fmap` Op mod</code></p>
+
+<h4>試してみる</h4>
+
+<p>定義した演算を試してみよう。</p>
+
+<p><code>% ghci functor_op.hs<br/>
+*Main&gt; op add 3 4<br/>
+7<br/>
+*Main&gt; op comp 3 8<br/>
+LT<br/>
+*Main&gt; op dividable 8 3<br/>
+False<br/>
+*Main&gt; op dividable 8 4<br/>
+True</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+「なかの要素すべてに値を適用できる」という性質を持つコンテナを
+ファンクターとよぶ。
+ファンクター則を満たす関数fmapを定義して型クラスFunctorのインスタンスにする。
+ファンクターとなるのはコンテナだけではない。
+ファンクター則を満たす関数fmapを定義できれば何であれファンクターだ。
 </p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/monoid_more.html"
 	>「もっとモノイド」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/applicative.html"
+	>「アプリカティブファンクターとは」へ</a>
 </p>
