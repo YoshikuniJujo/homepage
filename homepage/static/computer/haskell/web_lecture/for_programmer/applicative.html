@@ -2,6 +2,74 @@
 
 <p>(工事中 0%)</p>
 
+<h2>はじめに</h2>
+
+<p>
+ファンクターに対してたとえば以下のようなことができる。
+</p>
+
+<p><code>fmap (* 15) foo</code></p>
+
+<p>
+fooのなかみを15倍にしている。
+それではfooのなかみとbarのなかみを足し合わせることはできるだろうか。
+まずは以下のようにしてみよう。
+</p>
+
+<p><code>fmap (+) foo</code></p>
+
+<p>
+結果の型は以下のようになるだろう。
+fooの型をFoo Intとする。
+</p>
+
+<p><code>Foo (Int -&gt; Int)</code></p>
+
+<p>
+Int -&gt; Int型の関数をFoo Int型の値に適用するのが関数fmapの働きだ。
+しかし、Foo (Int -&gt; Int)型の値に含まれる関数をFoo Int型の値に適用することは
+できない。
+そこで以下のような関数appを定義する。
+</p>
+
+<p><code>app :: Foo (a -&gt; b) -&gt; Foo a -&gt; Foo b</code></p>
+
+<p>
+この関数を使うとfooのなかみとbarのなかみを足し合わせるのは以下のようにできる。
+</p>
+
+<p><code>app (fmap (+) foo) bar</code></p>
+
+<p>中置記法にするこ読みやすくなる。</p>
+
+<p><code>(+) `fmap` foo `app` bar</code></p>
+
+<p>このようにすると関数(+)の引数としてfooとbarを与えている感じが出る。</p>
+
+<h2>予定</h2>
+
+<p>
+関数pureについてはたとえば
+<code>fun &lt;$&gt; [1, 2, 3] &lt;*&gt; pure 5 &lt;*&gt; [9, 10]</code>
+のような例で必要であることを示す。
+と思ったけど普通に
+<code>flip fun 5 &lt;$&gt; [1, 2, 3] &lt;*&gt; [9, 10]</code>
+でよくね?
+書きやすさの問題か?
+モナドの場合はa -&gt; m bを作るために必要な感じがするけど、
+アプリカティブの場合はfmapがあればm (a -&gt; b)とかいらない気がするのだ。
+</p>
+
+<p>
+(+) `fmap` foo `app` barではなく、
+fmapの代わりにappとしたうえでpureを追加して、
+pure (+) `app` foo `app` barのようにするほうが、
+pureの意義が説明できていい気がする。
+そのうえでfmap = app . pureだよね、という形で
+Applicativeなら必ずFunctorだということを示し、
+class Functor f =&gt; Applicative f whereに持っていく。
+</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/functor.html"
 	>「ファンクターとは」へもどる</a>
