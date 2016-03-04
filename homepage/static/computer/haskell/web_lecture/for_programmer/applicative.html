@@ -35,39 +35,147 @@ Int -&gt; Int型の関数をFoo Int型の値に適用するのが関数fmapの�
 <p><code>app :: Foo (a -&gt; b) -&gt; Foo a -&gt; Foo b</code></p>
 
 <p>
+関数fmapの代わりにこの関数を使うことを考えてみよう。
+はじめは関数はFooのなかに入っていないので、
+以下のような関数を定義してFooにはいっていない関数をFooに入れる必要がある。
+</p>
+
+<p><code>pure :: a -&gt; Foo a</code></p>
+
+<p>
 この関数を使うとfooのなかみとbarのなかみを足し合わせるのは以下のようにできる。
 </p>
 
-<p><code>app (fmap (+) foo) bar</code></p>
+<p><code>app (app (pure (+)) foo) bar</code></p>
 
 <p>中置記法にするこ読みやすくなる。</p>
 
-<p><code>(+) `fmap` foo `app` bar</code></p>
+<p><code>pure (+) `app` foo `app` bar</code></p>
 
 <p>このようにすると関数(+)の引数としてfooとbarを与えている感じが出る。</p>
+
+<h2>型クラスApplicative</h2>
+
+<p>
+複数のコンテナに対して多引数関数を適用するためには以下の2つがあればいい。
+</p>
+
+<p><code>pure :: a -&gt; Foo a<br/>
+app :: Foo (a -&gt; b) -&gt; Foo a -&gt; Foo b</code></p>
+
+<p>
+関数appは中置記法のほうがコードがわかりやすくなるので最初から演算子として
+定義する。
+</p>
+
+<p><code>pure :: a -&gt; Foo a<br/>
+(&lt;*&gt;) :: Foo (a -&gt; b) -&gt; Foo a -&gt; Foo b</code></p>
+
+<p>
+アプリカティブファンクターであれば以下のような定義で必ずファンクターにもなる。
+</p>
+
+<p><code>fmap = (&lt;*&gt;) . pure</code></p>
+
+<p>
+よって型クラスApplicativeのクラス宣言にはFunctorクラスのクラス制約をつける。
+</p>
+
+<p><code>class Functor f =&gt; Applicative f where<br/>
+	<span class="indent1">pure :: a -&gt; f a</span><br/>
+	<span class="indent1">(&lt;*&gt;) :: f (a -&gt; b) -&gt; f a -&gt; f b</span></code></p>
+
+<h2>アプリカティブ則</h2>
+
+<p>
+ファンクター則と同じようにアプリカティブにも型では強制できないが
+満たす必要のある規則がある。
+</p>
+
+<ul>
+<li>恒等関数保存(identity): (pure id &lt;*&gt;) == id</li>
+<li>準同型(homomorphism): pure f &lt;*&gt; pure x = pure (f x)</li>
+<li>交換則(interchange): u &lt;*&gt; pure y = pure ($ y) &lt;*&gt; u</li>
+<li>分配則(composition): pure (.) &lt;*&gt; u &lt;*&gt; v &lt;*&gt; w = u &lt;*&gt; (v &lt;*&gt; w)</li>
+</ul>
+
+<p>...</p>
+
+<ul>
+<li>写像性: fmap f x = pure f &lt;*&gt; x</li>
+</ul>
+
+<h3>恒等関数保存</h3>
+
+<p><code>(pure id &lt;*&gt;) == id</code></p>
+
+<p>
+関数pureによって作られる構造は(&lt;*&gt;)による「適用」によって
+引数の構造を変えない。
+構造を変えないので中身の変化のみだが、
+その変化がidであれば全体として値は変化しないことになる。
+</p>
+
+<p>...</p>
+
+<h3>準同型</h3>
+
+<p><code>pure f &lt;*&gt; pure x = pure (f x)</code></p>
+
+<p>
+関数pureによってもちあげられた関数fを&lt;*&gt;によって
+同じように関数pureによってもちあげられた値xに適用することが、
+関数fを直接、値xに適用したものをpureによってもちあげることとは同じである。
+これは...のときに余計なことをしないことを保証する。
+</p>
+
+<p>...</p>
+
+<h3>交換則</h3>
+
+<p><code>u &lt;*&gt; pure y = pure ($ y) &lt;*&gt; u</code></p>
+
+<p>...</p>
+
+<h3>分配則</h3>
+
+<p>...</p>
+
+<h3>写像性</h3>
+
+<p>...</p>
+
+<h2>リスト</h2>
+
+<p>
+たとえば[1, 2, 3]と[40, 50]の中身を足し算するとする。
+結果はどうなるだろうか。
+自然に考えて2通りの結果が考えられる。
+</p>
+
+<ul>
+<li>[41, 51, 42, 52, 43, 53]</li>
+<li>[41, 52]</li>
+</ul>
+
+<h2>型Maybe</h2>
+
+<h2>型ZipList</h2>
+
+<h2>整数に対する二項演算</h2>
 
 <h2>予定</h2>
 
 <p>
-関数pureについてはたとえば
-<code>fun &lt;$&gt; [1, 2, 3] &lt;*&gt; pure 5 &lt;*&gt; [9, 10]</code>
-のような例で必要であることを示す。
-と思ったけど普通に
-<code>flip fun 5 &lt;$&gt; [1, 2, 3] &lt;*&gt; [9, 10]</code>
-でよくね?
-書きやすさの問題か?
-モナドの場合はa -&gt; m bを作るために必要な感じがするけど、
-アプリカティブの場合はfmapがあればm (a -&gt; b)とかいらない気がするのだ。
+アプリカティブ則ではなくモノイダル則のほうを説明するのもひとつの方法かもしれない。
 </p>
 
+<p><code>class Functor f =&gt; Monoidal f where<br/>
+	<span class="indent1">unit :: f ()</span><br/>
+	<span class="indent1">(**) :: f a -&gt; f b -&gt; f (a, b)</span></code></p>
+
 <p>
-(+) `fmap` foo `app` barではなく、
-fmapの代わりにappとしたうえでpureを追加して、
-pure (+) `app` foo `app` barのようにするほうが、
-pureの意義が説明できていい気がする。
-そのうえでfmap = app . pureだよね、という形で
-Applicativeなら必ずFunctorだということを示し、
-class Functor f =&gt; Applicative f whereに持っていく。
+...
 </p>
 
 <p>
