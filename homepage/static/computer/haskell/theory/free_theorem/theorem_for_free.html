@@ -1,0 +1,60 @@
+Free Theorem
+
+<p>(工事中 0%)</p>
+
+<h2>もとの論文</h2>
+
+<p><a href="https://www.mpi-sws.org/~dreyer/tor/papers/wadler.pdf"
+	>Theorems for free!</a> (PDF)</p>
+
+<h2>概要</h2>
+
+<p>
+多相関数の型からその関数の満たす規則を導きだすことができる。
+</p>
+
+<h2>導入</h2>
+
+<h3>リストの例</h3>
+
+<p>以下のような多相関数rに対して</p>
+
+<p><code>r :: [a] -&gt; [a]</code></p>
+
+<p>以下の規則が成り立つ。</p>
+
+<p><code>map f . r == r . map f</code></p>
+
+<h4>直観的な説明</h4>
+
+<p>
+関数rはすべての型を要素とするリストに対して定義されるので、
+要素自体を処理することはできない。
+リストの並びかたを変化させることだけしかできない。
+各要素への関数の適用と要素の並びの変更はどちらを先にしても結果は同じとなる。
+</p>
+
+<h2>Parametricity explained</h2>
+
+<p>
+</p>
+
+<h2>Parametricity applied</h2>
+
+<h3>constant type</h3>
+
+<p><code>x :: T</code></p>
+
+<p><code>(x, x) &lt;- I_T</code></p>
+
+<h3>A * B</h3>
+
+<p><code>(x, y) :: (A, B)</code></p>
+
+<p><code>((x, y), (x', y')) &lt;- A * B<br/>
+iff<br/>
+(x, x') &lt;- A and (y, y') &lt;- B.</code></p>
+
+<h2>...</h2>
+
+<p>難しい</p>

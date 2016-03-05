@@ -4,57 +4,499 @@ Free Theorem
 
 <h2>もとの論文</h2>
 
-<p><a href="https://www.mpi-sws.org/~dreyer/tor/papers/wadler.pdf"
-	>Theorems for free!</a> (PDF)</p>
+<p><a href="/computer/haskell/theory/free_theorem/theorem_for_free.html"
+	>Theorems for free!</a></p>
 
-<h2>概要</h2>
-
-<p>
-多相関数の型からその関数の満たす規則を導きだすことができる。
-</p>
-
-<h2>導入</h2>
-
-<h3>リストの例</h3>
-
-<p>以下のような多相関数rに対して</p>
-
-<p><code>r :: [a] -&gt; [a]</code></p>
-
-<p>以下の規則が成り立つ。</p>
-
-<p><code>map f . r == r . map f</code></p>
-
-<h4>直観的な説明</h4>
+<h2>ざっくりとした説明</h2>
 
 <p>
-関数rはすべての型を要素とするリストに対して定義されるので、
-要素自体を処理することはできない。
-リストの並びかたを変化させることだけしかできない。
-各要素への関数の適用と要素の並びの変更はどちらを先にしても結果は同じとなる。
+型だけから関数の満たす規則を導き出すことができる。
+たとえば以下のような関数revがあったとする。
 </p>
 
-<h2>Parametricity explained</h2>
+<p><code>rev :: [a] -&gt; [a]</code></p>
 
 <p>
+すると関数の中身に関わらず以下の規則が成り立つ。
 </p>
 
-<h2>Parametricity applied</h2>
+<p><code>rev . map f == map f . rev</code></p>
 
-<h3>constant type</h3>
+<p>
+直観的に説明するとrevの引数や返り値となるリストの要素の型が
+型変数となっているので要素revは要素自体をいじることはできない。
+つまり関数revはリストの並びかたを変化させるだけの関数だ。
+それに対してmap fはリストの並びには影響せずに中身を変換する。
+リストの並びかたの変換とリストの中身の変換は互いに影響しない。
+このような直交性によって関数revと関数map fとは交換可能となる。
+</p>
 
-<p><code>x :: T</code></p>
+<p>
+このように型のみから規則を導き出せる。
+ただし、ボトス値_|_(エラーなど)も考慮すると規則を満たさない例が出てくる。
+つまり、エラーや無限ループでないならば、といった前提が必要となる。
+</p>
 
-<p><code>(x, x) &lt;- I_T</code></p>
+<h2>ファンクタ則</h2>
 
-<h3>A * B</h3>
+<p>
+ファンクタ則のひとつめからふたつめを導き出せることについて直観的な説明をする。
+ファンクタは「構造」と「要素」を持つ。
+リストであれば「構造」は値の並びかたであり「要素」はそれぞれの場所に入る値だ。
+</p>
 
-<p><code>(x, y) :: (A, B)</code></p>
+<p>
+ファンクタ則は以下の2つから成る。
+</p>
 
-<p><code>((x, y), (x', y')) &lt;- A * B<br/>
-iff<br/>
-(x, x') &lt;- A and (y, y') &lt;- B.</code></p>
+<ul>
+<li><code>fmap id == id</code></li>
+<li><code>fmap (g . h) == fmap g . fmap h</code></li>
+</ul>
 
-<h2>...</h2>
+<p>ふたつめの規則はひとつめの規則と関数fmapの型から導き出せる。</p>
 
-<p>難しい</p>
+<h3>補助定理</h3>
+
+<p>まずは以下の2つの関数について考えてみよう。</p>
+
+<p><code>foo :: (a -&gt; b) -&gt; F a -&gt; F b<br/>
+bar :: (a -&gt; b) -&gt; F a -&gt; F b</code></p>
+
+<p>
+型だけから以下の規則が導き出せる。
+</p>
+
+<p><code>g . h == p . qならばfoo g . bar h == foo p . bar q</code></p>
+
+<p>
+foo :: (a -&gt; b) -&gt; F a -&gt; F bについて見ていこう。
+たとえばfoo f mのようなときファンクタmに対して2つの変換が行われうる。
+</p>
+
+<ul>
+<li>要素に対する変換</li>
+<li>構造に対する変換</li>
+</ul>
+
+<p>
+要素の型が型変数で与えられているので
+要素に対しては関数fを適用することだけしかできない。
+また関数fは要素を変換することだけしかできず、
+構造に影響を与えることはできない。
+ファンクターを変換するfoo fについて
+要素に対する変換と構造に対する変換とは直交している。
+もちろん関数barについても同じことだ。
+</p>
+
+<p>foo g . bar hは以下の2つの直交した変換から成る。</p>
+
+<ul>
+<li>関数fooとbarの構造に対する変換を合成した変換</li>
+<li>要素に対して関数gとhを合成した変換</li>
+</ul>
+
+<p>これはg . h == p . qのときに以下と同じことになる。</p>
+
+<ul>
+<li>関数fooとbarの構造に対する変換を合成した変換</li>
+<li>要素に対して関数pとqを合成した変換</li>
+</ul>
+
+<p>よって</p>
+
+<p><code>foo g . bar h == foo p . bar q</code><p>
+
+<p>となる。</p>
+
+<h3>ファンクタ則のふたつめを証明する</h3>
+
+<p>ファンクタ則のひとつめからふたつめを証明する。</p>
+
+<p>上の定理でfoo = fmap、bar = fmapとする。</p>
+
+<p><code>fmap g . fmap h == fmap p . fmap q</code></p>
+
+<p>ここでg = idとするとg . h == p . qよりh == p . qとなるので</p>
+
+<p><code>fmap id . fmap (p . q) == fmap p . fmap q</code></p>
+
+<p>ファンクタのひとつめの規則fmap id == idを使うと</p>
+
+<p><code>fmap (p . q) = fmap p . fmap q</code></p>
+
+<p>となる。</p>
+
+<h2>アプリカティブ則</h2>
+
+<p>
+ファンクタとアプリカティブの関係を導き出す直観的な説明をする。
+アプリカティブ則は以下のようになる。
+</p>
+
+<ul>
+<li><code>(pure id &lt;*&gt;) == id</code></li>
+<li><code>pure f &lt;*&gt; pure x = pure (f x)</code></li>
+<li><code>u &lt;*&gt; pure y = pure ($ y) &lt;*&gt; u</code></li>
+<li><code>pure (.) &lt;*&gt; u &lt;*&gt; v &lt;*&gt; w =
+	u &lt;*&gt; (v &lt;*&gt; w)</code></li>
+</ul>
+
+<p>
+<code>fmap' f = (pure f &lt;*&gt;)</code>について考える。
+</p>
+
+<p><code>fmap' id == (pure id &lt;*&gt;) == id</code></p>
+
+<p>
+なので、fmap'はファンクタ則を満たす。
+つぎに
+</p>
+
+<p><code>g . h == p . q</code>ならば<code>foo g . bar h == foo p . bar q</code></p>
+
+<p>
+についてh == id, p == idとすると
+</p>
+
+<p><code>g == q</code>ならば<code>foo g . bar id == foo id . bar q</code></p>
+
+<p>
+もしも関数fooとbarがアプリカティブ則を満たすならば
+</p>
+
+<p><code>foo g == bar g</code></p>
+
+<p>
+が成り立つ。
+つまりファンクタ則を満たす(a -&gt; b) -&gt; F a -&gt; F b型の関数は
+すべて(外延として)同じ関数となる(外延性: extensionality)。
+よって
+</p>
+
+<p><code>fmap' == fmap</code></p>
+
+<p>となる。</p>
+
+<h2>モノイダル則</h2>
+
+<p>
+モノイダル則のうち自動に導出されるfmapと(.**)との関係について説明する。
+</p>
+
+<p><code>fmap (g *** h) (u .** v) == fmap g u .** fmap h v<br/>
+	<span class="indent1">where g *** h = \(x, y) -&gt; (g x, h y)</span></code></p>
+
+<p>となることを示す。(.**)の型は</p>
+
+<p><code>(.**) :: F a -&gt; F b -&gt; F (a, b)</code></p>
+
+<p>
+のようになっている。
+関数(.**)は型aや型bの要素をいじることはできない。
+構造だけを扱う関数だ。
+それに対して関数fmapは要素となる値だけを変換する関数である。
+よってfmapによる変換を(.**)でまとめる前に行ってもあとに行っても結果は変わらない。
+</p>
+
+<h2>モノイダルとアプリカティブが同値であることを示す</h2>
+
+<h3>ファンクタ則とモノイダル則からアプリカティブ則を導き出す</h3>
+
+<p>ファンクタ則</p>
+
+<ul>
+<li><code>fmap id == id</code></li>
+<li><code>fmap (g . h) == fmap g . fmap h</code></li>
+</ul>
+
+<p>モノイダル則</p>
+
+<ul>
+<li><code>fmap snd $ unit .** v == v</code></li>
+<li><code>fmap fst $ u .** unit == u</code></li>
+<li><code>fmap asl $ u .** (v .** w) == (u .** v) .** w</code>
+	<ul>
+	<li>where asl (x, (y, z)) == ((x, y), z)</li>
+	</ul></li>
+</ul>
+
+<p>ファンクタ則とモノイダル則からアプリカティブ則を導き出す。</p>
+
+<h4>定義</h4>
+
+<p><code>pure x = fmap (const x) unit<br/>
+f &lt;*&gt; v = fmap (uncurry ($)) $ f .** v</code></p>
+
+<h4>恒等関数保存</h4>
+
+<p><code>(pure id &lt;*&gt;) == id</code></p>
+
+<p><code>pure id &lt;*&gt; v == v</code></p>
+
+<p>を示す。</p>
+
+<p><code>pure id &lt;*&gt; v<br/>
+=&gt; fmap (const id) unit &lt;*&gt; v<br/>
+=&gt; fmap (uncurry ($)) $ fmap (const id) unit .** v<br/>
+=&gt; fmap (uncurry ($)) . fmap (first $ const id) $ unit .** v<br/>
+=&gt; fmap (uncurry ($) . first (const id)) $ unit .** v<br/>
+(ここから)<br/>
+=&gt; fmap (uncurry $ ($) . const id) $ unit .** v<br/>
+=&gt; fmap (uncurry $ const (id $)) $ unit .** v<br/>
+=&gt; fmap (uncurry $ const id) $ unit .** v<br/>
+=&gt; fmap (uncurry $ \_ -&gt; id) $ unit .** v<br/>
+=&gt; fmap (uncurry $ \_ x -&gt; x) $ unit .** v<br/>
+=&gt; fmap (\(_, x) -&gt; x) $ unit .** v<br/>
+=&gt; fmap snd $ unit .** v<br/>
+(ここまでをもっとすっきりさせる)<br/>
+=&gt; v</code></p>
+
+<small>
+メモ: 式変形がなんかもたついている、もっとすっきりさせたい。
+uncurry ($) . first (const id) == sndを別で示すとか。
+</small>
+
+<h4>準同型</h4>
+
+<!--
+pure x = fmap (const x) unit
+f &lt;*&gt; v = fmap (uncurry ($)) $ f .** v
+-->
+
+<p><code>pure f &lt;*&gt; pure x = pure (f x)</code></p>
+
+<p><code>pure f &lt;*&gt; pure x<br/>
+=&gt; fmap (const f) unit &lt;*&gt; fmap (const x) unit<br/>
+=&gt; fmap (uncurry ($)) $ fmap (const f) unit .** fmap (const x) unit<br/>
+=&gt; fmap (uncurry ($)) . fmap (const f *** const x) $ unit .** unit<br/>
+=&gt; fmap (uncurry ($) . (const f *** const x)) $ unit .** unit<br/>
+=&gt; fmap (uncurry ($) . const (f, x)) $ unit .** unit<br/>
+=&gt; fmap (const (f x)) $ unit .** unit<br/>
+=&gt; fmap (const (f x) . fst) $ unit .** unit<br/>
+=&gt; fmap (const (f x)) $ fmap fst $ unit .** unit<br/>
+=&gt; fmap (const (f x)) unit<br/>
+=&gt; pure (f x)</code></p>
+
+<h4>交換則</h4>
+
+<!--
+pure x = fmap (const x) unit
+f &lt;*&gt; v = fmap (uncurry ($)) $ f .** v
+-->
+
+<p><code>u &lt;*&gt; pure y == pure ($ y) &lt;*&gt; u</code></p>
+
+<p><code>u &lt;*&gt; pure y<br/>
+=&gt; u &lt;*&gt; fmap (const y) unit<br/>
+=&gt; fmap (uncurry ($)) $ u .** fmap (const y) unit<br/>
+=&gt; fmap (uncurry ($)) . fmap (second $ const y) $ u .** unit<br/>
+=&gt; fmap (uncurry ($) . second (const y)) $ u .** unit<br/>
+=&gt; fmap (uncurry ($) . (, y) . fst) $ u .** unit<br/>
+=&gt; fmap (uncurry ($) . (, y)) $ fmap fst $ u.** unit<br/>
+=&gt; fmap (uncurry ($) . (, y)) u<br/>
+=&gt; fmap (\x -&gt; (\(f, y) -&gt; f y) (x, y)) u<br/>
+=&gt; fmap (\x -&gt; x y) u<br/>
+=&gt; fmap (\x -&gt; ($ y) x) u<br/>
+=&gt; fmap ($ y) u<br/>
+=&gt; pure ($ y) &lt;*&gt; u</code></p>
+
+<p>やはりもたつく。</p>
+
+<h4>分配則</h4>
+
+<!--
+pure x = fmap (const x) unit
+f &lt;*&gt; v = fmap (uncurry ($)) $ f .** v
+-->
+
+<p><code>pure (.) &lt;*&gt; u &lt;*&gt; v &lt;*&gt; w == u &lt;*&gt; (v &lt;*&gt; w)</code></p>
+
+<p><code>pure (.) &lt;*&gt; u &lt;*&gt; v &lt;*&gt; w<br/>
+=&gt; fmap (.) u &lt;*&gt; v &lt;*&gt; w<br/>
+=&gt; (fmap (uncurry ($)) $ fmap (.) u .** v) &lt;*&gt; w<br/>
+=&gt; (fmap (uncurry ($)) . fmap (first (.)) $ u .** v) &lt;*&gt; w<br/>
+=&gt; (fmap (uncurry ($) . first (.)) $ u .** v) &lt;*&gt; w<br/>
+=&gt; (fmap (uncurry (.)) $ u .** v) &lt;*&gt; w<br/>
+=&gt; fmap (uncurry ($)) $ (fmap (uncurry (.)) $ u .** v) .** w<br/>
+=&gt; fmap (uncurry ($)) . fmap (first $ uncurry (.)) $ (u .** v) .** w<br/>
+=&gt; fmap (uncurry ($) . first (uncurry (.))) $ (u .** v) .** w<br/>
+=&gt; fmap (uncurry $ uncurry (.)) $ (u .** v) .** w<br/>
+=&gt; fmap (uncurry $ uncurry (.)) . fmap asl $ u .** (v .** w)<br/>
+=&gt; fmap (uncurry (uncurry (.)) . asl) $ u .** (v .** w)<br/>
+=&gt; fmap ((\(fg, x) -&gt; uncurry (.) fg x) . asl) $ u .** (v .** w)<br/>
+=&gt; fmap ((\((f, g), x) -&gt; (.) f g x) . asl) $ u .** (v .** w)<br/>
+=&gt; fmap (\(f, (g, x)) -&gt; f $ g x) $ u .** (v .** w)<br/>
+=&gt; fmap (uncurry ($) . second (uncurry ($))) $ u .** (v .** w)<br/>
+=&gt; fmap (uncurry ($)) $ u .** fmap (uncurry ($)) (v .** w)<br/>
+=&gt; u &lt;*&gt; fmap (uncurry ($)) (v .** w)<br/>
+=&gt; u &lt;*&gt; (v &lt;*&gt; w)</code></p>
+
+<p>もたつく。</p>
+
+<h3>アプリカティブ則からファンクタ則とモノイダル則を導き出す</h3>
+
+<h4>定義</h4>
+
+<p><code>fmap f = (pure f &lt;*&gt;)<br/>
+unit = pure ()<br/>
+u .** v = pure (,) &lt;*&gt; u &lt;*&gt; v</code></p>
+
+<h4>ファンクタ則</h4>
+
+<p><code>fmap id == id</code></p>
+
+<p><code>fmap id<br/>
+=&gt; (pure id &lt;*&gt;)<br/>
+=&gt; id</code></p>
+
+<h4>モノイダル則: 左単位元</h4>
+
+<p><code>fmap snd $ unit .** v == v</code></p>
+
+<!--
+(pure id <*>) == id
+pure f <*> pure x = pure (f x)
+u <*> pure y = pure ($ y) <*> u
+pure (.) <*> u <*> v <*> w = u <*> (v <*> w)
+-->
+
+<p><code>fmap snd $ unit .** v<br/>
+=&gt; pure snd &lt;*&gt; (pure (,) &lt;*&gt; pure () &lt;*&gt; v)<br/>
+=&gt; pure (.) &lt;*&gt; pure snd &lt;*&gt; (pure (,) &lt;*&gt; pure ())
+	&lt;*&gt; v<br/>
+=&gt; pure (snd .) &lt;*&gt; pure (() ,) &lt;*&gt; v<br/>
+=&gt; pure (snd . (() ,)) &lt;*&gt; v<br/>
+=&gt; pure id &lt;*&gt; v<br/>
+=&gt; v</code></p>
+
+<h4>モノイダル則: 右単位元</h4>
+
+<p><code>fmap fst $ u .** unit == u</code></p>
+
+<!--
+(pure id <*>) == id
+pure f <*> pure x = pure (f x)
+u <*> pure y = pure ($ y) <*> u
+pure (.) <*> u <*> v <*> w = u <*> (v <*> w)
+-->
+
+<p><code>fmap fst $ u .** unit<br/>
+=&gt; pure fst &lt;*&gt; (pure (,) &lt;*&gt; u &lt;*&gt; pure ())<br/>
+=&gt; pure fst &lt;*&gt; (pure ($ ()) &lt;*&gt; (pure (,) &lt;*&gt; u))<br/>
+=&gt; pure fst &lt;*&gt; (pure (.) &lt;*&gt; pure ($ ()) &lt;*&gt; pure (,) &lt;*&gt; u)<br/>
+=&gt; pure fst &lt;*&gt; (pure (($ ()) .) &lt;*&gt; pure (,) &lt;*&gt; u)<br/>
+=&gt; pure fst &lt;*&gt; (pure (($ ()) . (,)) &lt;*&gt; u)<br/>
+=&gt; pure fst &lt;*&gt; (pure (\x -&gt; (x, ())) &lt;*&gt; u)<br/>
+=&gt; pure fst &lt;*&gt; (pure (, ()) &lt;*&gt; u)<br/>
+=&gt; pure (.) &lt;*&gt; pure fst &lt;*&gt; pure (, ()) &lt;*&gt; u<br/>
+=&gt; pure (fst .) &lt;*&gt; pure (, ()) &lt;*&gt; u<br/>
+=&gt; pure (fst . (, ())) &lt;*&gt; u<br/>
+=&gt; pure id &lt;*&gt; u<br/>
+=&gt; u</code></p>
+
+<h4>モノイダル則: 結合則</h4>
+
+<p><code>fmap asl $ u .** (v .** w) == (u .** v) .** w<br/>
+	<span class="indent1">where asl (x, (y, z)) = ((x, y), z)</span></code></p>
+
+<!--
+fmap f = (pure f <*>)
+unit = pure ()
+u .** v = pure (,) <*> u <*> v
+-->
+
+<!--
+(pure id <*>) == id
+pure f <*> pure x = pure (f x)
+u <*> pure y = pure ($ y) <*> u
+pure (.) <*> u <*> v <*> w = u <*> (v <*> w)
+-->
+
+<p><code>u .** (v .** w)<br/>
+=&gt; pure (,) &lt;*&gt; u &lt;*&gt; (pure (,) &lt;*&gt; v &lt;*&gt; w)<br/>
+=&gt; pure (.) &lt;*&gt; (pure (,) &lt;*&gt; u) &lt;*&gt;
+	(pure (,) &lt;*&gt; v) &lt;*&gt; w<br/>
+=&gt; pure (.) &lt;*&gt; pure (.) &lt;*&gt; pure (,) &lt;*&gt; u &lt;*&gt;
+	(pure (,) &lt;*&gt; v) &lt;*&gt; w<br/>
+=&gt; pure ((.) .) &lt;*&gt; pure (,) &lt;*&gt; u &lt;*&gt;
+	(pure (,) &lt;*&gt; v) &lt;*&gt; w<br/>
+=&gt; pure ((.) . (,)) &lt;*&gt; u &lt;*&gt;
+	(pure (,) &lt;*&gt; v) &lt;*&gt; w<br/>
+=&gt; pure (.) &lt;*&gt; (pure ((.) . (,)) &lt;*&gt; u) &lt;*&gt;
+	pure (,) &lt;*&gt; v &lt;*&gt; w<br/>
+=&gt; pure (.) &lt;*&gt; pure (.) &lt;*&gt; pure ((.) . (,)) &lt;*&gt; u &lt;*&gt;
+	pure (,) &lt;*&gt; v &lt;*&gt; w<br/>
+=&gt; pure ((.) .) &lt;*&gt; pure ((.) . (,)) &lt;*&gt; u &lt;*&gt;
+	pure (,) &lt;*&gt; v &lt;*&gt; w<br/>
+=&gt; pure ((.) . (.) . (,)) &lt;*&gt; u &lt;*&gt;
+	pure (,) &lt;*&gt; v &lt;*&gt; w<br/>
+=&gt; pure ($ (,)) &lt;*&gt; (pure ((.) . (.) . (,)) &lt;*&gt; u) &lt;*&gt;
+	v &lt;*&gt; w<br/>
+=&gt; pure (.) &lt;*&gt; pure ($ (,)) &lt;*&gt; pure ((.) . (.) . (,)) &lt;*&gt;
+	u &lt;*&gt; v &lt;*&gt; w<br/>
+=&gt; pure (($ (,)) .) &lt;*&gt; pure ((.) . (.) . (,)) &lt;*&gt;
+	u &lt;*&gt; v &lt;*&gt; w<br/>
+=&gt; pure (($ (,)) . (.) . (.) . (,)) &lt;*&gt; u &lt;*&gt; v &lt;*&gt; w
+</code></p>
+
+<p><code>($ (,)) . (.) . (.) . (,)<br/>
+=&gt; \x -&gt; ($ (,)) . (.) . (.) . (,) $ x<br/>
+=&gt; \x -&gt; ($ (,)) . (.) . (.) $ (x ,)<br/>
+=&gt; \x -&gt; ($ (,)) . (.) $ ((x ,) .)<br/>
+=&gt; \x -&gt; ($ (,)) $ (((x ,) .) .)<br/>
+=&gt; \x -&gt; (((x ,) .) .) (,)<br/>
+=&gt; \x -&gt; ((x ,) .) . (,)<br/>
+=&gt; \x y -&gt; ((x ,) .) (y ,)<br/>
+=&gt; \x y -&gt; (x ,) . (y ,)<br/>
+=&gt; \x y z -&gt; (x ,) (y, z)<br/>
+=&gt; \x y z -&gt; (x, (y, z))</code></p>
+
+<p><code>pure (\x y z -&gt; (x, (y, z)) &lt;*&gt; u &lt;*&gt; v &lt;*&gt; w</code></p>
+
+<p>f x y z = (x, (y, z))と置く。</p>
+
+<p>aslをつけると</p>
+
+<p><code>pure asl &lt;*&gt; (pure f &lt;*&gt; u &lt;*&gt; v &lt;*&gt; w)<br/>
+=&gt; pure (.) &lt;*&gt; pure asl &lt;*&gt;
+	(pure f &lt;*&gt; u &lt;*&gt; v) &lt;*&gt; w<br/>
+=&gt; pure (asl .) &lt;*&gt;
+	(pure f &lt;*&gt; u &lt;*&gt; v) &lt;*&gt; w<br/>
+=&gt; pure (.) &lt;*&gt; pure (asl .) &lt;*&gt;
+	(pure f &lt;*&gt; u) &lt;*&gt; v &lt;*&gt; w<br/>
+=&gt; pure ((asl .) .) &lt;*&gt;
+	(pure f &lt;*&gt; u) &lt;*&gt; v &lt;*&gt; w<br/>
+=&gt; pure (.) &lt;*&gt; pure ((asl .) .) &lt;*&gt; pure f &lt;*&gt;
+	u &lt;*&gt; v &lt;*&gt; w<br/>
+=&gt; pure (((asl .) .) .) &lt;*&gt; pure f &lt;*&gt;
+	u &lt;*&gt; v &lt;*&gt; w<br/>
+=&gt; pure (((asl .) .) . f) &lt;*&gt; u &lt;*&gt; v &lt;*&gt; w<br/>
+</code></p>
+
+<p><code>((asl .) .) . f<br/>
+\x -&gt; (asl .) . f x<br/>
+\x y -&gt; asl . f x y<br/>
+\x y z -&gt; asl $ f x y z<br/>
+\x y z -&gt; (\(x, (y, z)) -&gt; ((x, y), z)) (x, (y, z))<br/>
+\x y z -&gt; ((x, y), z)</code></p>
+
+<p><code>pure (\x y z -&gt; ((x, y), z)) &lt;*&gt; u &lt;*&gt; v &lt;*&gt; w</code></p>
+
+<p><code>(u .** v) .** w<br/>
+=&gt; pure (,) &lt;*&gt; (pure (,) &lt;*&gt; u &lt;*&gt; v) &lt;*&gt; w<br/>
+=&gt; pure (.) &lt;*&gt; pure (,) &lt;*&gt;
+	(pure (,) &lt;*&gt; u) &lt;*&gt; v &lt;*&gt; w<br/>
+=&gt; pure ((,) .) &lt;*&gt;
+	(pure (,) &lt;*&gt; u) &lt;*&gt; v &lt;*&gt; w<br/>
+=&gt; pure (.) &lt;*&gt; pure ((,) .) &lt;*&gt; pure (,) &lt;*&gt;
+	u &lt;*&gt; v &lt;*&gt; w<br/>
+=&gt; pure (((,) .) .) &lt;*&gt; pure (,) &lt;*&gt; u &lt;*&gt; v &lt;*&gt; w<br/>
+=&gt; pure (((,) .) . (,)) &lt;*&gt; u &lt;*&gt; v &lt;*&gt; w</code></p>
+
+<p><code>((,) .) . (,)<br/>
+=&gt; \x -&gt; (,) . (x ,)<br/>
+=&gt; \x y -&gt; (,) (x, y)<br/>
+=&gt; \x y z =&gt; ((x, y), z)</code></p>
+
+<p><code>pure (\x y z -&gt; ((x, y), z) &lt;*&gt; u &lt;*&gt; v &lt;*&gt; w</code></p>
