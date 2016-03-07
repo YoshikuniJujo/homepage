@@ -258,7 +258,147 @@ fmap snd, fmap fst, fmap aslの部分は中身についてそれぞれ
 Haskellではひとつめのやりかたがデフォルトとなっている。
 </p>
 
+<p><code>instance Applicative [] where<br/>
+	<span class="indent1">pure = (: [])</span><br/>
+	<span class="indent1">fs &lt;*&gt; xs =
+		concat $ map (\f -&gt; map f xs) fs</span></code></p>
+
+<p>以下の例で考えてみよう。</p>
+
+<p><code>[(+ 10), (+ 20), (+ 30)] &lt;*&gt; [1, 2]<br/>
+=&gt; concat $ map (\f -&gt; map f [1, 2]) [(+ 10), (+ 20), (+ 30)]</code></p>
+
+<p>
+まず仮引数fに(+ 10)が入る。
+map (+ 10) [1, 2]なので[11, 12]となる。
+同素に(+ 20), (+ 30)についても計算されて[[11, 12], [21, 22], [31, 32]]となる。
+最後にconcatでまとめられて[11, 12, 21, 22, 31, 32]となる。
+</p>
+
+<h3>ファンクタ則</h3>
+
+<p><code>pure id xs<br/>
+=&gt; concat $ map (\f -&gt; map f xs) [id]<br/>
+=&gt; concat $ [map id xs]<br/>
+=&gt; map id xs<br/>
+=&gt; xs</code></p>
+
+<h3>モノイダル則</h3>
+
+<p>まずは値unitと演算子(.**)を定義する。</p>
+
+<p><code>unit<br/>
+=&gt; pure ()<br/>
+=&gt; [()]</code></p>
+
+<p><code>xs .** ys<br/>
+=&gt; pure (,) &lt;*&gt; xs &lt;*&gt; ys<br/>
+=&gt; concat (map (\f -&gt; map f xs) [(,)]) &lt;*&gt; ys<br/>
+=&gt; concat [map (,) xs] &lt;*&gt; ys<br/>
+=&gt; map (,) xs &lt;*&gt; ys<br/>
+=&gt; concat $ map (\f -&gt; map f ys) (map (,) xs)<br/>
+=&gt; concat $ map ((\f -&gt; map f ys) . (,)) xs<br/>
+=&gt; concat $ map (\x -&gt; map (x ,) ys) xs<br/>
+=&gt; concat $ (`map` ys) . (,) `map` xs</code></p>
+
+<p><code>[(x, y) | x &lt;- xs, y &lt;- ys]</code></p>
+
+<p>モノイダル則の確認をする。</p>
+
+<p><code>fmap snd $ unit .** ys<br/>
+=&gt; map snd $ concat $ (`map` ys) . (,) `map` [()]<br/>
+=&gt; map snd $ concat $ map (\x -&gt; map (x ,) ys) [()]<br/>
+=&gt; map snd $ concat $ [map (() ,) ys]<br/>
+=&gt; map snd $ map (() ,) ys<br/>
+=&gt; ys</code></p>
+
+<p><code>fmap fst $ xs .** unit<br/>
+=&gt; map fst $ concat $ map (\x -&gt; map (x ,) [()]) xs<br/>
+=&gt; map fst $ concat $ map (\x -&gt; [(x, ())]) xs<br/>
+=&gt; map fst $ map (\x -&gt; (x, ()) xs<br/>
+=&gt; map fst $ map (, ()) xs<br/>
+=&gt; xs</code></p>
+
+<p><code>fmap asl $ xs .** (ys .** zs)<br/>
+=&gt; map asl $ concat $ map (\x -&gt; map (x ,) (ys .** zs)) xs<br/>
+=&gt; map asl $ concat $
+	map (\x -&gt; map (x ,) (concat $ map (\y -&gt; map (y ,) zs) ys) xs</code></p>
+
+<p><code>fmap asl $ xs .** (ys .** zs)<br/>
+=&gt; [ asl (x, yz) | x &lt;- xs, yz &lt;- [ (y, z) | y &lt;- ys, z &lt;- zs ] ]</code></p>
+
+<p><code>?=&gt; [ asl (x, (y, z)) | x &lt;- xs, y &lt;- ys, z &lt;- zs ]</code></p>
+
+<p><code>(xs .** ys) .** zs<br/>
+=&gt; concat $ map (\xy -&gt; map (xy ,) zs) $ xs .** ys<br/>
+=&gt; concat $ map (\xy -&gt; map (xy ,) zs) $ concat $ map (\x -&gt; (x ,) ys) xs<br/>
+=&gt; concat $ map (map 
+</code></p>
+
+<p><code>=&gt; [ (xy, z) |
+	xy &lt;- [ (x, y) | x &lt;- xs, y &lt;- ys ], z &lt;- zs ]</code></p>
+
+<p><code>?=&gt; [ ((x, y), z) | x &lt;- xs, y &lt;- ys, z &lt;- zs ]</code></p>
+
+<p><code>map f . concat . map (map g) == concat . map (map f . g)</code></p>
+
+<h3>メモ</h3>
+
+<p>以下をさきに証明しておくべきかも。</p>
+
+<p><code>[ f x y | ..., (x, y) &lt;- [ (x, y) | x &lt;- xs, y &lt;- ys ], ... ]<br/>
+&lt;=&gt; [ f x y | ..., x &lt;- xs, y &lt;- ys, ... ]</code></p>
+
 <h2>リスト(2)</h2>
+
+<p>
+リストをアプリカティブにする方法のふたつめについては
+ラッパー型に対して定義されている。
+</p>
+
+<p><code>newtype ZipList a = ZipList [a]</code></p>
+
+<p>定義は以下のようになる。</p>
+
+<p><code>instance Applicative ZipList where<br/>
+	<span class="indent1">pure = repeat</span><br/>
+	<span class="indent1">fs &lt;*&gt; xs = zipWith ($) fs xs</span></code></p>
+
+<p>これに対する関数fmap、値unitと演算子(.**)とを考えてみよう。</p>
+
+<p><code>fmap f xs<br/>
+=&gt; pure f &lt;*&gt; xs<br/>
+=&gt; zpiWith ($) (repeat f) xs<br/>
+=&gt; map f xs</code></p>
+
+<p><code>unit<br/>
+=&gt; pure ()<br/>
+=&gt; repeat ()</code></p>
+
+<p><code>xs .** ys<br/>
+=&gt; pure (,) &lt;*&gt; xs &lt;*&gt; ys<br/>
+=&gt; zipWith ($) (zipWith ($) (repeat (,)) xs) ys<br/>
+=&gt; zipWith ($) (map (,) xs) ys<br/>
+=&gt; zipWith (,) xs ys<br/>
+=&gt; zip xs ys</code></p>
+
+<p>これらがファンクタ則とモノイダル則を満たすことを確認する。</p>
+
+<p><code>fmap id<br/>
+=&gt; map id<br/>
+=&gt; id</code></p>
+
+<p><code>fmap snd $ unit .** ys<br/>
+=&gt; map snd $ zip (repeat ()) ys<br/>
+=&gt; ys</code></p>
+
+<p><code>fmap fst $ xs .** unit<br/>
+=&gt; map fst $ zip xs (repeat ())<br/>
+=&gt; xs</code></p>
+
+<p><code>fmap asl $ xs .** (ys .** zs)<br/>
+=&gt; map asl $ zip xs (zip ys zs)<br/>
+=&gt; zip (zip xs ys) zs</code></p>
 
 <h2>型Maybe</h2>
 
