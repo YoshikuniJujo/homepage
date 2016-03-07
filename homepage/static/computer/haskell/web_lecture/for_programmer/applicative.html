@@ -1,6 +1,6 @@
 アプリカティブファンクター
 
-<p>(工事中 0%)</p>
+<p>(工事中 10%)</p>
 
 <h2>はじめに</h2>
 
@@ -85,6 +85,85 @@ app :: Foo (a -&gt; b) -&gt; Foo a -&gt; Foo b</code></p>
 	<span class="indent1">pure :: a -&gt; f a</span><br/>
 	<span class="indent1">(&lt;*&gt;) :: f (a -&gt; b) -&gt; f a -&gt; f b</span></code></p>
 
+<h2>ファンクター</h2>
+
+<p>関数pureと(&lt;*&gt;)から関数fmapを定義できる。</p>
+
+<p><code>fmap f = (pure f &lt;*&gt;)</code></p>
+
+<p>さらに簡潔にすると</p>
+
+<p><code>fmap = (&lt;*&gt;) . pure</code></p>
+
+<p>
+関数fmapを実装としては必ずしもこのように定義する必要はない。
+しかし、関数の働きとしては同じでなければならない。
+このことを以下のように表現する。
+</p>
+
+<p><code>fmap == (&lt;*&gt;) . pure</code></p>
+
+<p>
+関数fmapはファンクタ則を満たす必要があることから
+</p>
+
+<p><code>pure id (&lt;*&gt;) == id</code></p>
+
+<p>でなければならない。</p>
+
+<h2>モノイダル則</h2>
+
+<small>
+メモ: 「モノイダル則」という言葉は一般的ではない。
+ここでは仮に「モノイダル則」と呼んでおくといったただし書きが必要だ。
+</small>
+
+<p>
+アプリカティブにも満たさなければならない規則がある。
+アプリカティブ則は直観的にわかりにくいので
+よりわかりやすいモノイダル則を示す。
+ファンクタ則とモノイダル則とからアプリカティブ則を示すことができ、
+逆にアプリカティブ則からファンクタ則とモノイダル則とを導き出せる。
+</p>
+
+<p>まず以下の値や関数を考える。</p>
+
+<p><code>unit :: Applicative f =&gt; f ()<br/>
+unit = pure ()</code></p>
+
+<p><code>(.**) :: Applicative f =&gt; f a -&gt; f b -&gt; f (a, b)<br/>
+u .** v = pure (,) &lt;*&gt; u &lt;*&gt; v</code></p>
+
+<p>
+値unitは「基本となる構造」を示す。
+演算子(.**)は値を含む2つの構造をひとつにまとめる働きをする。
+このとき、以下の規則を成り立たせる必要がある。
+</p>
+
+<ul>
+<li><code>fmap snd $ unit .** v == v</code></li>
+<li><code>fmap fst $ u .** unit == u</code></li>
+<li><code>fmap asl $ u .** (v .** w) == (u .** v) .** w</code>
+	<ul>
+	<li>where asl (x, (y, z)) = ((x, y), z)</li>
+	</ul></li>
+</ul>
+
+<p>
+fmap snd, fmap fst, fmap aslの部分は中身についてそれぞれ
+((), y)をyに(x, ())をxに(x, (y, z))を((x, y), z)に変換している。
+ユニット値とのタプルをとることや、ペアの位置を変えることをトリビアルな変換と考え、
+それらの前後の値を同型と考えて(===)で表現すると
+</p>
+
+<ul>
+<li><code>unit .** v === v</code></li>
+<li><code>u .** unit === u</code></li>
+<li><code>u .** (v .** w) === (u .** v) .** w</code></li>
+</ul>
+
+<p>となり、これはモノイド則となっている。</p>
+
 <h2>アプリカティブ則</h2>
 
 <p>
@@ -92,18 +171,32 @@ app :: Foo (a -&gt; b) -&gt; Foo a -&gt; Foo b</code></p>
 満たす必要のある規則がある。
 </p>
 
+<p>
+アプリカティブがファンクタ則とモノイダル則を満たすための必要十分条件は
+以下のようになる。
+</p>
+
 <ul>
 <li>恒等関数保存(identity): (pure id &lt;*&gt;) == id</li>
-<li>準同型(homomorphism): pure f &lt;*&gt; pure x = pure (f x)</li>
-<li>交換則(interchange): u &lt;*&gt; pure y = pure ($ y) &lt;*&gt; u</li>
-<li>分配則(composition): pure (.) &lt;*&gt; u &lt;*&gt; v &lt;*&gt; w = u &lt;*&gt; (v &lt;*&gt; w)</li>
+<li>準同型(homomorphism): pure f &lt;*&gt; pure x == pure (f x)</li>
+<li>交換則(interchange): u &lt;*&gt; pure y == pure ($ y) &lt;*&gt; u</li>
+<li>分配則(composition): pure (.) &lt;*&gt; u &lt;*&gt; v &lt;*&gt; w == u &lt;*&gt; (v &lt;*&gt; w)</li>
 </ul>
 
-<p>...</p>
+<p>
+これらを満たすアプリカティブを作ればファンクタ則やモノイダル則を満たすようになる。
+</p>
 
 <ul>
-<li>写像性: fmap f x = pure f &lt;*&gt; x</li>
+<li>写像性: fmap f x == pure f &lt;*&gt; x</li>
 </ul>
+
+<p>
+この規則は関数pureと(&lt;*&gt;)がアプリカティブ則を満たし、
+関数fmapがファンクタ則を満たしさえすれば成り立つ。
+</p>
+
+<!--
 
 <h3>恒等関数保存</h3>
 
@@ -145,6 +238,8 @@ app :: Foo (a -&gt; b) -&gt; Foo a -&gt; Foo b</code></p>
 
 <p>...</p>
 
+-->
+
 <h2>リスト</h2>
 
 <p>
@@ -157,6 +252,13 @@ app :: Foo (a -&gt; b) -&gt; Foo a -&gt; Foo b</code></p>
 <li>[41, 51, 42, 52, 43, 53]</li>
 <li>[41, 52]</li>
 </ul>
+
+<p>
+すべての組み合わせで足し算を行うか、対応する位置の値どうしを足し算するかだ。
+Haskellではひとつめのやりかたがデフォルトとなっている。
+</p>
+
+<h2>リスト(2)</h2>
 
 <h2>型Maybe</h2>
 
@@ -172,7 +274,7 @@ app :: Foo (a -&gt; b) -&gt; Foo a -&gt; Foo b</code></p>
 
 <p><code>class Functor f =&gt; Monoidal f where<br/>
 	<span class="indent1">unit :: f ()</span><br/>
-	<span class="indent1">(**) :: f a -&gt; f b -&gt; f (a, b)</span></code></p>
+	<span class="indent1">(.**) :: f a -&gt; f b -&gt; f (a, b)</span></code></p>
 
 <p>
 ...
