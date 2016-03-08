@@ -1,0 +1,67 @@
+構文: リスト内包表記の変形
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+入れ子になったリスト内包表記を変形して平坦にすることを考える。
+</p>
+
+<h2>変形</h2>
+
+<p>以下のような変形が可能であることを示す。</p>
+
+<p><code>[ 結果 | ..., (x, y) &lt;- [ (x, y) | x &lt;- 式1, y &lt;- 式2 ], ... ]
+=&gt; [ 結果 | ..., x &lt;- 式1, y &lt;- 式2, ... ]</code></p>
+
+<h2>左結合と右結合</h2>
+
+<p>concatMap </p>
+
+<h2>メモ</h2>
+
+<p><code>concatMap :: (a -&gt; [b]) -&gt; [a] -&gt; [b]</code></p>
+
+<p><code>cm = flip concatMap</code></p>
+
+<p><code>[a] `cm` k = k a<br/>
+m `cm` (: []) = m<br/>
+m `cm` (\x -&gt; k x `cm` h) = (m `cm` k) `cm` h</code></p>
+
+<p>do記法っぽくモナド則を表現してみよう。</p>
+
+<p><code>m &gt;&gt;= (\x -&gt;<br/>
+k x -&gt; \y -&gt;<br/>
+h y)</code></p>
+
+<p><code>(m &gt;&gt;= \x -&gt;<br/>
+k x) &gt;&gt; \y -&gt;<br/>
+h y</code></p>
+
+<p>たとえば以下のような場合どうなるか。</p>
+
+<p><code>m &gt;&gt;= (\x -&gt;<br/>
+k x &gt;&gt;= \y -&gt;<br/>
+h x y)</code></p>
+
+<p><code>[ r | x &lt;- m, y &lt;- k x, r &lt;- h x y ]</code></p>
+
+<p><code>(m &gt;&gt;= \x -&gt;<br/>
+k x &gt;&gt;= \y -&gt; return (x, y)) &gt;&gt; \(x, y) -&gt;<br/>
+h x y</code></p>
+
+<p><code>[ r | (x, y) &lt;- [ (x, y) | x &lt;- m, y &lt;- k x ], r &lt;- h x y ]</code></p>
+
+<p><code>(m &gt;&gt;= \x -&gt;
+k x &gt;&gt;= \y -&gt; return (x, y)) &gt;&gt; \(x, y) -&gt;
+h x y<br/>
+=&gt;</code></p>
+
+<p><code>m &gt;&gt;= (\x -&gt; k x &gt;&gt;= \y -&gt; h x y)</code></p>
+
+<a href="/computer/haskell/web_lecture/for_programmer/list_comprehensions2.html"
+	>「構文: リスト内包表記(2)」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/parser_prelude.html"
+	>「パーサ: はじめに」へ</a>
+</p>
