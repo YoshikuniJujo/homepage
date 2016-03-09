@@ -471,30 +471,39 @@ Slack等の管理を普段から行っていてHubotの設定に慣れている�
 <ul>
 <li><a href="/computer/haskell/web_lecture/for_programmer/functor.html"
 	>ファンクターとは</a> (工事中 50%)</li>
+<li>ファンクターの使い道 (工事中 0%)</li>
+</ul>
+
+<h2>関数の変換: 引数の追加や削除</h2>
+
+<ul>
+<li>1引数関数の引数と返り値に対する引数の追加と削除</li>
+<li>2引数関数の引数と返り値に対する引数の追加と削除</li>
 </ul>
 
 <h2>モナド1</h2>
 
 <ul>
-<li>..</li>
-<li>..</li>
+<li>失敗する可能性のある関数をつなぐ</li>
+<li>電卓をエミュレートする</li>
+<li>共通する枠組み: モナド</li>
 </ul>
 
 <h2>アプリカティブファンクター</h2>
 
 <ul>
-<li><a href="/computer/haskell/web_lecture/for_programmer/applicative.html"
-	>アプリカティブファンクターとは</a> (工事中 10%)</li>
-<li>..</li>
-<li>モナドであればアプリカティブファンクターでもある</li>
-<li>..</li>
+<li>モナドとファンクターのあいだ</li>
+<li>モノイダル則</li>
+<li>アプリカティブファンクターであるがモナドではない例</li>
 </ul>
 
 <h2>モナド2</h2>
 
 <ul>
-<li>..</li>
-<li>..</li>
+<li>型クラスMonad</li>
+<li>do記法</li>
+<li>計算のログ</li>
+<li>ライオンの檻</li>
 </ul>
 
 <h2>IOモナド</h2>
@@ -655,6 +664,8 @@ alt="[数値に関する型クラスの図]" />
 	>関数concatMapの性質</a> (工事中 0%)</li>
 <li><a href="/computer/haskell/web_lecture/for_programmer/list_comprehensions_trans.html"
 	>構文: リスト内包表記の変形</a> (工事中 0%)</li>
+<li><a href="/computer/haskell/web_lecture/for_programmer/applicative_bak.html"
+	>アプリカティブファンクターとは</a> (工事中 10%)</li>
 </ul>
 
 <p>
@@ -664,6 +675,14 @@ alt="[数値に関する型クラスの図]" />
 しかし新しいバージョンで<code>class Applicative m =&gt; Monad m</code>となった
 ので説明する必要が出てきた。
 ただ、そうするとモナドにならないようなアプリカティブの例を挙げるのが難しいかも。
+</p>
+
+<p>
+foldrについては後回しにする。
+できたら最後のほうで触れたいが...。
+型クラスFoldableの説明などしていると大がかりになる。
+たとえば、続編を出せたらそこで触れたい。
+数値型についても続編で触れられたらいいな。
 </p>
 
 <p>
