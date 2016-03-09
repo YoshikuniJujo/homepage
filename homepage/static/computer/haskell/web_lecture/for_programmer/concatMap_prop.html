@@ -1,0 +1,89 @@
+関数concatMapの性質
+
+<p>(工事中 0%)</p>
+
+<h2>メモ</h2>
+
+<p>
+あとでリストがモノイダル則(を通してアプリカティブ則)を満たすことを示すために、
+リスト内包表記でできる変形の説明をする。
+そのためにconcatMapの満たす性質を示しておく必要がある。
+また、ここで関数concatMapの性質を説明しておくと、
+モナドの説明のときにすこし入りやすくなるかも。
+</p>
+
+<p>
+ここまで、かっちりとやる必要があるかどうかは不明だが、
+かために使っておいてやわらかくするほうが簡単なので。
+</p>
+
+<p><code>[ exp | exp1, (x, y) &lt;- [ (x, y) | x &lt;- xs, y &lt;-ys ], exp2 ]<br/>
+&lt;=&gt; [ exp | exp1, x &lt;- xs, y &lt;- ys, exp2 ]</code></p>
+
+<p>
+を示せるレベルまで。
+まずは、アトランダムに必要そうな性質を示していこう。
+あとで整理する。
+</p>
+
+<p>
+concatMapについてほぼファンクター、アプリカティブファンクター、モナドの
+説明のレベルまでしてしまおう。
+それを何となく覚えていることで本番の説明が入りやすくなるだろう。
+</p>
+
+<h2>はじめに</h2>
+
+<p>
+concatMapにはいろいろな性質がある。
+リスト内包表記をより単純な形に変形するのときにそろ性質を使うことができる。
+ここでそれらの性質について示す。
+</p>
+
+<h2>演算子(++)の性質</h2>
+
+<p>これは定義から明らかだが演算子(++)には以下のような性質がある。</p>
+
+<p><code>(x : xs) ++ ys == x : (xs ++ ys)</code></p>
+
+<h2>concatMapの定義</h2>
+
+<p>ここでは関数concatMapが以下のように定義されているものとする。</p>
+
+<p><code>concatMap f (x : xs) = f x ++ concatMap f xs<br/>
+concatMap _ _ = []</code></p>
+
+<h2>分配則</h2>
+
+<p><code>concatMap f (xs ++ ys) == concatMap f xs ++ concatMap f ys</code></p>
+
+<h3>証明</h3>
+
+<p>
+xs = []のときは定義から明らかである。
+ここでconcatMap f (is ++ ys) == concatMap f is ++ concatMap f ys
+が成り立つとする。
+</p>
+
+<p><code>concatMap f ((i : is) ++ ys)<br/>
+=&gt; concatMap f (i : (is ++ ys))<br/>
+=&gt; f i ++ concatMap (is ++ ys)<br/>
+=&gt; f i ++ concatMap f is ++ concatMap f ys<br/>
+=&gt; concatMap f (i : is) ++ concatMap f ys</code></p>
+
+<p>
+xs = isで成り立つときにxs = i : isで成り立つことが証明された。
+数学的帰納法によりconcatMap f (xs ++ ys) == concatMap f xs ++ concatMap f ys
+は任意のxsで成り立つ。
+</p>
+
+<h2>結合則</h2>
+
+<p><code>concatMap (concatMap f . g) == concatMap f . concatMap g</code></p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/filter_concatmap.html"
+	>「関数concatMapによる関数filterの定義」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/list_comprehensions1.html"
+	>「構文: リスト内包表記1」へ</a>
+</p>
