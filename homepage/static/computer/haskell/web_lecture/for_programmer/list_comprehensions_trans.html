@@ -19,9 +19,52 @@
 
 <p>(脱糖のしかたを再掲する)</p>
 
+<p><code>[ rst | var1 &lt;- exp1, var2 &lt;- exp2, ..., varN &lt;- expN ]</code></p>
+
+<p>は以下のように脱糖される。</p>
+
+<p><code>(`concatMap` exp1) $ \var1 -&gt;<br/>
+(`concatMap` exp2) $ \var2 -&gt;<br/>
+...<br/>
+(`concatMap` expN) $ \varN -&gt;<br/>
+[rst]</code></p>
+
+<p><code>bind :: [a] -&gt; (a -&gt; [b]) -&gt; [b]<br/>
+bind = flip concatMap</code></p>
+
+<p>とすると</p>
+
+<p><code>exp1 `bind` \var1 -&gt;<br/>
+exp2 `bind` \var2 -&gt;<br/>
+...<br/>
+expN `bind` \varN -&gt;<br/>
+[rst]</code></p>
+
+<p>となる。</p>
+
+<!--
+
+<p><code>bd :: (a -&gt; [b]) -&gt; (b -&gt; [c]) -&gt; a -&gt; [c]<br/>
+bd f g x = f x `bind` g</code></p>
+
+<p>とすると</p>
+
+<p><code>($ ()) $ const exp1 `bd`</code></p>
+
+-->
+
 <h2>わける</h2>
 
 <p>(内包表記の前後をわけるやりかたを説明する)</p>
+
+<p><code>[ rst | var1 &lt;- exp1, var2 &lt;- exp2, ...,
+	varK &lt;- expK, varL &lt;- expL, ..., varN &lt;- expN ]</code></p>
+
+<p>上が下と同じ値になることを示す。</p>
+
+<p><code>[ rst | (var1, var2, ..., varK) &lt;-
+	[ (var1, var2, ..., varK) | var1 &lt;- exp1, var2 &lt;- exp2, ...,
+		varK &lt;- expK ], varL &lt;- expL, ..., varN &lt;- expN ]</code></p>
 
 <h2>平坦化</h2>
 
@@ -85,6 +128,33 @@ h x y<br/>
 =&gt;</code></p>
 
 <p><code>m &gt;&gt;= (\x -&gt; k x &gt;&gt;= \y -&gt; h x y)</code></p>
+
+<h3>「わける」の示しかた</h3>
+
+<p>まずは2の場合から3の場合を導いてみる。</p>
+
+<p><code>[ (x, y, z) | x &lt;- u, y &lt;- v, z &lt;- w ]<br/>
+&lt;=&gt; [ (x, y, z) |
+	(x, y) &lt;- [ (x, y) | x &lt;- u, y &lt;- v ], z &lt;- w ]</code></p>
+
+<p><code>[ (x, y, z, a) | x &lt;- u, y &lt;- v, z &lt;- w, a &lt;- t ]<br/>
+&lt;=&gt; [ (x, y, z, a) | (x, y) &lt;- [ (x, y) | x &lt;- u, y &lt;- v ],
+	z &lt;- w, a &lt;- t ]<br/>
+&lt;=&gt; [ (x, y, z, a) |
+	((x, y), z) &lt;- [ ((x, y), z) | (x, y) &lt;- [ (x, y) | x &lt;- u, y &lt;- v ], z &lt;- w ], a &lt;- t ]<br/>
+&lt;=&gt; [ (x, y, z, a) |
+	(x, y, z) &lt;- [ (x, y, z) | (x, y) &lt;- [ (x, y) | x &lt;- u, y &lt;- v ], z &lt;- w ], a &lt;- t ]<br/>
+&lt;=&gt; [ (x, y, z, a) |
+	(x, y, z) &lt;- [ (x, y, z) | x &lt;- u, y &lt;- v, z &lt;- w ], a &lt;- t ]</code></p>
+
+<h3>前処理</h3>
+
+<p>前処理として以下をやっておくといいかも。</p>
+
+<p><code>[ rst | var1 &lt;- exp1, var2 &lt;- exp2, ..., varN &lt;- expN ]</code></p>
+
+<p><code>map (\(var1, var2, ..., varN) -&gt; rst)
+	[ (var1, var2, ..., varN) | var1 &lt;- exp1, var2 &lt;- exp2, ..., varN &lt;- expN ]</code></p>
 
 <a href="/computer/haskell/web_lecture/for_programmer/list_comprehensions2.html"
 	>「構文: リスト内包表記(2)」へもどる</a>
