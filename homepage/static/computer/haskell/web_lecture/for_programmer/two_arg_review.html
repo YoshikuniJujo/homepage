@@ -1,6 +1,6 @@
 2引数関数についての復習
 
-<p>(工事中 0%)</p>
+<p>(工事中 70%)</p>
 
 <h2>はじめに</h2>
 
@@ -9,9 +9,66 @@
 そのとき基本的なこととして2引数関数の意味を知っておくことが大切だ。
 </p>
 
+<h2>(-&gt;)は右結合</h2>
+
+<p>
+関数型をつくるときに使われる(-&gt;)は右結合だ。
+以下のふたつは同じだ。
+</p>
+
+<p><code>a -&gt; b -&gt; c<br/>
+a -&gt; (b -&gt; c)</code></p>
+
+<p>これを以下のように考えることができる。</p>
+
+<ul>
+<li>引数を2つとる関数と</li>
+<li>引数を1つとり「引数を1つとる関数」を返す関数</li>
+</ul>
+
+<p>とは同じものだ。</p>
+
+<h2>関数curryの例</h2>
+
+<h3>2引数関数返す関数</h3>
+
+<p>関数curryを例にしてこのことを確認してみよう。</p>
+
+<p><code>curry :: ((a, b) -&gt; c) -&gt; (a -&gt; b -&gt; c)<br/>
+curry f = \x y -&gt; f (x, y)</code></p>
+
+<p>これは</p>
+
+<ul>
+<li>タプルをとる関数を</li>
+<li>引数を2つとる関数に</li>
+</ul>
+
+<p>変換する関数と考えられる。</p>
+
+<h3>引数を3つとる関数</h3>
+
+<p>関数curryは以下のようにも書ける。</p>
+
+<p><code>curry :: ((a, b) -&gt; c) -&gt; a -&gt; b -&gt; c<br/>
+curry f x y = f (x, y)</code></p>
+
+<p>
+これは
+「タプルをとる関数のほかに引数をふたつとり、
+それらをタプルにし第1引数の関数を適用する関数」と考えられる。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+(-&gt;)は右結合であり、2引数関数は、
+引数をひとつとり「引数をひとつとる関数」を返す関数である。
+</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/functor_use.html"
 	>「ファンクターの使い道」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/trans_unit.html"
+	>「ユニット型について」へ</a>
 </p>
