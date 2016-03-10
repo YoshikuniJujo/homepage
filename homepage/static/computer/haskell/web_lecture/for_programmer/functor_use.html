@@ -1,0 +1,51 @@
+ファンクターの使い道
+
+<p>(工事中 40%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+より学習が進むとファンクターの使える場面が増える。
+ここではやや人工的な例を示す。
+</p>
+
+<h2>中身を文字コードに</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/functor_use.hs"
+	>functor_use.hs</a></p>
+
+<p>
+ファンクターの中身の文字を文字コードに変換する関数を考える。
+</p>
+
+<p><code>import Data.Char</code></p>
+
+<p><code>toCode :: Functor f =&gt; f Char -&gt; f Int<br/>
+toCode = fmap ord</code></p>
+
+<p>この関数はリストに対してでもMaybe値に対してでも使うことができる。</p>
+
+<p><code>% ghci functor_use.hs<br/>
+*Main&gt; toCode "abc"<br/>
+[97,98,99]<br/>
+*Main&gt; toCode $ Just 'd'<br/>
+Just 100</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+コンテナなどの構造に影響を与えないような変換を行うのに関数fmapが使える。
+関数fmapを使って定義しておけばファンクターでさえあれば値を含むどんな構造であっても
+かまわない。
+</p>
+
+<h2>メモ</h2>
+
+<p>ファンクターの良さはこれで伝わるか? </p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/functor.html"
+	>「ファンクターとは」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/two_arg_review.html"
+	>「2引数関数についての復習」へ</a>
+</p>
