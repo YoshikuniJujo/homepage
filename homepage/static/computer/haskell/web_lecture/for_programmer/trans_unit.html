@@ -1,6 +1,6 @@
 ユニット型について
 
-<p>(工事中 0%)</p>
+<p>(工事中 70%)</p>
 
 <h2>はじめに</h2>
 
@@ -52,11 +52,36 @@ valとfunが情報としては同じであることを示す。
 
 <h2>値とタプルが同じ</h2>
 
+<p>以下のふたつについても確認する。</p>
+
+<p><code>val :: a<br/>
+tup :: (a, ())</code></p>
+
+<h3>valでtupを定義</h3>
+
+<p>値valによってタプルtupを定義する。</p>
+
+<p><code>tup = (val, ())</code></p>
+
+<h3>tupでvalを定義</h3>
+
+<p>タプルtupによって値valを定義する。</p>
+
+<p><code>val = fst tup</code></p>
+
 <h2>まとめ</h2>
+
+<p>
+たとえばBool型であればTrueまたはFalseなので
+どちらかであることがわかれば情報が増える。
+しかし、()型には()しかないので()であることがわかっても情報は増えない。
+情報量が0なので引数に追加、削除することができるし、
+返り値や値そのものにタプルとして追加することも、削除することもできる。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/two_arg_review.html"
 	>「2引数関数の復習」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/trans_value.html"
+	>「単純な値の変換」へ</a>
 </p>
