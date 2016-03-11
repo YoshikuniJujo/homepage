@@ -1,10 +1,118 @@
 1引数関数の引数と返り値に対する引数の追加と削除
 
-<p>(工事中 0%)</p>
+<p>(工事中 70%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+1引数関数の引数と返り値に対して引数を追加することができる。
+また、そのような形になっている関数からはそれらの引数を削除することができる。
+</p>
+
+<h2>関数myChr</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/trans_1_arg.hs"
+	>trans_1_arg.hs</a></p>
+
+<p>以下の関数を見てみよう。</p>
+
+<p><code>import Data.Char (chr, ord)</code></p>
+
+<p><code>myChr :: (a -&gt; Int) -&gt; (a -&gt; Char)<br/>
+myChr f = \x -&gt; chr $ f x</code></p>
+
+<p>
+関数fを引数にとり「引数にfを適用しchrを適用する関数」を返している。
+</p>
+
+<p><code>% ghci trans_1_arg.hs<br/>
+*Main&gt; myChr (* 2) 55<br/>
+'n'<br/>
+*Main&gt; ord 'n'<br/>
+110<br/>
+*Main&gt; myChr ord 'j'<br/>
+'j'</code></p>
+
+<p>関数myChrと関数chrの型を比較してみよう。</p>
+
+<p><code>chr :: Int -&gt; Char<br/>
+myChr :: (a -&gt; Int) -&gt; (a -&gt; Char)</code></p>
+
+<p>
+引数(Int)と返り値(Char)の両方に同じ型変数aが引数として追加されている。
+このような場合これらの関数は互いに変換可能だ。
+</p>
+
+<h2>引数を追加する変換</h2>
+
+<p>
+関数chrを関数myChrに変換する関数addArgを作る。
+型は以下のようになるだろう。
+</p>
+
+<p><code>addArg :: (b -&gt; c) -&gt; ((a -&gt; b) -&gt; (a -&gt; c))</code></p>
+
+<p>
+(-&gt;)は右結合なので括弧を省略できる。
+関数の定義は以下のようになるだろう。
+</p>
+
+<p><code>addArg :: (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c<br/>
+addArg fun f x = fun (f x)</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; let mc = addArg chr<br/>
+*Main&gt; mc (* 2) 55<br/>
+'n'</code></p>
+
+<h2>引数を削除する変換</h2>
+
+<p>
+関数myChrを関数chrに変換する関数rmArgを作る。
+型は以下のようになる。
+</p>
+
+<p><code>rmArg :: ((a -&gt; b) -&gt; (a -&gt; c)) -&gt; (b -&gt; c)</code></p>
+
+<p>
+括弧は省略できる。
+関数の定義は以下のようになる。
+</p>
+
+<p><code>rmArg :: ((a -&gt; b) -&gt; a -&gt; c)) -&gt; b -&gt; c<br/>
+rmArg fun' x = fun' (const x) undefined</code></p>
+
+<p>
+const xで値xを「引数を無視して値xを返す関数」に変換してfun'に与える。
+fun'はもうひとつ引数をとるがそこには何を入れても影響がないので
+ここではとりあえずundefined値を入れておく。
+</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; let ch = rmArg myChr<br/>
+*Main&gt; ch 110<br/>
+'n'</code></p>
+
+<h2>まとめ</h2>
+
+<p>以下の2つの関数はほとんど同じものと考えられる。</p>
+
+<ul>
+<li><code>fun :: b -&gt; c</code></li>
+<li><code>fun' :: (a -&gt; b) -&gt; (a -&gt; c)</code></li>
+</ul>
+
+<p>以下のような型を持つ関数はより単純な関数に置きかえられる。</p>
+
+<ul>
+<li><code>(a -&gt; Int) -&gt; (a -&gt; Char)</code></li>
+<li><code>(a -&gt; [Int]) -&gt; (a -&gt; [Bool])</code></li>
+<li><code>(a -&gt; Int -&gt; Char) -&gt; (a -&gt; Bool)</code></li>
+</ul>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/trans_value.html"
 	>「単純な値の変換」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/trans_2_args.html"
+	>「2引数関数の変換」へ</a>
 </p>
