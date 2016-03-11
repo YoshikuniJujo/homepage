@@ -2,9 +2,300 @@
 
 <p>(工事中 0%)</p>
 
+<h2>はじめに</h2>
+
+<p>
+モナドはすべてファンクターである。
+それはモナド関数によってfmapが定義できることから明らかだ。
+もともとはそれだけだった。
+しかし、近年になってファンクターとモナドのあいだの
+アプリカティブファンクターというものが便利であることがわかり、
+Haskellにも導入された
+(ここらへんの歴史について調べたい)。
+</p>
+
+<p>
+(「文脈つきの値」とするか「値を含む構造」とするか)
+(「文脈つきの値」という言葉についてどこかで説明する必要がある)
+</p>
+
+<h2>モナドはすべてファンクター</h2>
+
+<p>モナドには以下の関数がある。</p>
+
+<p><code>ret :: a -&gt; m a<br/>
+bind :: m a -&gt; (a -&gt; m b) -&gt; m b</code></p>
+
+<p>この2つを使って関数fmapを定義することができる。</p>
+
+<p><code>fmap f = (`bind` (ret . f))</code></p>
+
+<p>また、モナド則から</p>
+
+<p><code>f `pipe` ret == f<br/>
+	<span class="indent1">where (g `pipe` h) x = g x `bind` h</span><br/>
+=&gt; f x `bind` ret == f x<br/>
+=&gt; (`bind` ret) == id<br/>
+=&gt; (`bind` ret . id) == id<br/>
+=&gt; fmap id == id</code></p>
+
+<p>
+ファンクタ則も満たす。
+よってモナドならばファンクタだ。
+</p>
+
+<h2>モナドにはできてファンクターにはできないこと</h2>
+
+<p>(ここらへんに関数joinあたりの話題を置くか)</p>
+
+<p>関数bindの引数をいれかえると</p>
+
+<p><code>flip bind :: (a -&gt; m b) -&gt; m a -&gt; m b</code></p>
+
+<p>となる。これと</p>
+
+<p><code>fmap :: (a -&gt; b) -&gt; m a -&gt; m b</code></p>
+
+<p>
+とはよく似ている。
+(厳密には違うが)型変数はどんな型に置きかえてもいいので関数fmapの型の
+型変数bを型(m b)にしてみる。
+すると
+</p>
+
+<p><code>fmap :: (a -&gt; m b) -&gt; m a -&gt; m (m b)</code></p>
+
+<p>
+となる。
+つまりモナドにできてファンクターにできないことは
+二重になったmをひとつにまとめることだ。
+</p>
+
+<p>(
+このあたり何か具体例でも挙げられるといいのだけど...。
+そもそもファンクターにできる構造で
+モナドにすることができない構造には何があるかな
+)</p>
+
+<h2>ファンクターからアプリカティブファンクターへ</h2>
+
+<p>(ファンクターでは多引数関数に複数の文脈つきの値を適応できないという話)</p>
+
+<p>
+ファンクターでは構造のなかみの値に対して関数を適用することができる。
+しかし、多引数関数に対して複数の文脈つきの値を与えることはできない。
+2引数関数に対して関数fmapによって引数をひとつ与えることを考える。
+</p>
+
+<p><code>g :: a -&gt; b -&gt; c<br/>
+x :: f a<br/>
+fmap g x :: f (b -&gt; c)</code></p>
+
+<p>
+このように文脈つきの関数が返る。
+文脈つきの関数を扱うことは関数fmapにはできない。
+そこで以下のような関数appを考える。
+</p>
+
+<p><code>app :: f (a -&gt; b) -&gt; f a -&gt; f b</code></p>
+
+<p>
+関数fmapのかわりに関数appを使うことを考える。
+一番最初に普通の関数に文脈をつける必要があるので
+</p>
+
+<p><code>pure :: a -&gt; m a</code></p>
+
+<p>
+も定義する。
+すると2引数関数を2つの文脈つきの値に適用するには
+</p>
+
+<p><code>g :: a -&gt; b -&gt; c<br/>
+x :: f a<br/>
+y :: f b<br/>
+pure g `app` x `app` y :: f c</code></p>
+
+<p>のようにできる。</p>
+
+<h2>モノイダル則</h2>
+
+<p>アプリカティブ関数は以下のふたつである。</p>
+
+<p><code>pure :: a -&gt; f a<br/>
+app :: f (a -&gt; b) -&gt; f a -&gt; f b</code></p>
+
+<p>これらの関数から以下の関数が定義できる。</p>
+
+<p><code>fmap :: (a -&gt; b) -&gt; f a -&gt; f b<br/>
+unit :: f ()<br/>
+tup :: f a -&gt; f b -&gt; f (a, b)</code></p>
+
+<p>それぞれの定義は</p>
+
+<p><code>fmap = app . pure<br/>
+unit = pure ()<br/>
+u `tup` v = pure (,) `app` u `app` v</code></p>
+
+<p>
+となる。
+このときアプリカティブ関数は
+</p>
+
+<p><code>fmap id == id<br/>
+fmap snd (unit `tup` v) == v<br/>
+fmap fst (u `tup` unit) == u<br/>
+fmap asl (u `tup` (v `tup` w)) == (u `tup` v) `tup` w<br/>
+	<span class="indent1">where asl (x, (y, z)) = ((x, y), z)</span></code></p>
+
+<p>
+を満たすように定義されている必要がある。
+fmap snd, fmap fst, fmap aslは型を合わせるためにある。
+本質的には
+</p>
+
+<p><code>unit `tup` v == v<br/>
+u `tup` unit == u<br/>
+u `tup` (v `tup` w) == (u `tup` v) `tup` w</code></p>
+
+<p>と同じことだ。</p>
+
+<h2>アプリカティブはすべてファンクター</h2>
+
+<p>上記より明らか。</p>
+
+<h2>モナドはすべてアプリカティブファンクター</h2>
+
+<p>(
+モナド則からモノイド則を導くのが煩雑だ。
+すこし考える必要がある
+)</p>
+
+<p>関数appは関数bindで</p>
+
+<p><code>u `app` v = u `bind` \f -&gt; v `bind` \x -&gt; ret (f x)</code></p>
+
+<p>
+のように定義することができる。また、pure = retと定義できる。
+すると
+</p>
+
+<p><code>unit = ret ()</code></p>
+
+<p>であり</p>
+
+<p>(<code>(m `bind` f) `bind` g == m `bind` \x -&gt; f x `bind` g</code>)</p>
+<p>(<code>(m `bind` \x -&gt; f x) `bind` g == m `bind` \x -&gt; f x `bind` g</code>)</p>
+
+<p><code>u `tup` v<br/>
+=&gt; pure (,) `app` u `app` v<br/>
+=&gt; (ret (,) `bind` \f -&gt; u `bind` \x -&gt; ret (f x)) `app` v<br/>
+=&gt; (u `bind` \x -&gt; ret (x ,)) `app` v<br/>
+=&gt; (u `bind` \x -&gt; ret (x ,)) `bind` \f -&gt; v `bind` \y -&gt; ret (f y)<br/>
+=&gt; u `bind` \x -&gt; ret (x ,) `bind` \f -&gt; v `bind` \y -&gt; ret (f y)<br/>
+=&gt; u `bind` \x -&gt; v `bind` \y -&gt; ret (x, y)</code></p>
+
+<p>となる。</p>
+
+<p><code>fmap snd (unit `tup` v)<br/>
+=&gt; fmap snd (ret () `tup` v)<br/>
+=&gt; fmap snd (ret () `bind` \x -&gt; v `bind` \y -&gt; ret (x, y))<br/>
+=&gt; fmap snd (v `bind` \y -&gt; ret ((), y))<br/>
+=&gt; fmap snd $ v `bind` ret . (() ,)<br/>
+=&gt; fmap snd $ fmap (() ,) v<br/>
+=&gt; fmap (snd . (() ,)) v<br/>
+=&gt; fmap id v<br/>
+=&gt; v</code></p>
+
+<p><code>fmap fst (u `tup` unit)<br/>
+=&gt; fmap fst (v `tup` ret ())<br/>
+=&gt; fmap fst (v `bind` \x -&gt; ret () `bind` \y -&gt; ret (x, y))<br/>
+=&gt; fmap fst (v `bind` \x -&gt; ret (x, ()))<br/>
+=&gt; fmap fst (v `bind` ret . (, ()))<br/>
+=&gt; fmap fst $ (`bind` ret . (, ())) v<br/>
+=&gt; fmap fst $ fmap (, ()) v<br/>
+=&gt; fmap (fst . (, ())) v<br/>
+=&gt; fmap id v<br/>
+=&gt; v</code></p>
+
+<p><code>(u `bind` \x -&gt; v `bind` \y -&gt; ret (x, y)) `bind`
+	\(x, y) -&gt; f x y<br/>
+=&gt; u `bind` \x -&gt; (v `bind` \y -&gt; ret (x, y)) `bind`
+	\(x, y) -&gt; f x y<br/>
+=&gt; u `bind` \x -&gt; v `bind` \y -&gt; (\y -&gt; return (x, y)) y `bind`
+	\(x, y) -&gt; f x y<br/>
+=&gt; u `bind` \x -&gt; v `bind` \y -&gt; return (x, y) `bind`
+	\(x, y) -&gt; f x y<br/>
+=&gt; u `bind` \x -&gt; v `bind` \y -&gt; f x y</code></p>
+
+<p><code>fmap asl (u `tup` (v `tup` w))<br/>
+=&gt; fmap asl (u `bind` \x -&gt; (v `tup` w) `bind` \yz -&gt; ret (x, yz))<br/>
+=&gt; fmap asl (u `bind` \x -&gt;
+	(v `bind` \y -&gt; w `bind` \z -&gt; ret (y, z)) `bind` \yz -&gt; ret (x, yz)<br/>
+=&gt; fmap asl (u `bind` \x -&gt; v `bind` \y -&gt; w `bind` \z -&gt; ret (x, (y, z)))<br/>
+=&gt; (u `bind` \x -&gt; v `bind` \y -&gt; w `bind` \z -&gt; ret (x, (y, z)))
+	`bind` ret . asl<br/>
+=&gt; u `bind` \x -&gt; (v `bind` \y -&gt; w `bind` \z -&gt; ret (x, (y, z)))
+	`bind` ret . asl<br/>
+=&gt; u `bind` \x -&gt; v `bind` \y -&gt; (w `bind` \z -&gt; ret (x, (y, z)))
+	`bind` ret . asl<br/>
+=&gt; u `bind` \x -&gt; v `bind` \y -&gt; w `bind` \z -&gt; ret (x, (y, z))
+	`bind` ret . asl<br/>
+=&gt; u `bind` \x -&gt; v `bind` \y -&gt; w `bind` \z -&gt; ret (asl (x, (y, z)))<br/>
+=&gt; u `bind` \x -&gt; v `bind` \y -&gt; w `bind` \z -&gt; ret ((x, y), z)<br/>
+=&gt; u `bind` \x -&gt; v `bind` \y -&gt; ret (x, y) `bind` \(x, y) -&gt;
+	w `bind` \z -&gt; ret ((x, y), z)<br/>
+=&gt; u `bind` \x -&gt; (v `bind` \y -&gt; ret (x, y)) `bind` \(x, y) -&gt;
+	w `bind` \z -&gt; ret ((x, y), z)<br/>
+=&gt; (u `bind` \x -&gt; v `bind` \y -&gt; ret (x, y)) `bind` \(x, y) -&gt;
+	w `bind` \z -&gt; ret ((x, y), z)<br/>
+=&gt; (u `tup` v) `tup` w</code></p>
+
+<h2>モナドにはできてアプリカティブファンクターにはできないこと</h2>
+
+<p>
+(
+ファンクターをモナドにできる関数joinのような関数は
+アプリカティブとモナドのあいだにはないのかな
+)
+</p>
+
+<p>(
+アプリカティブファンクターでは、aの値によってm bのmの部分、
+つまり構造を変化させることができない。
+そのあたりを具体例を挙げて書きたい。
+)</p>
+
+<p><code>app :: m (a -&gt; b) -&gt; m a -&gt; m b<br/>
+flip bind :: (a -&gt; m b) -&gt; m a -&gt; m b</code></p>
+
+<p>
+appとflip bindとを比較すると、
+関数appではa型の値によって変化させられるのはb型の値だけであるのに対して、
+関数bindではa型の値によってm bのmの部分つまり構造(文脈)の部分も変化させられる
+ことがわかる。
+</p>
+
+<h2>メモ</h2>
+
+<p><code>fmap :: (a -&gt; b) -&gt; m a -&gt; m b<br/>
+app :: m (a -&gt; b) -&gt; m a -&gt; m b<br/>
+flip bind :: (a -&gt; m b) -&gt; m a -&gt; m b</code></p>
+
+<p><code>tup :: m a -&gt; m b -&gt; m (a, b)<br/>
+tup m n = m `bind` \x -&gt; n `bind` \y -&gt; ret (x, y)</code></p>
+
+<p><code>m `app` n = m `bind` \f -&gt; n `bind` \x -&gt; ret (f x)</code></p>
+
+<p>ファンクタにretとjoinを追加するとモナド</p>
+
+<p>ファンクタにretとtupを追加するとアプリカティブファンクター</p>
+
+<p>joinがあればtupは表現できる。</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/common_monad.html"
-	>「共通の枠組み」へもどる</a>
+	>「共通の枠組み: モナド」へもどる</a>
 <a href="/computer/haskell/web_lecture/for_programmer"
 	>「1から学ぶHaskell」トップへ</a>
 </p>
