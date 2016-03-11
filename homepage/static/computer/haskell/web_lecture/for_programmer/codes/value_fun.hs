@@ -1,5 +1,5 @@
 valToFun :: a -> ((a -> b) -> b)
 valToFun x = ($ x)
 
-funToVal :: ((a -> b) -> b) -> a
+funToVal :: ((a -> a) -> a) -> a
 funToVal = ($ id)
