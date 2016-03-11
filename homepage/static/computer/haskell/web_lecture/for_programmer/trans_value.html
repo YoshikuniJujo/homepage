@@ -2,6 +2,99 @@
 
 <p>(工事中 0%)</p>
 
+<h2>はじめに</h2>
+
+<p>
+単純な値を情報としての意味を変えずに関数にすることができる。
+</p>
+
+<h2>関数eight</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/eight.hs"
+	>eight.hs</a></p>
+
+<p>
+「整数をとり何らかの値を返す関数」をとり
+その関数に引数として整数8を与えて何らかの値を返す関数を考える。
+</p>
+
+<p><code>eight :: (Int -&gt; a) -&gt; a<br/>
+eight f = f 8</code></p>
+
+<p>この関数は以下のようにも書ける。</p>
+
+<p><code>eight = ($ 8)</code></p>
+
+<p>同じことだ。</p>
+
+<p>
+関数eightは整数8とほとんど同じものだ。
+対話環境で見てみよう。
+</p>
+
+<p><code>% ghci eight.hs<br/>
+*Main&gt; eight (+ 5)<br/>
+13<br/>
+*Main&gt; eight even<br/>
+True<br/>
+*Main&gt; eight id<br/>
+8</code></p>
+
+<h2>単純な値から関数への変換</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/value_fun.hs"
+	>value_fun.hs</a></p>
+
+<p>
+どのような値であれ関数eightのような関数に変換することができる。
+</p>
+
+<p><code>x :: X<br/>
+funX :: (X -&gt; b) -&gt; b<br/>
+funX = ($ x)</code></p>
+
+<p>
+この変換を行う関数を書いてみよう。
+</p>
+
+<p><code>valToFun :: a -&gt; ((a -&gt; b) -&gt; b)<br/>
+valToFun x = ($ x)</code></p>
+
+<h3>試してみる</h3>
+
+<p><code>*Main&gt; :load value_fun.hs<br/>
+*Main&gt; let three = valToFun 3<br/>
+*Main&gt; three (+ 7)<br/>
+10<br/>
+*Main&gt; three even<br/>
+False<br/>
+*Main&gt; :m + Data.Char<br/>
+*Main Data.Char&gt; let c = valToFun 'c'<br/>
+*Main Data.Char&gt; c isLower<br/>
+True</code></p>
+
+<h2>関数から単純な値への変換</h2>
+
+<p>ランク2多相が必要かと思ったけどそんなことはなかった。</p>
+
+<h3>ここはあとで消す</h3>
+
+<p>逆に単純な値と同じ意味を持つ関数を単純な値に変換する関数も書ける。</p>
+
+<p>
+けど、ランク2多相拡張とかが必要になり、説明するのつらいので、ごまかす。
+以下はそのうち消す。
+</p>
+
+<p><code>funToVal :: ((a -&gt; b) -&gt; b) -&gt; a<br/>
+funToVal = ($ id)</code></p>
+
+<h3>こっちを残す</h3>
+
+<p>関数から単純な値への変換は引数に関数idを与えればいい。</p>
+
+<p><code></code></p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/trans_unit.html"
 	>「ユニット型について」へもどる</a>
