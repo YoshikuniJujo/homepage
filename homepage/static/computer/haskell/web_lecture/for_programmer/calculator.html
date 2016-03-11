@@ -1,10 +1,494 @@
 電卓をエミュレートする
 
-<p>(工事中 0%)</p>
+<p>(工事中 50%)</p>
+
+<h2>はじめに</h2>
+
+<p>メモリ機能つきの電卓を関数でエミュレートしてみよう。</p>
+
+<h2>計算の例</h2>
+
+<p>以下の計算をメモリ機能つきの電卓で計算する。</p>
+
+<p><code>(3 * 4 + 2 * 5) * 7</code></p>
+
+<p>以下のようにボタンを押す。</p>
+
+<p><code>3 * 4 M+ C 2 * 5 M+ C MR * 7</code></p>
+
+<ul>
+<li>3 * 4を計算しメモリに足す</li>
+<li>表示をクリアする</li>
+<li>2 * 5を計算しメモリに足す</li>
+<li>表示をクリアする</li>
+<li>メモリを呼びだす</li>
+<li>7をかける</li>
+</ul>
+
+<p>電卓はメモリ内の記憶を状態として持っている。</p>
+
+<h2>仕様</h2>
+
+<p>それぞれの操作を</p>
+
+<ul>
+<li>画面の表示とメモリの状態を引数としてとり</li>
+<li>画面の表示とメモリの状態を返り値としてかえす</li>
+</ul>
+
+<p>
+関数として実装する。
+実際の電卓とは異なるが
+</p>
+
+<ul>
+<li>M+は画面をクリアするものとする(つまりCの動作を含む)</li>
+<li>MRを押す前に画面がクリアされている必要がある</li>
+	<ul>
+	<li>MRは画面の状態を受けとらない</li>
+	</ul>
+</ul>
+
+<h2>M+とMR</h2>
+
+<p>
+M+とMRとを表す関数のそれぞれの型は以下のようになる。
+</p>
+
+<p><code>mplus :: Int -&gt; Int -&gt; ((), Int)<br/>
+mrecall :: () -&gt; Int -&gt; (Int, Int)</code></p>
+
+<p>
+関数mplusでは返り値の画面の表示の部分が()となり、
+関数mrecallでは引数の画面の表示の部分が()となっている。
+表示がないということを()で表現している。
+</p>
+
+<h2>画面を変化させる</h2>
+
+<p>
+画面を変化させる関数を作る。
+(Int -&gt; Int)型の関数を変換して作ることにする。
+この関数はメモリは変化させない。
+</p>
+
+<p><code>arrC :: (Int -&gt; Int) -&gt; (Int -&gt; Int -&gt; (Int, Int))</code></p>
+
+<p>
+この関数によってたとえば'+ 3'のように押したときの動きを作ることができる。
+さらに、たとえば画面がクリアされている状態で5を押したときの動きを作るために
+(() -&gt; Int)型の関数も変換できるようにしたい。
+</p>
+
+<p><code>arrC :: (() -&gt; Int) -&gt; (() -&gt; Int -&gt; (Int, Int))</code></p>
+
+<p>これら2つの型をひとつの型で表すと</p>
+
+<p><code>arrC :: (a -&gt; Int) -&gt; (a -&gt; Int -&gt; (Int, Int))</code></p>
+
+<p>
+となる。
+Intや()を型変数aとして一般化した。
+さらに画面のクリアも(Int -&gt; ())型の関数を関数arrCで変換して作りたい。
+このような使いかたをするときには関数arrCは
+</p>
+
+<p><code>arrC :: (Int -&gt; ()) -&gt; (Int -&gt; Int -&gt; ((), Int)</code></p>
+
+<p>
+のようであればいい。
+よって画面のクリアにも使えるように関数arrCをさらに一般化すると
+</p>
+
+<p><code>arrC :: (a -&gt; b) -&gt; (a -&gt; Int -&gt; (b, Int))</code></p>
+
+<p>
+となる。
+この型を見ると関数arrCはa型の値をとりb型の値を返す関数を、
+a型の値と整数値をとりb型の値と整数値を返す関数に変換すていることがわかる。
+</p>
+
+<h2>必要な関数</h2>
+
+<p>ここまでで見てきた関数は以下の3つとなる。</p>
+
+<p><code>mplus :: Int -&gt; Int -&gt; ((), Int)<br/>
+mrecall :: () -&gt; Int -&gt; (Int, Int)<br/>
+arrC :: (a -&gt; b) -&gt; a -&gt; Int -&gt; (b, Int)</code></p>
+
+<h2>関数mplus</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/calculator.hs"
+	>calculator.hs</a></p>
+
+<p>関数mplusは</p>
+
+<p><code>mplus :: Int -&gt; Int -&gt; ((), Int)<br/>
+mplus x m = ((), x + m)</code></p>
+
+<p>
+となる。
+第1引数が画面の表示であり第2引数はメモリのなかみだ。
+返り値であるタプルの第1要素が画面の表示であり第2要素がメモリのなかみだ。
+</p>
+
+<h2>関数mrecall</h2>
+
+<p>関数mrecallは</p>
+
+<p><code>mrecall :: () -&gt; Int -&gt; (Int, Int)<br/>
+mrecall _ m = (m, m)</code></p>
+
+<p>
+となる。
+第1引数は画面の表示である。
+mrecallを呼び出すときには必ず画面はクリアされている必要がある。
+第2引数はメモリのなかみだ。
+結果のタプルの第1要素は画面の表示であり
+第2要素はメモリのなかみだ。
+メモリの中身はそのままであり、
+画面の表示はクリア状態からメモリのなかみの値へと変化する。
+</p>
+
+<h2>試してみる</h2>
+
+<p>ここまでの関数を試してみよう。</p>
+
+<p><code>% ghci calculator.hs<br/>
+*Main&gt; mplus 3 0<br/>
+((), 3)<br/>
+*Main&gt; mplus 4 8<br/>
+((), 12)<br/>
+*Main&gt; mrecall () 12<br/>
+(12, 12)</code></p>
+
+<p>
+画面表示が3でメモリが0のときにM+すると
+画面表示はクリアされメモリは3になる。
+画面表示が4でメモリが8のときにM+すると
+画面表示はクリアされメモリは12になる。
+画面表示がクリアされメモリが12のときにMRすると
+画面表示は12となりメモリも12のままとなる。
+</p>
+
+<h2>関数arrC</h2>
+
+<p>関数arrCの定義は</p>
+
+<p><code>arrC :: (a -&gt; b) -&gt; a -&gt; Int -&gt; (b, Int)<br/>
+arrC f x m = (f x, m)</code></p>
+
+<p>
+となる。
+画面表示xは与えられた関数fで変換する。
+メモリのなかみmはそのまま返す。
+</p>
+
+<h2>試してみる</h2>
+
+<p>
+画面表示がクリアされているときに
+数字キーを打ったところをエミュレートする。
+</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; arrC (const 8) () 4<br/>
+(8,4)<br/>
+*Main&gt; arrC (const 11) () 32<br/>
+(11,32)</code></p>
+
+<p>
+画面表示はクリアされメモリは4のときに
+8を打つと画面表示は8となりメモリは4のままとなる。
+画面表示はクリアされメモリは32のときに
+11を打つと画面表示は11となりメモリは32のままとなる。
+</p>
+
+<p>画面に数字が表示されている状態で演算キーと数字キーを打つ。</p>
+
+<p><code>*Main&gt; arrC (* 3) 2 5<br/>
+(6,5)<br/>
+*Main&gt; arrC (+ 8) 7 23<br/>
+(15,23)</code></p>
+
+<p>
+ひとつめの例では画面表示が2でメモリが5のときに'* 3'を入力した。
+ふたつめの例では画面表示が7でメモリが23のときに'+ 8'を入力した。
+メモリのなかみを変えずに画面をそれぞれの関数で変化させているのがわかる。
+</p>
+
+<h2>画面の表示は多相的</h2>
+
+<p>画面をクリアしてみよう。</p>
+
+<p><code>*Main&gt; arrC (const ()) 37 8<br/>
+((),8)</code></p>
+
+<p>
+画面がクリアされた状態を()で表現した。
+整数が表示されている状態はInt型で表現される。
+そのために画面の表示を表す部分は多相的にした。
+普通の電卓以上のことができる。
+たとえば偶数かどうかをチェックすることができる。
+</p>
+
+<p><code>*Main&gt; arrC even 4 7<br/>
+(True,7)</code></p>
+
+<p>画面の表示はTrueとなる。</p>
+
+<h2>型Calc</h2>
+
+<p>
+今まで扱ってきた関数は共通の構造を持っている。
+共通する部分をとりだすと
+</p>
+
+<p><code>a -&gt; Int -&gt; (b, Int)</code></p>
+
+<p>
+となる。
+a, bはそれぞれ直前と直後の画面の値である。
+ひとつめのIntは直前のメモリの値であり、ふたつめのIntは直後のメモリの値だ。
+この関数の型に別名をつけておく。
+</p>
+
+<p><code>type Calc a b = a -&gt; Int -&gt; (b, Int)</code></p>
+
+<p>それぞれの関数の型は</p>
+
+<p><code>mplus :: Calc Int ()<br/>
+mrecall :: Calc () Int<br/>
+arrC :: (a -&gt; b) -&gt; Calc a b</code></p>
+
+<p>となる。</p>
+
+<h2>組み合わせる</h2>
+
+<p>
+計算の部品はそろった。
+これらを組みあわせていこう。
+組みあわせる関数pipeCの型は
+</p>
+
+<p><code>pipeC :: Calc a b -&gt; Calc b c -&gt; Calc a c</code></p>
+
+<p>
+となる。
+画面の値をaからbにする計算と画面の値をbからcにする計算とをつないで、
+画面の値をaからcにする計算をつくる。
+定義は
+</p>
+
+<p><code>(f `pipeC` g) x m = let (x', m') = f x m in g x' m'</code></p>
+
+<p>
+となる。
+画面の値xとメモリの値mとを関数fで変化させる。
+その結果である画面の値x'とメモリの値m'を関数gに与える。
+</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; (arrC (const 3) `pipeC` arrC (* 2)) () 23<br/>
+(6,23)<br/>
+*Main&gt; (arrC (const 4) `pipeC` mplus) () 3<br/>
+((),7)</code></p>
+
+<p>
+画面がクリアされていてメモリが23のときに'3 * 2'をした例と
+画面がクリアされていてメモリが3のときに'4 M+'をした例だ。
+</p>
+
+<h2>複雑な計算</h2>
+
+<p>最初の例は</p>
+
+<p><code>(3 * 4 + 2 * 5) * 7</code></p>
+
+<p>
+だった。
+キーの押しかたは
+</p>
+
+<p><code>3 * 4 M+ 2 * 5 M+ MR * 7</code></p>
+
+<p>
+である。
+これをエミュレートしてみよう。
+</p>
+
+<p><code>example :: Calc () Int<br/>
+example =<br/>
+	<span class="indent1">arrC (const 3) `pipeC`</span><br/>
+	<span class="indent1">arrC (* 4) `pipeC`</span><br/>
+	<span class="indent1">mplus `pipeC`</span><br/>
+	<span class="indent1">arrC (const 2) `pipeC`</span><br/>
+	<span class="indent1">arrC (* 5) `pipeC`</span><br/>
+	<span class="indent1">mplus `pipeC`</span><br/>
+	<span class="indent1">mrecall `pipeC`</span><br/>
+	<span class="indent1">arrC (* 7)</span></code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; example () 0<br/>
+(254,22)</code></p>
+
+<p>初期状態は画面はクリアされていてメモリは0である。</p>
+
+<h2>型State</h2>
+
+<p>型Calcは</p>
+
+<p><code>type Calc a b = a -&gt; Int -&gt; (b, Int)</code></p>
+
+<p>
+のように定義されている。
+型Stateを
+</p>
+
+<p><code>type State b = Int -&gt; (b, Int)</code></p>
+
+<p>のように定義する。</p>
+
+<p><code>Calc a b == a -&gt; State b</code></p>
+
+<p>
+のような関係となる。
+型(a -&gt; b)と型(a -&gt; State b)を比較すると
+</p>
+
+<ul>
+<li>a -&gt; bは画面の変化であり</li>
+<li>a -&gt; State bは画面とメモリの変化</li>
+</ul>
+
+<p>
+であり、画面の値の変化にメモリの値の変化が追加されていることがわかる。
+</p>
+
+<p>pipeCの型を型Stateを使って書いてみる。</p>
+
+<p><code>pipeC :: (a -&gt; State b) -&gt; (b -&gt; State c) -&gt; (a -&gt; State c)</code></p>
+
+<p>
+画面とメモリを変化させる関数をつないでいる。
+メモリの変化についてはState型のなかにかくされている。
+第1引数の'a -&gt;'と返り値の'a -&gt;'とは消せる。
+</p>
+
+<p><code>bindC :: State b -&gt; (b -&gt; State c) -&gt; State c</code></p>
+
+<p>となるような関数bindCと関数pipeCとは情報としては同じものとなる。</p>
+
+<h2>関数bindC</h2>
+
+<p>関数bindCの定義は</p>
+
+<p><code>bindC :: State a -&gt; (a -&gt; State b) -&gt; State b<br/>
+(f `bindC` g) m = let (x, m') = f m in g x m'</code></p>
+
+<p>
+となる。
+関数fに状態mを与え結果の値xと状態m'をgに与える。
+</p>
+
+<h2>関数retC</h2>
+
+<p>同様のことがarrCにもできる。</p>
+
+<p><code>arrC :: (a -&gt; b) -&gt; (a -&gt; State b)</code></p>
+
+<p>を</p>
+
+<p><code>retC :: b -&gt; State b</code></p>
+
+<p>
+とできる。
+関数retCの定義は
+</p>
+
+<p><code>retC x m = (x, m)</code></p>
+
+<p>
+となる。
+状態は変化させずに表示を値xとする。
+</p>
+
+<h2>計算例を書きなおす</h2>
+
+<p>pipeCとarrCではなくbindCとretCで計算例を書きなおしてみよう。</p>
+
+<p><code>example :: State Int<br/>
+example =<br/>
+	<span class="indent1">retC 3 `bindC`</span><br/>
+	<span class="indent1">(retC . (* 4)) `bindC`</span><br/>
+	<span class="indent1">mplus `bindC`</span><br/>
+	<span class="indent1">const (retC 2) `bindC`</span><br/>
+	<span class="indent1">(retC . (* 5)) `bindC`</span><br/>
+	<span class="indent1">mplus `bindC`</span><br/>
+	<span class="indent1">mrecall `bindC`</span><br/>
+	<span class="indent1">(retC . (* 7))</span></code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; example 0<br/>
+(154,22)</code></p>
+
+<h2>整形</h2>
+
+<p>
+同じことを以下のように整形して書いてみる。
+(本当は同じじゃない。そこらへんをどう説明するか。あるいはどうごまかすか)
+(ここの説明でモナド則をこっそり説明してしまうのもひとつの方法だ)
+</p>
+
+<p><code>example :: State Int<br/>
+example =<br/>
+	<span class="indent1">retC 3 `bindC` \x -&gt;</span><br/>
+	<span class="indent1">retC (x * 4) `bindC` \y -&gt;</span><br/>
+	<span class="indent1">mplus y `bindC` \_ -&gt;</span><br/>
+	<span class="indent1">retC 2 `bindC` \z -&gt;</span><br/>
+	<span class="indent1">retC (z * 5) `bindC` \w -&gt;</span><br/>
+	<span class="indent1">mplus w `bindC` \_ -&gt;</span><br/>
+	<span class="indent1">mrecall () `bindC` \v -&gt;</span><br/>
+	<span class="indent1">retC (v * 7)</span><br/>
+	</code></p>
+
+<ul>
+<li>retC 3で返る値でxを束縛し</li>
+<li>retC (x * 4)で返る値でyを束縛し</li>
+<li>mplus yでyの値を状態に足し返り値は捨て</li>
+<li>retC 2で返る値でzを束縛し</li>
+<li>retC (z * 5)で返る値でwを束縛し</li>
+<li>mplus wでwの値を状態に足し返り値は捨て</li>
+<li>mrecall ()で状態の値を呼びだし、vを束縛し</li>
+<li>retC (v * 7)で値を返す。</li>
+</ul>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; example 0<br/>
+(154,22)</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+メモリつき電卓の例を見た。
+画面の値とメモリの値のペアを次々と変換していく。
+画面の値にだけ注目しメモリの値を隠すことができる。
+以下の2つの関数で変換を部品としてつないでいける。
+</p>
+
+<p><code>pipeC :: (a -&gt; State b) -&gt; (b -&gt; State c) -&gt; (a -&gt; State c)<br/>
+arrC :: (a -&gt; b) -&gt; (a -&gt; State b)</code></p>
+
+<p>
+これらの関数はより単純な関数のペアに置きかえられる。
+</p>
+
+<p><code>bindC :: State a -&gt; (a -&gt; State b) -&gt; State b<br/>
+retC :: a -&gt; State a</code></p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/maybe_monad.html"
 	>「失敗する関数をつなぐ」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/common_monad.html"
+	>「共通する枠組み: モナド」へ</a>
 </p>

@@ -1,6 +1,6 @@
 失敗の可能性のある関数をつなぐ
 
-<p>(工事中 70%)</p>
+<p>(工事中 50%)</p>
 
 <h2>はじめに</h2>
 
@@ -231,7 +231,11 @@ _ `bindM` _ = Nothing</code></p>
 *Main&gt; lowerToCodeDiv2Mul3 'n'<br/>
 Just 165</code></p>
 
-<p>関数lowerToCodeDiv2Mul3の定義を以下のように整形することができる。</p>
+<p>
+関数lowerToCodeDiv2Mul3の定義を以下のように整形することができる。
+(本当は同じじゃない。そこらへんをどう説明するか。あるいはごまかすか)
+(ここの説明でモナド則をこっそり説明してしまうというのがひとつの方法だ)
+</p>
 
 <p><code>lowerToCodeDiv2Mul3 c =<br/>
 	<span class="indent1">lowerToCode c `bindM` \n -&gt;</span><br/>
