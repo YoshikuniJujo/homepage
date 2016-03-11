@@ -284,8 +284,8 @@ curryの2つの見方
 	fun' :: (a -> b) -> c -> (a -> d)
 	fun' f y = \\x -> fun (f x) y
 * 「第一引数と返り値に引数を1つ追加する」変換
-	itext t 0 "addArg2 :: (b -> c -> d) -> (a -> b) -> c -> (a -> d)
-	itext t 0 "addArg2 fun f y = \\x -> fun (f x) y
+	addArg2 :: (b -> c -> d) -> (a -> b) -> c -> (a -> d)
+	addArg2 fun f y = \\x -> fun (f x) y
 * これをポイントフリースタイルにすると
 	addArg2 = (. flip (.)) . flip (.) . flip
 * この変換には追加の情報は必要ないことがわかる
@@ -294,8 +294,8 @@ curryの2つの見方
 ----------
 
 * 逆方向の変換
-	itext t 0 "rmArg2 :: ((a -> b) -> c -> (a -> d)) -> (b -> c -> d)
-	itext t 0 "rmArg2 f = \\x y -> f (const x) y undefined
+	rmArg2 :: ((a -> b) -> c -> (a -> d)) -> (b -> c -> d)
+	rmArg2 f = \\x y -> f (const x) y undefined
 * x, yの型はそれぞれb, c
 	- const x :: a -> b
 	- f (const x) :: c -> (a -> d)

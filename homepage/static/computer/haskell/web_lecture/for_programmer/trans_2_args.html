@@ -1,10 +1,101 @@
 2引数関数の引数と返り値に対する引数の追加と削除
 
-<p>(工事中 0%)</p>
+<p>(工事中 70%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+1引数関数の引数と返り値に対する引数の追加と、
+結果としてできる関数からの引数と返り値のそれぞれからの引数の削除について見た。
+このような変換は2引数関数に対しても行うことができる。
+</p>
+
+<h2>関数myAdd</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/trans_2_args.hs"
+	>trans_2_args.hs</a></p>
+
+<p>
+関数fと整数yをとり
+「整数xをとり整数f xとyを足し合わせる関数」を返す関数myAddを考える。
+</p>
+
+<p><code>myAdd :: (a -&gt; Int) -&gt; Int -&gt; (a -&gt; Int)<br/>
+myAdd f y x = f x + y</code></p>
+
+<p><code>% ghci trans_2_args.hs<br/>
+*Main&gt; (myAdd (* 2) 3) 8<br/>
+19</code></p>
+
+<h2>関数addと関数myAdd</h2>
+
+<p>関数addを以下のように定義しておく。</p>
+
+<p><code>add :: Int -&gt; Int -&gt; Int<br/>
+add = (+)</code></p>
+
+<p>関数add(をInt型の値に対する)と関数myAddの型を比較する。</p>
+
+<p><code>add :: Int -&gt; Int -&gt; Int<br/>
+myAdd :: (a -&gt; Int) -&gt; Int -&gt; (a -&gt; Int)</code></p>
+
+<p>関数addの第1引数と返り値に対して型aが引数として追加されている。</p>
+
+<h2>より一般的に</h2>
+
+<p>より一般的には以下のようになる。</p>
+
+<p><code>fun :: X -&gt; Y -&gt; Z<br/>
+fun' :: (a -&gt; X) -&gt; Y -&gt; (a -&gt; Z)</code></p>
+
+<p>fun'は以下のように定義される。</p>
+
+<p><code>fun' f y x = fun (f x) y</code></p>
+
+<h2>引数の追加</h2>
+
+<p>引数を追加する関数は以下のようになる。</p>
+
+<p><code>addArg2 :: (b -&gt; c -&gt; d) -&gt; ((a -&gt; b) -&gt; c -&gt; (a -&gt; d))<br/>
+addArg2 fun f y x = fun (f x) y</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; let ma = addArg2 (+)<br/>
+*Main&gt; ma (* 2) 3 8<br/>
+19</code></p>
+
+<h2>引数の削除</h2>
+
+<p>引数を削除する関数は以下のようになる。</p>
+
+<p><code>rmArg2 :: ((a -&gt; b) -&gt; c -&gt; (a -&gt; d)) -&gt; (b -&gt; c -&gt; d)<br/>
+rmArg2 f x y = f (const x) y undefined</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; let ad = rmArg2 myAdd<br/>
+*Main&gt; ad 3 4<br/>
+7</code></p>
+
+<h2>まとめ</h2>
+
+<p>以下の2つの関数はほぼ同じである。</p>
+
+<ul>
+<li><code>fun :: X -&gt; Y -&gt; Z</code></li>
+<li><code>fun' :: (a -&gt; X) -&gt; Y -&gt; (a -&gt; Z)</code></li>
+</ul>
+
+<p>以下の型を見たらより単純な形に変換できる。</p>
+
+<ul>
+<li><code>(a -&gt; Char) -&gt; Int -&gt; (a -&gt; Bool)</code></li>
+<li><code>(a -&gt; [Bool]) -&gt; [Char] -&gt; (a -&gt; [Int])</code></li>
+<li><code>(a -&gt; Char) -&gt; (Double -&gt; Bool) -&gt; (a -&gt; Int)</code></li>
+</ul>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/trans_1_arg.html"
 	>「1引数関数の変換」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/maybe_monad.html"
+	>「失敗の可能性のある関数をつなぐ」へ</a>
 </p>
