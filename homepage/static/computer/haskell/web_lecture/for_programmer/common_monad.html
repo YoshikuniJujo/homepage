@@ -1,10 +1,115 @@
 共通する枠組み: モナド
 
-<p>(工事中 0%)</p>
+<p>(工事中 60%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+「失敗する可能性のある関数をつなぐ」ことと
+「メモリ機能つきの電卓をエミュレートする」こととのあいだに
+何の共通点があるのだろうか。
+普通に考えてこれら2つのコーディングに共通点はない。
+そんななかでかなり茫漠とした共通点を無理矢理見つけることができる。
+それは「値から複雑な値への変換」を連鎖させることだ。
+</p>
+
+<h2>MaybeとState</h2>
+
+<p>Maybeをつなぐときに使った関数は</p>
+
+<p><code>retM :: a -&gt; Maybe a<br/>
+bindM :: Maybe a -&gt; (a -&gt; Maybe b) -&gt; Maybe b</code></p>
+
+<p>
+のふたつだ。
+一方、Stateをつなぐときに使った関数は
+</p>
+
+<p><code>retC :: a -&gt; State a<br/>
+bindC :: State a -&gt; (a -&gt; State b) -&gt; State b</code></p>
+
+<p>
+のふたつだ。
+これらの型はMaybeとStateをとりかえただけになっている。
+共通する構造を抽出すると
+</p>
+
+<p><code>ret :: a -&gt; m a<br/>
+bind :: m a -&gt; (a -&gt; m b) -&gt; m b</code></p>
+
+<p>
+となる。
+MaybeやStateで見たようにこのふたつは
+</p>
+
+<p><code>arr :: (a -&gt; b) -&gt; (a -&gt; m b)<br/>
+pipe :: (a -&gt; m b) -&gt; (b -&gt; m c) -&gt; (a -&gt; m c)</code></p>
+
+<p>
+のふたつと同じことだ。
+関数pipeは関数bindから以下のように導くことができる。
+</p>
+
+<p><code>(f `pipe` g) x = f x `bind` g</code></p>
+
+<h2>モナド</h2>
+
+<p>関数retとbindを持ち以下の規則を満たすものがモナドである。</p>
+
+<p><code>ret `pipe` f == f<br/>
+f `pipe` ret == f<br/>
+(f `pipe` g) `pipe` h == f `pipe` (g `pipe` h)</code></p>
+
+<p>
+これをモナド則と呼ぶ
+(一般的なモナド則から変形してあるので知っている人用にことわりをいれる必要がある)。
+これは関数retが「値を単純にモナドにつつみこむこと」と
+モナド関数をつなげるときに左結合も右結合も変わらないことを意味する
+(もっと本質をついた解釈があれば置きかえる)。
+</p>
+
+<h2>まとめ</h2>
+
+<p>何であれ</p>
+
+<p><code>a -&gt; m a<br/>
+m a -&gt; (a -&gt; m b) -&gt; m b</code></p>
+
+<p>
+というふたつの型の関数があり
+それらがモナド則を満たしさえすれば型mはモナドである。
+MaybeもStateもモナドだ。
+なかみが何であれ関係ない。
+形式を満たしさえすればモナドだ。
+「モナド」は内容ではなく形式だ。
+MaybeとStateのあいだにはほとんど共通点はない。
+ただモナドという形式を満たすというだけだ。
+</p>
+
+<p>
+冗長だがより理解しやすいモナド関数のペアは
+</p>
+
+<p><code>(a -&gt; b) -&gt; (a -&gt; m b)<br/>
+(a -&gt; m b) -&gt; (b -&gt; m c) -&gt; (a -&gt; m c)</code></p>
+
+<p>
+である。
+つまり
+</p>
+
+<ul>
+<li>普通の関数を「値を文脈に入れる関数」に変換でき</li>
+<li>「値を文脈に入れる関数」同士をつなぐことができる</li>
+</ul>
+
+<p>ということだ。</p>
+
+<p>(「文脈」という言葉について吟味する)</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/calculator.html"
 	>「電卓をエミュレートする」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/between_functor_monad.html"
+	>「モナドとファンクターのあいだ」へ</a>
 </p>
