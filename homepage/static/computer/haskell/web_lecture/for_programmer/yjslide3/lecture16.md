@@ -115,8 +115,8 @@ Maybe
 	lowerToCodeDiv4 :: Char -> Maybe Int
 	lowerToCodeDiv4 c = case lowerToCode c of
 		Just n -> case evenDiv2 n of
-	itext t 3 "Just n' -> evenDiv2 n'
-	itext t 3 "Nothing -> Nothing
+			Just n' -> evenDiv2 n'
+			Nothing -> Nothing
 		Nothing -> Nothing
 
 Maybe
@@ -904,13 +904,13 @@ Stateモナド
 	example''' = do
 		let
 	preLine t
-	itext t 3 "x = 3
-	itext t 3 "y = x * 4
+			x = 3
+			y = x * 4
 		mplus y
 		let
 	preLine t
-	itext t 3 "z = 2
-	itext t 3 "w = z * 5
+			z = 2
+			w = z * 5
 		mplus w
 		v <- get
 		return $ v * 7

@@ -1,10 +1,292 @@
 失敗の可能性のある関数をつなぐ
 
-<p>(工事中 0%)</p>
+<p>(工事中 70%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+(a -&gt; m b)の型をとる関数がある。
+この形の関数の多くは(a -&gt; m b)と(b -&gt; m c)をつないで
+(a -&gt; m c)とすることができると便利である。
+</p>
+
+<p>
+たとえば失敗する可能性のある関数として以下の2つを考える。
+</p>
+
+<p><code>lowerToCode :: Char -&gt; Maybe Int<br/>
+evenDiv2 :: Int -&gt; Maybe Int</code></p>
+
+<p>
+それぞれ小文字だけを文字コードにする関数と偶数だけを2でわる関数だ。
+これらをつないで
+</p>
+
+<p><code>lowerToCodeDiv2 :: Char -&gt; Maybe Int</code></p>
+
+<p>
+を作ることを考える。
+これは小文字で文字コードが偶数であるものの文字コードを2でわった値を計算する。
+</p>
+
+<h2>関数lowerToCode</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/maybe_monad.hs"
+	>maybe_monad.hs</a></p>
+
+<p>小文字のみの文字コードを返す関数を作る。</p>
+
+<p><code>import Data.Char (isLower, ord)</code></p>
+
+<p><code>lowerToCode :: Char -&gt; Maybe Int<br/>
+lowerToCode c<br/>
+	<span class="indent1">| isLower c = Just $ ord c</span><br/>
+	<span class="indent1">| otherwise = Nothing</span></code></p>
+
+<p><code>ghci maybe_monad.hs<br/>
+*Main&gt; lowerToCode 'n'<br/>
+Just 110<br/>
+*Main&gt; lowerToCode 'X'<br/>
+Nothing</code></p>
+
+<h2>関数evenDiv2</h2>
+
+<p>偶数のみを2でわる関数を作る。</p>
+
+<p><code>evenDiv2 :: Int -&gt; Maybe Int<br/>
+evenDiv2 n<br/>
+	<span class="indent1">| even n = Just $ n `div` 2</span><br/>
+	<span class="indent1">| otherwise = Nothing</span></code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; evenDiv2 12<br/>
+Just 6<br/>
+*Main&gt; evenDiv2 17<br/>
+Nothing</code></p>
+
+<h2>関数lowerToCodeDiv2</h2>
+
+<p>
+関数lowerToCodeと関数evenDiv2とをつなげて
+小文字で文字コードが偶数のもののみの文字コードを2でわった値を計算する関数を
+作る。
+</p>
+
+<p><code>lowerToCode :: Char -&gt; Maybe Int<br/>
+evenDiv2 :: Int -&gt; Maybe Int</code></p>
+
+<p>これらの関数をつなげて</p>
+
+<p><code>lowerToCodeDiv2 :: Char &gt; Maybe Int</code></p>
+
+<p>を作る。</p>
+
+<p><code>lowerToCodeDiv2 :: Char -&gt; Maybe Int<br/>
+lowerToCodeDiv2 c = case lowerToCode c of<br/>
+	<span class="indent1">Just n -&gt; evenDiv2 n</span><br/>
+	<span class="indent1">_ -&gt; Nothing</span></code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; lowerToCodeDiv2 'n'<br/>
+Just 55<br/>
+*Main&gt; lowerToCodeDiv2 'N'<br/>
+Nothing<br/>
+*Main&gt; lowerToCodeDiv2 'y'<br/>
+Nothing</code></p>
+
+<h2>関数lowerToCodeDiv4</h2>
+
+<p>
+さらに関数evenDiv2を2回つなげることで
+「小文字で文字コードが4の倍数のものの文字コードを4でわったものを計算する関数」
+を作る。
+</p>
+
+<p><code>lowerToCode :: Char -&gt; Maybe Int<br/>
+evenDiv2 :: Int -&gt; Maybe Int<br/>
+evenDiv2 :: Int -&gt; Maybe Int</code></p>
+
+<p>の3つをつなぐ。</p>
+
+<p><code>lowerToCodeDiv4 :: Char -&gt; Maybe Int<br/>
+lowerToCodeDiv4 c = case lowerToCode c of<br/>
+	<span class="indent1">Just n -&gt; case evenDiv2 n of</span><br/>
+	<span class="indent2">Just n' -&gt; evenDiv2 n'</span><br/>
+	<span class="indent2">_ -&gt; Nothing</span><br/>
+	<span class="indent1">_ -&gt; Nothing</span><br/>
+	</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; lowerToCodeDiv4 'n'<br/>
+Nothing<br/>
+*Main&gt; lowerToCodeDiv4 'p'<br/>
+Just 28</code></p>
+
+<h2>関数pipeM</h2>
+
+<p>
+「失敗の可能性のある関数」をつないでみた。
+どのようなつなぎかただっただろうか。
+</p>
+
+<p><code>f :: a -&gt; Maybe b<br/>
+g :: b -&gt; Maybe c</code></p>
+
+<p>
+関数fと関数gをつなぐということは
+関数fの結果がJust xならば値xに関数gを適用するということだ。
+もし関数fの結果がNothingならば結果もNothingとなる。
+</p>
+
+<p>関数fまたは関数gのどちらかが「失敗」すれば全体も失敗する。</p>
+
+<p>このようなつなぎかたをする関数pipeMを作る。</p>
+
+<p><code>pipeM ::
+	(a -&gt; Maybe b) -&gt; (b -&gt; Maybe c) -&gt; (a -&gt; Maybe c)<br/>
+(f `pipeM` g) v = case f v of<br/>
+	<span class="indent1">Just x -&gt; g x</span><br/>
+	<span class="indent1">_ -&gt; Nothing</span></code></p>
+
+<h3>関数lowerToCodeDiv4の書きかえ</h3>
+
+<p>関数lowerToCodeDiv4を関数pipeMを使って書きかえる。</p>
+
+<p><code>lowerToCodeDiv4 :: Char -&gt; Maybe Int<br/>
+lowerToCodeDiv4 = lowerToCode `pipeM` evenDiv2 `pipeM` evenDiv2</code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; lowerToCodeDiv4 'n'<br/>
+Nothing<br/>
+*Main&gt; lowerToCodeDiv4 'p'<br/>
+Just 28</code></p>
+
+<h2>関数lowerToCodeDiv2Mul3</h2>
+
+<p>
+2回2でわるかわりに2でわったあとに3をかけることを考えよう。
+かけ算は失敗することはないので
+</p>
+
+<p><code>mul3 :: Int -&gt; Int<br/>
+mul3 = (* 3)</code></p>
+
+<p>
+となる。
+これをpipeMでつなぐことを考える。
+このままだと型が合わないので型を合わせるための関数を作る。
+</p>
+
+<p><code>arrM :: (a -&gt; b) -&gt; (a -&gt; Maybe b)<br/>
+arrM f = Just . f</code></p>
+
+<p>この関数は以下のようにも書ける。</p>
+
+<p><code>arrM = (Just .)</code></p>
+
+<p>これらを使って関数lowerToCodeDiv2Mul3を定義する。</p>
+
+<p><code>lowerToCodeDiv2Mul3 :: Char -&gt; Maybe Int<br/>
+lowerToCodeDiv2Mul3 =<br/>
+	<span class="indent1">lowerToCode `pipeM` evenDiv2 `pipeM` arrM mul3</span></code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; lowerToCodeDiv2Mul3 'n'<br/>
+Just 165</code></p>
+
+<h2>より単純にする</h2>
+
+<p>
+失敗の可能性のある関数同士やそれらと普通の関数をつないでいく書きかたをするために
+以下の2つの関数を定義した。
+</p>
+
+<p><code>pipeM :: (a -&gt; Maybe b) -&gt; (b -&gt; Maybe c) -&gt; (a -&gt; Maybe c)<br/>
+arrM :: (a -&gt; b) -&gt; (a -&gt; Maybe b)</code></p>
+
+<p>
+これらはどちらも引数と結果の両方に'a -&gt;'がある。
+これらを消して同じ情報を持つ関数を作ることができる。
+関数名はbindMとretMとすることにしよう。
+</p>
+
+<p><code>bindM :: Maybe b -&gt; (b -&gt; Maybe c) -&gt; Maybe c<br/>
+retM :: b -&gt; Maybe b</code></p>
+
+<p>bindMとretMとを定義しよう。</p>
+
+<p><code>Just x `bindM` f = f x<br/>
+_ `bindM` _ = Nothing</code></p>
+
+<p><code>retM = Just</code></p>
+
+<h2>関数lowerToCodeDiv2Mul3</h2>
+
+<p>関数bindMとretMのセットを使ってlowerToCodeDiv2Mul3を書きなおす。</p>
+
+<p><code>lowerToCodeDiv2Mul3 c =<br/>
+	<span class="indent1">lowerToCode c `bindM` evenDiv2 `bindM` (retM . mul3)</span></code></p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; lowerToCodeDiv2Mul3 'n'<br/>
+Just 165</code></p>
+
+<p>関数lowerToCodeDiv2Mul3の定義を以下のように整形することができる。</p>
+
+<p><code>lowerToCodeDiv2Mul3 c =<br/>
+	<span class="indent1">lowerToCode c `bindM` \n -&gt;</span><br/>
+	<span class="indent1">evenDiv2 n `bindM` \n' -&gt;</span><br/>
+	<span class="indent1">retM $ mul3 n'</span><br/>
+	<span class="indent1"></span><br/>
+	</code></p>
+
+<p>
+このような形にすると
+</p>
+
+<ul>
+<li>lowerToCode cの結果でnを束縛し</li>
+<li>evenDiv2 nの結果でn'を束縛し</li>
+<li>mul3 n'の値を返す</li>
+</ul>
+
+<p>
+のように読むことができる。
+参考までに上の形の定義に明示的に括弧をつけるとどうなるかを示す。
+</p>
+
+<p><code>lowerToCodeDiv2Mul3 c =<br/>
+	<span class="indent1">lowerToCode c `bindM` (\n -&gt;</span><br/>
+	<span class="indent1">evenDiv2 n `bindM` (\n' -&gt;</span><br/>
+	<span class="indent1">retM $ mul3 n'))</span><br/>
+	<span class="indent1"></span><br/>
+	</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+失敗するかもしれない計算(a -&gt; Maybe b)がある。
+このような計算をつなぐ関数は以下のような型となる。
+</p>
+
+<p><code>(a -&gt; Maybe b) -&gt; (b -&gt; Maybe c) -&gt; (a -&gt; Maybe c)</code></p>
+
+<p>
+普通の計算も以下の型の関数で型をそろえてつなぐことができる。
+</p>
+
+<p><code>(a -&gt; b) -&gt; (a -&gt; Maybe b)</code></p>
+
+<p>
+これらの関数はより単純な形に直すことができる。
+</p>
+
+<p><code>bindM :: Maybe a -&gt; (a -&gt; Maybe b) -&gt; Maybe b<br/>
+retM :: a -&gt; Maybe a</code></p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/trans_2_args.html"
 	>「2引数関数の変換」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/calculator.html"
+	>「電卓をエミュレートする」へ</a>
 </p>
