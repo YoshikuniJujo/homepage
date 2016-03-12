@@ -1,0 +1,26 @@
+モナド則から導きだせる規則
+
+<p>(工事中 0%)</p>
+
+<h2>メモ</h2>
+
+<p>
+モナド則からモノイダル則を導くのに以下の2つの規則が使えるとスムーズだ。
+</p>
+
+<p><code>fmap f [ ret | ... ] == [ f ret | ... ]</code></p>
+
+<p><code>[ ret | ..., (x, y) &lt;- [ (x, y) | x &lt;- u, y &lt;- v ], ... ] ==
+	[ ret | ..., x &lt;- u, y &lt;- v, ... ]</code></p>
+
+<p>
+これらをわかりやすく示したい。
+見やすさのためにMonadComprehensions拡張を紹介してしまおう。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/common_monad.html"
+	>「共通の枠組み: モナド」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/between_functor_monad.html"
+	>「モナドとファンクターのあいだ」へ</a>
+</p>

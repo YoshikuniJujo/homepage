@@ -294,8 +294,22 @@ tup m n = m `bind` \x -&gt; n `bind` \y -&gt; ret (x, y)</code></p>
 <p>joinがあればtupは表現できる。</p>
 
 <p>
-<a href="/computer/haskell/web_lecture/for_programmer/common_monad.html"
-	>「共通の枠組み: モナド」へもどる</a>
+アプリカティブの話は説明するのがやっかいだ。
+とくにモナドならばアプリカティブだというところで
+モナド則からモノイダル則を導くのに手間がかかる。
+</p>
+
+<p>
+さきにモナド則から導かれる法則をいくつか見ておくといいのかもしれない。
+</p>
+
+<p><code>fmap f [ ret | ... ] == [ f ret | ... ]<br/>
+[ ret | ..., (x, y) &lt;- [ (x, y) | x &lt;- u, y &lt;- v ], ... ] ==
+	[ ret | ..., x &lt;- u, y &lt;- v, ... ]</code></p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/from_monad_law.html"
+	>「モナド則から導かれる規則」へもどる</a>
 <a href="/computer/haskell/web_lecture/for_programmer"
 	>「1から学ぶHaskell」トップへ</a>
 </p>
