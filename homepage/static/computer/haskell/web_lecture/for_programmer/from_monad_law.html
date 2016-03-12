@@ -5,6 +5,19 @@
 <h2>メモ</h2>
 
 <p>
+!!これはだめだ。
+Monadクラスを説明してない。
+しかし、Monadクラスを説明するには'Applicative m =&gt;'がからんでくるし、
+難しいところだ。
+</p>
+
+<p>
+モナド則からモノイダル則を導くのはMonadクラス等の紹介が終わったあとにしようかな。
+とりあえずは「モナド則からモノイダル則が導けます」とだけ言っておいて、
+あとで示すといった感じか。
+</p>
+
+<p>
 モナド則からモノイダル則を導くのに以下の2つの規則が使えるとスムーズだ。
 </p>
 
@@ -17,6 +30,19 @@
 これらをわかりやすく示したい。
 見やすさのためにMonadComprehensions拡張を紹介してしまおう。
 </p>
+
+<p>
+途中に直観的にわかりやすい規則をはさむのがコツだと思う。
+</p>
+
+<p>参考: <a href="/computer/haskell/web_lecture/for_programmer/list_comprehensions_trans.html"
+	>リスト内包表記の変形</a></p>
+
+<ul>
+<li><code>[ (x, y) | ]</code></li>
+</ul>
+
+<p><code>m &gt;&gt;= f &gt;&gt;= g</code></p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/common_monad.html"
