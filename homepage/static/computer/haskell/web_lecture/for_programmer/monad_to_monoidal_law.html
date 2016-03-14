@@ -1,0 +1,97 @@
+モナド則からモノイダル則を導く
+
+<p>(工事中 0%)</p>
+
+<h2>メモ</h2>
+
+<p>
+以降はすべてメモだ。
+他で書いたものを保存してある。
+</p>
+
+<h2>モナドはすべてアプリカティブファンクター</h2>
+
+<p>(
+モナド則からモノイド則を導くのが煩雑だ。
+すこし考える必要がある
+)</p>
+
+<p>関数appは関数bindで</p>
+
+<p><code>u `app` v = u `bind` \f -&gt; v `bind` \x -&gt; ret (f x)</code></p>
+
+<p>
+のように定義することができる。また、pure = retと定義できる。
+すると
+</p>
+
+<p><code>unit = ret ()</code></p>
+
+<p>であり</p>
+
+<p>(<code>(m `bind` f) `bind` g == m `bind` \x -&gt; f x `bind` g</code>)</p>
+<p>(<code>(m `bind` \x -&gt; f x) `bind` g == m `bind` \x -&gt; f x `bind` g</code>)</p>
+
+<p><code>u `tup` v<br/>
+=&gt; pure (,) `app` u `app` v<br/>
+=&gt; (ret (,) `bind` \f -&gt; u `bind` \x -&gt; ret (f x)) `app` v<br/>
+=&gt; (u `bind` \x -&gt; ret (x ,)) `app` v<br/>
+=&gt; (u `bind` \x -&gt; ret (x ,)) `bind` \f -&gt; v `bind` \y -&gt; ret (f y)<br/>
+=&gt; u `bind` \x -&gt; ret (x ,) `bind` \f -&gt; v `bind` \y -&gt; ret (f y)<br/>
+=&gt; u `bind` \x -&gt; v `bind` \y -&gt; ret (x, y)</code></p>
+
+<p>となる。</p>
+
+<p><code>fmap snd (unit `tup` v)<br/>
+=&gt; fmap snd (ret () `tup` v)<br/>
+=&gt; fmap snd (ret () `bind` \x -&gt; v `bind` \y -&gt; ret (x, y))<br/>
+=&gt; fmap snd (v `bind` \y -&gt; ret ((), y))<br/>
+=&gt; fmap snd $ v `bind` ret . (() ,)<br/>
+=&gt; fmap snd $ fmap (() ,) v<br/>
+=&gt; fmap (snd . (() ,)) v<br/>
+=&gt; fmap id v<br/>
+=&gt; v</code></p>
+
+<p><code>fmap fst (u `tup` unit)<br/>
+=&gt; fmap fst (v `tup` ret ())<br/>
+=&gt; fmap fst (v `bind` \x -&gt; ret () `bind` \y -&gt; ret (x, y))<br/>
+=&gt; fmap fst (v `bind` \x -&gt; ret (x, ()))<br/>
+=&gt; fmap fst (v `bind` ret . (, ()))<br/>
+=&gt; fmap fst $ (`bind` ret . (, ())) v<br/>
+=&gt; fmap fst $ fmap (, ()) v<br/>
+=&gt; fmap (fst . (, ())) v<br/>
+=&gt; fmap id v<br/>
+=&gt; v</code></p>
+
+<p><code>(u `bind` \x -&gt; v `bind` \y -&gt; ret (x, y)) `bind`
+	\(x, y) -&gt; f x y<br/>
+=&gt; u `bind` \x -&gt; (v `bind` \y -&gt; ret (x, y)) `bind`
+	\(x, y) -&gt; f x y<br/>
+=&gt; u `bind` \x -&gt; v `bind` \y -&gt; (\y -&gt; return (x, y)) y `bind`
+	\(x, y) -&gt; f x y<br/>
+=&gt; u `bind` \x -&gt; v `bind` \y -&gt; return (x, y) `bind`
+	\(x, y) -&gt; f x y<br/>
+=&gt; u `bind` \x -&gt; v `bind` \y -&gt; f x y</code></p>
+
+<p><code>fmap asl (u `tup` (v `tup` w))<br/>
+=&gt; fmap asl (u `bind` \x -&gt; (v `tup` w) `bind` \yz -&gt; ret (x, yz))<br/>
+=&gt; fmap asl (u `bind` \x -&gt;
+	(v `bind` \y -&gt; w `bind` \z -&gt; ret (y, z)) `bind` \yz -&gt; ret (x, yz)<br/>
+=&gt; fmap asl (u `bind` \x -&gt; v `bind` \y -&gt; w `bind` \z -&gt; ret (x, (y, z)))<br/>
+=&gt; (u `bind` \x -&gt; v `bind` \y -&gt; w `bind` \z -&gt; ret (x, (y, z)))
+	`bind` ret . asl<br/>
+=&gt; u `bind` \x -&gt; (v `bind` \y -&gt; w `bind` \z -&gt; ret (x, (y, z)))
+	`bind` ret . asl<br/>
+=&gt; u `bind` \x -&gt; v `bind` \y -&gt; (w `bind` \z -&gt; ret (x, (y, z)))
+	`bind` ret . asl<br/>
+=&gt; u `bind` \x -&gt; v `bind` \y -&gt; w `bind` \z -&gt; ret (x, (y, z))
+	`bind` ret . asl<br/>
+=&gt; u `bind` \x -&gt; v `bind` \y -&gt; w `bind` \z -&gt; ret (asl (x, (y, z)))<br/>
+=&gt; u `bind` \x -&gt; v `bind` \y -&gt; w `bind` \z -&gt; ret ((x, y), z)<br/>
+=&gt; u `bind` \x -&gt; v `bind` \y -&gt; ret (x, y) `bind` \(x, y) -&gt;
+	w `bind` \z -&gt; ret ((x, y), z)<br/>
+=&gt; u `bind` \x -&gt; (v `bind` \y -&gt; ret (x, y)) `bind` \(x, y) -&gt;
+	w `bind` \z -&gt; ret ((x, y), z)<br/>
+=&gt; (u `bind` \x -&gt; v `bind` \y -&gt; ret (x, y)) `bind` \(x, y) -&gt;
+	w `bind` \z -&gt; ret ((x, y), z)<br/>
+=&gt; (u `tup` v) `tup` w</code></p>
