@@ -1,0 +1,95 @@
+モナドではないアプリカティブ (下書き)
+
+<p>(工事中 0%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+この記事はきれいにまとめられたら独立した記事にする。
+</p>
+
+<h2>ZipList的なものもモナドから導ける</h2>
+
+<p>たとえば値3つのタプルは以下のようにモナドにできる。</p>
+
+<p><code>return x = (x, x, x)<br/>
+(x, y, z) &gt;&gt;= f = let<br/>
+	<span class="indent1">(x', _, _) = f x</span><br/>
+	<span class="indent1">(_, y', _) = f y</span><br/>
+	<span class="indent1">(_, _, z') = f z in</span><br/>
+	<span class="indent1">(x', y', z')</span></code></p>
+
+<p>
+ZipListはモナドにならないアプリカティブの代表的なものだが、
+それはリストのリストにおいて要素数がバラバラであるということの結果であり、
+あまり本質的なことではない。
+無限リストを考えればZipListはモナドになるし、
+要素数が一定であるようなリストであればやはりモナドになる。
+</p>
+
+<p>
+モナド則を満たさないinsaneなものながら、
+型クラスMonadのインスタンスとしてZipListを定義することができる。
+そしてその定義を利用して型クラスApplicativeなsaneなインスタンスとして定義する
+ことが可能だ。
+</p>
+
+<h2>ならば本質的にモナドでないアプリカティブとは</h2>
+
+<p>
+これを考えるときにはモナドとアプリカティブの違いをできるだけ単純に抽出することが
+役に立つだろう。
+モナドとアプリカティブの違いは以下の関数に要約できる。
+</p>
+
+<ul>
+<li>tup :: f a -&gt; f b -&gt; f (a, b) (アプリカティブ)<code></code></li>
+<li>join :: f (f a) -&gt; f a (モナド)<code></code></li>
+</ul>
+
+<p>
+つまり関数tupなら定義できるけれど関数joinは定義できないような例を考えればいい。
+これが思ったより難しい。
+f aとf bをマージすることとf (f a)を平坦にすることとは
+2個のfという構造をマージするという点では共通しているからだ。
+</p>
+
+<p>
+関数tupのほうでしかできないことは何かということだ。
+f aとf bをマージするときに一度f (f (a, b))のような形にしてそれを関数joinで
+平坦にするようなやりかたではうまくいかないような関数tupの例を考えればいい。
+f (f (a, b))のようにしたときの外側のfはf a由来の構造だ。
+もしもf a -&gt; f b -&gt; f (a, b)がf bの構造の一部を必要としているようなときに、
+f aがNothing的な構造であり「なかみがない」ようなときf (f (a, b))において、
+f bの構造部分もまた消えてしまう。
+</p>
+
+<p>
+つまりf aが「なかみがない」ような値であることがあり、
+tup :: f a -&gt; f b -&gt; f (a, b)の結果がf bの構造に依存するような例を
+考えれば、
+モナドにはできないアプリカティブを作ることができる。
+そのようにして作ったのが<a href="/computer/haskell/web_lecture/for_programmer/codes/nma1.hs"
+>nma1.hs</a>だ。
+とりあえずまだリファクタリングやより本質的な部分の抽出はしていない。
+また、いちおうQuickCheckでモノイダル則の確認はしたが、
+きちんとした証明はしていない。
+とりあえずのたたきだいだ。
+</p>
+
+<p>
+モノイダル則の確認は以下のようにした。
+</p>
+
+<p><code>ghci nma1.hs<br/>
+*Main&gt; quickCheck (prop_monoidal_left :: List Int -&gt; Bool)<br/>
+...<br/>
+*Main&gt; quickCheck (prop_monoidal_right :: List Int -&gt; Bool)<br/>
+...<br/>
+*Main&gt; quickCheck (prop_monoidal_assoc :: List Int -&gt; List Int -&gt; List Int -&gt; Bool)<br/>
+...</code></p>
+
+<p>
+QuickCheckのためにRandomやBoundedのインスタンスにいちおうしたが、
+あまりよくないインスタンス定義だ。
+</p>
