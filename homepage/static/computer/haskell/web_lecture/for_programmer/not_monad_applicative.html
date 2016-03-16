@@ -16,11 +16,39 @@
 失敗の可能性のある計算にエラーメッセージを追加する例でこのことを見ていこう。
 </p>
 
-<h2>Maybeモナド</h2>
+<h2>モナドMaybe</h2>
 
-<h2>Errorモナド</h2>
+<p>
+Maybeモナドについてもう一度見てみよう。
+モナドにするためには以下の関数を定義する。
+</p>
+
+<p><code>mret :: a -&gt; m a<br/>
+mret = Just</code></p>
+
+<p><code>mbind :: Maybe a -&gt; (a -&gt; Maybe b) -&gt; Maybe b<br/>
+mbind m f = maybe Nothing f m</code></p>
+
+<p>
+0除算を行わない安全な除算関数を作成する。
+</p>
+
+<p><code>safeDivM :: Int -&gt; Int -&gt; Maybe Int<br/>
+safeDivM _ 0 = Nothing<br/>
+safeDivM x y = Just $ x `div` y</code></p>
+
+<p>整数演算a / b + c / dを安全に計算する関数を作成する。</p>
+
+<p><code>calcM :: Int -&gt; Int -&gt; Int -&gt; Int -&gt; Maybe Int<br/>
+calcM a b c d = </code></p>
+
+<h3>アプリカティブスタイル</h3>
+
+<h2>モナドTryM</h2>
 
 <h2>すべてのエラーメッセージを表示したい</h2>
+
+<h2>アプリカティブTryAでできないこと</h2>
 
 <h2>メモ</h2>
 
