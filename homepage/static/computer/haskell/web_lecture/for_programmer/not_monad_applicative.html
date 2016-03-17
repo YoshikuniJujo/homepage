@@ -1,6 +1,6 @@
 アプリカティブファンクターであるがモナドではない例
 
-<p>(工事中 0%)</p>
+<p>(工事中 60%)</p>
 
 <p><a href="/computer/haskell/web_lecture/for_programmer/codes/nma4.hs"
 	>nma4.hs</a></p>
@@ -40,15 +40,254 @@ safeDivM x y = Just $ x `div` y</code></p>
 <p>整数演算a / b + c / dを安全に計算する関数を作成する。</p>
 
 <p><code>calcM :: Int -&gt; Int -&gt; Int -&gt; Int -&gt; Maybe Int<br/>
-calcM a b c d = </code></p>
+calcM a b c d =<br/>
+	<span class="indent1">a `safeDivM` b `mbind` \x -&gt;</span><br/>
+	<span class="indent1">c `safeDivM` d `mbind` \y -&gt;</span><br/>
+	<span class="indent1">mret $ x + y</span></code></p>
+
+<p>試してみる。</p>
+
+<p><code>% ghci nma4.hs<br/>
+*Main&gt; calcM 10 3 30 7<br/>
+Just 7<br/>
+*Main&gt; calcM 25 4 18 0<br/>
+Nothing<br/>
+*Main&gt; calcM 38 0 95 8<br/>
+Nothing<br/>
+*Main&gt; calcM 8 0 2 0<br/>
+Nothing</code></p>
 
 <h3>アプリカティブスタイル</h3>
 
+<p>
+関数calcMはa `safeDivM` bのなかみで変数xを束縛し、
+c `safeDivM` dのなかみで変数yを束縛し、
+x + yに文脈をつけて返すという形だ。
+</p>
+
+<p><code>mapp :: Maybe (a -&gt; b) -&gt; Maybe a -&gt; Maybe b</code></p>
+
+<p>
+のような関数を定義することで
+</p>
+
+<p><code>calcM a b c d = mret (+) `mapp` (a `safeDivM` b) `mapp` (c `safeDivM` d)</code></p>
+
+<p>
+のように書くことができる。
+これはより直接的に関数(+)の第1引数に(a `safeDivM` b)のなかみをあたえ、
+第2引数に(c `safeDivM` d)のなかみをあたえていると考えられる。
+関数mappは
+</p>
+
+<p><code>mapp mf mx =<br/>
+	<span class="indent1">mf `mbind` \f -&gt;</span><br/>
+	<span class="indent1">mx `mbind` \m -&gt;</span><br/>
+	<span class="indent1">mret $ f m</span><code></p>
+
+<p>
+のように定義できる。
+文脈つきの関数mfのなかみで変数fを束縛し、
+文脈つきの値mxのなかみで変数xを束縛し、
+値xに関数fを適用したものに関数mretで文脈をつけている。
+</p>
+
 <h2>モナドTryM</h2>
+
+<p>
+Maybe値ではエラーをNothingで表現した。
+これだと何がエラーだったのかわからない。
+Nothingではなく文字列を持つ値構築子とすることで
+どんなエラーだったかを文字列で表現することができる。
+</p>
+
+<p><code>data TryM a = ErrorM String | SuccessM a deriving Show</code></p>
+
+<p>これに対してモナド関数を定義する。</p>
+
+<p><code>tret :: a -&gt; TryM a<br/>
+tret = SuccessM</code></p>
+
+<p><code>tbind :: TryM a -&gt; (a -&gt; TryM b) -&gt; TryM b<br/>
+SuccessM x `tbind` f = f x<br/>
+ErrorM em `tbind` _ = ErrorM em</code></p>
+
+<p>
+関数mbindのNothingの部分がErrorM emになっている。
+安全なわり算を定義する。
+</p>
+
+<p><code>safeDivTM :: Int -&gt; Int -&gt; TryM Int<br/>
+safeDivTM x 0 = ErrorM $ show x ++ " is divided by zero\n"<br/>
+safeDivTM x y = SuccessM $ x `div` y</code></p>
+
+<p>アプリカティブスタイルで書くための補助関数tmappを定義する。</p>
+
+<p><code>tmapp :: TryM (a -&gt; b) -&gt; TryM a -&gt; TryM b<br/>
+tf `tmapp` tx =<br/>
+	<span class="indent1">tf `tbind` \f -&gt;</span><br/>
+	<span class="indent1">tx `tbind` \x -&gt;</span><br/>
+	<span class="indent1">tmret $ f x</span></code></p>
+
+<p>これらを使って安全なa / b + c / dを定義する。</p>
+
+<p><code>calcTM :: Int -&gt; Int -&gt; Int -&gt; Int -&gt; TryM Int<br/>
+calcTM a b c d = tret (+) `tmapp` (a `safeDivTM` b) `tmapp` (c `safeDivTM` d)</code></p>
+
+<p>試してみる。</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; calcTM 15 4 28 3<br/>
+SuccessM 12<br/>
+*Main&gt; calcTM 8 0 53 8<br/>
+ErrorM "8 is divided by zero\n"<br/>
+*Main&gt; calcTM 33 9 25 0<br/>
+ErrorM "25 is divided by zero\n"<br/>
+*Main&gt; calcTM 23 0 18 0<br/>
+ErrorM "23 is divided by zero\n"</code></p>
+
+<p>
+はじめに0除算を行ったところで処理が終了してエラーメッセージが返される。
+</p>
 
 <h2>すべてのエラーメッセージを表示したい</h2>
 
+<h3>モナドではなくアプリカティブなら可能</h3>
+
+<p>
+TryM型を使うと0除算を行う計算が複数あってもはじめのエラーのみが報告される。
+すべてのエラーメッセージを表示するためにはどうしたらいいだろうか。
+モナド関数bindの型を見る。
+</p>
+
+<p><code>bind :: m a -&gt; (a -&gt; m b) -&gt; m b</code></p>
+
+<p>
+エラーが生じるということはm aの型aの値が計算できなかったということだ。
+よって型aの値を(a -&gt; m b)型の関数にわたすことができない。
+よってm b型の値は取得できない。
+たとえエラーであるとしてもふたつめのエラーはm b型の値である。
+m b型の値が作れないということはエラー値であっても取得できないということだ。
+</p>
+
+<p>
+今回の例であるa / b + c / dは直接的にはそれぞれの関数appを使っていて、
+関数bindを直接使う必要はない。
+よってアプリカティブ関数を直接定義することを考える。
+アプリカティブ関数appの型は以下のようになる。
+</p>
+
+<p>app :: f (a -&gt; b) -&gt; f a -&gt; f b</p>
+
+<p>
+これであればf (a -&gt; b)型とf a型の値の両方がエラー値であったときに、
+f b型の値に両方のエラー値の情報を含めることができる。
+</p>
+
+<h3>今回の例を書いてみる</h3>
+
+<p>
+アプリカティブ関数を定義するバージョンを書いてみよう。
+データ構造は
+</p>
+
+<p><code>data TryA a = ErrorA String | SuccessA a deriving Show</code></p>
+
+<p>
+となる。
+アプリカティブ関数は
+</p>
+
+<p><code>tpure :: a -&gt; TryA a<br/>
+tpure = SuccessA</code></p>
+
+<p><code>tapp :: TryA (a -&gt; b) -&gt; TryA a -&gt; TryA b<br/>
+SuccessA f `tapp` SuccessA x = SuccessA $ f x<br/>
+SuccessA _ `tapp` ErrorA em' = ErrorA em'<br/>
+ErrorA em `tapp` SuccessA _ = Error A em<br/>
+ErrorA em `tapp` ErrorA em' = ErrorA $ em ++ em'</code></p>
+
+<p>
+関数と値の両方がSuccess値であれば適用した結果をSuccess値として返す。
+どちらかの値がError値ならばError値を返す。
+もしも両方の値がError値ならばエラーメッセージを足し合わせる。
+</p>
+
+<p>安全なわり算は</p>
+
+<p><code>safeDivTA :: Int -&gt; Int -&gt; TryA Int<br/>
+safeDivTA x 0 = ErrorA $ show x ++ " is divided by zero\n"<br/>
+safeDivTA x y = SuccessA $ x `div` y</code></p>
+
+<p>
+となる。
+例の計算は
+</p>
+
+<p><code>calcTA :: Int -&gt; Int -&gt; Int -&gt; Int -&gt; TryA Int<br/>
+calcTA a b c d = tpure (+) `tapp` (a `safeDivTA` b) `tapp` (c `safeDivTA` d)</code></p>
+
+<p>
+だ。
+試してみよう。
+</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; calcTA 15 3 19 7<br/>
+SuccessA 7<br/>
+*Main&gt; calcTA 55 0 28 3<br/>
+ErrorA "55 is divided by zero\n"<br/>
+*Main&gt; calcTA 38 4 17 0<br/>
+ErrorA "17 is divided by zero\n"<br/>
+*Main&gt; calcTA 40 0 21 0<br/>
+ErrorA "40 is divided by zero\n21 is divided by zero\n"</code></p>
+
+<p>
+両方のエラーメッセージが結合されて返されていることがわかる。
+</p>
+
 <h2>アプリカティブTryAでできないこと</h2>
+
+<p>
+TryAではエラーが生じたときに、すべてのエラーメッセージを結合して返すことができる。
+しかし、エラーが生じうる関数からの値を次のエラーが生じうる関数にあたえることが
+できない。
+TryMでしかできない計算の例は
+</p>
+
+<p><code>calc2 :: Int -&gt; Int -&gt; Int -&gt; TryM Int<br/>
+calc2 a b c =<br/>
+	<span class="indent1">a `safeDivTM` b `tbind` \x -&gt;</span><br/>
+	<span class="indent1">x `safeDivTM` c</span><br/>
+
+<p>
+となる。
+f a型の値のなかみのa型の値を(a -&gt; f b)型の関数に渡す必要がある。
+アプリカティブ関数appの型は
+</p>
+
+<p><code>app :: f (a -&gt; b) -&gt; f a -&gt; f b</code></p>
+
+<p>
+であり、どう変形してもa型の値を(a -&gt; f b)型に渡すことはできない。
+例の関数を試してみよう。
+</p>
+
+<p><code>*Main&gt; calc2 52 3 4<br/>
+SuccessM 4<br/>
+*Main&gt; calc2 33 0 8<br/>
+ErrorM "2 is divided by zero\n"<br/>
+*Main&gt; calc2 46 3 0<br/>
+ErrorM "15 is divided by zero\n"</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+モナドにすることのできないアプリカティブを見た。
+f a型の値においてなかみにa型の値が存在しないような可能性があり、
+そのような場合にも「エラー値」のなかみを使って計算を続行するような
+アルゴリズムではモナドにすることができない。
+</p>
 
 <h2>メモ</h2>
 
@@ -61,8 +300,14 @@ Errorアプリカティブではアプリカティブ的な使いかたを示す
 </p>
 
 <p>
+用語「モナド関数」をreturn, (&gt;&gt;=)やそれと同じ型を持ち
+モナド則を満たす関数として定義する。
+用語「アプリカティブ関数」も同様にpure, (&lt;*&gt;)について定義する。
+</p>
+
+<p>
 <a href="/computer/haskell/web_lecture/for_programmer/between_functor_monad.html"
 	>「ファンクターとモナドのあいだ」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/applicative_class.html"
+	>「型クラス: Applicative」へ</a>
 </p>
