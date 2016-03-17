@@ -2,6 +2,236 @@
 
 <p>(工事中 0%)</p>
 
+<h2>はじめに</h2>
+
+<p>
+ファンクター、アプリカティブ、モナドについて見てきた。
+コンテナあるいは文脈の持つ性質だ。
+これらの性質は型クラスによって一般化できる。
+ファンクターを表す型クラスFunctorはすでに見た。
+ここでは型クラスApplicativeを示す。
+</p>
+
+<h2>関数fmapの別名</h2>
+
+<p>
+アプリカティブスタイルというコーディングの作法がある。
+たとえばモナドであったとしてもアプリカティブの範囲内で表現可能な
+アルゴリズムであればアプリカティブスタイルで書いたほうがきれいだ。
+モナドによる
+</p>
+
+<p><code>mx `bind` \x -&gt;<br/>
+my `bind` \y -&gt;<br/>
+ret $ g x y</code></p>
+
+<p>
+のような表現はアプリカティブスタイルで
+</p>
+
+<p><code>pure g `app` mx `app` my</code></p>
+
+<p>
+のように書ける。
+pure g `app`の部分は
+</p>
+
+<p><code>g :: a -&gt; b</code></p>
+
+<p>を</p>
+
+<p><code>app :: f (a -&gt; b) -&gt; f a -&gt; f b</code></p>
+
+<p>
+の第1引数とするために関数pureで文脈つきの関数に変換している。
+ファンクタ関数である
+</p>
+
+<p><code>fmap :: (a -&gt; b) -&gt; f a -&gt; f b</code></p>
+
+<p>を使えば</p>
+
+<p><code>g `fmap` mx `app` my</code></p>
+
+<p>
+のように書ける。
+関数fmapや関数appを演算子的に使うことで読みやすくなる。
+それならばはじめから同じ意味の演算子を用意すればいい。
+関数fmapには同じ意味の演算子(&lt;$&gt;)が用意されている。
+うえの例ならば
+</p>
+
+<p><code>(g &lt;$&gt; mx) `app` my</code></p>
+
+<p>
+のように書ける。
+丸括弧が必要になってしまったが
+型クラスApplicativeを導入することでこれは不要になる。
+</p>
+
+<p>
+演算子(&lt;$&gt;)はどこであれ関数fmapの代わりに使えるので、
+たとえばリストについても
+</p>
+
+<p><code>(* 10) &lt;$&gt; [3, 5, 2, 4, 8]</code></p>
+
+<p>
+のように使える。
+単純な関数適用
+</p>
+
+<p>(* 10) $ 8</p>
+
+<p>
+と比べてみよう。
+</p>
+
+<h2>型クラスApplicative</h2>
+
+<p>
+アプリカティブであるという性質を表現する型クラスApplicativeが用意されている。
+クラス関数は
+</p>
+
+<p><code>pure :: a -&gt; f a<br/>
+(&lt;*&gt;) :: f (a -&gt; b) -&gt; f a -&gt; f b</code></p>
+
+<p>
+のふたつだ。
+そして型クラスApplicativeのインスタンスが本当にアプリカティブであるためには
+ファンクタ則とモノイダル則を満たす必要がある。
+ファンクタ則は
+</p>
+
+<p><code>fm :: (a -&gt; b) -&gt; f a -&gt; f b<br/>
+fm g = (pure g &lt;*&gt;)</code></p>
+
+<p>と定義された関数fmについて</p>
+
+<p><code>fm id == id</code></p>
+
+<p>であり、モノイダル則は</p>
+
+<p><code>unit :: f ()<br/>
+unit = pure ()<br/>
+(.**) :: f a -&gt; f b -&gt; f (a, b)<br/>
+x .** y = pure (,) &lt;*&gt; x &lt;*&gt; y</code></p>
+
+<p>
+と定義された値unitと演算子(.**)について
+</p>
+
+<p><code>fm snd (unit .** v) == v<br/>
+fm fst (u .** unit) == u<br/>
+fm asl (u .** (v .** w)) == (u .** v) .** w<br/>
+	<span class="indent1">where asl (x, (y, z)) = ((x, y), z)</span></code></p>
+
+<p>
+である。
+((), x)や(x, ())が情報としてはxとほとんど変わらないことや
+(x, (y, z))と((x, y), z)も同じようにほとんど変わらないことを考えると
+これらはほぼ「単位元を持ち」「結合則を満たす」ということだ。
+</p>
+
+<p>
+アプリカティブであればファンクタである。
+よって型クラスApplicativeにはFunctorクラスの型クラス制約がつく。
+型クラスApplicativeの型クラス宣言は以下のようになる。
+</p>
+
+<p><code>class Functor f =&gt; Applicative f where<br/>
+	<span class="indent1">pure :: a -&gt; f a</span><br/>
+	<span class="indent1">(&lt;*&gt;) :: f (a -&gt; b) -&gt; f a -&gt; f b</span><br/>
+	</code></p>
+
+<h3>fmap == (&lt;*&gt;) . pure</h3>
+
+<p>
+ここで型クラスFunctorとApplicativeがそれぞれの規則を守って適切に定義されているならば
+必ずfmap == (&lt;*&gt;) . pureが成り立つことを示す。
+つまり型クラスApplicativeのクラス関数から組み立てられたファンクタ関数と
+型クラスFunctorのクラス関数であるファンクタ関数とが交換可能ということだ。
+</p>
+
+<p>まず前提として</p>
+
+<p><code>foo :: (a -&gt; b) -&gt; X a -&gt; X b<br/>
+bar :: (a -&gt; b) -&gt; X a -&gt; X b</code></p>
+
+<p>であるとき</p>
+
+<p><code>g . h == p . q</code></p>
+
+<p>を満たすすべてのg, h, p, qで</p>
+
+<p><code>foo g . bar h == foo p . bar q</code></p>
+
+<p>
+が成り立つということを示す。
+これは((a -&gt; b) -&gt; X a -&gt; X b)型の関数において
+なかみの値の変化は第1引数の(a -&gt; b)型の関数にまかせるしかないことと
+文脈Xに関する変化は引数にかかわらず常に同じである必要があることから導ける。
+つまり、この型の関数では常になかみに対する変換と文脈に対する変換に
+直交性があるということだ。
+</p>
+
+<p>h = id, p = idとするとg . id == id . qであり</p>
+
+<p><code>g == qとなり、また、</code></p>
+
+<p><code>foo g . bar id == foo id . bar q</code></p>
+
+<p>ここで関数foo, barがともにファンクタ則を満たすとすると</p>
+
+<p><code>foo g . id == id . bar g</code></p>
+
+<p>となる。よって、すべての関数gに対して</p>
+
+<p><code>foo g == bar g</code></p>
+
+<p>
+だ。
+よって関数fooの型が(a -&gt; b) -&gt; X a -&gt; X bであり、
+かつファンクタ則を満たすならば関数fooは一意に定まる。
+</p>
+
+<p>
+よってともにファンクタ則を満たす関数fmapと(&lt;*&gt;) . pureは
+それぞれに同じ引数を与えれば同じ値を返すという点で等しいと言える。
+</p>
+
+<h2>アプリカティブスタイル</h2>
+
+<p>
+型クラスApplicativeのクラス関数によるアプリカティブスタイルの例を見てみよう。
+</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; (*) &lt;$&gt; Just 3 &lt;*&gt; Just 10<br/>
+Just 30<br/>
+Prelude&gt; (*) &lt;$&gt; Just 3 &lt;*&gt; Nothing<br/>
+Nothing</code></p>
+
+<p>
+関数(*)に複数の文脈つきの値をあたえているのがうまく表現されている。
+</p>
+
+<h2>まとめ</h2>
+
+<p>(...ここから書き始める...)</p>
+
+<h2>メモ</h2>
+
+<p>
+とりあえずGHC-7.10以降を対象にした説明とする。
+つまりアプリカティブスタイルを使用するのにimport Control.Applicativeは不要とする。
+ただし出版前に状況を確認し初心者でもGHC-7.8以前をインストールしている可能性が
+どのくらいか、や7.10へのアップデートの敷居の高さを考慮して、
+注意書きを追加するかどうか決めよう。
+7.10以降への対応で良さそうだ。
+</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/not_monad_applicative.html"
 	>「モナドではないアプリカティブ」へもどる</a>
