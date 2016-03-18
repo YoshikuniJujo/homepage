@@ -1,10 +1,204 @@
 リストモナド
 
-<p>(工事中 0%)</p>
+<p>(工事中 60%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+リストもモナドだ。
+リストがモナドであるということは
+</p>
+
+<p><code>g :: a -&gt; [b]<br/>
+h :: b -&gt; [c]</code></p>
+
+<p>
+のふたつの関数をつないでa -&gt; [c]型の関数が作れるということだ。
+すなおなつなぎかたは以下のようになるだろう。
+関数gにa型の値をあたえて得られたb型の値のリストのすべての
+要素に対して関数hを適用して得られたc型の値のリストのリストを
+一段階のリストに平坦化する。
+</p>
+
+<p><code>(g `pipe` h) x = concat $ map h (g x)</code></p>
+
+<p>
+リストモナドは可能性のある値すべてを試す演算と考えることができる。
+</p>
+
+<h2>インスタンス宣言</h2>
+
+<p>
+リストははじめから型クラスMonadのインスタンスである。
+インスタンス宣言は
+</p>
+
+<p><code>instance Monad [] where<br/>
+	<span class="indent1">return = (: [])</span><br/>
+	<span class="indent1">m &gt;&gt;= f = concat $ map f m</span></code></p>
+
+<p>
+となる。
+</p>
+
+<h2>平方根の例</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/list_monad.hs"
+	>list_monad.hs</a></p>
+
+<p>
+xの平方根とは2乗するとxになる値のことである。
+たとえば2乗して4になる値は-2と2だ。
+4の平方根は-2と2ということになる。
+2乗して0になる値は0だけだ。
+また2乗して負になる値は(実数の範囲では)存在しない。
+あたえられた実数値の平方根となる実数を返す関数は
+</p>
+
+<p><code>root :: Double -&gt; [Double]<br/>
+root 0 = 0<br/>
+root x<br/>
+	<span class="indent1">| x &lt; 0 = []</span><br/>
+	<span class="indent1">| otherwise = [- sqrt x, sqrt x]</span></code></p>
+
+<p>
+のようになる。
+これを使ってある値aの平方根に値bを加算した値の平方根(root (root a + b))
+を求める関数を作成する。
+</p>
+
+<p><code>calc :: Double -&gt; Double -&gt; [Double]<br/>
+calc a b = root a &gt;&gt;= root . (+ b)</code></p>
+
+<p>試してみる。</p>
+
+<p><code>% ghci list_monad.hs<br/>
+*Main&gt; calc 16 5<br/>
+[-1.0,1.0,-3.0,3.0]<br/>
+*Main&gt; calc 49 2<br/>
+[-3.0,3.0]<br/>
+*Main&gt; calc 1 1<br/>
+[0.0,-1.4142135623730951,1.4142135623730951]</code></p>
+
+<p>
+16の平方根は-4と4でありそれぞれに5を足すと1と9になる。
+これらの平方根をとると-1, 1, -3, 3となる。
+49の平方根は-7と7でありそれぞれに2を足すと-5と9になる。
+-5の実数の平方根は存在しない。
+9の平方根は3である。
+1の平方根は-1と1でありそれぞれに1を足すと0と2になる。
+0の平方根は0であり2の平方根は-1.41421356...と1.41421356...である。
+</p>
+
+<h3>do記法</h3>
+
+<p>
+今回の例であればdo記法を使うのはかえって冗長だ。
+もっと複雑になるとdo記法によってコードがわかりやすくなることがある。
+関数calcをdo記法で書くと
+</p>
+
+<p><code>calc a b = do<br/>
+	<span class="indent1">x &lt;- root a</span><br/>
+	<span class="indent1">root $ x + b</span></code></p>
+
+<p>
+となる。
+</p>
+
+<h2>条件</h2>
+
+<p>
+たとえば関数calcの結果を非負の値だけにしぼりたいとする。
+まずは関数grdを定義する。
+</p>
+
+<p><code>grd :: Bool -&gt; [()]<br/>
+grd False = []<br/>
+grd _ = [()]</code></p>
+
+<p>これを使って以下のように定義できる。</p>
+
+<p><code>calc2 :: Double -&gt; Double -&gt; [Double]<br/>
+calc2 a b = do<br/>
+	<span class="indent1">x &lt;- root a</span><br/>
+	<span class="indent1">y &lt;- root $ x + b</span><br/>
+	<span class="indent1">grd $ y &gt;= 0</span><br/>
+	<span class="indent1">return y</span></code></p>
+
+<p>
+grd (y &gt;= 0)は何をやっているのだろうか。
+yが0より小だったときに空リストを返すことでその枝をかりとっている。
+以下の式を考えてみよう。
+</p>
+
+<p><code>[3, 4, 5] &gt;&gt;= const []</code></p>
+
+<p>
+これは3に対して[]、4に対して[]、5に対して[]ということだ。
+[]とは可能性がないということであり、全体としても[]となる。
+つまり[]によって枝をかりとることが可能ということだ。
+</p>
+
+<h3>メモ</h3>
+
+<p>本来ならば</p>
+
+<p><code>guard :: MonadPlus m =&gt; Bool -&gt; m ()</code></p>
+
+<p>
+を使うべきだが、MonadPlusの説明がめんどくさいので
+今回は車輪を再発明して
+</p>
+
+<p><code>grd :: Bool -&gt; [()]</code></p>
+
+<p>を定義して使うことにしよう。</p>
+
+<h2>リスト内包表記との関係</h2>
+
+<p>
+リスト内包表記による表現とリストモナドとしての表現は
+まるで別のことをしているかのように見える。
+リスト内包表記は「すべての組み合わせにおける演算」であり
+リストモナドの意味あいは「すべての可能性に対する演算」である。
+実質的には同じものだ。
+リスト内包表記は以下のようにリストモナドの書きかたに直せる。
+</p>
+
+<p><code>[ expR | var0 &lt;- exp0, var1 &lt;- exp1, ..., varN &lt;- expN ]<br/>
+|<br/>
+V<br/>
+do<br/>
+<span class="indent1">var0 &lt;- exp0</span><br/>
+<span class="indent1">var1 &lt;- exp1</span><br/>
+<span class="indent1">.</span><br/>
+<span class="indent1">.</span><br/>
+<span class="indent1">.</span><br/>
+<span class="indent1">varN &lt;- expN</span><br/>
+<span class="indent1">return expR</span><br/>
+</code></p>
+
+<p>
+途中に条件式expBがある場合にはgrd expBのような置きかえをすればいい。
+calc2をリスト内包表記で書きなおすと
+</p>
+
+<p><code>calc2 a b = [ y | x &lt;- root a, y &lt;- root $ x + b, y &gt;= 0 ]</code></p>
+
+<p>となる。</p>
+
+<h2>まとめ</h2>
+
+<p>
+リストモナドは「すべての可能性を追いかける」演算と考えられる。
+「すべての組み合わせを試す」リスト内包表記と実質的に同じ演算になる。
+リストモナドとリスト内包表記とは機械的な書きかえが可能だ。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/do_notation.html"
 	>「構文: do記法」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/monad_comprehensions.html"
+	>「拡張機能: MonadComprehensions」へ</a>
 </p>
