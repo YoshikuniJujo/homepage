@@ -34,6 +34,24 @@
 
 <p>のようにして示すことができる。</p>
 
+<h2>そのまま</h2>
+
+<p>(以下を示すこと)</p>
+
+<p><code>[ x | x &lt;- u ] == u</code></p>
+
+<h2>returnは消せる</h2>
+
+<p>(以下を示すこと)</p>
+
+<p><code>[ f x' | ..., x' &lt;- return x, ... ] == [ f x | ..., ... ]</code></p>
+
+<h2>内側のfmap</h2>
+
+<p>(以下を示すこと)</p>
+
+<p><code>[ f x' | ..., x' &lt;- fmap g mx, ...] == [ f (g x) | ..., x &lt;- mx, ...] </code></p>
+
 <h2>モナド則の連鎖</h2>
 
 <p><code>(m0 &gt;&gt;= \v0 -&gt; m1 &gt;&gt;= \v1 -&gt; ... mn &gt;&gt;= \vn -&gt; return r) &gt;&gt;= f<br/>
@@ -269,3 +287,4 @@ m0 &gt;&gt;= \v0 -&gt; ... m(k-1) &gt;&gt;= \v(k-1) -&gt; [ r | w0 &lt;- n0, ...
 	>「拡張機能: MonadComprehensions」へもどる</a>
 <a href="/computer/haskell/web_lecture/for_programmer/monad_to_monoidal_law.html"
 	>「モナド則からモノイダル則を導く」へ</a>
+</p>

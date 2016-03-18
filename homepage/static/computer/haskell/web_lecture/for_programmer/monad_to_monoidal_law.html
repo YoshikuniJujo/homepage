@@ -1,6 +1,109 @@
 モナド則からモノイダル則を導く
 
-<p>(工事中 0%)</p>
+<p>(工事中 50%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+モナドならアプリカティブファンクターである。
+それを示すためにはモナド則からモノイダル則を導く必要がある。
+</p>
+
+<h2>定義</h2>
+
+<p>
+モナド関数によるアプリカティブ関数の定義は
+</p>
+
+<ul>
+<li><code>pure = return</code></li>
+<li><code>mf &lt;*&gt; mx = [ f x | f &lt;- mf, x &lt;- mx ]</code></li>
+</ul>
+
+<p>
+となる。
+モノイダル則は
+</p>
+
+<ul>
+<li><code>fmap = (&lt;*&gt;) . pure</code></li>
+<li><code>unit = pure ()</code></li>
+<li><code>u .** v = pure (,) &lt;*&gt; u &lt;*&gt; v</code></li>
+</ul>
+
+<p>として</p>
+
+<ul>
+<li><code>fmap snd (unit .** v) == v</code></li>
+<li><code>fmap fst (u .** unit) == u</code></li>
+<li><code>fmap asl (u .** (v .** w)) == (u .** v) .** w</code>
+	<ul>
+	<li>where asl (x, (y, z)) = ((x, y), z)</li>
+	</ul></li>
+</ul>
+
+<p>となる。</p>
+
+<h2>展開</h2>
+
+<p>関数fmapとモノイダル関数をモナド関数まで展開する。</p>
+
+<p><code>fmap f mx = pure f &lt;*&gt; mx<br/>
+=&gt; [ f' x | f' &lt;- return f, x &lt;- mx ]<br/>
+=&gt; [ f x | x &lt;- mx ]<br/>
+=&gt; mx &gt;&gt;= return . f</code></p>
+
+<p><code>unit = pure ()<br/>
+=&gt; return ()</code></p>
+
+<p><code>u .** v = pure (,) &lt;*&gt; u &lt;*&gt; v<br/>
+=&gt; [ g y | g &lt;- pure (,) &lt;*&gt; u, y &lt;- v ]<br/>
+=&gt; [ g y | g &lt;- [ f x | f &lt;- return (,), x &lt;- u ], y &lt;- v ]<br/>
+=&gt; [ g y | g &lt;- [ (x ,) | x &lt;- u ], y &lt;- v ]<br/>
+=&gt; [ g y | g &lt;- fmap (,) [ x | x &lt;- u ], y &lt;- v ]<br/>
+=&gt; [ ((,) x) y | x &lt;- [ x | x &lt;- u ], y &lt;- v ]<br/>
+=&gt; [ (x, y) | x &lt;- u, y &lt;- v ]</code></p>
+
+<h2>モノイダル則</h2>
+
+<p>モノイダル則を導く。</p>
+
+<p><code>fmap snd (unit .** v)<br/>
+=&gt; fmap snd [ (x, y) | x &lt;- return (), y &lt;- v ]<br/>
+=&gt; [ snd ((), y) | y &lt;- v ]<br/>
+=&gt; [ y | y &lt;- v ]<br/>
+=&gt; v</code></p>
+
+<p><code>fmap fst (u .** unit)<br/>
+=&gt; fmap fst [ (x, y) | x &lt;- u, y &lt;- return () ]<br/>
+=&gt; [ fst (x, ()) | x &lt;- u ]<br/>
+=&gt; [ x | x &lt;- u ]<br/>
+=&gt; u</code></p>
+
+<p><code>fmap asl (u .** (v .** w))<br/>
+=&gt; fmap asl [ (x, (y, z)) | x &lt;- u, (y, z) &lt;- [ (y, z) | y &lt;- v, z &lt;- w ] ]<br/>
+=&gt; [ asl (x, (y, z)) | x &lt;- u, y &lt;- v, z &lt;- w ]<br/>
+=&gt; [ ((x, y), z) | x &lt;- u, y &lt;- v, z &lt;- w ]</code></p>
+
+<p><code>(u .** v) .** w<br/>
+=&gt; [ ((x, y), z) | (x, y) &lt;- [ (x, y) | x &lt;- u, y &lt;- v ], z &lt;- w ]<br/>
+=&gt; [ ((x, y), z) | x &lt;- u, y &lt;- v, z &lt;- w ]</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+モナド則からモノイダル則を導くことができた。
+よってモナドならばアプリカティブファンクターだ。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/from_monad_law.html"
+	>「モナド則から導ける規則」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/monad_log.html"
+	>「モナド: 計算のログ」へ</a>
+</p>
+
+<hr/>
 
 <h2>メモ</h2>
 
@@ -99,6 +202,6 @@
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/from_monad_law.html"
 	>「モナド則から導ける規則」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/monad_log.html"
+	>「モナド: 計算のログ」へ</a>
 </p>
