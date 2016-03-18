@@ -1,10 +1,206 @@
 構文: do記法
 
-<p>(工事中 0%)</p>
+<p>(工事中 60%)</p>
+
+<h2>型クラスMonadは特別</h2>
+
+<p>
+文脈を対象とした型クラスは数多くあるがHaskellにおいて型クラスMonadは
+特別な扱いを受けている。
+型クラスMonadのインスタンスだけに適用される構文糖がある。
+あとで学ぶがHaskellでは状態変化や外部とのやりとりをIOという型によって扱う。
+これらの入出力は「機械をつなぐ」という考えかたで行われる。
+「つなぐ」インターフェースとして型クラスMonadのクラス関数が使われている。
+それが特別な構文糖が用意されている理由であり、その構文糖をdo記法と呼ぶ。
+</p>
+
+<h2>メモリつき電卓の例</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/do_notation.hs"
+	>do_notation.hs</a></p>
+
+<p>
+前回のCalcのコピペでいいと思うがここに再掲する
+(ghc-7.10以降であればimport Control.Applicativeは不要なのであとで削除する)。
+</p>
+
+<p><code>{-# LANGUAGE TupleSections #-}</code></p>
+
+<p><code>import Control.Applicative</code></p>
+
+<p><code>newtype Calc a = Calc { runCalc :: Int -&gt; (a, Int) }</code></p>
+
+<p><code>instance Functor Calc where<br/>
+	<span class="indent1">fmap = (=&lt;&lt;) . (return .)</span></code></p>
+
+<p><code>instance Applicative Calc where<br/>
+	<span class="indent1">pure = return</span><br/>
+	<span class="indent1">mf &lt;*&gt; =</span><br/>
+	<span class="indent2">mf &gt;&gt;= \f -&gt;</span><br/>
+	<span class="indent2">mx &gt;&gt;= \x -&gt;</span><br/>
+	<span class="indent2">return $ f x</span></code></p>
+
+<p><code>instance Monad Calc where<br/>
+	<span class="indent1">return = Calc . (,)</span><br/>
+	<span class="indent1">m &gt;&gt;= f = Calc $ \s -&gt;</span><br/>
+	<span class="indent2">let (x, s') = runCalc m s in runCalc (f x) s'</span></code></p>
+
+<p><code>mplus :: Int -&gt; Calc ()<br/>
+mplus x = Calc $ (() ,) . (+ x)</code></p>
+
+<p><code>mrecall :: Calc Int<br/>
+mrecall = Calc $ \s -&gt; (s, s)</code></p>
+
+<h3>do記法を使わないと</h3>
+
+<p>
+メモリつき電卓で(3 * 4 + 2 * 5) * 7を計算することを考える。
+do記法を使わないと
+</p>
+
+<p><code>calc :: Calc Int<br/>
+calc =<br/>
+	<span class="indent1">return (3 * 4) &gt;&gt;=</span><br/>
+	<span class="indent1">mplus &gt;&gt;</span><br/>
+	<span class="indent1">return (2 * 5) &gt;&gt;=</span><br/>
+	<span class="indent1">mplus &gt;&gt;</span><br/>
+	<span class="indent1">mrecall &gt;&gt;=</span><br/>
+	<span class="indent1">return . (* 7)</span></code></p>
+
+<p>
+のようになる。
+</p>
+
+<h3>仮引数の明示</h3>
+
+<p>
+do記法への書き換えのために仮引数を明示する形に書き換える。
+</p>
+
+<p><code>calc =<br/>
+	<span class="indent1">return (3 * 4) &gt;&gt;= \x -&gt;</span><br/>
+	<span class="indent1">mplus x &gt;&gt;</span><br/>
+	<span class="indent1">return (2 * 5) &gt;&gt;= \y -&gt;</span><br/>
+	<span class="indent1">mplus y &gt;&gt;</span><br/>
+	<span class="indent1">mrecall &gt;&gt;= \z -&gt;</span><br/>
+	<span class="indent1">return (z * 7)</span></code></p>
+
+<h3>do記法</h3>
+
+<p>これをdo記法を使って書き直すと</p>
+
+<p><code>calc = do<br/>
+	<span class="indent1">x &lt;- return (3 * 4)</span><br/>
+	<span class="indent1">mplus x</span><br/>
+	<span class="indent1">y &lt;- return (2 * 5)</span><br/>
+	<span class="indent1">mplus y</span><br/>
+	<span class="indent1">z &lt;- mrecall</span><br/>
+	<span class="indent1">return (z * 7)</span></code></p>
+
+<p>
+となる。
+1行目にdoをつけて
+その後は「exp &gt;&gt;= \v -&gt;」を「v &lt;- exp」に
+「exp &gt;&gt;」を「exp」に変換する。
+do以降のそれぞれの行はインデントをそろえる必要がある。
+</p>
+
+<h3>do記法のlet構文</h3>
+
+<p>
+「var &lt;- return val」はモナド則を守った正しいモナドでは
+値valで変数varを束縛しているのと同じことになる。
+さらに甘くする。
+</p>
+
+<p><code>calc = do<br/>
+	<span class="indent1">let x = 3 * 4</span><br/>
+	<span class="indent1">mplus x</span><br/>
+	<span class="indent1">let y = 2 * 5</span><br/>
+	<span class="indent1">mplus y</span><br/>
+	<span class="indent1">z &lt;- mrecall</span><br/>
+	<span class="indent1">return (z * 7)</span></code></p>
+
+<p>
+「var &lt;- return val」を「let var = val」に置きかえた。
+</p>
+
+<h3>おまけ: もっとシンプルに</h3>
+
+<p>
+モナドを学ぶための例だったのであえて冗長な書きかたをしてきた。
+もちろん(3 * 4 + 2 * 5) * 7を計算するにはそのまま
+</p>
+
+<p><code>(3 * 4 + 2 * 5) * 7</code></p>
+
+<p>
+とすればいいわけだがとりあえずCalcモナドのまま簡略にしていこう。
+まずわざわざ変数xやyに整数を束縛して使う必要はない。
+また変数zも消すことができる。
+</p>
+
+<p><code>calc = do<br/>
+	<span class="indent1">mplus $ 3 * 4</span><br/>
+	<span class="indent1">mplus $ 2 * 5</span><br/>
+	<span class="indent1">mrecall &gt;&gt;= return . (* 7)</span></code></p>
+
+<p>
+最後のところでdo記法を使わない記法が復活している。
+このようにdo記法と(&gt;&gt;=)を明示する書きかたは併用することができる。
+ここでfmap f = (&gt;&gt;= return . f)を考えると
+</p>
+
+<p><code>calc = do<br/>
+	<span class="indent1">mplus $ 3 * 4</span><br/>
+	<span class="indent1">mplus $ 2 * 5</span><br/>
+	<span class="indent1">fmap (* 7) mrecall</span></code></p>
+
+<p>
+となる。
+アプリカティブスタイルのところで導入した関数fmapの別名を使うと
+</p>
+
+<p><code>calc = do<br/>
+	<span class="indent1">mplus $ 3 * 4</span><br/>
+	<span class="indent1">mplus $ 2 * 5</span><br/>
+	<span class="indent1">(* 7) &lt;$&gt; mrecall</span></code></p>
+
+<p>
+とできる。
+「3 * 4の結果をメモリに足し、2 * 5の結果をメモリに足し、
+mrecallによって返ってきた結果を7倍する」ということだ。
+</p>
+
+<h2>{};を明記する書きかた</h2>
+
+<p>(この項目はあとで書く)</p>
+
+<h2>まとめ</h2>
+
+<p>
+モナド関数による計算の連鎖はdo記法で書きかえることができる。
+先頭にdoをつけて、その後の行はインデントをそろえる。
+そして以下のような書きかえを行う。
+</p>
+
+<ul>
+<li>「exp &gt;&gt;= \v -&gt;」 =&gt; 「v &lt;- exp」</li>
+<li>「exp &gt;&gt;」 =&gt; 「exp」</li>
+<li>「var &lt;- return val」 =&gt; 「let var = val」</li>
+</ul>
+
+<p>
+do記法と(&gt;&gt;=)を明記する書きかたとは併用することができる。
+アプリカティブスタイルとの併用も可能だ。
+インデントルールを使わずに{};を明記する書きかたもある。
+これらのいくつかの書きかたを適切に選択することで、
+簡潔さや、わかりやすさを調整することができる。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/monad_class.html"
 	>「型クラス: Monad」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/list_monad.html"
+	>「リストモナド」へ</a>
 </p>
