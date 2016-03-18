@@ -1,10 +1,208 @@
 モナド: 計算のログ
 
-<p>(工事中 0%)</p>
+<p>(工事中 60%)</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/monad_log.hs"
+	>monad_log.hs</a></p>
+
+<h2>はじめに</h2>
+
+<p>
+ここまででモナドの基本は学んだ。
+モナドはなかみではなく形式だ。
+</p>
+
+<p><code>return :: a -&gt; m a<br/>
+(&gt;&gt;=) :: m a -&gt; (a -&gt; m b) -&gt; m b</code></p>
+
+<p>のふたつの関数があり</p>
+
+<p><code>return x &gt;&gt;= f == f x<br/>
+m &gt;&gt;= return == m<br/>
+(m &gt;&gt;= f) &gt;&gt;= g == m &gt;&gt;= (\x -&gt; f x &gt;&gt;= g)</code></p>
+
+<p>
+を満たせば内容に関係なくそれはモナドだ。
+(a -&gt; m b)型の関数と(b -&gt; m c)型の関数とをつなぐことができ、
+つなぎかたが左結合でも右結合でも結果は同じで、
+左右どちらからつないでも関数を変化させない特別な関数returnがあるということだ。
+モナドのもうひとつの例として計算のログをとる仕組みを作る。
+</p>
+
+<h2>ログを残す関数の例</h2>
+
+<h3>型Logger</h3>
+
+<p>ログを残しながら文字コードを求める関数を考える。</p>
+
+<p><code>toCode :: Char -&gt; Logger Int</code></p>
+
+<p>
+たとえば<code>toCode 'c'</code>はログとして["toCode 'c'"]を持ち、
+計算の結果として99を持つ。
+つまり、Logger型の値は文字列のリストと結果の値を持つ。
+Logger型の定義は
+</p>
+
+<p><code>data Logger a = Logger [String] a deriving Show</code></p>
+
+<p>
+のようになる。
+</p>
+
+<h3>関数toCode</h3>
+
+<p>
+関数toCodeの定義は
+</p>
+
+<p><code>toCode c = Logger ["toCode " ++ show c] (ord c)</code></p>
+
+<p>となる。</p>
+
+<h3>関数double</h3>
+
+<p>同様にログを残しながら整数値を2倍する関数は</p>
+
+<p><code>double :: Int -&gt; Logger Int<br/>
+double n = Logger ["double " ++ show n] (n * 2)</code></p>
+
+<p>となる。</p>
+
+<h2>ファンクター、アプリカティブファンクター</h2>
+
+<p>
+モナドであれば型クラスFunctor, Applicativeのインスタンス宣言は機械的にできる。
+さきに書いてしまおう。
+</p>
+
+<p><code>instance Functor Logger where<br/>
+	<span class="indent1">fmap = (=&lt;&lt;) . (return .)</span></code></p>
+
+<p><code>instance Applicative Logger where<br/>
+	<span class="indent1">pure = return</span><br/>
+	<span class="indent1">mf &lt;*&gt; mx =
+		[ f x | f &lt;- mf, x &lt;- mx ]</span></code></p>
+
+<p>ソースファイルの先頭に</p>
+
+<p><code>{-# LANGUAGE MonadComprehensions #-}</code></p>
+
+<p>を書いておく。</p>
+
+<h2>モナド</h2>
+
+<p>
+関数returnはログを残さずに値を返せばいいだろう。
+ログを返す関数をつなぐにはどうしたらいいだろうか。
+</p>
+
+<p><code>g :: a -&gt; Logger b<br/>
+h :: b -&gt; Logger c</code></p>
+
+<p>
+であるような関数gとhをつなぐことを考える。
+まずgに引数xをあたえる。
+返り値にはログlとb型の値yとが含まれているはずだ。
+値yを関数hにあたえる。
+すると返り値にはログl'と値zとが含まれている。
+最終的な結果にはログ(l ++ l')と値zを含めればいい。
+</p>
+
+<p><code>(g &gt;=&gt; h) x = let<br/>
+	<span class="indent1">Logger l y = g x</span><br/>
+	<span class="indent1">Logger l' z = h y in</span><br/>
+	<span class="indent1">Logger (l ++ l') z</span></code></p>
+
+<p>演算子(&gt;&gt;=)の型に合わせて変形すると</p>
+
+<p><code>Logger l y &gt;&gt;= h = let<br/>
+	<span class="indent1">Logger l' z = h y in</span><br/>
+	<span class="indent1">Logger (l ++ l') z</span></code></p>
+
+<p>型クラスMonadのインスタンス宣言は</p>
+
+<p><code>instance Monad Logger where<br/>
+	<span class="indent1">return = Logger []</span><br/>
+	<span class="indent1">Logger l x &gt;&gt;= f =
+		let Logger l' y = f x in Logger (l ++ l') y</span><br/>
+	</code></p>
+
+<p>となる。</p>
+
+<h2>関数toCodeDouble</h2>
+
+<p>ログを残しながら文字コードを2倍する関数は</p>
+
+<p><code>toCodeDouble :: Char -&gt; Logger Int<br/>
+toCodeDouble c = toCode c &gt;&gt;= double</code></p>
+
+<p>となる。</p>
+
+<p><code>% ghci monad_log.hs<br/>
+*Main&gt; toCodeDouble 'c'<br/>
+Logger ["toCodeDouble 'c'","double 99"] 198</code></p>
+
+<h2>関数tell</h2>
+
+<p>
+関数tellを定義すると関数toCodeやdoubleをより抽象化することができる。
+</p>
+
+<p><code>tell :: String -&gt; Logger ()<br/>
+tell l = Logger [l] ()</code></p>
+
+<p><code>toCode :: Char -&gt; Logger Int<br/>
+toCode c = tell ("toCode " ++ show c) &gt;&gt; ord c</code></p>
+
+<p><code>double :: Int -&gt; Logger Int<br/>
+double n = tell ("double " ++ show n) &gt;&gt; (n * 2)</code></p>
+
+<p>
+関数toCodeやdoubleが型Loggerのなかみについて知っている必要がなくなる。
+関数tellとモナドインターフェースだけで定義されている。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+モナドのさらなる例としてログを残しながら演算をする仕組みを作った。
+なかみには関係なくモナド関数をもち、それらがモナド則を満たしさえすれば、
+それはモナドだ。
+裸の値を文脈にいれる関数をつなぐことができ、
+そのつなぎかたが単位元をもち、結合則を満たすということだ。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/monad_to_monoidal_law.html"
 	>「モナド則からモノイド則を導く」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/monad_cage.html"
+	>「モナド: ライオンの檻」へ</a>
+</p>
+
+<hr/>
+
+<h2>メモ</h2>
+
+<p>
+書籍ではこれを演習問題として使おうかな。
+演習問題ではできれば「問いかけ」「答え」のようにしたい。
+そしてできるだけ「問いかけ」と「答え」のページをかえたい。
+ページxに「問いかけ1」「問いかけ2」「問いかけ3」「問いかけ4」があって
+ページx+1に「答え1」「答え2」「答え3」「答え4」がある感じか。
+ただたとえば「問いかけk+1」が「答えk」に依存するときにどうするかが問題だ。
+そこらへんはうまくごまかせるだろうか?
+また「自力で解くまで」先に進めない人がそこで読むのをやめてしまう問題を解決したい。
+</p>
+
+<p>
+今はとりあえずスピーディーに終わらせるために変更はしないが
+関数tellの名前はlogのほうがいいかもしれない。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/monad_to_monoidal_law.html"
+	>「モナド則からモノイド則を導く」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/monad_cage.html"
+	>「モナド: ライオンの檻」へ</a>
 </p>
