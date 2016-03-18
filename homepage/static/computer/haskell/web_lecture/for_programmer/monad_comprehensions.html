@@ -1,10 +1,128 @@
 拡張機能: MonadComprehensions
 
-<p>(工事中 0%)</p>
+<p>(工事中 50%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+リスト内包表記はリストモナドをすっきりとわかりやすく表現できる。
+リスト内包表記は条件式以外ではリストのモナドとしてのインターフェースしか
+使っていない。
+よってリスト内包表記はより一般的なモナドへと拡張できる。
+それをモナド内包表記と呼ぶ。
+</p>
+
+<h2>言語拡張</h2>
+
+<p>
+モナド内包表記はHaskellの標準的な機能ではない。
+GHCの言語拡張として使える。
+ソースファイルの先頭に
+</p>
+
+<p><code>{-# LANGUAGE MonadComprehensions #-}</code></p>
+
+<p>と書く。</p>
+
+<h2>Maybe内包表記</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/monad_comprehensions.hs"
+	>monad_comprehensions.hs</a></p>
+
+<p>安全なわり算を定義する。</p>
+
+<p><code>safeDiv :: Int -&gt; Int -&gt; Maybe Int<br/>
+_ `safeDiv` 0 = Nothing<br/>
+x `safeDiv` y = Just $ x `div` y</code></p>
+
+<p>
+a / b / cを安全に計算する関数をまずはdo記法で書く。
+モナド内包表記に変換するために冗長なreturnを使っている。
+</p>
+
+<p><code>calc :: Int -&gt; Int -&gt; Int -&gt; Maybe Int<br/>
+calc a b c = do<br/>
+	<span class="indent1">x &lt;- a `safeDiv` b</span><br/>
+	<span class="indent1">y &lt;- x `safeDiv` c</span><br/>
+	<span class="indent1">return y</span><br/>
+	</code></p>
+
+<p>これをモナド内包表記に変換してみよう。</p>
+
+<p><code>calc = [ y | x &lt;- a `safeDiv` b, y &lt;- x `safeDiv` c ]</code></p>
+
+<h2>Calc内包表記</h2>
+
+<p>ソースコードの先頭に</p>
+
+<p><code>{-# LANGUAGE MonadComprehensions, TupleSections #-}</code></p>
+
+<p>
+を書く。
+Calc型を作成し型クラスFunctor, Applicative, Monadのインスタンスにする。
+</p>
+
+<p><code>newtype Calc a = Calc { runCalc :: Int -&gt; (a, Int) }</code></p>
+
+<p><code>instance Functor Calc where<br/>
+	<span class="indent1">fmap = (=&lt;&lt;) . (return .)</span></code></p>
+
+<p><code>instance Applicative Calc where<br/>
+	<span class="indent1">pure = return</span><br/>
+	<span class="indent1">mf &lt;*&gt; mx = do</span><br/>
+	<span class="indent2">f &lt;- mf</span><br/>
+	<span class="indent2">x &lt;- mx</span><br/>
+	<span class="indent2">return $ f x</span></code></p>
+
+<p><code>instance Monad Calc where<br/>
+	<span class="indent1">return = Calc . (,)</span><br/>
+	<span class="indent1">m &gt;&gt;= f = Calc $ \s -&gt;</span><br/>
+	<span class="indent2">let (x, s') = runCalc m s in runCalc (f x) s'</span></code></p>
+
+<p>メモリへの加算、メモリの内容の呼び出し関数を定義する。</p>
+
+<p><code>mplus :: Int -&gt; Calc ()<br/>
+mplus x = Calc $ (() ,) . (+ x)</code></p>
+
+<p><code>mrecall :: Calc Int<br/>
+mrecall = Calc $ \s -&gt; (s, s)</code></p>
+
+<p>
+(3 * 4 + 2 * 5) * 7をまずはdo記法で書いてみる。
+モナド内包表記に書きなおすことを考えて最後をreturnで終わるようにしておく。
+</p>
+
+<p><code>calcC :: Calc Int<br/>
+calcC = do<br/>
+	<span class="indent1">mplus $ 3 * 4</span><br/>
+	<span class="indent1">mplus $ 2 * 5</span><br/>
+	<span class="indent1">x &lt;- mrecall</span><br/>
+	<span class="indent1">return $ x * 7</span><br/>
+	</code></p>
+
+<p>
+モナド内包表記に書きなおすときに気をつけるところは
+mplus $ 3 * 4などをそのまま書くと`&lt;-'がないため
+「条件」として扱われてしまうことだ。
+`_ &lt;-`をつけることで「条件じゃないよ」と示す必要がある。
+</p>
+
+<p><code>calcC = [ x * 7 | _ &lt;- mplus $ 3 * 4, _ &lt;- mplus $ 2 * 5, x &lt;- mrecall ]</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+Haskellの標準的な機能ではないがGHCの拡張機能として
+リスト内包表記を一般的なモナドに使うことができる。
+do記法では最後に来るreturn expのexpの部分を内包表記では
+先頭に置くことができる。
+これは「結論から先」ということであり、最終的な結果が重要なタイプの
+モナドでは読みやすくなる可能性がある。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/list_monad.html"
 	>「リストモナド」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/from_monad_law.html"
+	>「モナド則から導ける規則」へ</a>
 </p>
