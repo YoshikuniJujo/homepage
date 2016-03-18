@@ -1,6 +1,6 @@
 型クラス: Monad
 
-<p>(工事中 0%)</p>
+<p>(工事中 60%)</p>
 
 <h2>はじめに</h2>
 
@@ -126,13 +126,136 @@ Error "92 is divided by zero\n"<br/>
 *Main&gt; calcE 71 4 0<br/>
 Error "17 is divided by zero\n"</code></p>
 
-<h2>Stateモナド</h2>
+<h2>Calcモナド</h2>
 
-<p>(...ここから書き始める...)</p>
+<p>
+メモリつきの電卓をエミュレートする。
+型クラスMonadのクラス関数として定義するためにInt -&gt; (a, Int)型を
+ラップしてCalc aという新しい型を作る必要がある。
+値構築子Calcとフィールド関数runCalcによって
+Int -&gt; (a, Int)型の関数をCalc a型へと包みこんだり
+裸にしたりする以外は前の復習となる。
+</p>
+
+<small>(フィールド関数という言葉は適切か考えること)</small>
+
+<p><code>newtype Calc a = Calc { runCalc :: Int -&gt; (a, Int) }</code></p>
+
+<p>
+型クラスFunctorとApplicativeのインスタンス宣言は型クラスMonadのクラス関数から
+機械的に導ける。
+</p>
+
+<p><code>instance Functor Calc where<br/>
+	<span class="indent1">fmap = (=&lt;&lt;) . (return .)</span></code></p>
+
+<p><code>instance Applicative Calc where<br/>
+	<span class="indent1">pure = return</span><br/>
+	<span class="indent1">mf &lt;*&gt; mx =</span><br/>
+	<span class="indent2">mf &gt;&gt;= \f -&gt;</span><br/>
+	<span class="indent2">mx &gt;&gt;= \x -&gt;</span><br/>
+	<span class="indent2">return $ f x</span></code></p>
+
+<p>型クラスMonadのインスタンス宣言は</p>
+
+<p><code>instance Monad Calc where<br/>
+	<span class="indent1">return = Calc . (,)</span><br/>
+	<span class="indent1">m &gt;&gt;= f = Calc $ \s -&gt;</span><br/>
+	<span class="indent2"> let (x, s') = runCalc m s in runCalc (f x) s'</span></code></p>
+
+<p>
+複雑に見えるかもしれない。
+まずはCalcとrunCalcとを消して考えよう。
+これはInt -&gt; (a, Int)という構造を型クラスMonadのインスタンスにするために
+ひとつの型に包みこんだり裸にしたりしているだけにすぎない
+(このあたりはもしかすると別の例で独立した説明が必要かもしれない)。
+</p>
+
+<p>
+モナドの枠組みではないこの型特有の機能としてメモリへの整数値の加算と
+メモリの値の呼び出しを実装する。
+まずはソースファイルの先頭に
+</p>
+
+<p><code>{-# LANGUAGE TupleSections #-}</code></p>
+
+<p>
+を追加する。
+メモリへの整数値の加算は
+</p>
+
+<p><code>mplus :: Int -&gt; Calc ()<br/>
+mplus x = Calc $ (() ,) . (+ x)</code></p>
+
+<p>
+となる。
+メモリの値の呼び出しは
+</p>
+
+<p><code>mrecall :: Calc Int<br/>
+mrecall = Calc $ \s -&gt; (s, s)</code></p>
+
+<p>となる。</p>
+
+<h3>計算例</h3>
+
+<p>例として</p>
+
+<p><code>(3 * 4 + 2 * 5) * 7</code></p>
+
+<p>を計算してみよう。</p>
+
+<p><code>calcS :: Calc Int<br/>
+calcS =<br/>
+	<span class="indent1">return (3 * 4) &gt;&gt;=</span><br/>
+	<span class="indent1">mplus &gt;&gt;= \_ -&gt;</span><br/>
+	<span class="indent1">return (2 * 5) &gt;&gt;=</span><br/>
+	<span class="indent1">mplus &gt;&gt;= \_ -&gt;</span><br/>
+	<span class="indent1">mrecall &gt;&gt;= \x -&gt;</span><br/>
+	<span class="indent1">return (x * 7)</span></code></p>
+
+<p>試してみよう。</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; runCalc calcS 0<br/>
+(154,22)</code></p>
+
+<p>
+runCalcでCalc Int型からInt -&gt; (Int, Int)型の関数に変換し、
+メモリの初期値0を与えている。
+</p>
+
+<p>値を次に渡さない演算子(&gt;&gt;=)の変種が用意されている。</p>
+
+<p><code>(&gt;&gt;) :: m a -&gt; m b -&gt; m b<br/>
+m &gt;&gt; n = m &gt;&gt;= const n</code></p>
+
+<p>
+これを使うと関数calcSはよりすっきりする。
+ついでに最後もポイントフリースタイルにしておく。
+</p>
+
+<p><code>calcS =<br/>
+	<span class="indent1">return (3 * 4) &gt;&gt;=</span><br/>
+	<span class="indent1">mplus &gt;&gt;</span><br/>
+	<span class="indent1">return (2 * 5) &gt;&gt;=</span><br/>
+	<span class="indent1">mplus &gt;&gt;</span><br/>
+	<span class="indent1">mrecall &gt;&gt;=</span><br/>
+	<span class="indent1">return . (* 7)</span></code></p>
+
+<h2>まとめ</h2>
+
+<p>
+モナドであるということを表現する型クラスMonadを紹介した。
+この型クラスを使うことでそれぞれの型用に別々に定義していた関数retやbindを
+関数returnと演算子(&gt;&gt;=)とにまとめることができた。
+また、モナドであるという性質だけを必要とする抽象度の高い関数であれば、
+いろいろなモナドに対する演算をひとまとめにして定義することもできる。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/applicative_class.html"
-	>「型クラス: アプリカティブ」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+	>「型クラス: Applicative」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/do_notation.html"
+	>「構文: do記法」へ</a>
 </p>
