@@ -1,6 +1,95 @@
 モナド則から導きだせる規則
 
-<p>(工事中 0%)</p>
+<p>(工事中 50%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+モナド則から導かれる規則を示す。
+見やすさを考慮してモナド内包表記で表現する。
+モナド則から導かれる規則を見れば、
+それが直観的に「成り立っていてほしい」規則であることがわかるだろう。
+</p>
+
+<h2>モナド則の変換</h2>
+
+<p>モナド則として</p>
+
+<p><code>(...演算子(&gt;=&gt;)を使ったモナド則...)</code></p>
+
+<p>
+の3つを紹介した。
+直観的にわかりやすい規則だ。
+しかし
+</p>
+
+<p><code>(...演算子(&gt;&gt;=)を使ったモナド則...)</code></p>
+
+<p>
+のように変形したほうが使いやすい。
+これは
+</p>
+
+<p><code>(...式変形...)</code></p>
+
+<p>のようにして示すことができる。</p>
+
+<h2>モナド則の連鎖</h2>
+
+<p><code>(m0 &gt;&gt;= \v0 -&gt; m1 &gt;&gt;= \v1 -&gt; ... mn &gt;&gt;= \vn -&gt; return r) &gt;&gt;= f<br/>
+=&gt; m0 &gt;&gt;= \v0 -&gt; (m1 &gt;&gt;= \v1 -&gt; ... mn &gt;&gt;= \vn -&gt; return r) &gt;&gt;= f<br/>
+.<br/>
+.<br/>
+.<br/>
+=&gt; m0 &gt;&gt;= \v0 -&gt; m1 &gt;&gt;= \v1 -&gt; ... mn &gt;&gt;= \vn -&gt; return r &gt;&gt;= f<br/>
+=&gt; m0 &gt;&gt;= \v0 -&gt; m1 &gt;&gt;= \v1 -&gt; ... mn &gt;&gt;= \vn -&gt; f r</code></p>
+
+<h2>内包表現とfmap</h2>
+
+<p><code>fmap g [ r | v0 &lt;- m0, ..., vn &lt;- mn ]<br/>
+=&gt; (m0 &gt;&gt;= \v0 -&gt; ... mn &gt;&gt;= \vn -&gt; return r) &gt;&gt;= return . g<br/>
+=&gt; m0 &gt;&gt;= \v0 -&gt; ... mn &gt;&gt;= \vn -&gt; return (g r)<br/>
+=&gt; [ g r | v0 &lt;- m0, ..., vn &lt;- mn ]</code></p>
+
+<h2>内包表記の先頭のネスト</h2>
+
+<p><code>[ r | (w0, ..., wn) &lt;- [ (w0, ..., wn) | w0 &lt;- n0, ..., wn &lt;- nn ], ..., vn &lt;- mn ]<br/>
+=&gt; (n0 &gt;&gt;= \w0 -&gt; ... nn &gt;&gt;= \wn -&gt; return (w0, ..., wn)) &gt;&gt;= \(w0, ..., wn) -&gt; ... mn &gt;&gt;= \vn -&gt; return r<br/>
+=&gt; n0 &gt;&gt;= \w0 -&gt; ... nn &gt;&gt;= \wn -&gt; ... mn &gt;&gt;= \vn -&gt; return r<br/>
+=&gt; [ r | w0 &lt;- n0, ..., wn &lt;- nn, ..., vn &lt;- mn ]</code></p>
+
+<h2>内包表記の中間のネスト</h2>
+
+<p><code>[ r | v0 &lt;- m0, ..., (w0, ..., wn) &lt;- [ (w0, ..., wn) | w0 &lt;- n0, ..., wn &lt;- nn ], ..., vn &lt;- mn ]<br/>
+=&gt; m0 &gt;&gt;= \v0 -&gt; [ r | v1 &lt;- m1, ..., (w0, ..., wn) &lt;- [ (w0, ..., wn) | w0 &lt;- n0, ..., wn &lt;- nn ], ... vn &lt;- mn ]<br/>
+=&gt; m0 &gt;&gt;= \v0 -&gt; ... [ r | (w0, ..., wn) &lt;- [ (w0, ..., wn) | w0 &lt;- n0, ..., wn &lt;- nn], ..., vn &lt;- mn ]<br/>
+=&gt; m0 &gt;&gt;= \v0 -&gt; ... [ r | w0 &lt;- n0, ..., wn &lt;- nn, ..., vn &lt;- mn ]<br/>
+=&gt; [ r | v0 &lt;- m0, ... w0 &lt;- n0, ..., wn &lt;- nn, ..., vn &lt;- mn ]</code></p>
+
+<h2>まとめ</h2>
+
+<p>モナド則から以下の規則が導けた。</p>
+
+<p><code>fmap f [ r | ... ] == [ f r | ... ]</code></p>
+
+<p><code>[ r | ..., (v0, ..., vn) &lt;-
+	[ (v0, ..., vn) | v0 &lt;- m0, ... vn &lt;- mn ], ... ]<br/>
+== [ r | ..., v0 &lt;- m0, ... vn &lt;- mn, ... ]</code></p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/monad_comprehensions.html"
+	>「拡張機能: MonadComprehensions」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/monad_to_monoidal_law.html"
+	>「モナド則からモノイダル則を導く」へ</a>
+</p>
+
+<!--
+<h2>モナド則からファンクター則を</h2>
+
+<h2>内包表記を前後でわける</h2>
+
+<h2>内包表記のネストを解消する</h2>
+-->
 
 <h2>メモ</h2>
 
@@ -44,9 +133,139 @@ Monadクラスを説明してない。
 
 <p><code>m &gt;&gt;= f &gt;&gt;= g</code></p>
 
+<h2>メモ2</h2>
+
+<p><code>(m &gt;&gt;= f) &gt;&gt;= g</code></p>
+
+<p><code>m &gt;&gt;= (\x -&gt; f x &gt;&gt;= g)</code></p>
+
+<p><code>[ z | y &lt;- [ y | x &lt;- m, y &lt;- f x ], z &lt;- g y ]<br/>
+(m &gt;&gt;= f) &gt;&gt;= (\y -&gt; g y &gt;&gt;= return)</code></p>
+
+<p><code>[ z | x &lt;- m, y &lt;- f x, z &lt;- g y ]<br/>
+m &gt;&gt;= (\x -&gt; f x &gt;&gt;= (\y -&gt; g y &gt;&gt;= return))</code></p>
+
+<p><code>f' x == fmap (x ,) (f x)</code>とおくと</p>
+
+<p><code>f' x<br/>
+=&gt; fmap (x ,) (f x)<br/>
+=&gt; f x &gt;&gt;= return . (x ,)<br/>
+=&gt; f x &gt;&gt;= \y -&gt; return (x, y)</code></p>
+
+<p><code>[ z | y &lt;- [ y | x &lt;- m, y &lt;- f' x ], z &lt;- g y ]<br/>
+[ z | xy &lt;- [ (x, y) | x &lt;- m, y &lt;- f x ], z &lt;- g xy ]<br/>
+[ z | (x, y) &lt;- [ (x, y) | x &lt;- m, y &lt;- f x ], z &lt;- g (x, y) ]</code></p>
+
+<p><code>[ z | x &lt;- m, y &lt;- f' x, z &lt;- g y ]<br/>
+[ z | x &lt;- m, y &lt;- f x &gt;&gt;= \y -&gt; return (x, y), z &lt;- g y ]<br/>
+[ z | x &lt;- m, (x, y) &lt;- f x &gt;&gt;= \y -&gt; return (x, y), z &lt;- g (x, y) ]<br/>
+[ z | x &lt;- m, z &lt;- (f x &gt;&gt;= \y -&gt; return (x, y)) &gt;&gt;= \(x, y) -&gt; g (x, y) ]<br/>
+[ z | x &lt;- m, z &lt;- f x &gt;&gt;= \y -&gt; return (x, y) &gt;&gt;= \(x, y) -&gt; g (x, y) ]<br/>
+[ z | x &lt;- m, z &lt;- f x &gt;&gt;= \y -&gt; g (x, y) ]<br/>
+m &gt;&gt;= \x -&gt; (f x &gt;&gt;= \y -&gt; g (x, y)) &gt;&gt;= \z -&gt; return z<br/>
+m &gt;&gt;= \x -&gt; f x &gt;&gt;= \y -&gt; g (x, y)<br/>
+m &gt;&gt;= \x -&gt; f x &gt;&gt;= \y -&gt; g (x, y) &gt;&gt;= \z -&gt; return z<br/>
+[ z | x &lt;- m, y &lt;- f x, z &lt;- g (x, y) ]</code></p>
+
+<p><code>do { y &lt;- do { x &lt;- m; f x }; g y }</code></p>
+
+<p><code>do { x &lt;- m; y &lt;- f x; g y }
+
+<p><code>[ (x, (y, z)) | x &lt;- u, (y, z) &lt;- [ (y, z) | y &lt;- v, z &lt;- w ] ]<br/>
+do { x &lt;- u; (y, z) &lt;- do { y &lt;- v; z &lt;- w; return (y, z) }; return (x, (y, z)) }<br/>
+u &gt;&gt;= \x -&gt; (v &gt;&gt;= \y -&gt; w &gt;&gt;= \z -&gt; return (y, z)) &gt;&gt;= \(y, z) -&gt; return (x, (y, z))<br/>
+u &gt;&gt;= \x -&gt; v &gt;&gt;= \y -&gt; (w &gt;&gt;= \z -&gt; return (y, z)) &gt;&gt;= \(y, z) -&gt; return (x, (y, z))<br/>
+u &gt;&gt;= \x -&gt; v &gt;&gt;= \y -&gt; w &gt;&gt;= \z -&gt; return (y, z) &gt;&gt;= \(y, z) -&gt; return (x, (y, z))<br/>
+u &gt;&gt;= \x -&gt; v &gt;&gt;= \y -&gt; w &gt;&gt;= \z -&gt; return (x, (y, z))<br/>
+[ (x, (y, z)) | x &lt;- u, y &lt;- v, z &lt;- w ]</code></p>
+
+<p><code>[ ((x, y), z) | (x, y) &lt;- [ (x, y) | x &lt;- u, y &lt;- v ], z &lt;- w ]<br/>
+do { (x, y) &lt;- do { x &lt;- u; y &lt;- v; return (x, y) }; z &lt;- w; return ((x, y), z) }<br/>
+(u &gt;&gt;= \x -&gt; v &gt;&gt;= \y -&gt; return (x, y)) &gt;&gt;= \(x, y) -&gt; w &gt;&gt;= \z -&gt; return ((x, y), z)<br/>
+u &gt;&gt;= \x -&gt; (v &gt;&gt;= \y -&gt; return (x, y)) &gt;&gt;= \(x, y) -&gt; w &gt;&gt;= \z -&gt; return ((x, y), z)<br/>
+u &gt;&gt;= \x -&gt; v &gt;&gt;= \y -&gt; return (x, y) &gt;&gt;= \(x, y) -&gt; w &gt;&gt;= \z -&gt; return ((x, y), z)<br/>
+u &gt;&gt;= \x -&gt; v &gt;&gt;= \y -&gt; w &gt;&gt;= \z -&gt; return ((x, y), z)<br/>
+[ ((x, y), z) | x &lt;- u, y &lt;- v, z &lt;- w ]</code></p>
+
+<p><code>fmap asl [ (x, (y, z)) | x &lt;- u, y &lt;- v, z &lt;- w ]<br/>
+(u &gt;&gt;= \x -&gt; v &gt;&gt;= \y -&gt; w &gt;&gt;= \z -&gt; return (x, (y, z))) &gt;&gt;= return . asl<br/>
+u &gt;&gt;= \x -&gt; (v &gt;&gt;= \y -&gt; w &gt;&gt;= \z -&gt; return (x, (y, z))) &gt;&gt;= return . asl<br/>
+u &gt;&gt;= \x -&gt; v &gt;&gt;= \y -&gt; (w &gt;&gt;= \z -&gt; return (x, (y, z))) &gt;&gt;= return . asl<br/>
+u &gt;&gt;= \x -&gt; v &gt;&gt;= \y -&gt; w &gt;&gt;= \z -&gt; return (x, (y, z)) &gt;&gt;= return . asl<br/>
+u &gt;&gt;= \x -&gt; v &gt;&gt;= \y -&gt; w &gt;&gt;= \z -&gt; return (asl (x, (y, z)))<br/>
+u &gt;&gt;= \x -&gt; v &gt;&gt;= \y -&gt; w &gt;&gt;= \z -&gt; return ((x, y), z)<br/>
+[ ((x, y), z) | x &lt;- u, y &lt;- v, z &lt;- w ]</code></p>
+
+<p><code>(f x &gt;&gt;= g) &gt;&gt;= h<br/>
+(f &gt;=&gt; g) x &gt;&gt;= h<br/>
+((f &gt;=&gt; g) &gt;=&gt; h) x</code></p>
+
+<p><code>f x &gt;&gt;= (\y -&gt; g y &gt;&gt;= h)<br/>
+f x &gt;&gt;= (\y -&gt; (g &gt;=&gt; h) y)<br/>
+f x &gt;&gt;= (g &gt;=&gt; h)<br/>
+(f &gt;=&gt; (g &gt;=&gt; h)) x</code></p>
+
+<p><code>f = const u, g = const v, h = const w</code></p>
+
+<p><code>[ (x, (y, z)) | x &lt;- u, y &lt;- v, z &lt;- w ]<br/>
+u &gt;&gt;= \x -&gt; v &gt;&gt;= \y -&gt; w &gt;&gt;= \z -&gt; (x, (y, z))<br/>
+f a &gt;&gt;= \x -&gt; g x &gt;&gt;= \y -&gt; h y &gt;&gt;= \z -&gt; (x, (y, z))<br/>
+(f &gt;=&gt; \x -&gt; g x &gt;&gt;= \y -&gt; h y &gt;&gt;= \z -&gt; (x, (y, z))) a<br/>
+(f &gt;=&gt; \x -&gt; (g &gt;=&gt; \y -&gt; h y &gt;&gt;= \z -&gt; (x, (y, z))) x) a</code></p>
+
+<h2>メモ3</h2>
+
+<p><code>mf &lt;*&gt; mx<br/>
+=&gt; [ f x | f &lt;- mf, x &lt;- mx ]</code></p>
+
+<p><code>pure (,) &lt;*&gt; mx &lt;*&gt; my<br/>
+=&gt; [ g y | g &lt;- (pure (,) &lt;*&gt; mx), y &lt;- my ]<br/>
+=&gt; [ g y | g &lt;- [ f x | f &lt;- return (,), x &lt;- mx ], y &lt;- my ]<br/>
+=&gt; [ g y | g &lt;- [ (x ,) | x &lt;- mx ], y &lt;- my ]<br/>
+=&gt; (mx &gt;&gt;= \x -&gt; return (x ,)) &gt;&gt;= \g -&gt; my &gt;&gt;= \y -&gt; return g y<br/>
+=&gt; mx &gt;&gt;= \x -&gt; return (x ,) &gt;&gt;= \g -&gt; my &gt;&gt;= \y -&gt; return g y<br/>
+=&gt; mx &gt;&gt;= \x -&gt; my &gt;&gt;= \y -&gt; return (x, y)<br/>
+=&gt; [ (x, y) | x &lt;- mx, y &lt;- my ]</code></p>
+
+<p><code>(exp0 &gt;&gt;= \v0 -&gt; exp1 &gt;&gt;= \v1 -&gt; exp2 &gt;&gt;= \v2 -&gt;  ... expn &gt;&gt;= \vn -&gt; expr) &gt;&gt;= expk<br/>
+=&gt; exp0 &gt;&gt;= \v0 -&gt; (exp1 &gt;&gt;= \v1 -&gt; exp2 &gt;&gt;= \v2 -&gt; ... expn &gt;&gt;= \vn -&gt; expr) &gt;&gt;= expk<br/>
+.<br/>
+.<br/>
+.<br/>
+=&gt; exp0 &gt;&gt;= \v0 -&gt; exp1 &gt;&gt;= \v1 -&gt; exp2 &gt;&gt;= \v2 -&gt; ... expn &gt;&gt;= \vn -&gt; expr &gt;&gt;= expk</code></p>
+
+<p><code>[ r | v0 &lt;- m0, v1 &lt;- m1, ..., vn &lt;- mn ]<br/>
+m0 &gt;&gt;= \v0 -&gt; m1 &gt;&gt;= \v1 -&gt; ... mn &gt;&gt;= \vn -&gt; return r<br/>
+(m0 &gt;&gt;= \v0 -&gt; m1) &gt;&gt;= \v1 -&gt; ... mn &gt;&gt;= \vn -&gt; return r<br/>
+[ r | v1 &lt;- [ v | v0 &lt;- m0, v &lt;- m1 ], ... vn &lt;- mn ]</code></p>
+
+<h2>メモ4</h2>
+
+<p><code>(m0 &gt;&gt;= \v0 -&gt; m1 &gt;&gt;= \v1 -&gt; m2 &gt;&gt;= \v2 -&gt;  ... mn &gt;&gt;= \vn -&gt; return r) &gt;&gt;= f<br/>
+=&gt; m0 &gt;&gt;= \v0 -&gt; (m1 &gt;&gt;= \v1 -&gt; m2 &gt;&gt;= \v2 -&gt; ... mn &gt;&gt;= \vn -&gt; return r) &gt;&gt;= f<br/>
+.<br/>
+.<br/>
+.<br/>
+=&gt; m0 &gt;&gt;= \v0 -&gt; m1 &gt;&gt;= \v1 -&gt; m2 &gt;&gt;= \v2 -&gt; ... mn &gt;&gt;= \vn -&gt; return r &gt;&gt;= f<br/>
+=&gt; m0 &gt;&gt;= \v0 -&gt; m1 &gt;&gt;= \v1 -&gt; m2 &gt;&gt;= \v2 -&gt; ... mn &gt;&gt;= \vn -&gt; f r</code></p>
+
+<p><code>[ r'' | r' &lt;- [ r | v0 &lt;- m0, ..., vn &lt;- mn ], r'' &lt;- f r' ]<br/>
+=&gt; [ r'' | r' &lt;- [ (v0, ..., vn) | v0 &lt;- m0, ..., vn &lt;- mn ], r'' &lt;- f r' ]<br/>
+=&gt; [ r'' | v0 &lt;- m0, ..., vn &lt;- mn, r'' &lt;- f (v0, ..., vn) ]</code></p>
+
+<p><code>[ r | v0 &lt;- m0, ..., vn &lt;- mn ]<br/>
+m0 &gt;&gt;= \v0 -&gt; [ r | v1 &lt;- m1, ..., vn &lt;- mn ]</code></p>
+
+<h2>メモ5</h2>
+
+<p><code>[ r | v0 &lt;- m0, ... vk &lt;- [ s | w0 &lt;- n0, ..., wn &lt;- nn ], ..., vn &lt;- mn ]<br/>
+m0 &gt;&gt;= \v0 -&gt; ... m(k-1) &gt;&gt;= \v(k-1) -&gt; [ r | vk &lt;- [ s | w0 &lt;- n0, ..., wn &lt;- nn ], ..., vn &lt;- mn ]<br/>
+m0 &gt;&gt;= \v0 -&gt; ... m(k-1) &gt;&gt;= \v(k-1) -&gt; [ r | (w0, ..., wn) &lt;- [ (w0, ..., wn) | w0 &lt;- n0, ..., wn &lt;- nn ], ..., vn &lt;- mn ]<br/>
+m0 &gt;&gt;= \v0 -&gt; ... m(k-1) &gt;&gt;= \v(k-1) -&gt; [ r | w0 &lt;- n0, ..., wn &lt;- nn, v(k+1) &lt;- m(k+1), ..., vn &lt;- mn ]<br/>
+[ r | v0 &lt;- m0, ..., v(k-1) &lt;- m(k-1), w0 &lt;- n0, ..., wn &lt;- nn, v(k+1) &lt;- m(k+1), ..., vn &lt;- mn ]</code></p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/monad_comprehensions.html"
 	>「拡張機能: MonadComprehensions」へもどる</a>
 <a href="/computer/haskell/web_lecture/for_programmer/monad_to_monoidal_law.html"
 	>「モナド則からモノイダル則を導く」へ</a>
-</p>
