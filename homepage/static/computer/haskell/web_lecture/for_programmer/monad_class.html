@@ -2,6 +2,134 @@
 
 <p>(工事中 0%)</p>
 
+<h2>はじめに</h2>
+
+<p>
+「モナドである」という性質を表現する型クラスMonadがある。
+</p>
+
+<h2>型クラス宣言</h2>
+
+<p>
+モナドであればアプリカティブなのでApplicativeのクラス制約がある。
+クラス関数はモナド関数である
+</p>
+
+<p><code>return :: a -&gt; m a<br/>
+(&gt;&gt;=) :: m a -&gt; (a -&gt; m b) -&gt; m b</code></p>
+
+<p>
+のふたつだ。
+クラス宣言は
+</p>
+
+<p><code>class Applicative m =&gt; Monad m where<br/>
+	<span class="indent1">return :: a -&gt; m a</span><br/>
+	<span class="indent1">(&gt;&gt;=) :: m a -&gt; (a -&gt; m b) -&gt; m b</span></code></p>
+
+<p>のようになる。</p>
+
+<h2>Maybeモナド</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/monad_class.hs"
+	>monad_class.hs</a></p>
+
+<p>
+型Maybeは型クラスMonadのインスタンスだ。
+よって関数mretやmbindを定義する必要はない。
+</p>
+
+<p><code>safeDivM :: Int -&gt; Int -&gt; Maybe Int<br/>
+_ `safeDivM` 0 = Nothing<br/>
+x `safeDivM` y = Just $ x `div` y</code></p>
+
+<p><code>calcM :: Int -&gt; Int -&gt; Int -&gt; Maybe Int<br/>
+calcM a b c =<br/>
+	<span class="indent1">a `safeDivM` b &gt;&gt;= \x -&gt;</span><br/>
+	<span class="indent1">x `safeDivM` c</span></code></p>
+
+<h2>Errorモナド</h2>
+
+<p>
+エラーのときにエラーメッセージを返すようにする。
+</p>
+
+<p><code>data Try a = Error String | Success a deriving Show</code></p>
+
+<p>
+これを型クラスFunctor, Applicative, Monadのインスタンスにする。
+型クラスFunctorとApplicativeのクラス関数は効率を考えなければ、
+型クラスMonadのクラス関数から機械的に定義できる。
+まずは型クラスFunctorのインスタンス宣言からだ。
+</p>
+
+<p><code>instance Functor Try where<br/>
+	<span class="indent1">fmap = (=&lt;&lt;) . (return .)</span></code></p>
+
+<p>
+(=&lt;&lt;)は(&gt;&gt;=)の引数をいれかえたものだ。
+使いかたによってはこちらのほうが都合がいいので用意されている。
+定義は
+</p>
+
+<p><code>(=&lt;&lt;) :: (a -&gt; m b) -&gt; m a -&gt; m b<br/>
+(=&lt;&lt;) = flip (&gt;&gt;=)</code></p>
+
+<p>
+となるだろう。
+fmap = (=&lt;&lt;) . (return .)については明示的な引数を追加して変形してみよう。
+何をしているかわかるはずだ。
+次に型クラスApplicativeのインスタンス宣言を見てみよう。
+</p>
+
+<p><code>instance Applicative Try where<br/>
+	<span class="indent1">pure = return</span><br/>
+	<span class="indent1">tf &lt;*&gt; tx =</span><br/>
+	<span class="indent2">tf &gt;&gt;= \f -&gt;</span><br/>
+	<span class="indent2">tx &gt;&gt;= \x -&gt;</span><br/>
+	<span class="indent2">return $ f x</span></code></p>
+
+<p>
+これらのインスタンス宣言に使われているモナド関数の定義は
+型クラスMonadのインスタンス宣言のなかで行われる。
+</p>
+
+<p><code>instance Monad Try where<br/>
+	<span class="indent1">return = Success</span><br/>
+	<span class="indent1">Error em &gt;&gt;= _ = Error em</span><br/>
+	<span class="indent1">Success x &gt;&gt;= f = f x</span></code></p>
+
+<p>
+これで型Tryは型クラスFunctor, Applicative, Monadのインスタンスになった。
+安全なわり算の例で試してみよう。
+</p>
+
+<p><code>safeDivE :: Int -&gt; Int -&gt; Try Int<br/>
+x `safeDivE` 0 = Error $ show x ++ " is divided by zero\n"<br/>
+x `safeDivE` y = Success $ x `div` y</code></p>
+
+<p>a / b / cを安全に計算してみよう。</p>
+
+<p><code>calcE :: Int -&gt; Int -&gt; Int -&gt; Try Int<br/>
+calcE a b c =<br/>
+	<span class="indent1">a `safeDivE` b &gt;&gt;= \x -&gt;</span><br/>
+	<span class="indent1">x `safeDivE` c</span><br/>
+	</code></p>
+
+<p>試してみる。</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; calcE 84 5 7<br/>
+Success 2<br/>
+*Main&gt; calcE 92 0 8<br/>
+Error "92 is divided by zero\n"<br/>
+*Main&gt; calcE 71 4 0<br/>
+Error "17 is divided by zero\n"</code></p>
+
+<h2>Stateモナド</h2>
+
+<p>(...ここから書き始める...)</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/applicative_class.html"
 	>「型クラス: アプリカティブ」へもどる</a>
