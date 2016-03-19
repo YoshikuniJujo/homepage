@@ -2,9 +2,191 @@
 
 <p>(工事中 0%)</p>
 
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/Lion.hs"
+	>Lion.hs</a></p>
+
+<h2>はじめに</h2>
+
+<p>モナド関数の型は</p>
+
+<p><code>return :: a -&gt; m a<br/>
+(&gt;&gt;=) :: m a -&gt; (a -&gt; m b) -&gt; m b</code></p>
+
+<p>
+のようになっている。
+モナドのインターフェースがモナド関数のみだったとする。
+すると一度文脈がついた値からは文脈を外すことはできない。
+(a -&gt; m b)型の関数によって文脈のつかない値を取り出して使うことはできるが、
+取り出された値は必ず再び文脈のついた値として返される。
+</p>
+
+<p>
+この性質によって安全にライオンの世話をしてみよう。
+</p>
+
+<h2>モジュール</h2>
+
+<p>
+Haskellでは値に対するアクセスの制御にはモジュールを使う。
+モジュール名はLionとする。
+ファイル名はモジュール名に.hsをつけた名前にするといい。
+ここではLion.hsとする。
+ソースファイルの先頭に
+</p>
+
+<p><code>{-# LANGUAGE MonadComprehensions #-}</code></p>
+
+<p><code>module Lion where</code></p>
+
+<p>としておこう。</p>
+
+<small>
+GHC-7.8だとimport Control.Applicativeが必要だが7.10以降なら不要と思われる。
+あとできちんと確認すること!
+</small>
+
+<h2>ライオン</h2>
+
+<p>
+ライオンは名前と状態を持つものとする。
+名前はStringとし状態はHungry, Normal, Fullの3つをとるものとする。
+</p>
+
+<p><code>data Lion = Lion Name State deriving Show</code></p>
+
+<p><code>type Name = String<br/>
+data State = Hungry | Normal | Full deriving show</code></p>
+
+<h2>檻</h2>
+
+<p>値構築子Cagedのついた値は檻に入っていることにする。</p>
+
+<p><code>newtype Caged a = Caged a deriving Show</code></p>
+
+<h3>ボイラープレート</h3>
+
+<p>
+型クラスFunctor, Applicativeのインスタンス宣言はモナドに対しては
+ボイラープレートとなる。
+</p>
+
+<p><code>instance Functor Caged where<br/>
+	<span class="indent1">fmap = (=&lt;&lt;) . (return .)</span></code></p>
+
+<p><code>instance Applicative Caged where<br/>
+	<span class="indent1">pure = return</span><br/>
+	<span class="indent1">mf &lt;*&gt; mx = [ f x | f &lt;- mf, x &lt;- mx ]</span></code></p>
+
+<h3>モナド</h3>
+
+<p>
+このモナドは今まで見てきたなかで一番単純なものとなる。
+関数returnは単にそのまま「檻に入れる」だけだし、
+演算子(&gt;&gt;=)は値をとりだして関数を適用するだけだ。
+</p>
+
+<p><code>instance Monad Caged where<br/>
+	<span class="indent1">return = Caged</span><br/>
+	<span class="indent1">Caged x &gt;&gt;= f = f x</span></code></p>
+
+<h2>ライオンを生み出す</h2>
+
+<p>ライオンは檻のなかで生まれる。</p>
+
+<p><code>lion :: Name -&gt; Caged Lion<br/>
+lion n = Caged $ Lion n Hungry</code></p>
+
+<h2>ライオンの世話をする</h2>
+
+<p>
+ライオンの状態は餌をあげるとHungryからNormalに、NormalからFullになる。
+遊んであげるとFullからNormalに、NormalからHungryになる。
+</p>
+
+<p><code>feed, play :: Lion -&gt; Lion<br/>
+feed (Lion n Hungry) = Lion n Normal<br/>
+feed (Lion n _) = Lion n Full</code></p>
+
+<p><code>play (Lion n Full) = Lion n Normal<br/>
+play (Lion n _) = Lion n Hungry</code></p>
+
+<h2>エクスポートリスト</h2>
+
+<p><code>module Lion where</code>の行を</p>
+
+<p><code>module Lion (Lion, Caged, lion, feed play) where</code></p>
+
+<p>
+としよう。
+型LionやCagedはエクスポートしているが、
+値構築子LionやCagedはエクスポートしていないことに注意しよう。
+</p>
+
+<h2>檻の外にライオンが?!</h2>
+
+<p>
+これでライオンが檻の外に出る心配はない。
+</p>
+
+<p><code>% ghci Lion.hs<br/>
+*Lion&gt; Lion "denger" Hungry<br/>
+Lion "denger" Hungry</code></p>
+
+<p>
+危ない!ライオンが檻の外にいる。
+対話環境のモジュール名Lionの左に*がある。
+*Lionは「モジュールLionのなかにいるよ」という意味だ。
+エクスポートしていない値も使うことができる。
+モジュールLionの外からこのモジュールをインポートしている状態にしよう。
+</p>
+
+<p><code>*Lion&gt; :m Lion<br/>
+Prelude Lion&gt; Lion "denger" Hungry<br/>
+&lt;interactive&gt;:X:Y: Not in scope: data constructor `Lion'<br/>
+&lt;interactive&gt;:X:Y: Not in scope: data constructor `Hungry'</code></p>
+
+<p>
+これでライオンが檻の外をうろつくことはなくなった。
+ライオンが生まれるよ!
+</p>
+
+<p><code>Prelude Lion&gt; lion "Simba"<br/>
+Caged (Lion "Simba" Hungry)<br/>
+Prelude Lion&gt; let simba = it</code></p>
+
+<h2>必ず檻にもどす</h2>
+
+<p>餌をあげてみよう。</p>
+
+<p><code>Prelude Lion&gt; feed simba<br/>
+(型エラーの詳細はあとで書く)<br/>
+Prelude Lion&gt; simba &gt;&gt;= feed<br/>
+(型エラーの詳細はあとで書く)</code></p>
+
+<p>
+型エラーとなる。
+必ずreturnで檻にもどす必要がある。
+</p>
+
+<p><code>Prelude Lion&gt; simba &gt;&gt;= return . feed<br/>
+Caged (Lion "Simba" Normal)<br/>
+Prelude Lion&gt; it &gt;&gt;= return . feed<br/>
+Caged (Lion "Simba" Full)<br/>
+Prelude Lion&gt; it &gt;&gt;= return . play<br/>
+Caged (Lion "Simba" Normal)<br/>
+Prelude Lion&gt; it &gt;&gt;= return . play<br/>
+Caged (Lion "Simba" Hungry)</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+値構築子をエクスポートせずにモナドインターフェースだけを公開することで
+一度文脈のなかにいれた値の文脈を外せないようにできる。
+</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/monad_log.html"
 	>「モナド: 計算のログ」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/monad_summary.html"
+	>「モナド: まとめ」へ</a>
 </p>
