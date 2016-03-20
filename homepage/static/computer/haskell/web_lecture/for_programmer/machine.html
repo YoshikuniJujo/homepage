@@ -2,9 +2,80 @@ Machine型
 
 <p>(工事中 0%)</p>
 
+<h2>はじめに</h2>
+
+<p>
+出力を行うMachine型を考える。
+Machine型は関数nextでつないでいくことができる。
+「出力1をして出力2をして...」のようにつなぐことで
+求める出力を組みたてることができる。
+</p>
+
+<h2>何も考えずに</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/Machine.hs"
+	>Machine.hs</a></p>
+
+<p>
+Machine.hsをダウンロードしてカレントディレクトリに置くか、
+あるいは何も考えずに以下のコードを作成しよう。
+名前はMachine.hsとしておく。
+</p>
+
+<p><code>module Machie (Machine, runMachine, next, putHello, putWorld) where</code></p>
+
+<p><code>newtype Machine = Machine { runMachine :: IO () }</code></p>
+
+<p><code>putHello, putWorld :: Machine<br/>
+putHello = Machine $ putStrLn "Hello"<br/>
+putWorld = Machine $ putStrLn "World"</code></p>
+
+<p><code>next :: Machine -&gt; Machine -&gt; Machine<br/>
+next (Machine m1) (Machine m2) = Machine $ m1 &gt;&gt; m2</code></p>
+
+<p>
+このモジュールが何をしているのかは今は考えないようにしよう。
+とにかくこのモジュールがエクスポートしている
+型Machine, 関数runMachine, next, putHello, putWorldがはじめから存在しているとして
+考えることにする。
+</p>
+
+<h2>意味づけ</h2>
+
+<p>
+モジュールMachineをインポートした世界について考えよう。
+Machine型とその値putHelloとputWorldが存在する。
+Machine型の値は対話環境でrunMachineすると実行される。
+</p>
+
+<h2>試してみる</h2>
+
+<p><code>% ghci Machine.hs<br/>
+*Machine&gt; :m Machine<br/>
+Prelude Machine&gt; runMachine putHello<br/>
+Hello<br/>
+Prelude Machine&gt; runMachine putWorld<br/>
+World<br/>
+Prelude Machine&gt; runMachine $ putHello `next` putWorld<br/>
+Hello<br/>
+World</code></p>
+
+<p>
+"Hello"を出力する機械putHelloと"World"を出力する機械putWorldがある。
+これらを関数nextでつないで"Hello"を出力したあとに"World"を出力する機械を
+作った。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+特定の文字列を出力する関数がありそれを次々につなげていく仕組みを作った。
+「これをして次にあれをして」という処理を行うことができる。
+</p>
+
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/about_io.html"
 	>「入出力について」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/machine_problem.html"
+	>「Machine型の問題点」へ</a>
 </p>

@@ -1,4 +1,4 @@
-module Machine (Machine, next, putHello, putWorld) where
+module Machine (Machine, runMachine, next, putHello, putWorld) where
 
 newtype Machine = Machine { runMachine :: IO () }
 
