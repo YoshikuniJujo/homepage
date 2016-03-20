@@ -1,10 +1,96 @@
 IOMcn型: 普通の関数をつなぐ
 
-<p>(工事中 0%)</p>
+<p>(工事中 60%)</p>
+
+<h2>はじめに</h2>
+
+<p>IOMcn型の機械は(&gt;&gt;&gt;)で次々とつないでいける。</p>
+
+<p><code>m1 &gt;&gt;&gt; m2 &gt;&gt;&gt; m3 &gt;&gt;&gt; m4 &gt;&gt;&gt; ...</code></p>
+
+<p>
+途中に普通の関数をはさみたいことがある。
+たとえば入力された文字列を逆順にして表示するようなときには、
+getLineとputLineのあいだに関数reverseをはさみたくなる。
+このようなときには関数reverseを機械に変換すればいい。
+</p>
+
+<h2>関数arr</h2>
+
+<p>モジュールIOMcnには関数arrが用意されている。</p>
+
+<p><code>arr :: (a -&gt; b) -&gt; IOMcn a b</code></p>
+
+<p>
+関数arrは普通の関数を機械に変換する。
+たとえば
+</p>
+
+<p><code>arr reverse</code></p>
+
+<p>
+は文字列を入力するとそれを逆順にして出力する機械になる。
+ユーザがうちこんだ文字列を逆順にしてコンソールに表示する機械は
+</p>
+
+<p><code>getLine &gt;&gt;&gt; arr reverse &gt;&gt;&gt; putLine</code></p>
+
+<p>
+となる。
+対話環境で試してみよう。
+</p>
+
+<p><code>% ghci IOMcn.hs<br/>
+*IOMcn&gt; runIOMcn $ getLine &gt;&gt;&gt; arr reverse &gt;&gt;&gt; putLine<br/>
+(適当に入力ここではhello)hello<br/>
+olleh</code></p>
+
+<h2>値を入力する</h2>
+
+<p>
+関数がIOMcnに変換できるということは値を機械に流しこめるということだ。
+文字列"Hello"を機械に流しこむには
+</p>
+
+<p><code>arr (const "Hello") &gt;&gt;&gt; putLine</code></p>
+
+<p>
+とする。
+引数を無視して"Hello"を返す関数を機械に変換する。
+入力値を無視して"Hello"を出力する機械となる。
+Machine型のときに見た機械putHello, putWorldは
+</p>
+
+<p><code>putHello, putWorld :: IOMcn () String<br/>
+putHello = arr (const "Hello") &gt;&gt;&gt; putLine<br/>
+putWorld = arr (const "World") &gt;&gt;&gt; putLine</code></p>
+
+<p>
+と定義できる。
+対話環境で試してみよう。
+</p>
+
+<p><code>*IOMcn&gt; runIOMcn $ arr (const "Hello") &gt;&gt;&gt; putLine<br/>
+Hello<br/>
+*IOMcn&gt; runIOMcn $ arr (const "World") &gt;&gt;&gt; putLine<br/>
+World</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+機械と普通の関数をつなぎたいときがある。
+そのようなときには
+</p>
+
+<p><code>arr :: (a -&gt; b) -&gt; IOMcn a b</code></p>
+
+<p>
+を使って普通の関数を機械に変えてやればいい。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/iomcn_intro.html"
 	>「IOMcn型: 導入」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/iomcn_greeting.html"
+	>「IOMcn型: 秒針の偶奇であいさつを変える」へ</a>
 </p>

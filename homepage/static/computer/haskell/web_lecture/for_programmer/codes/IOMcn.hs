@@ -1,9 +1,11 @@
 module IOMcn (
-	IOMcn, runIOMcn, (>>>),
-	putHello, putWorld, getLine, getInt, putLine) where
+	IOMcn, runIOMcn, (>>>), arr,
+	getLine, getInt, putLine, isEven) where
 
 import Prelude hiding (getLine)
 import qualified Prelude
+import Control.Applicative
+import Data.Time
 
 newtype IOMcn a b = IOMcn { getIOMcn :: a -> IO b }
 
@@ -13,9 +15,8 @@ runIOMcn m = getIOMcn m ()
 (>>>) :: IOMcn a b -> IOMcn b c -> IOMcn a c
 m1 >>> m2 = IOMcn $ \x -> getIOMcn m1 x >>= getIOMcn m2
 
-putHello, putWorld :: IOMcn () ()
-putHello = IOMcn . const $ putStrLn "Hello"
-putWorld = IOMcn . const $ putStrLn "World"
+arr :: (a -> b) -> IOMcn a b
+arr f = IOMcn $ return . f
 
 getLine :: IOMcn () String
 getLine = IOMcn $ const Prelude.getLine
@@ -25,3 +26,6 @@ getInt = IOMcn . const $ fmap read Prelude.getLine
 
 putLine :: IOMcn String ()
 putLine = IOMcn putStrLn
+
+isEven :: IOMcn () Bool
+isEven = IOMcn . const $ even . floor . utctDayTime <$> getCurrentTime
