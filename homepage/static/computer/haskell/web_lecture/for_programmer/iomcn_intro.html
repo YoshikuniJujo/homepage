@@ -1,0 +1,205 @@
+IOMcn型: 導入
+
+<p>(工事中 60%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+Machine型でユーザからの文字列のうちこみを扱うことを考える。
+Machine型だと機能的に問題があり、
+本来なら型エラーとなるはずのエラーが実行時エラーとなってしまうことを説明する。
+</p>
+
+<h2>入力と出力をつなぐ</h2>
+
+<p>
+関数nextはふたつの動作をつなぐ関数だった。
+動作1と動作2をつないで「動作1のあとに動作2を行う」という機械を作る。
+今度は動作1の出力と動作2の入力とをつなぐことを考えよう。
+</p>
+
+<p><code>(&gt;&gt;&gt;) :: Machine -&gt; Machine -&gt; Machine</code></p>
+
+<p>
+のような演算子がありこれはひとつめのMachineが出力する値を
+ふたつめのMachineの入力とするような働きをするものとする。
+</p>
+
+<p><code>getLine :: Machine</code></p>
+
+<p><code>putLine :: Machine</code></p>
+
+<p>
+のようにMachine型の値がふたつある。
+getLineはユーザのうちこんだ文字列をうけとりそれを出力とする。
+putLineは入力として文字列をうけとりコンソールに表示する。
+するとユーザのうちこんだ文字列をコンソールに表示する動作は
+</p>
+
+<p><code>getLine &gt;&gt;&gt; putLine</code></p>
+
+<p>
+のように書ける。
+</p>
+
+<h2>型エラーのチェック</h2>
+
+<p>ここで</p>
+
+<p><code>getInt :: Machine</code></p>
+
+<p>
+がありこれはユーザのうちこんだ文字列を数値に変換し出力とする機械とする。
+そして
+</p>
+
+<p><code>getInt &gt;&gt;&gt; putLine</code></p>
+
+<p>
+のようにしたとき機械putLineは入力として文字列を期待しているので、
+数値をわたされると予測できない動作をする。
+つまり型システムでチェックされない型エラーが生じるということだ。
+このようなことはさけたい。
+Machine型のかわりに機械への入力値と出力値のそれぞれの型を指定する
+</p>
+
+<p><code>IOMcn a b</code></p>
+
+<p>
+を考えよう。
+ここでひとつめの型引数aはこの機械への入力値の型を示し、
+ふたつめの型引数bはこの機械からの出力値の型を示す。
+Machine型ではなくIOMcn型で型を書きなおすと
+</p>
+
+<p><code>(&gt;&gt;&gt;) :: IOMcn a b -&gt; IOMcn b c -&gt; IOMcn a c<br/>
+getInt :: IOMcn () Int<br/>
+putLine :: IOMcn String ()</code></p>
+
+<p>
+となる。
+このようにすると
+</p>
+
+<p><code>getInt &gt;&gt;&gt; putLine</code></p>
+
+<p>
+はgetIntからは型変数bはIntとなるのに対して、
+putLineからは型変数bがStringであることを期待されるので
+型エラーとなる。
+つまり、おかしなつなぎかたは、ちゃんと型エラーとなる。
+</p>
+
+<h2>正しいつなぎかた</h2>
+
+<p>
+型エラーになるようなつなぎかたを見た。
+それに対して
+</p>
+
+<p><code>getLine :: IOMcn () String<br/>
+putLine :: IOMcn String ()<br/>
+getLine &gt;&gt;&gt; putLine</code></p>
+
+<p>
+のようなつなぎかたはgetLineの出力値の型Stringと
+putLineの入力値の型Stringとが一致するので型エラーは生じない。
+</p>
+
+<h2>何も考えずに</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/IOMcn.hs"
+	>IOMcn.hs</a></p>
+
+<p>
+モジュールMachineのときと同じように
+IOMcn.hsをカレントディレクトリにダウンロードする。
+または以下のソースファイルを何も考えずに作成しよう。
+</p>
+
+<p><code>module IOMcn (<br/>
+	<span class="indent1">IOMcn, runIOMcn, (&gt;&gt;&gt;),</span><br/>
+	<span class="indent1">putHello, putWorld, getLine, getInt, putLine) where</span></code></p>
+
+<p><code>import Prelude hiding (getLIne)<br/>
+import qualified Prelude</code></p>
+
+<p><code>newtype IOMcn a b = IOMcn { getIOMcn :: a -&gt; IO b }</code></p>
+
+<p><code>runIOMcn :: IOMcn () () -&gt; IO ()<br/>
+runIOMcn m = getIOMcn m ()</code></p>
+
+<p><code>(&gt;&gt;&gt;) :: IOMcn a b -&gt; IOMcn b c -&gt; IOMcn a c<br/>
+m1 &gt;&gt;&gt; m2 = IOMcn $ \x -&gt; getIOMcn m1 x &gt;&gt;= getIOMcn m2</code></p>
+
+<p><code>putHello, putWorld :: IOMcn () ()<br/>
+putHello = IOMcn . const $ putStrLn "Hello"<br/>
+putWorld = IOMcn . const $ putStrLn "World"</code></p>
+
+<p><code>getLine :: IOMcn () String<br/>
+getLine = IOMcn $ const Prelude.getLine</code></p>
+
+<p><code>getInt :: IOMcn () Int<br/>
+getInt = IOMcn . const $ fmap read Prelude.getLine</code></p>
+
+<p><code>putLine :: IOMcn String ()<br/>
+putLIne = IOMcn putStrLn</code></p>
+
+<h2>対話環境で試してみる</h2>
+
+<p>対話環境で試してみよう。</p>
+
+<p><code>% ghci IOMcn.hs<br/>
+*IOMcn&gt; runIOMcn $ getLine &gt;&gt;&gt; putLine<br/>
+(適当な文字列を入力し改行ここではhello)hello<br/>
+hello</code></p>
+
+<p>
+キーボードからうちこんだ文字列がgetLineでうけとられその出力となり、
+putLineの入力となりコンソールに表示される。
+</p>
+
+<p><code>*IOMcn&gt; runIOMcn $ getInt &gt;&gt;&gt; putLine<br/>
+(...エラーメッセージはあとで書く...)</code></p>
+
+<p>文字列と数値とで一致しない型なので型エラーとなる。</p>
+
+<h2>まとめ</h2>
+
+<p>
+機械には入力と出力とがある。
+機械1の出力と機械2の出力とをつないで新たな機械を合成することを考える。
+Machine型で考えると合成関数は
+</p>
+
+<p><code>(&gt;&gt;&gt;) :: Machine -&gt; Machine -&gt; Machine</code></p>
+
+<p>
+のようになる。
+しかし機械に入力される値や出力される値には型があり
+その機械で扱えない型の値をわたされると実行時エラーとなってしまう。
+これは型システムによる型チェックをすりぬけていることになる。
+きちんと型チェックを働かせるためにはMachine型ではなく
+</p>
+
+<p><code>IOMcn a b</code></p>
+
+<p>
+のように入力値や出力値の型を指定できるIOMcn型を扱う必要がある。
+このとき機械をつなぐ関数の型は
+</p>
+
+<p><code>(&gt;&gt;&gt;) :: IOMcn a b -&gt; IOMcn b c -&gt; IOMcn a c</code></p>
+
+<p>
+となる。
+このように機械の型を入力値、出力値によって細かく分類することで、
+型エラーをきちんとチェックすることが可能になる。
+</p>
+
+<p>
+<a href="/computer/haskell/web_lecture/for_programmer/machine.html"
+	>「Machine型」へもどる</a>
+<a href="/computer/haskell/web_lecture/for_programmer/iomcn_normal.html"
+	>「IOMcn型: 普通の関数をつなぐ」へ</a>
+</p>
