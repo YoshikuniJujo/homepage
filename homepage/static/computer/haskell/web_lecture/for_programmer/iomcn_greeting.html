@@ -1,10 +1,225 @@
 IOMcn型: 秒針の偶奇であいさつを変える
 
-<p>(工事中 0%)</p>
+<p>(工事中 60%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+ここまでのインターフェースで入力値や出力値についていろいろといじることはできる。
+しかし、出力の値によって機械を選ぶことはできない。
+秒針の偶奇であいさつを変える例を見ながら必要な追加で必要な機械を紹介する。
+</p>
+
+<h2>仕様</h2>
+
+<p>
+偶数の秒には"olleh"を奇数の秒には"hello"を表示する機械を作る。
+今が偶数の秒であることを確認する機械は用意した。
+</p>
+
+<p><code>isEven :: IOMcn () Bool</code></p>
+
+<p>機械isEvenを動かしてみよう。</p>
+
+<p><code>% ghci IOMcn.hs<br/>
+*IOMcn&gt; runIOMcn isEven<br/>
+(その時によってTrueかFalseが表示される)True<br/>
+*IOMcn&gt; runIOMcn isEven<br/>
+False</code></p>
+
+<h2>関数message</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/greeting.hs"
+	>greeting.hs</a></p>
+
+<p>
+関数messageは引数によって違う機械を返す関数だ。
+Bool値をとり
+</p>
+
+<ul>
+<li>Falseなら入力値である文字列をそのまま表示する機械を</li>
+<li>Trueなら入力値の文字列を逆順で表示する機械を</li>
+</ul>
+
+<p>
+それぞれ返す関数だ。
+定義は
+</p>
+
+<p><code>message :: Bool -&gt; IOMcn String ()<br/>
+message True = arr reverse &gt;&gt;&gt; putLine<br/>
+message False = putLine</code></p>
+
+<p>
+となる。
+モジュールIOMcnを使うのでファイルの先頭に
+</p>
+
+<p><code>import IOMcn</code></p>
+
+<p>
+を追加したうえで関数messageの定義を書きこもう。
+</p>
+
+<p><code>% ghci greeting.hs<br/>
+*Main&gt; runIOMcn $ arr (const "hello") &gt;&gt;&gt; message False<br/>
+hello<br/>
+*Main&gt; runIOMcn $ arr (const "hello") &gt;&gt;&gt; message True<br/>
+olleh</code></p>
+
+<h2>どうつなげればいいのか</h2>
+
+<p>今あるのは</p>
+
+<p><code>isEven :: IOMcn () Bool<br/>
+message :: Bool -&gt; IOMcn String ()</code></p>
+
+<p>
+という機械と関数だ。
+これらをどうつなげれば
+</p>
+
+<ul>
+<li>奇数の秒にはhelloを表示し</li>
+<li>偶数の秒にはollehを表示する</li>
+</ul>
+
+<p>
+機械が作れるだろうか。
+機械isEvenの出力であるBool値をうけとるためには
+Bool値を引数としてとる関数messageをBool値を入力とする機械にする必要がある。
+</p>
+
+<p><code>arr message :: IOMcn Bool (IOMcn String ())</code></p>
+
+<p>これと機械isEvenとをつないでみよう。</p>
+
+<p><code>isEven &gt;&gt;&gt; arr message :: IOMcn () (IOMcn String ())</code></p>
+
+<p>これらの型を対話環境で確かめてみよう。</p>
+
+<p><code>*Main&gt; :t message<br/>
+message :: Bool -&gt; IOMcn String ()<br/>
+*Main&gt; :t arr message<br/>
+arr message :: IOMcn Bool (IOMcn String ())<br/>
+*Main&gt; :t isEven &gt;&gt;&gt; arr message<br/>
+isEven &gt;&gt;&gt; message :: IOMcn () (IOMcn String ())</code></p>
+
+<h2>うまくいかない</h2>
+
+<p>機械を出力する機械がある。</p>
+
+<p><code>isEven &gt;&gt;&gt; arr message :: IOMcn () (IOMcn String ())</code></p>
+
+<p>
+今まで学んできた範囲ではこれ以上はどうすることもできない。
+</p>
+
+<h2>機械app</h2>
+
+<p>
+機械の出力になってしまった機械をどう扱えばいいだろうか。
+機械mとそれに対する入力値のタプルを入力として機械mの出力を出力とする機械を考える。
+</p>
+
+<p><code>app :: IOMcn (IOMcn a b, a) b</code></p>
+
+<p>
+これは機械mと値vを入力されると機械mに値vを入力して機械mの出力を出力とする機械だ。
+この機械を使えばいい。
+</p>
+
+<h2>機械appを使うための準備</h2>
+
+<p>
+機械appを使うには
+</p>
+
+<p><code>IOMcn () (IOMcn String ())</code></p>
+
+<p>ではなく</p>
+
+<p><code>IOMcn () (IOMcn String (), String)</code></p>
+
+<p>
+のような機械が必要になる。
+この型の機械は
+</p>
+
+<p><code>isEven :: IOMcn () Bool</code></p>
+
+<p>と</p>
+
+<p><code>IOMcn Bool (IOMcn String (), String)</code></p>
+
+<p>
+のような機械をつなげばいい。
+さらにこのような型の機械は
+</p>
+
+<p>Bool -&gt; (IOMcn String (), String)</p>
+
+<p>
+のような関数にarrを適用すればできる。
+この型の関数を作るのは簡単だ。
+関数sayHelloとして定義してみよう。
+</p>
+
+<p><code>sayHello :: Bool -&gt; (IOMcn String (), String)<br/>
+sayHello b = (message b, "hello")</code></p>
+
+<p>これをgreeting.hsに書きこむ。</p>
+
+<h2>組み立てる</h2>
+
+<p>対話環境で組み立ててみよう。</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; :t arr sayHello<br/>
+arr sayHello :: IOMcn Bool (IOMcn String (), String)<br/>
+*Main&gt; :t isEven &gt;&gt;&gt; arr sayHello<br/>
+isEven &gt;&gt;&gt; arr sayHello :: IOMcn () (IOMcn String (), String)<br/>
+*Main&gt; :t isEven &gt;&gt;&gt; arr sayHello &gt;&gt;&gt; app<br/>
+isEven &gt;&gt;&gt; arr sayHello &gt;&gt;&gt; app :: IOMcn () ()<br/>
+*Main&gt; runIOMcn $ isEven &gt;&gt;&gt; arr sayHello &gt;&gt;&gt; app<br/>
+(時間によってhelloまたはolleh)hello</code></p>
+
+<h2>関数greetingの定義は</h2>
+
+<p>greeting :: IOMcn () ()<br/>
+greeting = isEven &gt;&gt;&gt; arr sayHello &gt;&gt;&gt; app</p>
+
+<p>
+機械isEvenはBool値を出力する。
+機械arr sayHelloはBool値を入力し
+「文字列を入力値とする機械」と文字列とを出力する機械だ。
+関数appは機械mと値xを入力し値xを機械mに入力したときの出力を出力とする機械だ。
+機械greetingの定義をgreeting.hsに書きこむ。
+</p>
+
+<p><code>*Main&gt; :reload<br/>
+*Main&gt; runIOMcn greeting<br/>
+hello<br/>
+*Main&gt; runIOMcn greeting<br/>
+olleh</code></p>
+
+<h2>まとめ</h2>
+
+<p>
+他の機械の出力値によって次の機械を変化させるためには
+</p>
+
+<p><code>(&gt;&gt;&gt;) :: IOMcn a b -&gt; IOMcn b c -&gt; IOMcn a c<br/>
+arr :: (a -&gt; b) -&gt; IOMcn a b</code></p>
+
+<p>だけでなく機械と値を入力とし値を機械に入力する機械appが必要になる。</p>
+
+<p><code>app :: IOMcn (IOMcn a b, a) b</code></p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/iomcn_normal.html"
 	>「IOMcn型: 普通の関数をつなぐ」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/iomcn_summary.html"
+	>「IOMcn型: まとめ」へ</a>
 </p>
