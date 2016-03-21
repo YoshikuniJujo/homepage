@@ -1,10 +1,46 @@
 IOMcn型: まとめ
 
-<p>(工事中 0%)</p>
+<p>(工事中 60%)</p>
+
+<h2>一般の言語では</h2>
+
+<p>
+一般の言語では関数の評価のタイミングで入出力動作を行い、
+入力値は関数の返り値としてうけとる。
+</p>
+
+<h2>参照透過性と遅延評価</h2>
+
+<p>
+関数の返り値として入力値を扱うと参照透過ではなくなる。
+また関数の評価のタイミングで入出力動作を行うと評価の順序が
+コードの意味に影響をおよぼしてしまう。
+</p>
+
+<h2>IOを行う機械</h2>
+
+<p>
+機械を組み立てていき最終的な評価結果が「機械」であるようにする。
+その「機械」は評価と独立した機構で「実行」されると考えることができる。
+機械は入力と出力の型がそれぞれ決められていて
+</p>
+
+<p><code>IOMcn a b</code></p>
+
+<p>
+のような型となる。
+機械に期待される機能をすべて実現するために
+</p>
+
+<p><code>(&gt;&gt;&gt;) :: IOMcn a b -&gt; IOMcn b c -&gt; IOMcn a c<br/>
+arr :: (a -&gt; b) -&gt; IOMcn a b<br/>
+app :: IOMcn (IOMcn a b, a) b</code></p>
+
+<p>のみっつのインターフェースがあればいい。</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/iomcn_greeting.html"
 	>「IOMcn型: 秒針の偶奇であいさつを変える」へもどる</a>
-<a href="/computer/haskell/web_lecture/for_programmer"
-	>「1から学ぶHaskell」トップへ</a>
+<a href="/computer/haskell/web_lecture/for_programmer/io.html"
+	>「IO型」へ</a>
 </p>
