@@ -1,6 +1,201 @@
 IO型
 
-<p>(工事中 0%)</p>
+<p>(工事中 60%)</p>
+
+<h2>はじめに</h2>
+
+<p>
+IOMcn型と(&gt;&gt;&gt;), arr, appでやりたいことは全部できる。
+全部できるがIOMcn型やその道具はもっとスマートな形になおせる。
+</p>
+
+<h2>入力か引数か</h2>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/iomcn_io.hs"
+	>iomcn_io.hs</a></p>
+
+<p><code>IOMcn a b<br/>
+a -&gt; IOMcn () b</code></p>
+
+<p>
+のふたつが相互に変換可能であるということを示す。
+a型の値を入力とする機械とa型の値を引数として機械を返す関数とが同じ意味である
+ということだ。
+</p>
+
+<h2>入力を引数にする</h2>
+
+<p><code>IOMcn a b</code></p>
+
+<p>
+の入力aを外に出して関数の引数とする。
+つまり
+</p>
+
+<p><code>a -&gt; IOMcn () b</code></p>
+
+<p>とする関数を書く。</p>
+
+<p><code>outArg :: IOMcn a b -&gt; a -&gt; IOMcn () b<br/>
+outArg m x = arr (const x) &gt;&gt;&gt; m</code></p>
+
+<p>値xを出力する機械を作りそれと機械mとをつなげている。</p>
+
+<h2>引数を入力にする</h2>
+
+<p><code>a -&gt; IOMcn () b</code></p>
+
+<p>
+の引数aを入力にする。
+つまり
+</p>
+
+<p><code>IOMcn a b</code></p>
+
+<p>
+という機械にする関数を作る。
+</p>
+
+<p><code>inArg :: (a -&gt; IOMcn () b) -&gt; IOMcn a b<br/>
+inArg f = arr (\x -&gt; (f x, ())) &gt;&gt;&gt; app</code></p>
+
+<p>
+まずは
+</p>
+
+<p><code>\x -&gt; (f x, ()) :: a -&gt; (IOMcn () b, ())</code></p>
+
+<p>
+を作る。
+これを機械にする。
+</p>
+
+<p><code>arr (\x -&gt; (f x, ())) :: IOMcn a (IOMcn () b, ())</code></p>
+
+<p>IOMcn () bに()を入力値として与えるために機械appにつなぐ。</p>
+
+<p><code>arr (\x -&gt; (f x, ()))) &gt;&gt;&gt; app :: IOMcn a b</code></p>
+
+<h2>IO型</h2>
+
+<p><code>IOMcn a b<br/>
+a -&gt; IOMcn () b</code></p>
+
+<p>
+のふたつは同じものと考えられる。
+a型の値を入力するとb型の値を出力する機械を
+a型の値を引数として「b型の値を出力する機械」を返り値とする関数に変換できる。
+</p>
+
+<p><code>IOMcn a b</code></p>
+
+<p>という機械をすべて</p>
+
+<p><code>a -&gt; IOMcn () b</code></p>
+
+<p>という形に統一し</p>
+
+<p><code>type IO = IOMcn ()</code></p>
+
+<p>のようにすることができる。</p>
+
+<h2>道具の変換</h2>
+
+<p>outArg, inArgを使うことで</p>
+
+<p><code>(&gt;&gt;&gt;) :: IOMcn a b -&gt; IOMcn b c -&gt; IOMcn a c<br/>
+arr :: (a -&gt; b) -&gt; IOMcn a b</code></p>
+
+<p>のふたつを</p>
+
+<p><code>(&gt;=&gt;) :: (a -&gt; IO b) -&gt; (b -&gt; IO c) -&gt; (a -&gt; IO c)<br/>
+arr' :: (a -&gt; b) -&gt; (a -&gt; IO b)</code></p>
+
+<p>
+におきかえられる。
+これらはモナド関数と同じことだ。
+</p>
+
+<p><code>(&gt;&gt;=) :: IO a -&gt; (a -&gt; IO b) -&gt; IO b<br/>
+return :: a -&gt; IO a</code></p>
+
+<p>機械に値をわたす機械も変換する。</p>
+
+<p><code>app :: IOMcn (IOMcn a b, a) b</code></p>
+
+<p>が</p>
+
+<p><code>(a -&gt; IO b, a) -&gt; IO b</code></p>
+
+<p>となるがこれはたんなる関数適用なのでわざわざ定義する必要はない。</p>
+
+<h2>IO型の機械の例</h2>
+
+<p>文字列を表示する機械に</p>
+
+<p><code>putStrLn :: String -&gt; IO ()</code></p>
+
+<p>
+がある。
+これはインターフェイスとしては文字列をとって機械を返す関数となっている。
+しかし、本質的にはIOMcn String ()である。
+文字列を入力値とする機械をoutArgで変換して
+「文字列を引数とし機械を返り値とする関数」として公開されている。
+</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; putStrLn "Hello"<br/>
+Hello</code></p>
+
+<p>
+対話環境は評価された値が機械だったときにはそれを「実行」する。
+入力についても試してみよう。
+</p>
+
+<p><code>% ghci<br/>
+Prelude&gt; getLine<br/>
+hello<br/>
+"hello"</code></p>
+
+<h2>型クラスMonad</h2>
+
+<p>
+IOはモナドなのでMonadクラスのインスタンスである。
+do記法が使える。
+</p>
+
+<p><code>some :: IO ()<br/>
+some = do<br/>
+	<span class="indent1">str &lt;- getLine</span><br/>
+	<span class="indent1">putStrLn str</span></code></p>
+
+<p>
+手続き型言語のように見える。
+</p>
+
+<h2>まとめ</h2>
+
+<p>
+IOモナドを説明するためにIOMcnという型を導入した。
+IOMcnのインターフェイスは
+</p>
+
+<p><code>(&gt;&gt;&gt;) :: IOMcn a b -&gt; IOMcn b c -&gt; IOMcn a c<br/>
+arr :: (a -&gt; b) -&gt; IOMcn a b<br/>
+app :: IOMcn (IOMcn a b, a) b</code></p>
+
+<p>
+のみっつだ。
+IOMcnを変換することでIOが導きだせる。
+IOはモナドだ。
+</p>
+
+<p><code>(&gt;&gt;=) :: IO a -&gt; (a -&gt; IO b) -&gt; IO b<br/>
+return :: a -&gt; IO a</code></p>
+
+<p>
+HaskellではこのようなIO型が採用されている。
+</p>
 
 <p>
 <a href="/computer/haskell/web_lecture/for_programmer/iomcn_summary.html"
