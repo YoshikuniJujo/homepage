@@ -48,7 +48,7 @@ seven = 7</code></p>
 
 <p>
 関数のほうを変換することを考える。
-関数の型をDouble -&gt; DoubleからInt -&gt; Doubleに変換する。
+関数の型をDouble -&gt; DoubleからInteger -&gt; Doubleに変換する。
 </p>
 
 <p><code>convert :: (Double -&gt; Double) -&gt; (Integer -&gt; Double)</code></p>
@@ -118,7 +118,7 @@ src="/computer/haskell/web_lecture/for_programmer/images/conversion_adapter2.svg
 <ol>
 <li>対話環境で文字'c'を文字コードに変換したものが偶数かどうかをチェックせよ
 	<ul>
-	<li>文字コードへの変換には関数ordを使う(import Data.Charが必要)</li>
+	<li>文字コードへの変換には関数ordを使う(モジュールData.Charが必要)</li>
 	<li>偶数であることの確認には関数evenを使う</li>
 	</ul></li>
 <li>文字コードへの変換を関数even側でするようにせよ</li>
