@@ -97,6 +97,31 @@ diffRecip x y = case x - y of<br/>
 
 <p>-&gt; [式]の代わりに| [真偽値] -&gt; [式]を必要なだけ置く。</p>
 
+<h2>case式にもwhere節を</h2>
+
+<p>意味はないが</p>
+
+<ul>
+<li>文字列に対応する数値を検索し</li>
+<li>それを文字列になおし</li>
+<li>その文字列の正順と逆順を連結する</li>
+</ul>
+
+<p>関数を定義する。</p>
+
+<p><code>nonsense :: String -&gt; [(String, Int)] -&gt; String<br/>
+nonsense k d = case lookup k d of<br/>
+	<span class="indent1">Just n -&gt; s ++ reverse s</span><br/>
+		<span class="indent2">where s = show n</span><br/>
+	<span class="indent1">_ -&gt; "NO VALUE"</span></code></p>
+
+<p>
+case式のJust nにたいするパターンマッチにwhere節をつけた。
+</p>
+
+<p><a href="/computer/haskell/web_lecture/for_programmer/codes/case_where.hs"
+	>case_where.hs</a></p>
+
 <h2>まとめ</h2>
 
 <p>
