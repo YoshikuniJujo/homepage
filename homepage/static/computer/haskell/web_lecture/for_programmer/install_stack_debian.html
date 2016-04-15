@@ -1,0 +1,22 @@
+stackの導入: Debian
+
+<p>64ビットのシステムでのインストールを説明する。
+32ビットのシステムやこのやりかたでうまくいかないときにはLinux一般のやりかたを
+参照すること。</p>
+<h4>FP CompleteのGnuPG鍵を入手</h4>
+<p>FP Complete社のGnuPG鍵を入手する。</p>
+<pre><code>sudo apt-key adv --keyserver keyserevr.ubuntu.com -- recv-keys 575159689BDFB442
+</code></pre>
+<h4>リポジトリの追加</h4>
+<p>適切なリポジトリを追加する。
+Debian 8(amd64)では</p>
+<pre><code>echo 'deb http://download.fpcomplete.com/debian jessie main' | sudo tee /etc/apt/sources.list.d/fpco.list
+</code></pre>
+<p>とし、Debian 7(amd64)では</p>
+<pre><code>echo 'deb http://download.fpcomplete.com/debian wheezy main' | sudo tee /etc/apt/sources.list.d/fpco.list
+</code></pre>
+<p>とする。</p>
+<h4>aptの更新と導入</h4>
+<p>パッケージのデータベースを更新しstackを導入する。</p>
+<pre><code>sudo apt-get update &amp;&amp; sudo apt-get install stack -y
+</code></pre>

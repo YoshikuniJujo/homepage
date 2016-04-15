@@ -1,0 +1,35 @@
+stackの導入: Linux一般
+
+<p>64ビット版と32ビット版とがある。
+実行可能ファイルを直接導入する。
+ディストリビューションによって名前は異なるが</p>
+<pre><code>perl, make, automake, gcc, gmp-devel
+</code></pre>
+<p>などのパッケージがシステムに導入されている必要がある。</p>
+<h4>圧縮ファイルのダウンロード</h4>
+<p>システムにあわせて64ビット版または32ビット版をダウンロードする。</p>
+<p><a href="https://www.stackage.org/stack/linux-x86_64">https://www.stackage.org/stack/linux-x86_64</a>
+<a href="https://www.stackage.org/stack/linux-i386">https://www.stackage.org/stack/linux-i386</a></p>
+<p>多くのシステムはlibgmp4(libgmp.so.3)からgmpに更新されたが
+CentOS/RHEL/Amazon Linux 6.xなどはまだlibgmp4なのでそれらについては</p>
+<p><a href="https://www.stackage.org/stack/linux-x86_64-gmp4">https://www.stackage.org/stack/linux-x86_64-gmp4</a>
+<a href="https://www.stackage.org/stack/linux-i386-gmp4">https://www.stackage.org/stack/linux-i386-gmp4</a></p>
+<p>のほうをダウンロードする。</p>
+<h4>実行可能ファイルstackをコピー</h4>
+<p>圧縮ファイルを拡張し実行可能ファイルstackをコピーする。
+ファイル名などはそれぞれにあわせてかえる。</p>
+<pre><code>% tar xvzf stack-1.0.4.3-linux-x86_64.tar.gz
+% mkdir -p ~/.local/bin
+% cp stack-1.0.4.3-linux-x86_64/stack ~/.local/bin/
+</code></pre>
+<h4>パスを通す</h4>
+<p>つかっているシェルがbashであれば</p>
+<pre><code>% vi .bashrc
+PATH=$HOME/.local/bin:$PATH
+</code></pre>
+<p>となる。
+つかっているシェルがzshであれば</p>
+<pre><code>% vi .zshrc
+path=($HOME/.local/bin(N-/) $path)
+</code></pre>
+<p>となる。</p>

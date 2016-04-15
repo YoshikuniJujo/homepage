@@ -1,0 +1,19 @@
+stackの導入: CentOS/Red Hat/Amazon Linux
+
+<p>64ビットのシステムでのインストールを説明する。
+32ビットのシステムやこのやりかたでうまくいかないときにはLinux一般のやりかたを
+参照すること。</p>
+<h4>適切なリポジトリの追加</h4>
+<p>適切なリポジトリを追加する。
+CentOS7/RHEL7(x86_64)では</p>
+<pre><code>curl -sSL https://s3.amazonaws.com/download.fpcomplete.com/centos/7/fpco.repo | sudo tee /etc/yum.repos.d/fpco.repo
+</code></pre>
+<p>とする。
+CentOS6/RHEL6(x86_64)では</p>
+<pre><code>curl -sSL https://s3.amazonaws.com/download.fpcomplete.com/centos/6/fpco.repo | sudo tee /etc/yum.repos.d/fpco.repo
+</code></pre>
+<p>とする。</p>
+<h4>導入</h4>
+<p>stackを導入する。</p>
+<pre><code>sudo yum -y install stack
+</code></pre>

@@ -1,0 +1,27 @@
+stackの導入: Windows
+
+<p>コマンドstackを走らせるまえに環境変数STACK_ROOTをセットしておくとよい。</p>
+<pre><code>set STACK_ROOT=c:\stack_root
+</code></pre>
+<p>のようにする(らしい、あとでWindows PCでチェックする必要がある)。
+Windowsではファイルパスの長さが260文字までに制限されている。
+STACK_ROOTを短くしておくことでその制限にひっかかることを回避できる。</p>
+<h4>メモ</h4>
+<p>以下を調べる必要がある。</p>
+<ul>
+<li>STACK_ROOT変数はインストーラが設定してくれるかどうか</li>
+<li>STACK_ROOT変数に指定されたディレクトリは自分で用意する必要があるかどうか</li>
+</ul>
+<p><a href="https://www.fpcomplete.com/blog/2015/08/stack-ghc-windows" title="Windowsでstackをつかううえでの問題点">「Windowsでstackをつかううえでの問題点」</a>を読む。</p>
+<h4>インストーラをつかう</h4>
+<p>32ビット用と64ビット用のインストーラが用意されている。</p>
+<p><a href="http://www.stackage.org/stack/windows-i386-installer" title="Windows 32ビット用インストーラ">http://www.stackage.org/stack/windows-i386-installer</a>
+<a href="http://www.stackage.org/stack/windows-x86_64-installer" title="Windows 64ビット用インストーラ">http://www.stackage.org/stack/windows-x86_64-installer</a></p>
+<h4>実行可能ファイルを直接導入する</h4>
+<p>実行可能ファイルを直接導入することもできる。</p>
+<p><a href="http://www.stackage.org/stack/windows-i386" title="Windows 32ビット用実行可能ファイル">http://www.stackage.org/stack/windows-i386</a>
+<a href="http://www.stackage.org/stack/windows-x86_64" title="Windows 64ビット用実行可能ファイル">http://www.stackage.org/stack/windows-x86_64</a></p>
+<p>システムにあわせてどちらかの圧縮ファイルをダウンロードし解凍する。
+stack.exeを%APPDATA%\local\binにコピーする。
+またこのディレクトリにパスを通しておこう。
+これでターミナルからstackコマンドが実行できる。</p>

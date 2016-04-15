@@ -1,0 +1,24 @@
+stackの導入: Mac OS X
+
+<h4>Homebrewをつかう</h4>
+<p>Homebrewをつかっているユーザーであれば</p>
+<pre><code>brew install haskell-stack
+</code></pre>
+<p>とする。
+ビルドずみのバイナリをインストールするはずだ。
+あとで</p>
+<pre><code>stack setup
+</code></pre>
+<p>としたときに</p>
+<pre><code>configure: error: cannot run C compiled programs
+</code></pre>
+<p>のようなエラーがでたときには</p>
+<pre><code>xcode-select --install
+</code></pre>
+<p>とする。</p>
+<h4>実行可能ファイルを直接導入する</h4>
+<p>下記のリンクから圧縮ファイルをダウンロードする。</p>
+<p><a href="https://www.stackage.org/stack/osx-x86_64">https://www.stackage.org/stack/osx-x86_64</a></p>
+<p>展開し実行可能ファイルstackをみつける。
+ホームディレクトリに.local/binディレクトリを作成しそこにstackをコピーする。
+$HOME/.local/binにパスを通しておこう。</p>

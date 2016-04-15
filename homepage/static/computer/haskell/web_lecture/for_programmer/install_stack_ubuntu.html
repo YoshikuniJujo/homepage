@@ -1,0 +1,30 @@
+stackの導入: Ubuntu
+
+<p>64ビットのシステムでのインストールを説明する。
+32ビットのシステムやこのやりかたでうまくいかないときにはLinux一般のやりかたを
+参照すること。</p>
+<h4>FP Complete GnuPG鍵を入手</h4>
+<p>FP Complete社のGnuPG鍵を入手する。</p>
+<pre><code>sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 575159689BEFB442
+</code></pre>
+<h4>適切なリポジトリの追加</h4>
+<p>つかっているUbuntuのバージョンを調べる。</p>
+<pre><code>lsb_release -a
+</code></pre>
+<p>Ubuntu 15.10(amd64)ならば</p>
+<pre><code>echo 'deb http://download.fpcomplete.com/ubuntu wily main' | sudo tee /etc/apt/sources.list.d/fpco.list
+</code></pre>
+<p>とする。Ubuntu 15.04(amd64)ならば</p>
+<pre><code>echo 'deb http://download.fpcomplete.com/ubuntu vivid main' | sudo tee /etc/apt/sources.list.d/fpco.list
+</code></pre>
+<p>とする。Ubuntu 14.10(amd64)ならば</p>
+<pre><code>echo 'deb http://download.fpcomplete.com/ubuntu trusty main' | sudo tee /etc/apt/sources.list.d/fpco.list
+</code></pre>
+<p>とする。Ubuntu 12.04(amd64)ならば</p>
+<pre><code>echo 'deb http://download.fpcomplete.com/ubuntu precise main' | sudo tee /etc/apt/sources.list.d/fpco.list
+</code></pre>
+<p>とする。</p>
+<h4>aptの更新とstackの導入</h4>
+<p>パッケージのデータベースを更新しstackを導入する。</p>
+<pre><code>sudo apt-get update &amp;&amp; sudo apt-get install stack -y
+</code></pre>
