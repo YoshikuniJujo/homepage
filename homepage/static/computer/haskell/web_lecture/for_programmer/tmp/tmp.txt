@@ -1,0 +1,6 @@
+*Main Data.Foldable> operateAll [E $ I 3 :+: I 5, E $ I 8 :*: I 9, E $ I 7 :-:
+I 5, ErasePreLine, E $ I 3 :*: I 5] `runState` []
+([(E (I 3 :+: I 5),Just 8),(E (I 8 :*: I 9),Just 72),(E (I 7 :-: I 5),Just
+2),(ErasePreLine,Nothing),(E (I 3 :*: I 5),Just 15)],["(3 * 5) = 15","(8 * 9)
+= 72","(3 + 5) = 8"])
+*Main Data.Foldable>
