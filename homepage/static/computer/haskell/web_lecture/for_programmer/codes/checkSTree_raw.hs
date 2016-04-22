@@ -35,3 +35,17 @@ checkTreeS _ = pure Tip
 
 checkTree :: (Bounded a, Ord a) => STree a -> STree (a, Bool)
 checkTree = (`evalState` minBound) . checkTreeS
+
+ttraverse :: Applicative f => (a -> f b) -> STree a -> f (STree b)
+ttraverse f (Node l x r) = Node <$> ttraverse f l <*> f x <*> ttraverse f r
+ttraverse _ _ = pure Tip
+
+checkTree' :: (Bounded a, Ord a) => STree a -> STree (a, Bool)
+checkTree' = (`evalState` minBound) . ttraverse check1
+
+ltraverse :: Applicative f => (a -> f b) -> [] a -> f ([] b)
+ltraverse f (x : xs) = (:) <$> f x <*> ltraverse f xs
+ltraverse _ _ = pure []
+
+checkList :: (Bounded a, Ord a) => [a] -> [(a, Bool)]
+checkList = (`evalState` minBound) . ltraverse check1
